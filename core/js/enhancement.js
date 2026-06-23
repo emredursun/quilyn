@@ -51,18 +51,26 @@
 
   /* ── State helpers ──────────────────────────────────────────────── */
   var LMS_KEY = 'pega_lms_state';
-  var SRS_KEY = 'pega_srs_state';
+  var UNIVERSAL_KEY = 'pega_universal_state';
 
   function loadLMS() {
     try { var r = localStorage.getItem(LMS_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; }
-  }
-  function loadSRS() {
-    try { var r = localStorage.getItem(SRS_KEY); return r ? JSON.parse(r) : null; } catch(e) { return null; }
   }
 
   function getActiveTrackId() {
     var h = (location.hash || '').replace(/^#/, '').split('/');
     return h[0] || null;
+  }
+
+  /* SRS lives inside pega_universal_state, keyed by track */
+  function loadSRS() {
+    try {
+      var raw = localStorage.getItem(UNIVERSAL_KEY);
+      if (!raw) return null;
+      var state = JSON.parse(raw);
+      var track = getActiveTrackId() || 'PSA';
+      return (state.tracks && state.tracks[track] && state.tracks[track].srs) || null;
+    } catch(e) { return null; }
   }
 
   function getTrackProgress(trackId) {

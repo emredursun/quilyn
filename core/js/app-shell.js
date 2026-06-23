@@ -75,7 +75,7 @@
     currentMode = 'lms';
     setLmsChrome(true);
     setNavActive('lms');
-    document.title = "PegaAcademy — Offline Learning Management System";
+    document.title = "PegaAcademy — PCBA & PCSA Exam Prep";
     /* Engine already re-rendered sidebar + content; nothing else to do */
   }
 
