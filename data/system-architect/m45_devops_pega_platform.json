@@ -1,0 +1,616 @@
+{
+  "moduleId": "m45",
+  "moduleTitle": "DevOps in Pega Platform",
+  "moduleUrl": "https://academy.pega.com/module/devops-pega-platform/v4/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/devops-pega-platform/v4/quiz/in/96211",
+  "learningObjectives": [
+    "Create and run unit test cases for Rules and Processes using assertions and test suites.",
+    "Use the Test Coverage tool to measure and analyze which Rules are covered by tests."
+  ],
+  "estTime": "~35 min · 3 topics",
+  "topics": [
+    {
+      "title": "Unit tests",
+      "url": "https://academy.pega.com/topic/unit-tests/v6/in/96211/73771",
+      "duration": "15 min"
+    },
+    {
+      "title": "Creating unit test Cases",
+      "url": "https://academy.pega.com/topic/creating-unit-test-cases/v7/in/72681/73771",
+      "duration": "5 min"
+    },
+    {
+      "title": "Test coverage",
+      "url": "https://academy.pega.com/topic/test-coverage/v4/in/96211/73771",
+      "duration": "15 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Unit Testing in Pega",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "Unit testing a Rule is like a quality inspector on a production line testing one specific component (a single bolt, a single circuit) with known inputs before it goes into the final product. The Test Pyramid is the assembly line strategy: test the cheap individual parts (unit tests) most often, and reserve expensive full-car crash tests (end-to-end) for last."
+        },
+        {
+          "type": "concept",
+          "term": "Unit testing — purpose",
+          "description": "Tests individual Rules with test data you provide. Reduces risk of configuration errors propagating to other Rules. Supports continuous delivery. Run via: Actions → Run on the Rule form toolbar in Dev Studio."
+        },
+        {
+          "type": "concept",
+          "term": "Binary file Rules — cannot be unit tested",
+          "description": "For some Rule types such as binary file Rules, Pega does not provide a unit testing option. The 'Run' option is unavailable on their Rule forms."
+        },
+        {
+          "type": "concept",
+          "term": "Rule resolution applies during unit testing",
+          "description": "When you unit test a Rule, Pega applies Rule resolution. If a higher version of the Rule exists, the HIGHER version runs — not necessarily the version you opened."
+        },
+        {
+          "type": "concept",
+          "term": "Test case and assertions",
+          "description": "A reusable test checking whether a Rule returns expected results (created from a test run). Each expected result is an ASSERTION. Types: Property (value), Validation summary (harness errors), Run time (≤ N seconds), Page (page in memory)."
+        },
+        {
+          "type": "concept",
+          "term": "Test suites",
+          "description": "Group multiple test cases to execute in a specified order. Test suites run SEQUENTIALLY — NOT in parallel. Requires a Ruleset configured to store test cases. PegaUnit auto-runs saved unit tests. Run tests on every merge and check-in at minimum."
+        },
+        {
+          "type": "concept",
+          "term": "High-priority vs low-priority test candidates",
+          "description": "HIGH-PRIORITY: predictable results, executed frequently, complex logic requiring less manual effort, Rules with wide usage. LOW-PRIORITY: frequently changed Rules, easy to test manually, too complex to automate, Rules involving database persistence."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 280\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">UNIT TESTING IN PEGA — KEY CONCEPTS</text><rect x=\"10\" y=\"28\" width=\"215\" height=\"108\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">What Can Be Tested</text><text x=\"117\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">✓ Data Transforms</text><text x=\"117\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">✓ Decision Tables / Trees</text><text x=\"117\" y=\"94\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">✓ Flow Actions, Activities</text><text x=\"117\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">✗ Binary file rules (no logic)</text><rect x=\"253\" y=\"28\" width=\"215\" height=\"108\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Rule Resolution</text><text x=\"360\" y=\"68\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Applies normally during unit testing</text><text x=\"360\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Higher version runs</text><text x=\"360\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Ruleset required to SAVE test cases</text><text x=\"360\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">(missing Ruleset = save fails)</text><rect x=\"496\" y=\"28\" width=\"215\" height=\"108\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Test Suites</text><text x=\"603\" y=\"68\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Run SEQUENTIALLY (not parallel)</text><text x=\"603\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Requires SysAdm4 role</text><text x=\"603\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">v8.5+: no recording for new</text><text x=\"603\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Case Types with Create Stage</text><rect x=\"10\" y=\"156\" width=\"700\" height=\"110\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"176\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">Report Visibility: User-Level vs Application-Level</text><rect x=\"30\" y=\"188\" width=\"300\" height=\"62\" rx=\"8\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"180\" y=\"208\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">User-Level</text><text x=\"180\" y=\"228\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Visible to creator only (private)</text><rect x=\"390\" y=\"188\" width=\"300\" height=\"62\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"540\" y=\"208\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"700\">Application-Level</text><text x=\"540\" y=\"228\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Visible to all application users (shared)</text></svg>",
+          "caption": "Unit testing: testable rule types, rule resolution behavior, test suite execution order, and report visibility levels."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Creating Unit Test Cases",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Test cases for Rules",
+          "description": "Convert a unit test run into a reusable test case. Define assertions (expected results). When the test case runs, results are compared to assertions — mismatch → test FAILS."
+        },
+        {
+          "type": "concept",
+          "term": "Test cases for Processes and Case Types",
+          "description": "Actions → Record test Case (toolbar) → step through the flow entering input → click 'Create test Case' (lower-right) to save the recording. Modify pxCapturePropertyIgnore Data Transform to EXCLUDE unwanted properties from the test."
+        },
+        {
+          "type": "concept",
+          "term": "v8.5+ restriction on Case Type test recording",
+          "description": "From Pega v8.5+, recording a test Case for a process that has a Create Stage is NOT possible for NEW Case Types. It only works for Case Types MIGRATED from versions lower than 8.5."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m45-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">CREATING UNIT TEST CASES — 3-STEP WORKFLOW</text><rect x=\"10\" y=\"36\" width=\"200\" height=\"130\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"110\" y=\"62\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">① Select Rule</text><text x=\"110\" y=\"82\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Open the rule to test in</text><text x=\"110\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Dev Studio</text><text x=\"110\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Data Transform, Decision</text><text x=\"110\" y=\"128\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Table, Flow Action, etc.</text><line x1=\"210\" y1=\"101\" x2=\"258\" y2=\"101\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#m45-arr)\"/><rect x=\"260\" y=\"36\" width=\"200\" height=\"130\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"62\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">② Configure Inputs</text><text x=\"360\" y=\"82\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Set mock clipboard values</text><text x=\"360\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">(page, properties)</text><text x=\"360\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">No real data source called</text><text x=\"360\" y=\"128\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Isolation = single-rule logic</text><line x1=\"460\" y1=\"101\" x2=\"508\" y2=\"101\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#m45-arr)\"/><rect x=\"510\" y=\"36\" width=\"200\" height=\"130\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"610\" y=\"62\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">③ Assert Output</text><text x=\"610\" y=\"82\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Define expected property values</text><text x=\"610\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">after rule executes</text><text x=\"610\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"9\" font-weight=\"600\">PASS if output matches ✓</text><text x=\"610\" y=\"128\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"9\" font-weight=\"600\">FAIL if mismatch — pipeline stops ✗</text></svg>",
+          "caption": "3-step unit test case creation: select rule → configure mock inputs → assert expected output."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Test Coverage",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Test Pyramid",
+          "description": "Industry best practice for test strategy. Bottom of pyramid (unit tests): least expensive, easiest to maintain, fastest, should be the MOST tests. Top (end-to-end tests): most expensive, hardest to maintain, slowest, fewest tests. Higher up = higher cost."
+        },
+        {
+          "type": "concept",
+          "term": "Test coverage tool",
+          "description": "Determines how many Rules are covered by tests. User-level report: covered/uncovered Rules for the current user. Application-level report: aggregates results from MULTIPLE USERS — visible in the APPLICATION QUALITY DASHBOARD in Dev Studio."
+        },
+        {
+          "type": "concept",
+          "term": "Test coverage configuration",
+          "description": "Configure quality settings: Dev Studio → Configure → Application → Quality → Settings. Merge reports: Quality → Test Coverage (only the LATEST application-level report per application appears). Role requirement: SysAdm4 needed to run test suites."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 400 240\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"380\" height=\"220\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"200\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Test Pyramid</text><polygon points=\"200,50 340,200 60,200\" fill=\"none\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><line x1=\"110\" y1=\"133\" x2=\"290\" y2=\"133\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\" stroke-dasharray=\"4,3\"/><line x1=\"155\" y1=\"92\" x2=\"245\" y2=\"92\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\" stroke-dasharray=\"4,3\"/><text x=\"200\" y=\"76\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"bold\" fill=\"var(--pa-err)\">End-to-end</text><text x=\"200\" y=\"88\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-err)\">Fewest / Most expensive</text><text x=\"200\" y=\"116\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"bold\" fill=\"var(--pa-brand)\">Integration tests</text><text x=\"200\" y=\"128\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-brand)\">Medium cost &amp; count</text><text x=\"200\" y=\"163\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-ok)\">Unit tests</text><text x=\"200\" y=\"177\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ok)\">Most / Cheapest / Fastest</text><text x=\"200\" y=\"215\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-3)\">Run on every merge &amp; check-in</text></svg>",
+          "caption": "Test Pyramid: unit tests (bottom) = cheapest, fastest, most. End-to-end (top) = most expensive, fewest."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Binary file Rules cannot be unit tested",
+      "trapDescription": "Questions list rule types and ask which CANNOT be unit tested. Candidates mark Flow or Activity (common complex rules). Binary file rules (images, JARs) have no executable logic — they cannot be unit tested.",
+      "bestPractice": "Binary file Rules have no unit test option — the 'Run' action is unavailable on their Rule forms. Not all Rule types support unit testing."
+    },
+    {
+      "title": "Rule resolution applies during unit testing — higher version runs",
+      "trapDescription": "A scenario has two versions of the same rule and asks which runs during a unit test. Candidates assume the base/lower version. Rule resolution applies normally — the highest available version in the context runs.",
+      "bestPractice": "When you unit test a Rule, Pega applies Rule resolution. If a higher version exists, the HIGHER version runs — not the one you opened."
+    },
+    {
+      "title": "Test suites run SEQUENTIALLY — not in parallel",
+      "trapDescription": "Questions ask how test suites execute. Candidates say 'in parallel to save time.' Test suites always run sequentially — order matters and parallel execution is not supported.",
+      "bestPractice": "When running test suites in bulk, they execute SEQUENTIALLY (one at a time in specified order). Parallel execution is not supported."
+    },
+    {
+      "title": "Saving test cases requires a Ruleset configured to store them",
+      "trapDescription": "A question asks why a unit test case cannot be saved. Candidates blame permissions. The actual requirement is a correctly configured Ruleset — without it the save operation fails regardless of user role.",
+      "bestPractice": "You cannot save test cases to a Ruleset not configured to store them. Work with the system administrator to identify the correct Ruleset before recording."
+    },
+    {
+      "title": "v8.5+ restriction: no test recording for new Case Types with Create Stage",
+      "trapDescription": "Questions describe recording a test for a new Case Type in v8.5+. Candidates say it works like earlier versions. v8.5+ prohibits test recording for new Case Types that include a Create Stage — manual test case creation is required.",
+      "bestPractice": "From Pega v8.5+, recording a test case for a process with a Create Stage is NOT possible for NEW Case Types. Only works for Case Types migrated from versions lower than 8.5."
+    },
+    {
+      "title": "User-level vs Application-level report visibility",
+      "trapDescription": "A question asks how to make a report visible to all application users vs. only the creator. Candidates confuse user-level (private) with application-level (shared). Application-level is the correct setting for shared visibility.",
+      "bestPractice": "User-level reports → Coverage history section. Application-level reports (multiple users) → Application Quality Dashboard in Dev Studio."
+    },
+    {
+      "title": "SysAdm4 role required to run test suites",
+      "trapDescription": "Questions ask which role can execute a full test suite. Candidates say 'any developer' or 'PegaRULES:Administrators.' The specific role required is SysAdm4 — a lower privilege role cannot run test suites.",
+      "bestPractice": "A user needs the SysAdm4 role to run test suites in Pega Platform."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m45_q01",
+      "type": "single-select",
+      "scenario": "How do you run a unit test for a Rule in Dev Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Click Actions → Run on the Rule form toolbar"
+        },
+        {
+          "id": "B",
+          "text": "Right-click the Rule in App Explorer and select Test"
+        },
+        {
+          "id": "C",
+          "text": "Navigate to Configure > Application > Quality > Test Coverage"
+        },
+        {
+          "id": "D",
+          "text": "Open the Rule and select PegaUnit from the header menu"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The Run option is on the Rule form toolbar.",
+      "rationale": "To unit test a Rule: Actions → Run on the Rule form toolbar in Dev Studio. This runs the Rule with test data you provide."
+    },
+    {
+      "questionId": "m45_q02",
+      "type": "single-select",
+      "scenario": "A developer unit tests a Decision Table v01.01.01. A higher version v01.02.01 also exists. Which version runs during the test?",
+      "options": [
+        {
+          "id": "A",
+          "text": "v01.02.01 — Rule resolution runs the higher version"
+        },
+        {
+          "id": "B",
+          "text": "v01.01.01 — the version that was opened runs"
+        },
+        {
+          "id": "C",
+          "text": "Both versions run and results are compared"
+        },
+        {
+          "id": "D",
+          "text": "The version in the current branch runs"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Pega applies normal rule resolution even when resolving rules during unit test execution.",
+      "rationale": "When you unit test a Rule, Pega applies Rule resolution. If a higher version exists, the HIGHER version runs — not the one you opened."
+    },
+    {
+      "questionId": "m45_q03",
+      "type": "single-select",
+      "scenario": "A QA lead is setting up the automated test suite for a new Pega application and asks which Rule types cannot be unit-tested. Which Rule type CANNOT be unit tested in Pega Platform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Binary file Rules"
+        },
+        {
+          "id": "B",
+          "text": "Decision Tables"
+        },
+        {
+          "id": "C",
+          "text": "When Rules"
+        },
+        {
+          "id": "D",
+          "text": "Data Transforms"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "One Rule type has no Run option on its form.",
+      "rationale": "Binary file Rules cannot be unit tested — the Run option is unavailable on their Rule forms. Decision Tables, When Rules, and Data Transforms all support unit testing."
+    },
+    {
+      "questionId": "m45_q04",
+      "type": "single-select",
+      "scenario": "A lead SA is explaining test suite execution order to a junior team member who is planning a bulk test run for a Pega application. How are test suites executed when run in bulk in Pega Platform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Sequentially — one at a time in the specified order"
+        },
+        {
+          "id": "B",
+          "text": "In parallel — simultaneously for faster execution"
+        },
+        {
+          "id": "C",
+          "text": "In random order based on test priority"
+        },
+        {
+          "id": "D",
+          "text": "Only the first test suite runs; the rest are queued indefinitely"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Test suites in the Test Runner execute test cases one at a time sequentially.",
+      "rationale": "When you run multiple test suites in bulk in Pega Platform, they execute sequentially — one suite completes before the next begins, in the order specified. Parallel execution of test suites is not supported. This sequential behavior means bulk test runs can take significant time on large applications, and teams should plan pipeline time budgets accordingly."
+    },
+    {
+      "questionId": "m45_q05",
+      "type": "single-select",
+      "scenario": "A developer wants to save a unit test case. What must be true about the target Ruleset?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Ruleset must be configured to store test cases"
+        },
+        {
+          "id": "B",
+          "text": "The Ruleset must be the highest version in the system"
+        },
+        {
+          "id": "C",
+          "text": "The Ruleset must be locked for production"
+        },
+        {
+          "id": "D",
+          "text": "Any unlocked Ruleset can store test cases"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Not all Ruleset types support storing test cases — only specific ones qualify.",
+      "rationale": "In Pega, test cases must be saved into a Ruleset that has been configured to allow test rule storage. If you attempt to save a test case to an unconfigured Ruleset, the platform will prevent the save. In this situation, the correct resolution is to consult the system administrator to identify and configure an appropriate Ruleset for test case storage."
+    },
+    {
+      "questionId": "m45_q06",
+      "type": "single-select",
+      "scenario": "An assertion must verify that a specific page exists in memory after a Rule runs. Which assertion type is used?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Page — tests for the presence of a page in memory"
+        },
+        {
+          "id": "B",
+          "text": "Property — tests the value of a property"
+        },
+        {
+          "id": "C",
+          "text": "Validation summary — tests for harness validation errors"
+        },
+        {
+          "id": "D",
+          "text": "Run time — tests execution duration"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This assertion checks memory state, not property values.",
+      "rationale": "The Page assertion tests for the presence of a specific page in Clipboard memory. Property tests a property value. Validation summary tests for validation errors. Run time checks execution duration."
+    },
+    {
+      "questionId": "m45_q07",
+      "type": "single-select",
+      "scenario": "How do you create a unit test case for a Case Type or Process in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Actions → Record test Case → step through → click 'Create test Case'"
+        },
+        {
+          "id": "B",
+          "text": "Actions → Run on the Rule form toolbar → convert to test case"
+        },
+        {
+          "id": "C",
+          "text": "Configure > Application > Quality > Test Coverage → Record"
+        },
+        {
+          "id": "D",
+          "text": "PegaUnit → New Case Type Test → step through flow"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Process/Case Type tests use recording, not the Run option.",
+      "rationale": "For Processes and Case Types: Actions → Record test Case → step through entering input → click 'Create test Case' (lower-right). This is different from the Actions → Run approach used for individual Rules."
+    },
+    {
+      "questionId": "m45_q08",
+      "type": "single-select",
+      "scenario": "From Pega Platform v8.5 onwards, when is it NOT possible to record a test case for a process?",
+      "options": [
+        {
+          "id": "A",
+          "text": "When the process has a Create Stage in a new Case Type"
+        },
+        {
+          "id": "B",
+          "text": "When the process has more than 10 Stages"
+        },
+        {
+          "id": "C",
+          "text": "When the Case Type is in a locked Ruleset"
+        },
+        {
+          "id": "D",
+          "text": "When the process uses parallel processing"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This restriction applies to v8.5+, a specific Stage type, and new Case Types.",
+      "rationale": "From Pega v8.5+, recording a test case for a process with a Create Stage is not possible for NEW Case Types. It only works for Case Types migrated from versions lower than 8.5."
+    },
+    {
+      "questionId": "m45_q09",
+      "type": "single-select",
+      "scenario": "According to the Test Pyramid, which test type is at the BOTTOM and should represent the MOST tests?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Unit tests"
+        },
+        {
+          "id": "B",
+          "text": "Integration tests"
+        },
+        {
+          "id": "C",
+          "text": "End-to-end tests"
+        },
+        {
+          "id": "D",
+          "text": "Performance tests"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Test pyramid: unit tests at the bottom — cheapest, fastest, and most numerous layer.",
+      "rationale": "Unit tests are at the bottom of the Test Pyramid — least expensive, easiest to maintain, fastest to execute, and should be the most numerous. End-to-end tests are at the top."
+    },
+    {
+      "questionId": "m45_q10",
+      "type": "single-select",
+      "scenario": "Which test coverage report aggregates results from multiple users and appears in the Application Quality Dashboard?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Application-level coverage report"
+        },
+        {
+          "id": "B",
+          "text": "User-level coverage report"
+        },
+        {
+          "id": "C",
+          "text": "Merge coverage report"
+        },
+        {
+          "id": "D",
+          "text": "PegaUnit coverage report"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "One test coverage report type aggregates results from all users across the application.",
+      "rationale": "Application-level coverage reports aggregate results from multiple users and are visible in the Application Quality Dashboard in Dev Studio. User-level reports are visible in the Coverage history section."
+    },
+    {
+      "questionId": "m45_q11",
+      "type": "single-select",
+      "scenario": "What Dev Studio path is used to merge application-level test coverage reports?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Configure > Application > Quality > Test Coverage"
+        },
+        {
+          "id": "B",
+          "text": "Configure > Org & Security > Test Management"
+        },
+        {
+          "id": "C",
+          "text": "App Explorer > Testing > Merge Reports"
+        },
+        {
+          "id": "D",
+          "text": "Configure > Application > Quality > Settings"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Quality > Test Coverage is the merge path.",
+      "rationale": "User-level coverage reports show rules covered for the current user only. Application-level reports aggregate results across all users and are visible in the Application Quality Dashboard in Dev Studio."
+    },
+    {
+      "questionId": "m45_q12",
+      "type": "single-select",
+      "scenario": "Which role does a user need to run test suites in Pega Platform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "SysAdm4"
+        },
+        {
+          "id": "B",
+          "text": "SysAdmin"
+        },
+        {
+          "id": "C",
+          "text": "PegaDeveloper"
+        },
+        {
+          "id": "D",
+          "text": "TestManager"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "It is a specific system administrator role level.",
+      "rationale": "Running test suites and test coverage sessions requires the SysAdm4 role. Lower roles can create and view test cases but cannot execute suite-level test runs or generate coverage reports."
+    },
+    {
+      "questionId": "m45_q13",
+      "type": "multi-select",
+      "scenario": "A Pega developer is building a PegaUnit test suite for a complex Case Type. Which TWO types of artifacts can be included in a PegaUnit test suite?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Unit test cases that validate the behavior of individual Rules such as Data Transforms"
+        },
+        {
+          "id": "B",
+          "text": "Unit test cases that validate Process (Flow) execution paths and outcomes"
+        },
+        {
+          "id": "C",
+          "text": "Load test scripts for simulating concurrent user performance"
+        },
+        {
+          "id": "D",
+          "text": "Integration test harnesses for external REST API endpoint validation"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "PegaUnit focuses on individual Rule and Process validation — not load testing or external integrations.",
+      "rationale": "PegaUnit test suites can contain unit test cases for individual Rules (such as Data Transforms, Decision Tables, and Activities) and for Process (Flow) rules. PegaUnit is not designed for load testing or external API integration testing — those require dedicated performance and integration tooling."
+    },
+    {
+      "questionId": "m45_q14",
+      "type": "multi-select",
+      "scenario": "An SA is reviewing test coverage for a Pega application before release. Which TWO statements correctly describe what the Test Coverage tool provides?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Test Coverage identifies which Rules have been exercised during unit test execution"
+        },
+        {
+          "id": "B",
+          "text": "Test Coverage results reveal untested code paths that may require additional test cases"
+        },
+        {
+          "id": "C",
+          "text": "Test Coverage automatically generates and applies fixes for Rules that fail assertions"
+        },
+        {
+          "id": "D",
+          "text": "Test Coverage measures response time and memory usage for each executed Rule"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Test Coverage is a diagnostic tool — it shows which Rules were hit, not performance metrics or auto-fixes.",
+      "rationale": "The Test Coverage tool tracks which Rules were executed during test runs, highlighting covered versus uncovered paths. This helps the SA identify gaps in test coverage that need additional test cases. It does not auto-fix failing Rules or measure performance metrics like response time or memory."
+    },
+    {
+      "questionId": "m45_q15",
+      "type": "multi-select",
+      "scenario": "A developer is creating a new PegaUnit test case for a Data Transform Rule. Which TWO elements must be configured to make the test case meaningful and executable?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Input values that establish the data context the Rule will execute against"
+        },
+        {
+          "id": "B",
+          "text": "Assertions that define the expected output or property values after the Rule runs"
+        },
+        {
+          "id": "C",
+          "text": "A pipeline target environment where the test will be deployed and executed"
+        },
+        {
+          "id": "D",
+          "text": "A Report Definition to persist test execution results in the Pega database"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Every test case needs a known input and a defined expected output to verify correctness.",
+      "rationale": "A PegaUnit test case requires two core elements: input values that set up the data context (simulating the state the Rule will operate on) and assertions that define what the output should be after the Rule executes. Pipeline targets and Report Definitions are not part of a PegaUnit test case configuration."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Run unit test",
+      "value": "Actions → Run on Rule form toolbar in Dev Studio. Binary file Rules = cannot test. Rule resolution applies (higher version runs)."
+    },
+    {
+      "key": "Assertion types",
+      "value": "Property (value), Validation summary (harness errors), Run time (duration ≤ N sec), Page (page in memory)."
+    },
+    {
+      "key": "Test suites",
+      "value": "Group test cases; run SEQUENTIALLY (not in parallel). Requires Ruleset configured to store test cases. SysAdm4 role needed."
+    },
+    {
+      "key": "Process/Case Type recording",
+      "value": "Actions → Record test Case → step through → 'Create test Case'. v8.5+ restriction: no recording for Create Stage in NEW Case Types."
+    },
+    {
+      "key": "Test Pyramid",
+      "value": "Bottom (unit tests) = cheapest/fastest/most. Top (end-to-end) = most expensive/slowest/fewest."
+    },
+    {
+      "key": "Coverage report types",
+      "value": "User-level → Coverage history section. Application-level (multiple users) → Application Quality Dashboard."
+    },
+    {
+      "key": "Merge path + role",
+      "value": "Configure > Application > Quality > Test Coverage. Only latest app-level report shown. SysAdm4 role required."
+    }
+  ]
+}

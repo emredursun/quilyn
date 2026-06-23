@@ -1,0 +1,492 @@
+{
+  "moduleId": "m31",
+  "moduleTitle": "Creating a child Case",
+  "moduleUrl": "https://academy.pega.com/module/creating-child-case/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/creating-child-case/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Create a child Case during Case processing using a Create Case automation Step.",
+    "Choose between copying data and using a data reference when propagating data from a parent Case to a child Case."
+  ],
+  "estTime": "~15 min · 1 topic",
+  "topics": [
+    {
+      "title": "Child cases",
+      "url": "https://academy.pega.com/topic/child-cases/v6/in/67016",
+      "duration": "20 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Child Cases",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Top-level Case vs. Child Case",
+          "description": "A top-level Case has NO parent but CAN become one. A child Case is created within a parent Case. Example: an Accident Claim Case has children for Vehicle Damage, Medical, and Rental Car — each handled by different parties."
+        },
+        {
+          "type": "analogy",
+          "text": "Child cases are like sub-tasks on a project plan: the parent project (case) cannot be marked complete until all sub-tasks (child cases) are done. In Pega, each child case runs its own independent Life Cycle and can be assigned to different teams — but the parent case waits for all children to resolve before it advances. One sub-task delay holds the whole project."
+        },
+        {
+          "type": "concept",
+          "term": "When to use child Cases",
+          "description": "Use child Cases when work is performed by DIFFERENT PARTIES, follows DIFFERENT REPORTING OPTIONS, operates on DIFFERENT TIME FRAMES, or is COMMON TO MULTIPLE Case Types (reuse)."
+        },
+        {
+          "type": "concept",
+          "term": "Create Case Step",
+          "description": "Add a Create Case Automation Step to the Case Life Cycle to create a child Case. When executed, it creates a child Case of the specified Case Type. Dev Studio provides additional options, including contextual Case creation."
+        },
+        {
+          "type": "concept",
+          "term": "Data propagation — Copy vs. Data reference",
+          "description": "COPY DATA — snapshots parent data at child creation; child is NOT updated if parent changes later. DATA REFERENCE — child data stays synchronized with the parent; requires advanced configuration in Dev Studio."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 420 220\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"400\" height=\"200\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"210\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Parent Case and Child Cases</text><rect x=\"150\" y=\"45\" width=\"120\" height=\"30\" rx=\"8\" fill=\"var(--pa-brand)\" opacity=\"0.25\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"210\" y=\"64\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Parent Case</text><line x1=\"130\" y1=\"75\" x2=\"80\" y2=\"105\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr31)\"/><line x1=\"210\" y1=\"75\" x2=\"210\" y2=\"105\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr31)\"/><line x1=\"290\" y1=\"75\" x2=\"330\" y2=\"105\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr31)\"/><rect x=\"30\" y=\"108\" width=\"100\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"80\" y=\"126\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Child Case 1</text><rect x=\"160\" y=\"108\" width=\"100\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"210\" y=\"126\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Child Case 2</text><rect x=\"285\" y=\"108\" width=\"100\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"335\" y=\"126\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Child Case 3</text><text x=\"210\" y=\"158\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Each child runs its own Life Cycle independently.</text><text x=\"210\" y=\"173\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-err)\">Parent waits for ALL children to resolve before advancing.</text><text x=\"210\" y=\"195\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Create child cases using the Create Case automation shape.</text><defs><marker id=\"arr31\" markerWidth=\"6\" markerHeight=\"6\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 Z\" fill=\"var(--pa-ink-3)\"/></marker></defs></svg>",
+          "caption": "Parent case waits for ALL child cases to resolve. Each child runs its own independent Life Cycle."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Top-level Case has NO parent — but CAN become a parent",
+      "trapDescription": "Candidates confuse top-level Cases with Cases that can never be parents. A top-level Case starts without a parent but can spawn child Cases.",
+      "bestPractice": "Top-level Case = no parent Case above it, but it CAN create child Cases below it (making it a parent). Child Case = has a parent Case."
+    },
+    {
+      "title": "Create Case is an AUTOMATION Step — not a Process or manual Step",
+      "trapDescription": "Questions ask what type of element creates a child case in the Case Life Cycle. Candidates say 'a Process' or 'a manual Step.' Creating a child case is configured as an Automation Step — specifically the 'Create Case' automation shape in the Case Life Cycle.",
+      "bestPractice": "Child Cases are created using a Create Case AUTOMATION Step added to the Case Life Cycle. It executes automatically when the Case reaches that point — no user action required."
+    },
+    {
+      "title": "Copy data = snapshot, NOT synchronized",
+      "trapDescription": "A question asks whether the copied data in a child case updates when the parent case data changes. Candidates say yes. The 'Copy data' option takes a snapshot at child creation time — subsequent changes to the parent are NOT reflected in the child.",
+      "bestPractice": "Copy data captures a SNAPSHOT at the time of child Case creation. If the parent data changes afterward, the child Case data does NOT update — it stays frozen at the copied value."
+    },
+    {
+      "title": "Data reference = synchronized — but requires Dev Studio",
+      "trapDescription": "Questions ask how to keep child case data synchronized with parent data. Candidates say 'use Copy data.' A data reference keeps the child synchronized with the parent, but configuring a data reference requires Dev Studio — it is not available in App Studio.",
+      "bestPractice": "Data references keep child Case data synchronized with the parent. This requires ADVANCED CONFIGURATION IN DEV STUDIO — it cannot be done from App Studio alone."
+    },
+    {
+      "title": "Child Cases have their own independent lifecycle",
+      "trapDescription": "A question asks whether the child case follows the parent case's stages. Candidates say yes. Child Cases have a completely independent Case Life Cycle — they can be configured with different stages, processes, and SLAs from the parent.",
+      "bestPractice": "Child Cases are separate Case Types with their own independent lifecycle, Stages, Processes, and Steps. They may have different time frames, reporting options, and parties involved."
+    },
+    {
+      "title": "Case Type reuse is a key benefit of child Cases",
+      "trapDescription": "Questions ask why child cases are used instead of adding more processes to the parent. Candidates say 'for parallel processing.' Case Type reuse is the primary benefit — an existing Case Type can be reused as a child case without duplicating logic, enabling modular design.",
+      "bestPractice": "One of the four key benefits: implementing a business process in a separate Case Type allows REUSE of that Case Type across multiple parent Case Types — not just within one parent."
+    },
+    {
+      "title": "Four specific situations where child Cases are beneficial",
+      "trapDescription": "Questions ask for valid reasons to use child Cases — candidates confuse them with reasons to use Alternate Stages or optional Processes.",
+      "bestPractice": "Child Cases are for: (1) different parties, (2) different reporting options, (3) different time frames, (4) work common to multiple Case Types. These are distinct from Stage/Process configurations."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m31_q01",
+      "type": "single-select",
+      "scenario": "An auto insurance 'Accident Claim' Case needs separate tracking for vehicle damage (handled by a repair shop) and medical treatment (handled by a clinic). Why is a child Case the right approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Different parties perform different work — child Cases allow each party to have an independent Case lifecycle"
+        },
+        {
+          "id": "B",
+          "text": "The repair shop and clinic must use different applications — child Cases support multi-application workflows"
+        },
+        {
+          "id": "C",
+          "text": "Child Cases are required when a Case has more than two Stages"
+        },
+        {
+          "id": "D",
+          "text": "Child Cases automatically notify external parties without an email Step"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "One of the four child Case use cases is work performed by different parties.",
+      "rationale": "Different parties performing different work is a primary use case for child Cases. Each party (repair shop, clinic) manages their own Case independently. B, C, and D describe incorrect or fabricated reasons."
+    },
+    {
+      "questionId": "m31_q02",
+      "type": "multi-select",
+      "scenario": "A BA is advising a client on when to decompose a complex Case into parent and child Cases. Which TWO situations are valid business reasons to use child Cases in a Pega application?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Work that follows different time frames"
+        },
+        {
+          "id": "B",
+          "text": "Work that is common to multiple Case Types (reuse)"
+        },
+        {
+          "id": "C",
+          "text": "Work that requires more than 10 Steps in a single Process"
+        },
+        {
+          "id": "D",
+          "text": "Work that must be hidden from the parent Case owner"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Four valid reasons: different parties, different reporting, different time frames, reuse across Case Types.",
+      "rationale": "Different time frames and common work across Case Types are both documented reasons for using child Cases. C (Step count) and D (hiding work) are not documented use cases.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m31_q03",
+      "type": "single-select",
+      "scenario": "How does an SA add a child Case to a Case Type in App Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Add a Create Case Automation Step to the Case Life Cycle"
+        },
+        {
+          "id": "B",
+          "text": "Add a child Case Type in the Stage properties panel"
+        },
+        {
+          "id": "C",
+          "text": "Configure a Case hierarchy in the Case Type settings under the Relationships tab"
+        },
+        {
+          "id": "D",
+          "text": "Create a When Rule that triggers Case creation when conditions are met"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Child Cases are created using a specific Automation Step type.",
+      "rationale": "The Create Case Automation Step is the mechanism for creating child Cases within the Case Life Cycle. B, C, and D describe incorrect or non-existent configuration paths."
+    },
+    {
+      "questionId": "m31_q04",
+      "type": "single-select",
+      "scenario": "A Pega developer is designing a complex insurance application with parent Cases that spawn child Cases for sub-investigations. The developer asks an SA to define what a top-level Case is in relation to this hierarchy. What is a top-level Case in Pega Platform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Case that has no parent Case but can become a parent by creating child Cases"
+        },
+        {
+          "id": "B",
+          "text": "A Case that has no parent and cannot create child Cases"
+        },
+        {
+          "id": "C",
+          "text": "A Case at the top of the Case hierarchy that automatically aggregates all child Case data"
+        },
+        {
+          "id": "D",
+          "text": "A Case Type that serves as a template for all other Case Types in the application"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Top-level = no parent above it, but it CAN be a parent.",
+      "rationale": "A top-level Case has no parent but can become a parent by creating child Cases. B is wrong because top-level Cases can create children. C and D describe incorrect characteristics."
+    },
+    {
+      "questionId": "m31_q05",
+      "type": "single-select",
+      "scenario": "An SA needs the child Case to always display the most current address from the parent Case, even if the address is updated after child Case creation. Which data propagation method is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Data reference — keeps the child Case data synchronized with the parent"
+        },
+        {
+          "id": "B",
+          "text": "Copy data — copies the current address at creation and stays current automatically"
+        },
+        {
+          "id": "C",
+          "text": "Data reference — only available in App Studio via the Create Case Step configuration"
+        },
+        {
+          "id": "D",
+          "text": "Copy data — Pega automatically re-copies parent data every time the parent Case is updated"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Synchronized = data reference. Copy = frozen snapshot.",
+      "rationale": "Data references keep child Case data synchronized with the parent — if the parent address changes, the child Case reflects the update. B is wrong because copied data is a snapshot and does NOT auto-update. C is wrong because data references require Dev Studio, not App Studio. D is wrong because copied data is never automatically re-copied."
+    },
+    {
+      "questionId": "m31_q06",
+      "type": "single-select",
+      "scenario": "An SA configures a child Case using 'Copy data' for the customer's phone number. After the child Case is created, the customer updates their phone number in the parent Case. What happens to the phone number in the child Case?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It remains unchanged — copy data captures a snapshot at creation time only"
+        },
+        {
+          "id": "B",
+          "text": "It updates automatically — copy data creates a live reference to the parent field"
+        },
+        {
+          "id": "C",
+          "text": "It updates the next time the child Case is opened by a user"
+        },
+        {
+          "id": "D",
+          "text": "It triggers a warning that the data is out of sync and prompts the user to refresh"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Copy = frozen snapshot at creation. Not synchronized after.",
+      "rationale": "Copy data creates a snapshot at the time of child Case creation. Changes to the parent after creation do NOT propagate to the child. B, C, and D all describe synchronized behavior that belongs to data references."
+    },
+    {
+      "questionId": "m31_q07",
+      "type": "single-select",
+      "scenario": "An SA wants to configure a data reference in a child Case so its data stays synchronized with the parent. Where is this advanced configuration performed?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Dev Studio — data references require advanced configuration not available in App Studio"
+        },
+        {
+          "id": "B",
+          "text": "App Studio — the Create Case Step has a 'Synchronize' toggle for data references"
+        },
+        {
+          "id": "C",
+          "text": "Admin Studio — data synchronization is a system-level setting"
+        },
+        {
+          "id": "D",
+          "text": "The Case Life Cycle's Stage properties panel — select 'Inherit parent data' on the child Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Data references = advanced configuration = Dev Studio.",
+      "rationale": "Data references require advanced configuration in Dev Studio — this is explicitly noted in the Pega Academy content. B, C, and D describe incorrect locations."
+    },
+    {
+      "questionId": "m31_q08",
+      "type": "single-select",
+      "scenario": "A 'New Account Onboarding' Case Type needs a 'Background Check' Process that is also used in a 'Job Application' Case Type. What child Case benefit applies?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Work common to multiple Case Types — the Background Check Case Type can be reused as a child Case in both"
+        },
+        {
+          "id": "B",
+          "text": "Different parties — background checks are performed by external vendors"
+        },
+        {
+          "id": "C",
+          "text": "Different time frames — background checks take longer than onboarding"
+        },
+        {
+          "id": "D",
+          "text": "Different reporting options — background check results require a separate report"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Reuse across multiple Case Types is a specific child Case benefit.",
+      "rationale": "Implementing the Background Check as a separate Case Type and reusing it as a child Case in both 'New Account Onboarding' and 'Job Application' is the documented reuse benefit. B, C, and D may be partially true but don't capture the PRIMARY benefit described here."
+    },
+    {
+      "questionId": "m31_q09",
+      "type": "single-select",
+      "scenario": "When the Create Case Automation Step executes in a parent Case, what happens?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A new child Case of the configured Case Type is created automatically"
+        },
+        {
+          "id": "B",
+          "text": "A user is prompted to confirm whether to create the child Case"
+        },
+        {
+          "id": "C",
+          "text": "The parent Case pauses until the child Case is manually created by a manager"
+        },
+        {
+          "id": "D",
+          "text": "A draft child Case is created but must be submitted before it becomes active"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Automation Step = executes automatically, no user input required.",
+      "rationale": "The Create Case Step is an Automation — it executes automatically when the Case reaches it, creating the child Case without user interaction. B, C, and D describe user-initiated or manual behaviors that don't apply to Automation Steps."
+    },
+    {
+      "questionId": "m31_q10",
+      "type": "single-select",
+      "scenario": "Does a child Case follow the same lifecycle (Stages, Processes, Steps) as its parent Case?",
+      "options": [
+        {
+          "id": "A",
+          "text": "No — a child Case is a separate Case Type with its own independent lifecycle"
+        },
+        {
+          "id": "B",
+          "text": "Yes — the child Case inherits the parent's lifecycle by default"
+        },
+        {
+          "id": "C",
+          "text": "Yes — but only the Stages are inherited; Processes and Steps are independent"
+        },
+        {
+          "id": "D",
+          "text": "No — child Cases have no lifecycle and are completed through manual status updates only"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Child Cases are separate Case Types — independent everything.",
+      "rationale": "A child Case is a fully independent Case Type with its own Stages, Processes, Steps, and lifecycle. B and C are wrong because child Cases don't inherit the parent lifecycle. D is wrong because child Cases have their own complete lifecycle."
+    },
+    {
+      "questionId": "m31_q11",
+      "type": "single-select",
+      "scenario": "Which configuration option does Dev Studio provide for the Create Case Step that App Studio does not?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Creating the child Case as a contextual Case"
+        },
+        {
+          "id": "B",
+          "text": "Specifying the Case Type for the child Case"
+        },
+        {
+          "id": "C",
+          "text": "Selecting whether to copy or reference parent data"
+        },
+        {
+          "id": "D",
+          "text": "Setting the child Case priority level"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Dev Studio provides 'additional configuration options' — the specific one mentioned is contextual Cases.",
+      "rationale": "Dev Studio provides additional options for the Create Case Step, specifically creating the child as a contextual Case. B and C are available in App Studio as well. D is not mentioned in the Academy content."
+    },
+    {
+      "questionId": "m31_q12",
+      "type": "multi-select",
+      "scenario": "An SA is choosing between 'copy data' and 'data reference' for a child Case. Which TWO statements are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Copy data captures a snapshot at creation — it does not update if the parent changes"
+        },
+        {
+          "id": "B",
+          "text": "Data reference keeps child data synchronized with the parent and requires Dev Studio configuration"
+        },
+        {
+          "id": "C",
+          "text": "Copy data automatically re-syncs when the parent Case is submitted"
+        },
+        {
+          "id": "D",
+          "text": "Data references can be configured from App Studio without any Dev Studio involvement"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Copy = snapshot (frozen). Reference = synchronized (Dev Studio required).",
+      "rationale": "A and B are both correct and directly from the Academy content. C is wrong — copy data never auto-re-syncs. D is wrong — data references require Dev Studio.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m31_q13",
+      "type": "multi-select",
+      "scenario": "An SA needs to propagate customer contact data from a parent Insurance Case to a newly created child Investigation Case. Which TWO statements correctly guide this design decision?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Copying data creates an independent snapshot in the child Case — changes in one Case do not automatically affect the other"
+        },
+        {
+          "id": "B",
+          "text": "Using a data reference passes the parent's data page to the child, so the child always reflects the current state of the parent's data"
+        },
+        {
+          "id": "C",
+          "text": "Copying data from parent to child automatically keeps both records in sync when either record is modified"
+        },
+        {
+          "id": "D",
+          "text": "A data reference in the child always overwrites the parent's data if the child modifies the referenced value"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Copying creates an independent snapshot; a data reference shares a live pointer to the parent's data.",
+      "rationale": "When data is copied from parent to child, the child receives an independent copy — subsequent changes in the parent do not update the child and vice versa. A data reference passes a pointer to the parent's data page, so the child always reads the current parent data without duplication. References do not enable the child to overwrite parent data."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Top-level Case",
+      "value": "No parent Case, but CAN create child Cases. Child Case = has a parent."
+    },
+    {
+      "key": "4 reasons for child Cases",
+      "value": "(1) Different parties, (2) different reporting options, (3) different time frames, (4) work common to multiple Case Types."
+    },
+    {
+      "key": "Create Case Step",
+      "value": "Automation Step added to the Case Life Cycle. Executes automatically — no user action required. Dev Studio adds contextual Case option."
+    },
+    {
+      "key": "Copy data",
+      "value": "Snapshot of parent data at creation time. Does NOT update if parent changes later."
+    },
+    {
+      "key": "Data reference",
+      "value": "Stays synchronized with parent data. Requires advanced configuration in Dev Studio."
+    },
+    {
+      "key": "Independent lifecycle",
+      "value": "Child Cases are separate Case Types with their own Stages, Processes, Steps, and time frames."
+    },
+    {
+      "key": "Reuse benefit",
+      "value": "Implementing work in a separate Case Type allows it to be reused as a child Case across multiple parent Case Types."
+    }
+  ]
+}

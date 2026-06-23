@@ -1,0 +1,876 @@
+{
+  "moduleId": "BA-M08",
+  "moduleTitle": "Case Life Cycle design for Business Architect",
+  "moduleUrl": "https://academy.pega.com/module/case-life-cycle-design-business-architect/v2/in/93701",
+  "moduleQuizUrl": "https://academy.pega.com/module/case-life-cycle-design-business-architect/v2/quiz/in/93701",
+  "learningObjectives": [
+    "Describe the relationship between Pega's Microjourney, Case Type, and Case.",
+    "Explain how the three pillars of Pega Platform combine to define a Case Type.",
+    "Model the Life Cycle of a Case Type in Pega Platform.",
+    "Identify the elements of the Case Life Cycle: Stages, Processes, and Steps.",
+    "Differentiate between a Primary and Alternate Stage.",
+    "Explain why Case status and automated notifications matter throughout Case Life Cycle management."
+  ],
+  "estTime": "75 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Microjourney, Case Types, and Cases",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Microjourney",
+          "description": "The units of work that deliver a meaningful result to customers and users — a part of the overall customer journey. Each Microjourney is captured in App Studio as a Case Type."
+        },
+        {
+          "type": "concept",
+          "term": "The three pillars of an application",
+          "description": "Every Microjourney in App Studio is built on three pillars: (1) Case Types and Strategies, (2) Data and Interfaces, and (3) Personas and Channels."
+        },
+        {
+          "type": "concept",
+          "term": "Case Type vs. Case",
+          "description": "A Case Type is an ABSTRACT model of a repeatable business transaction. A Case is a SPECIFIC transaction instance — each time a user submits, Pega creates a Case and assigns it a number."
+        },
+        {
+          "type": "analogy",
+          "text": "A Case Type is the cookie cutter; a Case is the individual cookie. The Microjourney is the recipe card describing how that batch of cookies gets baked from mix to plate."
+        }
+      ],
+      "bulletPoints": [
+        "The Case Life Cycle is the business model of the Microjourney — it visualizes the path of work toward resolution.",
+        "Capturing the three pillars in App Studio builds consensus quickly by visually documenting the solution."
+      ]
+    },
+    {
+      "sectionTitle": "Building Blocks: Stages, Processes, Steps",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Stage",
+          "description": "The top-level organization of work — a distinct phase or milestone in the Case Life Cycle. Stages organize the process into a sequential, logical collection of activities that drive toward resolution (e.g., an online order's Submission, Processing, Delivery)."
+        },
+        {
+          "type": "concept",
+          "term": "Process",
+          "description": "A series of Tasks/Steps within a Stage. Each Stage can contain one or more Processes; a Case can only move to the next Process after completing the Steps in the current one (e.g., Place Order, Process Order, Ship Items)."
+        },
+        {
+          "type": "concept",
+          "term": "Step",
+          "description": "Either a user action or an automated action within a Process. A Step requiring user action is a Task or Assignment; a Step performed by the system is an Automation Step (e.g., 'Enter customer details')."
+        },
+        {
+          "type": "analogy",
+          "text": "Stages are chapters, Processes are scenes within a chapter, and Steps are the individual lines of action — together they tell the story of the Case from start to resolution."
+        }
+      ],
+      "bulletPoints": [
+        "Hierarchy: Stage → Process → Step. Stages are sequential phases; Processes group related tasks; Steps are the atomic actions.",
+        "A user-action Step = Task/Assignment; a system Step = Automation Step."
+      ]
+    },
+    {
+      "sectionTitle": "Stage Types and Components (Designing)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Create Stage",
+          "description": "The FIRST Stage, denoted by a GREEN bar; it holds Processes/Steps to enter initial data on creation. It CANNOT be deleted or repositioned but CAN be renamed. Cases that include the Create Stage are assigned a Case ID upon creation."
+        },
+        {
+          "type": "concept",
+          "term": "Create Process",
+          "description": "The default Process in the Create Stage. Non-Channel-specific Create Processes can only include Collect information Steps; Channel-specific ones may include Collect information and Automation Steps."
+        },
+        {
+          "type": "concept",
+          "term": "Primary Stages & primary path",
+          "description": "Primary Stages lead to an expected outcome (most Cases go through them; they are part of usual processing and required for positive resolution). The path through the Case Life Cycle without deviating from Primary Stages is the PRIMARY PATH."
+        },
+        {
+          "type": "concept",
+          "term": "Alternate Stage",
+          "description": "Handles DEVIATIONS from the primary path. Alternate Stages are OPTIONAL and either represent a negative Resolution Stage or are used for exception handling to allow the Case to re-enter the primary path."
+        },
+        {
+          "type": "concept",
+          "term": "Resolution Stage",
+          "description": "Denoted by a RED bar; defines Case behavior at the END of the Life Cycle. Every Case Type should have AT LEAST ONE Resolution Stage, and can have more than one if you define alternate paths."
+        },
+        {
+          "type": "analogy",
+          "text": "Color code for the exam: GREEN = Create Stage (start), RED = Resolution Stage (end). The primary path is the main highway; Alternate Stages are the detour ramps for exceptions."
+        }
+      ],
+      "bulletPoints": [
+        "Collect information Steps require user action/input and have GREEN icons (Assignments/Tasks).",
+        "Automation Steps are performed by the system and have YELLOW icons — they can send emails, create PDFs, wait a specified time, or change the Stage.",
+        "Parallel Processes: when two+ Processes can start/complete independently, configure them to run in any order; the Stage progresses when both complete (you can also make Create Stage Processes parallel)."
+      ]
+    },
+    {
+      "sectionTitle": "Stage and Step Transitions",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Stage transitions",
+          "description": "Configured in the Stage contextual properties pane to control how a Case moves between Stages. You CANNOT configure Stage transitions on the Create Stage."
+        },
+        {
+          "type": "concept",
+          "term": "Change Stage Automation",
+          "description": "A Change Stage Automation Step transitions the Case to a specific Stage automatically — most useful for automated transitions to and from Alternate Stages (e.g., return to Verification once rejected IT setup selections are modified)."
+        },
+        {
+          "type": "concept",
+          "term": "Step transitions & Previous button",
+          "description": "By default at run time, clicking Submit advances the Case to the next Step. Enabling the 'Allow users to go back to the previous Step' option in a Process displays the Previous button at run time."
+        },
+        {
+          "type": "analogy",
+          "text": "Submit is the gas pedal (move forward); 'Allow go back to previous Step' adds a reverse gear (the Previous button). The Create Stage, though, has no transition controls — it's the fixed on-ramp."
+        }
+      ],
+      "bulletPoints": [
+        "Change Stage Automations are the standard way to move into/out of Alternate Stages.",
+        "The Previous button only appears when the go-back option is enabled."
+      ]
+    },
+    {
+      "sectionTitle": "Users, Personas, and Channels",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Persona",
+          "description": "Represents a category of people involved in your processes — the role a user plays and the access they need (e.g., Customer, CSR, Manager). Personas are one of the three pillars and are captured in App Studio."
+        },
+        {
+          "type": "concept",
+          "term": "Channel",
+          "description": "The way users interact with a Case — for example a Web portal, mobile, or digital messaging. Personas and Channels together describe who participates and how."
+        },
+        {
+          "type": "analogy",
+          "text": "A Persona is the role on the cast list; a Channel is the stage door they enter through (web, mobile, messaging). The same play (Case Type) can be reached through different doors."
+        }
+      ],
+      "bulletPoints": [
+        "Personas and Channels form the second pillar of the application (with Case Types/Strategies and Data/Interfaces)."
+      ]
+    },
+    {
+      "sectionTitle": "User Guidance, Communication, and Benefits",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "User guidance",
+          "description": "Instructions and help that keep users oriented while completing work — Step/Stage instructions, optional actions, and contextual guidance — so users know what to do at each Assignment to drive the Case to resolution."
+        },
+        {
+          "type": "concept",
+          "term": "Communicating with stakeholders",
+          "description": "Pega keeps Case participants informed throughout the Life Cycle using features such as Pulse (post/view/reply to messages in Case context) and automated notifications (e.g., email) tied to Case events and status."
+        },
+        {
+          "type": "concept",
+          "term": "Case status & benefits",
+          "description": "Case status communicates where a Case stands in its Life Cycle and supports automated notifications. Case Management with Pega delivers automation, consistency, visibility, and faster, more reliable resolution by modeling work the way users think about it."
+        },
+        {
+          "type": "analogy",
+          "text": "Status + notifications are the flight tracker for a Case: participants always see the current 'gate' (status) and get alerts (notifications) when something changes."
+        }
+      ],
+      "bulletPoints": [
+        "Pulse enables in-context collaboration; automated notifications keep participants up to date.",
+        "Benefits of Pega Case Management: model work as users think about it, automate and standardize, and maintain visibility to resolution."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Stage / Process / Step hierarchy",
+      "trapDescription": "These three building blocks are tested constantly. Stage = phase; Process = group of Steps; Step = single user or automated action.",
+      "bestPractice": "Remember the nesting: a Stage contains Processes; a Process contains Steps."
+    },
+    {
+      "title": "Create Stage rules",
+      "trapDescription": "The Create Stage cannot be deleted or repositioned (but can be renamed), is the first Stage (green bar), assigns the Case ID, and cannot have Stage transitions configured.",
+      "bestPractice": "Memorize Create Stage constraints; non-Channel-specific Create Processes can only include Collect information Steps."
+    },
+    {
+      "title": "Primary vs. Alternate Stage",
+      "trapDescription": "Primary Stages lead to expected outcomes (the primary path); Alternate Stages handle deviations/exceptions and are optional.",
+      "bestPractice": "Usual path to positive resolution → Primary; deviation/exception handling → Alternate."
+    },
+    {
+      "title": "Resolution Stage requirement and color",
+      "trapDescription": "Every Case Type should have at least one Resolution Stage (red bar); there can be more than one.",
+      "bestPractice": "Red = Resolution (end). Green = Create (start)."
+    },
+    {
+      "title": "Step icon colors",
+      "trapDescription": "Collect information Steps (user action) are GREEN; Automation Steps (system) are YELLOW.",
+      "bestPractice": "Green icon = user does it; yellow icon = system does it."
+    },
+    {
+      "title": "Parallel Processes",
+      "trapDescription": "Processes normally run sequentially; configure parallel Processes only when they can start/complete independently — the Stage progresses when ALL complete.",
+      "bestPractice": "Independent work that can be done in any order → parallel Processes (also allowed in the Create Stage)."
+    },
+    {
+      "title": "Step transitions / Previous button",
+      "trapDescription": "Submit advances by default; the Previous button appears only when 'Allow users to go back to the previous Step' is enabled.",
+      "bestPractice": "No Previous button by default — it must be enabled per Process."
+    },
+    {
+      "title": "Naming conventions",
+      "trapDescription": "Case Type = outcome-focused name; Stage = noun/noun phrase/gerund (≤2 words); Process and Step = verb + noun.",
+      "bestPractice": "Stage 'Processing'; Process 'Process order'; Step 'Check inventory'. Avoid vague names like 'Financial operations'."
+    },
+    {
+      "title": "Change Stage Automation for Alternate Stages",
+      "trapDescription": "Automated transitions to/from Alternate Stages use a Change Stage Automation Step.",
+      "bestPractice": "Need to auto-move a Case to a specific Stage (often an Alternate Stage and back) → Change Stage Automation."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A BA models an online order as Submission, Processing, and Delivery. Which Case Life Cycle building block do these three represent?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Stages"
+        },
+        {
+          "id": "B",
+          "text": "Processes"
+        },
+        {
+          "id": "C",
+          "text": "Steps"
+        },
+        {
+          "id": "D",
+          "text": "Personas"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think about the top-level building blocks that divide the Case Life Cycle into named phases.",
+      "rationale": "Submission, Processing, and Delivery are Stages — the top-level phases of the Case Life Cycle. Processes and Steps live inside Stages, and Personas are user roles, not Life Cycle phases."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A new team member joining a Pega project asks a BA to clarify how Case Types and Cases relate to each other. What is the correct relationship between a Case Type and a Case?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Case Type is an abstract model of a repeatable transaction; a Case is a specific instance assigned a number"
+        },
+        {
+          "id": "B",
+          "text": "A Case is the abstract model; a Case Type is a single instance"
+        },
+        {
+          "id": "C",
+          "text": "They are identical terms"
+        },
+        {
+          "id": "D",
+          "text": "A Case Type is a single Step within a Case"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think about the relationship between a template (abstract) and a specific instance (concrete).",
+      "rationale": "The Case Type is the abstract, repeatable model; each Case is a specific numbered instance of that template created at run time. The Case Type is the blueprint; the Case is a concrete occurrence of work."
+    },
+    {
+      "questionId": "Q3",
+      "type": "multi-select",
+      "selectCount": 3,
+      "scenario": "Which THREE are the pillars of a Pega application used to capture a Microjourney?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case Types and Strategies"
+        },
+        {
+          "id": "B",
+          "text": "Personas and Channels"
+        },
+        {
+          "id": "C",
+          "text": "Data and Interfaces"
+        },
+        {
+          "id": "D",
+          "text": "Rulesets and Versions"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Every Microjourney in App Studio is built on three specific pillars — recall the three categories.",
+      "rationale": "The three pillars are Case Types and Strategies, Personas and Channels, and Data and Interfaces. Rulesets/Versions are a Rule-management concept, not a pillar. No partial credit."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A BA is configuring a new Case Life Cycle in App Studio and notices the green stage that always appears first. Which statement about the Create Stage is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It is the first Stage (green bar), cannot be deleted or repositioned but can be renamed, and assigns the Case ID on creation"
+        },
+        {
+          "id": "B",
+          "text": "It is the last Stage and is denoted by a red bar"
+        },
+        {
+          "id": "C",
+          "text": "It can be freely deleted and reordered"
+        },
+        {
+          "id": "D",
+          "text": "Stage transitions are configured on it like any other Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The Create Stage is always first, shown in green, and assigns the Case ID when the Case is created.",
+      "rationale": "The Create Stage is always first (shown in green), cannot be deleted or repositioned (only renamed), assigns the Case ID on creation, and does NOT support Stage-transition configuration."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A non-Channel-specific Create Process is being configured. Which Step type can it include?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Only Collect information Steps"
+        },
+        {
+          "id": "B",
+          "text": "Only Automation Steps"
+        },
+        {
+          "id": "C",
+          "text": "Any Step type without restriction"
+        },
+        {
+          "id": "D",
+          "text": "Only Change Stage Steps"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Non-Channel-specific Create Processes are restricted to one specific Step type for initial data entry.",
+      "rationale": "Create Processes that are not Channel-specific can only include Collect information Steps, which are designed for entering initial Case data. Automation Steps must be deferred until after the Case is created."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "An IT-setup approval is rejected and the Case must move off the main path to allow the selections to be modified before re-entering. What kind of Stage handles this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An Alternate Stage"
+        },
+        {
+          "id": "B",
+          "text": "The Create Stage"
+        },
+        {
+          "id": "C",
+          "text": "A Primary Stage"
+        },
+        {
+          "id": "D",
+          "text": "A parallel Process"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Alternate Stages sit off the primary path to handle exceptions, deviations, or negative resolutions.",
+      "rationale": "Alternate Stages handle deviations from the primary path — such as exception handling or negative resolutions like rejection — and allow the Case to re-enter the primary path once the exception is resolved."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "A BA is reviewing a colleague's Case Life Cycle design and notices there are no red-bar stages defined. A senior reviewer flags this as a design issue. Which statement about Resolution Stages is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Every Case Type should have at least one; it is denoted by a red bar and defines end-of-Life-Cycle behavior"
+        },
+        {
+          "id": "B",
+          "text": "A Case Type may have at most one, and it is green"
+        },
+        {
+          "id": "C",
+          "text": "Resolution Stages are optional and rarely used"
+        },
+        {
+          "id": "D",
+          "text": "They are always the first Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Resolution Stages use a red bar and every Case Type must include at least one to end the lifecycle.",
+      "rationale": "Every Case Type must have at least one Resolution Stage (displayed with a red bar) to mark the formal end of the Case Life Cycle. A Case Type may have more than one Resolution Stage for alternate resolution paths."
+    },
+    {
+      "questionId": "Q8",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "In the Case Life Cycle, which TWO statements about Step icon colors and types are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Collect information Steps (user action) have green icons"
+        },
+        {
+          "id": "B",
+          "text": "Automation Steps (system) have yellow icons"
+        },
+        {
+          "id": "C",
+          "text": "Collect information Steps have yellow icons"
+        },
+        {
+          "id": "D",
+          "text": "Automation Steps require user input"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Collect information Steps (user input) are green; Automation Steps (system actions) are yellow.",
+      "rationale": "Collect information Steps requiring user action are displayed in green; Automation Steps performing system actions — such as send email, create PDF, wait, or change Stage — are yellow. No partial credit."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "Two onboarding Processes — Create IT Setup and Create Facilities Setup — can be completed independently and in any order, with the Stage progressing once both finish. How should they be configured?",
+      "options": [
+        {
+          "id": "A",
+          "text": "As parallel Processes"
+        },
+        {
+          "id": "B",
+          "text": "As a single sequential Process"
+        },
+        {
+          "id": "C",
+          "text": "As Alternate Stages"
+        },
+        {
+          "id": "D",
+          "text": "As Collect information Steps"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Parallel Processes run in any order, independently, and both must finish before the Stage advances.",
+      "rationale": "Independent Processes that can run in any order and must both complete before the Stage progresses are configured as parallel Processes. Sequential Processes run in a fixed order; the Stage does not wait for both if they are sequential."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "A BA wants to automatically move a Case to the Verification Stage once rejected selections are corrected in an Alternate Stage. Which Step accomplishes this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Change Stage Automation Step"
+        },
+        {
+          "id": "B",
+          "text": "A Collect information Step"
+        },
+        {
+          "id": "C",
+          "text": "A Persona Step"
+        },
+        {
+          "id": "D",
+          "text": "A Submit button on the Create Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "One specific Automation shape exists solely to transition the Case to a different Stage automatically.",
+      "rationale": "A Change Stage Automation Step transitions the Case to a specific Stage automatically, without user action. It is commonly used to move the Case into and out of Alternate Stages based on run-time conditions."
+    },
+    {
+      "questionId": "Q11",
+      "type": "single-select",
+      "scenario": "At run time users can only move forward through Steps. How does a BA add a Previous button so users can go back?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Enable 'Allow users to go back to the previous Step' on the Process"
+        },
+        {
+          "id": "B",
+          "text": "Add a promoted Action to the Case header"
+        },
+        {
+          "id": "C",
+          "text": "Configure a Stage transition on the Create Stage"
+        },
+        {
+          "id": "D",
+          "text": "Convert the Step to an Automation Step"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A per-Process configuration option controls whether users can navigate backward through earlier Steps.",
+      "rationale": "Enabling 'Allow users to go back to the previous Step' on the Process displays the Previous button at run time. By default only Submit (forward) is shown."
+    },
+    {
+      "questionId": "Q12",
+      "type": "single-select",
+      "scenario": "Following Pega naming conventions, which is the BEST name for a Step inside the 'Process order' Process?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Check inventory"
+        },
+        {
+          "id": "B",
+          "text": "Inventory"
+        },
+        {
+          "id": "C",
+          "text": "Financial operations"
+        },
+        {
+          "id": "D",
+          "text": "Processing"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Processes and Steps follow a verb + noun naming convention, like 'Validate identity'.",
+      "rationale": "Steps and Processes use verb + noun naming — for example, 'Check inventory.' 'Inventory' and 'Processing' are nouns or gerunds suited to Stage naming, while 'Financial operations' is too vague and lacks the required verb."
+    },
+    {
+      "questionId": "Q13",
+      "type": "single-select",
+      "scenario": "A BA is creating Stage names for a new Case Type and wants to follow Pega naming conventions consistently. Which naming convention applies to Stage names?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A noun, noun phrase, or gerund, ideally no more than two words (e.g., 'Processing')"
+        },
+        {
+          "id": "B",
+          "text": "A verb + noun (e.g., 'Process order')"
+        },
+        {
+          "id": "C",
+          "text": "An outcome statement (e.g., 'Loan Application Review')"
+        },
+        {
+          "id": "D",
+          "text": "A single number"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Try it in 'This Case is in ___.'",
+      "rationale": "Stages use a noun, noun phrase, or gerund of up to two words — for example, 'Processing' or 'Delivery.' Verb + noun is the convention for Processes and Steps; outcome statements are used to name Case Types, not Stages."
+    },
+    {
+      "questionId": "Q14",
+      "type": "single-select",
+      "scenario": "A BA team is naming a new Case Type for a loan application review process and wants to follow Pega conventions. Which of the following is the BEST convention-following name for this Case Type?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Loan Application Review"
+        },
+        {
+          "id": "B",
+          "text": "Financial operations"
+        },
+        {
+          "id": "C",
+          "text": "Process"
+        },
+        {
+          "id": "D",
+          "text": "Submit form"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Focus on the outcome of the business process.",
+      "rationale": "Case Type names focus on the outcome and clearly convey purpose (e.g., 'Loan Application Review'). 'Financial operations' is ambiguous; the others are too generic or verb+noun (Step style)."
+    },
+    {
+      "questionId": "Q15",
+      "type": "single-select",
+      "scenario": "A solutions consultant is explaining how Pega models customer work to a stakeholder who is new to Case Management. What term describes a unit of work that delivers a meaningful result as part of the broader customer journey?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A unit of work (Life Cycle) that delivers a meaningful result — part of the overall customer journey tied to a specific outcome"
+        },
+        {
+          "id": "B",
+          "text": "A single field in the Data Model"
+        },
+        {
+          "id": "C",
+          "text": "A type of Ruleset version"
+        },
+        {
+          "id": "D",
+          "text": "An external system of record"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A Microjourney is a meaningful, outcome-delivering slice of the overall customer journey.",
+      "rationale": "A Microjourney is a Life Cycle/unit of work delivering a meaningful result — a part of the customer journey tied to specific outcomes, modeled as the Case Life Cycle."
+    },
+    {
+      "questionId": "Q16",
+      "type": "single-select",
+      "scenario": "A Step requires a user to enter customer details. How is this Step categorized?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Collect information Step (a Task/Assignment)"
+        },
+        {
+          "id": "B",
+          "text": "An Automation Step"
+        },
+        {
+          "id": "C",
+          "text": "A Resolution Stage"
+        },
+        {
+          "id": "D",
+          "text": "A Channel"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Steps that require user action or input are called Assignments or Tasks in Pega.",
+      "rationale": "A Step requiring user action or input is a Collect information Step, also called a Task or Assignment. Automation Steps are performed by the system without user interaction and are a separate category."
+    },
+    {
+      "questionId": "Q17",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "A BA is designing a Case Life Cycle and wants to know what system-executed actions are possible without requiring user input. Which TWO actions can an Automation Step perform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Send an email or create a PDF file"
+        },
+        {
+          "id": "B",
+          "text": "Wait a specified time or change the Stage of a Case"
+        },
+        {
+          "id": "C",
+          "text": "Require a user to type data into a form"
+        },
+        {
+          "id": "D",
+          "text": "Assign a Persona to a Channel"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Think about which Step category the system executes automatically, without any user involvement.",
+      "rationale": "Automation Steps (system) can send emails, create PDFs, wait, or change the Stage. Requiring user input is a Collect information Step; assigning Personas to Channels is not an Automation Step action. No partial credit."
+    },
+    {
+      "questionId": "Q18",
+      "type": "single-select",
+      "scenario": "Which pillar do Personas and Channels belong to, and what do they represent?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Personas-and-Channels pillar — who is involved and how they interact with a Case"
+        },
+        {
+          "id": "B",
+          "text": "The Data-and-Interfaces pillar — the data needed and how it is accessed"
+        },
+        {
+          "id": "C",
+          "text": "The Case-Types-and-Strategies pillar — the Case Life Cycle"
+        },
+        {
+          "id": "D",
+          "text": "The Ruleset pillar — versioning of Rules"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Who participates + how they reach the Case.",
+      "rationale": "Personas (the people and roles involved) and Channels (how they interact with the Case) form the second pillar of an application in App Studio. Case Types and Strategies are the first pillar; Data and Interfaces are the third."
+    },
+    {
+      "questionId": "Q19",
+      "type": "single-select",
+      "scenario": "How does Pega keep Case participants informed and enable in-context collaboration throughout the Life Cycle?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Via Pulse (post/view/reply in Case context) and automated notifications tied to Case events/status"
+        },
+        {
+          "id": "B",
+          "text": "Only by manually phoning each participant"
+        },
+        {
+          "id": "C",
+          "text": "By printing the Case to PDF nightly"
+        },
+        {
+          "id": "D",
+          "text": "By locking the Ruleset"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Pulse supports in-context conversation between team members and automated Case event notifications.",
+      "rationale": "Pulse enables in-context collaboration through posts, comments, and replies, and automated notifications keep all participants informed of Case events and status changes. It is not a routing or data mechanism."
+    },
+    {
+      "questionId": "Q20",
+      "type": "single-select",
+      "scenario": "Why does Pega model applications around the Case Life Cycle (Stages/Processes/Steps) rather than isolated transactions?",
+      "options": [
+        {
+          "id": "A",
+          "text": "So business users see and interact with a Case the same way they think about the work, improving consensus and resolution"
+        },
+        {
+          "id": "B",
+          "text": "To force all logic into a single monolithic application"
+        },
+        {
+          "id": "C",
+          "text": "To avoid using App Studio entirely"
+        },
+        {
+          "id": "D",
+          "text": "To eliminate the need for any data"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Model work the way users think about it.",
+      "rationale": "Case Life Cycle design lets business users see/interact with a Case as they conceive of the work, building consensus and driving consistent, visible resolution — a core benefit of Pega Case Management."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Microjourney",
+      "value": "A unit of work delivering a meaningful result; modeled as the Case Life Cycle (the business model of the Microjourney)."
+    },
+    {
+      "key": "Three pillars",
+      "value": "Case Types & Strategies; Personas & Channels; Data & Interfaces."
+    },
+    {
+      "key": "Case Type vs Case",
+      "value": "Case Type = abstract repeatable model; Case = a specific numbered instance."
+    },
+    {
+      "key": "Building blocks",
+      "value": "Stage (phase) → Process (group of Steps) → Step (user Task/Assignment or system Automation Step)."
+    },
+    {
+      "key": "Stage types",
+      "value": "Create (green, first, fixed, assigns Case ID), Primary (expected outcome / primary path), Alternate (deviations/exceptions, optional), Resolution (red, end; at least one required)."
+    },
+    {
+      "key": "Icons & parallel",
+      "value": "Collect info Steps = green (user); Automation Steps = yellow (system). Independent Processes → parallel; Stage advances when all complete."
+    },
+    {
+      "key": "Transitions",
+      "value": "Submit advances by default; enable 'Allow go back to previous Step' for a Previous button. Create Stage has no Stage transitions; use Change Stage Automation for Alternate Stages."
+    },
+    {
+      "key": "Naming",
+      "value": "Case Type = outcome (Loan Application Review); Stage = noun/gerund ≤2 words (Processing); Process/Step = verb+noun (Process order, Check inventory)."
+    },
+    {
+      "key": "Communication",
+      "value": "Pulse for in-context collaboration; automated notifications + Case status keep participants informed."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Pega's Case Life Cycle",
+      "url": "https://academy.pega.com/topic/pegas-case-life-cycle/v2/in/93701/80516",
+      "duration": "10 min"
+    },
+    {
+      "title": "Designing a Case Life Cycle",
+      "url": "https://academy.pega.com/topic/designing-case-life-cycle/v2/in/93701/80516",
+      "duration": "15 min"
+    },
+    {
+      "title": "Users, Personas, and Channels",
+      "url": "https://academy.pega.com/topic/users-personas-and-channels/v2/in/80516",
+      "duration": "15 min"
+    },
+    {
+      "title": "User guidance",
+      "url": "https://academy.pega.com/topic/user-guidance/v2/in/80516",
+      "duration": "10 min"
+    },
+    {
+      "title": "Communicating with stakeholders",
+      "url": "https://academy.pega.com/topic/communicating-stakeholders/v2/in/93701/80516",
+      "duration": "10 min"
+    },
+    {
+      "title": "Benefits of Case Management with Pega",
+      "url": "https://academy.pega.com/topic/benefits-case-management-pega/v2/in/80516",
+      "duration": "5 min"
+    }
+  ]
+}

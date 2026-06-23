@@ -1,0 +1,881 @@
+{
+  "moduleId": "BA-M09",
+  "moduleTitle": "Building a Data Model",
+  "moduleUrl": "https://academy.pega.com/module/building-data-model/v3/in/93701",
+  "moduleQuizUrl": "https://academy.pega.com/module/building-data-model/v3/quiz/in/93701",
+  "learningObjectives": [
+    "Differentiate between the Conceptual, Logical, and Physical Data Models.",
+    "Explain the importance of data objects, fields, and Field Types to the application Data Model.",
+    "Describe the information available on the Integration Designer's Data objects and integrations landing page.",
+    "Explain the relationship between data objects and Data Records.",
+    "Distinguish between when to use embedded data versus data reference relationships.",
+    "Explain the difference between a data object's three default Data Pages."
+  ],
+  "estTime": "95 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Basics of a Data Model",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Data Model",
+          "description": "The visual representation of all data elements and their relationships. It serves as a common language between Business and IT, existing at three levels: Conceptual, Logical, and Physical."
+        },
+        {
+          "type": "concept",
+          "term": "Conceptual Data Model",
+          "description": "A living document built WITH BUSINESS STAKEHOLDERS using Entities, Attributes, and Relationships (cardinality). It describes WHAT data exists, not how it is stored."
+        },
+        {
+          "type": "concept",
+          "term": "Logical Data Model",
+          "description": "The Conceptual model translated and refined for Pega Platform: entities become DATA OBJECTS and attributes become FIELDS. The BA configures the primary elements (data objects, fields, relationships) in App Studio, while System Architects configure advanced requirements in Dev Studio."
+        },
+        {
+          "type": "concept",
+          "term": "Physical Data Model",
+          "description": "Reflects how data is actually stored and accessed — integration settings, local Pega database storage, and external System of Record connectivity. Derived from the Logical model."
+        },
+        {
+          "type": "analogy",
+          "text": "Crayon → Lego → Plumbing: The Conceptual model is the crayon sketch you show stakeholders; the Logical model is the Lego build (objects and fields snapped together in App Studio); the Physical model is the plumbing (how data is really stored and piped in via integrations)."
+        }
+      ],
+      "bulletPoints": [
+        "Relationship indicators in the Visual Data Model: one line = one-to-one; multiple lines on one side = one-to-many; multiple lines on both sides = many-to-many.",
+        "The Data objects and Integrations landing page shows data objects, Data Pages, simulated data sources, the 'Referenced By' case types, systems of record (SOR), and links to View Data Model and View Integration Map.",
+        "The BA needs only a basic understanding of the SORs an organization uses; LSAs/SSAs design and configure the Physical model."
+      ]
+    },
+    {
+      "sectionTitle": "Understanding Data Objects",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Data object",
+          "description": "A structure that groups related fields describing a data entity (e.g., a Customer object with First Name, Last Name, Email). The Pega equivalent of a database table or entity."
+        },
+        {
+          "type": "concept",
+          "term": "Data object vs. data type (Dev Studio)",
+          "description": "'Data object' and 'field' are App Studio terms. In Dev Studio, the same constructs are called 'data type' and 'property.' The structure and information are identical; the terms are used interchangeably on projects."
+        },
+        {
+          "type": "concept",
+          "term": "Draft data object",
+          "description": "A placeholder created when you add a data object from the Case Life Cycle Designer without configuring fields or integration. Must be fully configured before use in production."
+        },
+        {
+          "type": "analogy",
+          "text": "A data object is a labeled folder; the fields are the forms inside it. A Draft data object is an empty, labeled folder you drop into the workflow now and fill with forms (fields) and a filing system (integration) later."
+        }
+      ],
+      "bulletPoints": [
+        "A data object can be extended by referencing another data object (nesting); any object can be referenced once or many times.",
+        "Across the Case Life Cycle, different Steps can surface different subsets of the same object's fields — guaranteeing it is the same record.",
+        "Source data locally (Pega database) or from an external system of record.",
+        "Pega ships pre-configured objects (e.g., Address-Postal, Address-Email) — reuse or extend before building custom.",
+        "Data objects are created/managed on the Data Objects and Integrations landing page."
+      ]
+    },
+    {
+      "sectionTitle": "Fields and Field Types",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Field",
+          "description": "A reusable UI component consisting of a NAME and a FIELD TYPE; each field stores one value associated with a Case. The Field Type determines the format/validation of the data and the input control presented to the user."
+        },
+        {
+          "type": "concept",
+          "term": "Choosing the right Field Type",
+          "description": "Selecting the correct type (rather than Text for everything) enforces a common, valid format across all Case Types, reducing errors and streamlining the workflow."
+        },
+        {
+          "type": "analogy",
+          "text": "The Field Type is the data's dress code: it dictates what a value may look like (a date, a currency amount, a yes/no) and how it is entered — so every Case Type collects it consistently."
+        }
+      ],
+      "bulletPoints": [
+        "Basic (value) field types include: Text, Integer, Decimal, Currency, Percentage, Date only, Date & time, Time of day, Boolean (True/False), Email, Phone, URL, Picklist, and Attachment.",
+        "A Picklist enforces a fixed set of options; Boolean captures yes/no; Currency formats monetary values.",
+        "Data-relationship field types (Embedded Data, Data reference, Case reference) connect a field to an entire data object rather than storing a single value."
+      ]
+    },
+    {
+      "sectionTitle": "Application Data Records",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Data Record",
+          "description": "A unique set of field values for one instance of a data object (e.g., one specific customer). Records are stored locally in Pega or retrieved from external systems."
+        },
+        {
+          "type": "concept",
+          "term": "Value change vs. structure change",
+          "description": "Changing a record's VALUE (adding a customer, updating a phone number) is normal business operation and needs no process change. Changing the data object's FIELDS/structure (adding a 'Status level' field) represents a change to the business process."
+        },
+        {
+          "type": "concept",
+          "term": "pyGUID",
+          "description": "Each locally-stored Data Record gets a pyGUID — an automatically-assigned unique identifier. The pyGUID is stored along with the Case so the record can be retrieved later."
+        },
+        {
+          "type": "analogy",
+          "text": "If a data object is a spreadsheet's column headers, a Data Record is a single row of values. Editing a cell (value) is routine; adding a new column (field) reshapes the whole process."
+        }
+      ],
+      "bulletPoints": [
+        "Local storage: enter records directly via the Records tab → stored in Pega database tables without touching the database directly.",
+        "External storage: each ROW in the external table is one Data Record; at runtime, integration settings and Data Pages fetch the values."
+      ]
+    },
+    {
+      "sectionTitle": "Creating Data Relationships",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Data relationship",
+          "description": "A container that associates a set of related fields but does NOT store data itself. It relates data between a data object and a Case Type, between data objects, and between Case Types."
+        },
+        {
+          "type": "concept",
+          "term": "Embedded Data",
+          "description": "Field type used when data is sourced from user input/action made DIRECTLY inside the Case instance (e.g., credit-card payment info entered each order). The data is stored WITH that specific Case instance and is only retrievable via that Case."
+        },
+        {
+          "type": "concept",
+          "term": "Data reference",
+          "description": "Field type used when data is sourced from Data Records stored locally in the Pega database OR retrieved from an external system of record (e.g., a Customer maintained in an external SOR, or a product catalog)."
+        },
+        {
+          "type": "concept",
+          "term": "Case reference",
+          "description": "Field type used when data is sourced from a selected Case Type (e.g., choosing from a list of Service Cases)."
+        },
+        {
+          "type": "analogy",
+          "text": "Two dials, set independently: Dial 1 = SOURCE (Embedded = typed into the case; Data reference = from a SOR; Case reference = from another Case Type). Dial 2 = CARDINALITY (Single record vs. List of records). Every relationship sets both dials."
+        }
+      ],
+      "bulletPoints": [
+        "The choice between Embedded and Data reference is about WHERE the data is sourced, not single vs. list.",
+        "Single record = one set of fields/values (e.g., one Customer); List of records = many grouped sets (e.g., ordered products).",
+        "Worked example: Credit card → Embedded Data, Single record; Customer (external SOR) → Data reference, Single record; Order line containing Product (external) → Data reference, Single; Order line added to the order → Embedded Data, List of records."
+      ]
+    },
+    {
+      "sectionTitle": "Accessing Data with Data Pages",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Data Page",
+          "description": "The bridge that retrieves data from a source and caches it for use. It decouples the Case from the underlying data source, supporting simulated data and refresh strategies."
+        },
+        {
+          "type": "concept",
+          "term": "Pega Live Data",
+          "description": "The virtualization layer separating the application's business logic and data utilization from the technical details of how/when data is accessed. Data Pages are a key component of Pega Live Data."
+        },
+        {
+          "type": "concept",
+          "term": "Three default Data Pages per data object",
+          "description": "Every data object includes a single-record read-only Data Page, a list read-only Data Page, and a single read-and-write Data Page (2 read-only + 1 read-write)."
+        },
+        {
+          "type": "concept",
+          "term": "Savable Data Page",
+          "description": "Saves a page or page list back to its system of record (local or external), enabling real-time updates; governed by a data save plan configured by System Architects in Dev Studio (the BA helps choose the plan)."
+        },
+        {
+          "type": "analogy",
+          "text": "A Data Page is a barista: you order a 'Customer' and it fetches the beans from whichever supplier (SOR) and hands you a fresh cup (cached page) — you never deal with the supply chain. A Savable Data Page also takes your changes back to the supplier."
+        }
+      ],
+      "bulletPoints": [
+        "Simulated data sources return placeholder data while the real source is still being developed; they still have a source (e.g., the Pega database), just not the production one.",
+        "Refresh strategies manage stale data — balancing application performance against data freshness.",
+        "Case Types have only TWO default Data Pages (single read-only + list read-only), used only when one Case Type requests data from another via a Case reference (because Cases auto-save)."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Conceptual vs. Logical vs. Physical ownership",
+      "trapDescription": "Questions swap who does what and where: Conceptual = with business stakeholders; Logical = App Studio (BA primary); Physical = Dev Studio/SOR (LSA/SSA primary).",
+      "bestPractice": "Map each model to its owner/tool using Crayon (stakeholders) → Lego (App Studio/BA) → Plumbing (Dev Studio/SA)."
+    },
+    {
+      "title": "Conceptual trio is Entity/Attribute/Relationship",
+      "trapDescription": "Distractors say data object/field for the Conceptual model — those are the Logical-model terms.",
+      "bestPractice": "Conceptual = Entity, Attribute, Relationship. Logical = Data object, Field."
+    },
+    {
+      "title": "Data object = data type; field = property",
+      "trapDescription": "Dev Studio synonyms are tested directly.",
+      "bestPractice": "App Studio 'data object/field' equals Dev Studio 'data type/property' — same structure."
+    },
+    {
+      "title": "A data relationship does NOT store data",
+      "trapDescription": "Tests whether you know the relationship is only a container that relates data-storing elements.",
+      "bestPractice": "Pick the option stating the relationship 'does not store data'; the data objects/fields store it."
+    },
+    {
+      "title": "Embedded vs. Data reference is about SOURCE",
+      "trapDescription": "Candidates choose based on single/list. The deciding factor is the data's source.",
+      "bestPractice": "Inside the case (user input) = Embedded; from a local/external SOR record = Data reference; from another Case Type = Case reference. Single vs. list is a separate choice."
+    },
+    {
+      "title": "pyGUID is for local records",
+      "trapDescription": "pyGUID is the auto-assigned unique ID for locally-stored Data Records, stored with the Case — not the Case ID.",
+      "bestPractice": "Associate pyGUID with local Data Records and later retrieval of that record."
+    },
+    {
+      "title": "Value change vs. structure change",
+      "trapDescription": "Adding/editing record VALUES is routine; adding/removing FIELDS changes the process.",
+      "bestPractice": "Record value change = no process change; field/structure change = process change."
+    },
+    {
+      "title": "Default Data Page counts",
+      "trapDescription": "Object = three (2 read-only + 1 read-write); Case Type = two (both read-only).",
+      "bestPractice": "Memorize both counts and that Case Type pages are used only for cross-Case-Type requests via Case reference."
+    },
+    {
+      "title": "Draft data object has no fields/integration",
+      "trapDescription": "A Draft created in the Case Life Cycle designer is a placeholder needing later configuration.",
+      "bestPractice": "If a question describes an object created from the Life Cycle with no fields/integration, it is a Draft to be configured later."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A BA runs an early workshop with business stakeholders to confirm which entities and attributes a new claims process needs. Which model should she present?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Conceptual Data Model"
+        },
+        {
+          "id": "B",
+          "text": "Logical Data Model"
+        },
+        {
+          "id": "C",
+          "text": "Physical Data Model"
+        },
+        {
+          "id": "D",
+          "text": "Integration Map"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think about which data model level is the most abstract and intended for business stakeholder collaboration.",
+      "rationale": "The Conceptual Data Model is the stakeholder-facing visualization of entities/attributes/relationships. Logical is the Pega-translated objects/fields; Physical is storage/integration; the Integration Map is one diagram within the Physical model."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "The team translates agreed entities and attributes into Pega data objects and fields. This artifact is the:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Logical Data Model"
+        },
+        {
+          "id": "B",
+          "text": "Conceptual Data Model"
+        },
+        {
+          "id": "C",
+          "text": "Physical Data Model"
+        },
+        {
+          "id": "D",
+          "text": "Data save plan"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Logical model translates entities to objects and attributes to fields — a direct mapping.",
+      "rationale": "Translating entities to data objects and attributes to fields produces the Logical Data Model. Conceptual precedes translation; Physical concerns storage/integration; a data save plan governs a Savable Data Page."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "In the Visual Data Model an icon shows a circle with multiple lines on BOTH sides. This indicates which relationship?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Many-to-many"
+        },
+        {
+          "id": "B",
+          "text": "One-to-one"
+        },
+        {
+          "id": "C",
+          "text": "One-to-many"
+        },
+        {
+          "id": "D",
+          "text": "No relationship"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "When both sides of a relationship can have multiple instances, it is a many-to-many relationship.",
+      "rationale": "Multiple lines on both sides of a relationship connector represent many-to-many cardinality. A single line on both sides means one-to-one; multiple lines on one side only means one-to-many."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A BA defines a Customer grouping of related fields in App Studio. A System Architect opens the same construct in Dev Studio. What is it called there, and what are its fields called?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A data type, whose fields are properties"
+        },
+        {
+          "id": "B",
+          "text": "A data object, whose fields are properties"
+        },
+        {
+          "id": "C",
+          "text": "A data type, whose fields are data objects"
+        },
+        {
+          "id": "D",
+          "text": "A Data Page, whose fields are records"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "App Studio object = Dev Studio data type; field = property.",
+      "rationale": "In Dev Studio, a data object is called a data type and a field is called a property. The underlying artifacts are identical — only the terminology differs between App Studio and Dev Studio."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A BA creates a new data object inside the Case Life Cycle designer's Data & Interfaces section. What does Pega generate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Draft data object — a placeholder with no fields or integration settings"
+        },
+        {
+          "id": "B",
+          "text": "A fully configured production object with fields and integrations"
+        },
+        {
+          "id": "C",
+          "text": "A Savable Data Page"
+        },
+        {
+          "id": "D",
+          "text": "A simulated data source"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A data object created via the Case Life Cycle Designer without configuration becomes a Draft placeholder.",
+      "rationale": "Creating a data object from the Case Life Cycle Designer produces a Draft placeholder with no fields or integration configured. It must be fully set up — with fields and a data source — before it can be used in production."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "A market adds a new customer and later updates that customer's phone number. How should this be classified?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A normal business operation (record value change) requiring no process change"
+        },
+        {
+          "id": "B",
+          "text": "A change to the data object's structure"
+        },
+        {
+          "id": "C",
+          "text": "A change requiring a new Case Type"
+        },
+        {
+          "id": "D",
+          "text": "A redesign of the business process"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Editing an existing record's values is a routine data operation, not a structural process change.",
+      "rationale": "Adding or editing record VALUES is a normal business data operation requiring no process change. Adding a new FIELD, however, changes the data object's structure and constitutes a change to the business process."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "A BA is reviewing a Data Model and notices a system-generated field called pyGUID on a locally-stored Data Record. What is the pyGUID, and what is its purpose?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An auto-assigned unique identifier for a locally-stored Data Record, stored with the Case for later retrieval"
+        },
+        {
+          "id": "B",
+          "text": "The customer's email address"
+        },
+        {
+          "id": "C",
+          "text": "The Case status"
+        },
+        {
+          "id": "D",
+          "text": "A simulated data source"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Every locally-stored Data Record gets an auto-generated unique identifier when it is saved.",
+      "rationale": "The pyGUID is an automatically-assigned unique ID for a locally-stored Data Record; it is stored with the Case so the record can be retrieved later."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "A BA is designing a Data Model and needs to understand the structural difference between data objects and data relationships. Which statement about a data relationship is TRUE?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It is a container that associates related fields but does not store data"
+        },
+        {
+          "id": "B",
+          "text": "It stores the data values itself"
+        },
+        {
+          "id": "C",
+          "text": "It can only connect two Case Types"
+        },
+        {
+          "id": "D",
+          "text": "It replaces the need for data objects"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A data relationship connects data-storing elements but does not hold any data itself.",
+      "rationale": "A data relationship is a structural link that connects a Case Type, data type, or another Case Type to describe how they relate. It does not store data — the data lives in the connected objects. It can represent object-to-Case, object-to-object, or Case-to-Case relationships."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "Customers must type their credit-card details into EACH order, and only one card per order is allowed. The correct configuration is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Embedded Data, Single record"
+        },
+        {
+          "id": "B",
+          "text": "Data reference, List of records"
+        },
+        {
+          "id": "C",
+          "text": "Case reference, Single record"
+        },
+        {
+          "id": "D",
+          "text": "Embedded Data, List of records"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "When data is typed directly into the Case and only one instance is needed, use Embedded Data, Single.",
+      "rationale": "User input directly in the Case and only one credit card per order → Embedded Data, Single record. Embedded means data lives in the Case; Single means one record, not a list."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "The Customer object is maintained in the supermarket's EXTERNAL system of record, and each order has exactly one customer. The correct configuration is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Data reference, Single record"
+        },
+        {
+          "id": "B",
+          "text": "Embedded Data, Single record"
+        },
+        {
+          "id": "C",
+          "text": "Data reference, List of records"
+        },
+        {
+          "id": "D",
+          "text": "Case reference, Single record"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "When data comes from an external System of Record with one instance per Case, use Data reference, Single.",
+      "rationale": "Sourced from an external System of Record → Data reference (not Embedded); only one customer per order → Single record. The source determines Embedded vs. Data reference; the count determines Single vs. List."
+    },
+    {
+      "questionId": "Q11",
+      "type": "single-select",
+      "scenario": "The deciding factor between an Embedded Data and a Data reference relationship is:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Where the data is sourced (in-case user input vs. local/external SOR records)"
+        },
+        {
+          "id": "B",
+          "text": "Whether you need one or many records"
+        },
+        {
+          "id": "C",
+          "text": "Whether the object has a pyGUID"
+        },
+        {
+          "id": "D",
+          "text": "Whether the Case auto-saves"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The key factor distinguishing Embedded Data from Data reference is the SOURCE of the data, not cardinality.",
+      "rationale": "The choice between Embedded Data and Data reference is determined by the data's source — in-Case user input (Embedded) vs. local or external System of Record (Data reference). Cardinality (Single vs. List) is an independent, secondary decision."
+    },
+    {
+      "questionId": "Q12",
+      "type": "single-select",
+      "scenario": "A user must select from a list of existing Service Cases. Which relationship field type fits?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case reference"
+        },
+        {
+          "id": "B",
+          "text": "Embedded Data"
+        },
+        {
+          "id": "C",
+          "text": "Data reference"
+        },
+        {
+          "id": "D",
+          "text": "Picklist"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "When the data source is another Case Type rather than a data object, use a Case reference relationship.",
+      "rationale": "Data sourced from a selected Case Type uses a Case reference. Embedded is in-case input; Data reference is from Data Records; Picklist is a value field type."
+    },
+    {
+      "questionId": "Q13",
+      "type": "single-select",
+      "scenario": "How many default Data Pages does each DATA OBJECT have, and of what kinds?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Three: single read-only, list read-only, single read-and-write"
+        },
+        {
+          "id": "B",
+          "text": "Two: single read-only and list read-only"
+        },
+        {
+          "id": "C",
+          "text": "One: single read-and-write"
+        },
+        {
+          "id": "D",
+          "text": "Four: including a savable page"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Each data object gets three default Data Pages: two read-only and one read-and-write.",
+      "rationale": "A data object has three default Data Pages: single read-only, list read-only, and single read-and-write (Savable). Case Types have only two default Data Pages, both read-only, because Cases auto-save and don't need a write Data Page."
+    },
+    {
+      "questionId": "Q14",
+      "type": "single-select",
+      "scenario": "The capability that lets developers use sourced data without knowing where or how it is stored is called:",
+      "options": [
+        {
+          "id": "A",
+          "text": "Pega Live Data (the virtualization layer)"
+        },
+        {
+          "id": "B",
+          "text": "A Savable Data Page"
+        },
+        {
+          "id": "C",
+          "text": "A simulated data source"
+        },
+        {
+          "id": "D",
+          "text": "A Case reference"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A Data Page acts as the virtualization layer between the Case and its underlying data source.",
+      "rationale": "Pega Live Data is the virtualization layer separating business logic from storage details; Data Pages are a key component. Savable pages write back; simulated sources are for development."
+    },
+    {
+      "questionId": "Q15",
+      "type": "single-select",
+      "scenario": "An external products integration is not ready, but the team must keep building and testing. Best approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use a simulated data source/Data Page (e.g., backed by the Pega database) returning placeholder data"
+        },
+        {
+          "id": "B",
+          "text": "Stop development until the API is live"
+        },
+        {
+          "id": "C",
+          "text": "Hard-code values into every Case"
+        },
+        {
+          "id": "D",
+          "text": "Convert the object to Embedded Data permanently"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A Simulated data source returns placeholder data during development while the real integration is built.",
+      "rationale": "Simulated data sources return placeholder data while the production source is built; they still have a source (e.g., Pega DB), just not the production one."
+    },
+    {
+      "questionId": "Q16",
+      "type": "single-select",
+      "scenario": "Case Types have only two default Data Pages (both read-only). When are they actually used?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Only when one Case Type requests data from another via a Case reference relationship"
+        },
+        {
+          "id": "B",
+          "text": "Every time any Case is saved"
+        },
+        {
+          "id": "C",
+          "text": "Whenever a Savable Data Page writes to the SOR"
+        },
+        {
+          "id": "D",
+          "text": "Only during simulated testing"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Case Type Data Pages are used only when another Case Type requests data via a Case reference field.",
+      "rationale": "Because Cases auto-save, the two read-only Case Type Data Pages are used specifically when one Case Type requests another's data via a Case reference relationship — not for general data lookup."
+    },
+    {
+      "questionId": "Q17",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "A new BA is learning about Pega Data Models and asks a senior team member to clarify what a data object is. Which TWO statements correctly describe a data object?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It groups a set of related fields to describe an entity"
+        },
+        {
+          "id": "B",
+          "text": "It is reusable across all of an application's Case Types"
+        },
+        {
+          "id": "C",
+          "text": "It stores exactly one Data Record and cannot be reused"
+        },
+        {
+          "id": "D",
+          "text": "It is the same thing as a data relationship"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Grouping related fields into a data object enables sharing and reuse across multiple Case Types.",
+      "rationale": "A data object groups related fields to describe an entity and is reusable across Case Types. It is not limited to one record (records are instances), and it is not a data relationship (which stores no data). No partial credit."
+    },
+    {
+      "questionId": "Q18",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "A customer adds MANY products (each with a quantity) to one order. The Order line object (Product + Quantity) is added to the Delivery Order. Which TWO configurations are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Within Order line, Product (from an external DB, one per line) is a Data reference, Single record"
+        },
+        {
+          "id": "B",
+          "text": "Order line added to the Delivery Order is Embedded Data, List of records"
+        },
+        {
+          "id": "C",
+          "text": "Within Order line, Product is Embedded Data, List of records"
+        },
+        {
+          "id": "D",
+          "text": "Order line added to the Delivery Order is Case reference, Single record"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Product comes from an external DB (one per line); the user enters quantities for many lines.",
+      "rationale": "Product is sourced externally and one per line → Data reference, Single. Order line captures user-entered quantities for many items → Embedded Data, List of records. C and D misclassify source/cardinality. No partial credit."
+    },
+    {
+      "questionId": "Q19",
+      "type": "single-select",
+      "scenario": "A BA needs users to pick a shipping speed from a fixed set: Standard / Express / Overnight. Best Field Type?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Picklist (a defined list of options)"
+        },
+        {
+          "id": "B",
+          "text": "Text (free entry)"
+        },
+        {
+          "id": "C",
+          "text": "Boolean"
+        },
+        {
+          "id": "D",
+          "text": "Attachment"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A Picklist enforces a fixed set of valid options, preventing free-form text entry.",
+      "rationale": "A Picklist enforces a defined, closed set of valid options. Free Text allows any input and invites inconsistency; Boolean is only yes/no; Attachment is for uploaded files. Picklists prevent invalid data entry for fields with known vocabulary."
+    },
+    {
+      "questionId": "Q20",
+      "type": "single-select",
+      "scenario": "Where in App Studio are data objects created and managed, and where are Data Records entered locally?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Objects on the Data Objects and Integrations landing page; local records via the Records tab"
+        },
+        {
+          "id": "B",
+          "text": "Both on the Reports landing page"
+        },
+        {
+          "id": "C",
+          "text": "Objects via the Records tab; records on the Integration Map"
+        },
+        {
+          "id": "D",
+          "text": "Both only in Dev Studio"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Two different places: landing page vs. Records tab.",
+      "rationale": "Data objects are created/managed on the Data Objects and Integrations landing page; local Data Records are entered via the Records tab (stored in Pega DB tables without direct DB access)."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Three models (CLP)",
+      "value": "Conceptual (stakeholders / entity-attribute-relationship) → Logical (App Studio / object+field) → Physical (Dev Studio / SOR+integration)."
+    },
+    {
+      "key": "Term mapping",
+      "value": "App Studio data object/field = Dev Studio data type/property."
+    },
+    {
+      "key": "Relationship",
+      "value": "A container that relates data but stores none. Sources: Embedded (in-case input), Data reference (local/external SOR), Case reference (another Case Type)."
+    },
+    {
+      "key": "Cardinality",
+      "value": "Single record vs. List of records — chosen independently of the source field type."
+    },
+    {
+      "key": "Data Record",
+      "value": "Fields + values for one instance. Value change = routine; field change = process change. pyGUID = local record ID stored with the Case."
+    },
+    {
+      "key": "Data Pages",
+      "value": "Bridge that caches data in memory; powers Pega Live Data. Object = 3 (2 read-only + 1 read-write); Case Type = 2 (both read-only)."
+    },
+    {
+      "key": "Savable / Simulated",
+      "value": "Savable Data Page writes back to the SOR (data save plan). Simulated data source returns placeholder data during development."
+    },
+    {
+      "key": "Relationship indicators",
+      "value": "One line = 1:1; one side multi = 1:many; both sides multi = many:many."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Basics of a Data Model",
+      "url": "https://academy.pega.com/topic/basics-data-model/v2/in/80411/80571",
+      "duration": "20 min"
+    },
+    {
+      "title": "Understanding Data Objects",
+      "url": "https://academy.pega.com/topic/understanding-data-objects/v2/in/80411/80571",
+      "duration": "10 min"
+    },
+    {
+      "title": "Fields and Field Types",
+      "url": "https://academy.pega.com/topic/fields-and-field-types/v2/in/80411/80571",
+      "duration": "15 min"
+    },
+    {
+      "title": "Application Data Records",
+      "url": "https://academy.pega.com/topic/application-data-records/v2/in/80411/80571",
+      "duration": "10 min"
+    },
+    {
+      "title": "Creating data relationships",
+      "url": "https://academy.pega.com/topic/creating-data-relationships/v2/in/80411/80571",
+      "duration": "15 min"
+    },
+    {
+      "title": "Accessing data with Data Pages",
+      "url": "https://academy.pega.com/topic/accessing-data-data-pages/v3/in/94321",
+      "duration": "15 min"
+    }
+  ]
+}

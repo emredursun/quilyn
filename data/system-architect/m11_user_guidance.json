@@ -1,0 +1,637 @@
+{
+  "moduleId": "m11",
+  "moduleTitle": "User guidance",
+  "moduleUrl": "https://academy.pega.com/module/user-guidance/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/user-guidance/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Explain how Case Status communicates progress to users and reports",
+    "Identify the four Case Status categories and their naming conventions",
+    "Configure Instructions for a Task to guide users at runtime"
+  ],
+  "estTime": "15 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Case Status",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Case status",
+          "description": "A value that communicates where a Case stands in its life cycle (e.g., New, Pending-Approval, Resolved-Completed). Status guides users on what is happening, drives reporting, and can trigger notifications. The work status is stored in the standard property pyStatusWork."
+        },
+        {
+          "type": "analogy",
+          "text": "Case status and assignment instructions are like a traffic light and GPS directions combined: the status indicator tells everyone where the case is in its journey (Open / Pending-Approval / Resolved), while the step instructions are turn-by-turn directions telling the current worker exactly what to do before pressing 'Submit.' Miss either one and the driver is left guessing at a green light."
+        },
+        {
+          "type": "concept",
+          "term": "Status categories",
+          "description": "Statuses follow conventional prefixes: New (just created), Open (in progress), Pending (waiting on something/someone), and Resolved (closed) — for example Resolved-Completed or Resolved-Rejected. A Resolved- status closes the Case."
+        },
+        {
+          "type": "concept",
+          "term": "Setting status",
+          "description": "You set a Case status as part of the life cycle — for example automatically when a Stage or Step is reached, or with a Change/Set Status automation. Choosing meaningful statuses keeps users and reports aligned on progress."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 270\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Case Status Lifecycle</title>\n<desc>Four status categories: New, Open, Pending, and Resolved with flow arrows</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">CASE STATUS CATEGORIES (stored in pyStatusWork)</text>\n<!-- New -->\n<rect x=\"20\" y=\"50\" width=\"160\" height=\"190\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"88\" font-size=\"15\" font-weight=\"700\" fill=\"#0E3D28\">New</text>\n<text x=\"40\" y=\"108\" font-size=\"11\" fill=\"#1E8A5B\">Case just created;</text>\n<text x=\"40\" y=\"124\" font-size=\"11\" fill=\"#1E8A5B\">not yet touched</text>\n<text x=\"40\" y=\"148\" font-size=\"11\" fill=\"#0E3D28\">e.g.</text>\n<text x=\"40\" y=\"164\" font-size=\"11\" fill=\"#0E3D28\">New</text>\n<!-- Arrow N→O -->\n<line x1=\"182\" y1=\"145\" x2=\"222\" y2=\"145\" stroke=\"#6d8bff\" stroke-width=\"2\"/>\n<polygon points=\"222,139 234,145 222,151\" fill=\"#6d8bff\"/>\n<!-- Open -->\n<rect x=\"236\" y=\"50\" width=\"160\" height=\"190\" rx=\"14\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"256\" y=\"88\" font-size=\"15\" font-weight=\"700\" fill=\"#0D3560\">Open-*</text>\n<text x=\"256\" y=\"108\" font-size=\"11\" fill=\"#185FA5\">Active work in</text>\n<text x=\"256\" y=\"124\" font-size=\"11\" fill=\"#185FA5\">progress</text>\n<text x=\"256\" y=\"148\" font-size=\"11\" fill=\"#0D3560\">e.g.</text>\n<text x=\"256\" y=\"164\" font-size=\"11\" fill=\"#0D3560\">Open-Processing</text>\n<text x=\"256\" y=\"180\" font-size=\"11\" fill=\"#0D3560\">Open-Submitted</text>\n<!-- Arrow O→P -->\n<line x1=\"398\" y1=\"145\" x2=\"438\" y2=\"145\" stroke=\"#6d8bff\" stroke-width=\"2\"/>\n<polygon points=\"438,139 450,145 438,151\" fill=\"#6d8bff\"/>\n<!-- Pending -->\n<rect x=\"452\" y=\"50\" width=\"160\" height=\"190\" rx=\"14\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"472\" y=\"88\" font-size=\"15\" font-weight=\"700\" fill=\"#5A3200\">Pending-*</text>\n<text x=\"472\" y=\"108\" font-size=\"11\" fill=\"#BA7517\">Waiting on another</text>\n<text x=\"472\" y=\"124\" font-size=\"11\" fill=\"#BA7517\">party or system</text>\n<text x=\"472\" y=\"148\" font-size=\"11\" fill=\"#5A3200\">e.g.</text>\n<text x=\"472\" y=\"164\" font-size=\"11\" fill=\"#5A3200\">Pending-Approval</text>\n<text x=\"472\" y=\"180\" font-size=\"11\" fill=\"#5A3200\">Pending-Review</text>\n<!-- Arrow P→R -->\n<line x1=\"614\" y1=\"145\" x2=\"654\" y2=\"145\" stroke=\"#6d8bff\" stroke-width=\"2\"/>\n<polygon points=\"654,139 666,145 654,151\" fill=\"#6d8bff\"/>\n<!-- Resolved -->\n<rect x=\"668\" y=\"50\" width=\"92\" height=\"190\" rx=\"14\" fill=\"#FEE2E2\" stroke=\"#DC2626\" stroke-width=\"2\"/>\n<text x=\"678\" y=\"88\" font-size=\"14\" font-weight=\"700\" fill=\"#7F1D1D\">Resolved-*</text>\n<text x=\"678\" y=\"112\" font-size=\"11\" fill=\"#DC2626\">Case closed</text>\n<text x=\"678\" y=\"132\" font-size=\"11\" fill=\"#7F1D1D\">e.g.</text>\n<text x=\"678\" y=\"148\" font-size=\"11\" fill=\"#7F1D1D\">Resolved-</text>\n<text x=\"678\" y=\"164\" font-size=\"11\" fill=\"#7F1D1D\">Completed</text>\n<text x=\"678\" y=\"180\" font-size=\"11\" fill=\"#7F1D1D\">Resolved-</text>\n<text x=\"678\" y=\"196\" font-size=\"11\" fill=\"#7F1D1D\">Rejected</text>\n<!-- Footer note -->\n<text x=\"20\" y=\"258\" font-size=\"11\" fill=\"var(--t)\" opacity=\".55\">Status updates automatically at Stage/Step transitions, or via Set Status automation · Set to read-only for users</text>\n</svg>",
+          "caption": "The four Case Status categories and example values. Status is stored in pyStatusWork and updates automatically as Stages and Steps progress."
+        },
+        {
+          "type": "interactive",
+          "title": "Case Status & Guidance Design Decisions",
+          "height": 440,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Status Prefix\", \"scenario\": \"A CSR's dashboard shows a loan Case with status 'PendingApproval'. Another shows 'Resolved-Approved'. A manager asks: 'Which Case is still open and which is closed?' How does a SA explain this quickly?\", \"opts\": [\"'Resolved-Approved' is closed \\u2014 the 'Resolved-' prefix is Pega's signal that the Case has reached end-of-life. 'PendingApproval' (no Resolved- prefix) is still active\", \"'PendingApproval' is closed because the approval is pending final resolution. 'Resolved-Approved' is open \\u2014 it shows the approval is resolved but the Case continues\", \"Both are open \\u2014 a Case only closes when manually deleted from the system. Status prefixes are display labels only\", \"'Resolved-Approved' means the approval sub-process resolved, but the parent Case may still be open \\u2014 the prefix only closes sub-processes\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. 'Resolved-' prefix = Case is closed. Any status without the 'Resolved-' prefix = Case is still active (New, Open-, Pending are all active).\", \"\\u2717 Incorrect. 'Resolved-' closes the CASE, not the pending action. PendingApproval is an active status for a Case awaiting an approver's decision.\", \"\\u2717 Incorrect. Status prefixes are meaningful to the Pega platform \\u2014 it uses the 'Resolved-' prefix to automatically close Cases in reporting and querying.\", \"\\u2717 Incorrect. 'Resolved-' at the Case level closes the entire Case, not just a sub-process. Sub-process resolution uses different mechanisms.\"]}, {\"label\": \"Status Automation\", \"scenario\": \"A loan Case should automatically update to 'Open-UnderReview' when it enters the Credit Check Stage, and to 'Resolved-Approved' or 'Resolved-Declined' at the Resolution Stage. How is this configured?\", \"opts\": [\"Add a 'Change status' automation (or configure status on the Stage itself) at the appropriate points in the Case Life Cycle \\u2014 status updates are automations, not manual user actions\", \"The CSR must manually update the status from the Case header at each Stage transition \\u2014 status changes cannot be automated\", \"Configure status in the SLA rule for each Stage \\u2014 the SLA's goal time triggers the status transition when elapsed\", \"Status updates require a Data Transform that writes to pyStatusWork \\u2014 no other mechanism is supported\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Case status is set automatically via automations (Change status shape) or Stage/Step configuration in the Case Life Cycle. It should not require CSR manual updates.\", \"\\u2717 Incorrect. Requiring CSRs to manually update statuses is an anti-pattern \\u2014 it introduces human error and defeats the purpose of automated Case management.\", \"\\u2717 Incorrect. SLA goals and deadlines control urgency and escalation timing \\u2014 they do not control status transitions.\", \"\\u2717 Incorrect. While Data Transforms CAN write to pyStatusWork, the standard and recommended mechanism is the Change status automation or Case Life Cycle Stage configuration.\"]}, {\"label\": \"Pulse vs Email\", \"scenario\": \"A claims team debates between using Pulse for case discussions vs. continuing their existing practice of emailing each other with Case context. What is the primary advantage of Pulse over email?\", \"opts\": [\"Pulse conversations are attached to the specific Case and visible to everyone with access \\u2014 no context is lost, no need to forward email chains, and the discussion is findable alongside the Case forever\", \"Pulse has better formatting than email \\u2014 it supports rich text, tables, and image embedding that email clients cannot render consistently\", \"Pulse sends notifications to all Operators in the system, ensuring broader awareness than email which can only reach named recipients\", \"Pulse is faster than email because it bypasses the email server and delivers messages directly through the Pega runtime\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Pulse attaches the conversation to the Case \\u2014 context is maintained, searchable, and visible to any authorized user without forwarding.\", \"\\u2717 Incorrect. While Pulse does support @mentions and attachments, the primary advantage over email is contextual attachment to the Case, not formatting features.\", \"\\u2717 Incorrect. Pulse notifies users who are working the Case, not all Operators in the system \\u2014 that would be noise, not an advantage.\", \"\\u2717 Incorrect. Pulse's advantage is contextual attachment, not delivery speed. Both Pulse and email operate through the Pega infrastructure.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Guiding users: instructions, help text, and visual cues",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Step (Assignment) instructions",
+          "description": "Text added to a Collect-information Step/Assignment that tells the user exactly what they must do to complete the Task. Instructions render at runtime on the assignment form, reducing confusion and errors."
+        },
+        {
+          "type": "concept",
+          "term": "Field-level help text",
+          "description": "A short, PERSISTENT description shown beneath or beside a field label to guide the user on what to enter (valid values, format, examples). Always visible — it does not require hovering."
+        },
+        {
+          "type": "concept",
+          "term": "Tooltip",
+          "description": "A short hint shown ON HOVER over an information icon or label. On-demand and space-saving — use it for an occasional one-sentence tip, versus persistent help text for guidance the user always needs."
+        },
+        {
+          "type": "concept",
+          "term": "Visual cues are presentational, not logic",
+          "description": "Optional/required indicators, decorative badges, inline status messages, and conditional alert banners are DISPLAY-ONLY guidance — shown/hidden with visibility conditions, but business logic belongs in automations, decision rules, and data transforms."
+        },
+        {
+          "type": "concept",
+          "term": "Progress and navigation indicators",
+          "description": "For a long, multi-section form or process, a navigation panel / progress indicator shows the user where they are (current step highlighted, sections completed). This orients the user across the Task, complementing per-field help text."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">USER GUIDANCE TOOLS — WHERE &amp; WHEN</text><rect x=\"10\" y=\"30\" width=\"165\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"92\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Instructions</text><text x=\"92\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Step-level guidance</text><text x=\"92\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Shown at Assignment</text><text x=\"92\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">NOT case-level notes</text><text x=\"92\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">What to do at this step</text><rect x=\"193\" y=\"30\" width=\"165\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"275\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Help Text</text><text x=\"275\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Field-level tooltip</text><text x=\"275\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">? icon on hover</text><text x=\"275\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Explains the field</text><text x=\"275\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">Input guidance</text><rect x=\"376\" y=\"30\" width=\"165\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"458\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Case Status</text><text x=\"458\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Stored in pyStatusWork</text><text x=\"458\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"9\" font-weight=\"600\">Resolved- prefix = closed</text><text x=\"458\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Used by correspondence</text><text x=\"458\" y=\"112\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">and routing rules</text><rect x=\"559\" y=\"30\" width=\"152\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"635\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Visual Cues</text><text x=\"635\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Required field markers (*)</text><text x=\"635\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Inline validation messages</text><text x=\"635\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Progress indicators</text><text x=\"635\" y=\"112\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">Improve UX without code</text></svg>",
+          "caption": "Instructions at Assignment level (not case notes); Help Text is field-level tooltip; pyStatusWork stores status; Resolved- prefix signals closure."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Status prefixes and closure",
+      "trapDescription": "Questions list Case Status values and ask which prefix signals closure. Candidates select 'Completed-' or 'Finished-.' Case Statuses that begin with 'Resolved-' signal closure — Pega uses this prefix to determine when a Case is considered done.",
+      "bestPractice": "Remember: only the Resolved- prefix signals Case closure — Pending means waiting for something. Exam questions may list misleading prefixes like 'Completed-' or 'Finished-'."
+    },
+    {
+      "title": "pyStatusWork",
+      "trapDescription": "A question asks which property stores the current Case Status. Candidates name a custom property. The system property pyStatusWork stores the Case Status — it is updated automatically by Pega and referenced by correspondence and routing rules.",
+      "bestPractice": "Always reference the current Case Status through the system property pyStatusWork — never create a custom status property, as the system and rules expect this specific property."
+    },
+    {
+      "title": "Status is set via the life cycle",
+      "trapDescription": "Status is typically set as Stages/Steps are reached or with a Set Status automation — not entered ad hoc by users.",
+      "bestPractice": "Configure status changes in the life cycle (or via Set Status) at meaningful points."
+    },
+    {
+      "title": "Instructions guide the user at the Step",
+      "trapDescription": "Questions ask where Instructions text appears to the user. Candidates say 'on the Case summary page.' Instructions are displayed at the Assignment level — they guide the user working on that specific Step, not on the overall Case summary.",
+      "bestPractice": "Add concise instructions to each Assignment so users complete Tasks correctly."
+    },
+    {
+      "title": "Status vs. Stage",
+      "trapDescription": "A Stage is a life-cycle phase; a status is a value describing where the Case stands. They are related but not the same.",
+      "bestPractice": "Stage = phase of work; status = the reported state (can change within a Stage)."
+    },
+    {
+      "title": "Case status vs. Step label — different artifacts",
+      "trapDescription": "Candidates conflate the status displayed in the case header (Case Status) with the step name shown in the process (Action name / Stage name).",
+      "bestPractice": "Case Status is a Property value that reflects the high-level state (e.g., Open-Pending-Approval). The step label is what the worker sees as the task title. Both matter for user guidance but are configured separately — Status in the Case Type settings, step labels in the Life Cycle process."
+    },
+    {
+      "title": "Assignment instructions are not case-level notes",
+      "trapDescription": "A question asks the correct way to communicate step-specific guidance to operators. Candidates describe adding a Note to the Case. Assignment Instructions are the correct tool — they are Step-specific and displayed only when the operator is working on that Assignment.",
+      "bestPractice": "Assignment instructions are role-specific guidance for the current step — they appear only on the active assignment screen. They are distinct from case-level notes (Pulse, audit history) and from the field tooltip. Write instructions to tell the worker WHAT to do at this specific step."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m11_q01",
+      "type": "single-select",
+      "scenario": "A user filling out a loan application form needs to understand what value to enter in a 'Requested Loan Purpose' field. The SA wants to display a short description of accepted values directly below the field label. Which UI guidance mechanism should be used?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Field-level help text — a short description shown directly beneath the field label to guide the user on valid inputs"
+        },
+        {
+          "id": "B",
+          "text": "A Pulse comment — the SA adds a comment to the Case's Pulse stream that the user reads before filling out the field"
+        },
+        {
+          "id": "C",
+          "text": "A Case-wide tooltip — a single tooltip at the top of the form describes every field in the Case for the user"
+        },
+        {
+          "id": "D",
+          "text": "An email notification — the system sends an email to the user before they open the form describing what to enter"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Short description below a field label = field-level help text.",
+      "rationale": "Field-level help text appears directly beneath or beside the field label, giving the user immediate, contextual guidance without leaving the form. Tooltips are on-demand (hover); section headers provide structural context."
+    },
+    {
+      "questionId": "m11_q02",
+      "type": "single-select",
+      "scenario": "A CSR searches for 'all closed loan applications from last quarter.' In the reporting filter, which status prefix should they use to find Cases that have reached the end of their life cycle?",
+      "options": [
+        {
+          "id": "A",
+          "text": "'Resolved-' — Cases with a status beginning with 'Resolved-' are closed; the system uses this prefix to distinguish closed Cases from active ones (New, Open, Pending)"
+        },
+        {
+          "id": "B",
+          "text": "'Closed-' — Pega uses 'Closed-' as the terminal status prefix; 'Resolved-' is used for intermediate escalation statuses"
+        },
+        {
+          "id": "C",
+          "text": "'Final-' — Case statuses ending the life cycle must begin with 'Final-' to trigger the Case closure mechanism in Pega"
+        },
+        {
+          "id": "D",
+          "text": "'Complete' — there is no required prefix; any status the team designates as terminal will automatically close the Case when set"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What prefix distinguishes a Case that has reached end-of-life from one that is mid-process?",
+      "rationale": "Cases with status beginning 'Resolved-' are closed. The 'Resolved-' prefix is the standard Pega convention that identifies terminal-state Cases — any other prefix indicates an open Case."
+    },
+    {
+      "questionId": "m11_q03",
+      "type": "single-select",
+      "scenario": "An SA configures a status update automation in a Case Life Cycle. They type 'StatusWork' as the property name. The application compiles but the status never appears in reports. A dev senior colleague identifies the property name error. What is the correct standard property name for Case work status?",
+      "options": [
+        {
+          "id": "A",
+          "text": "pyStatusWork — the 'py' prefix indicates a standard Pega system property; 'StatusWork' without the prefix references a custom property that doesn't integrate with Pega's built-in status reporting"
+        },
+        {
+          "id": "B",
+          "text": "pxStatusWork — the 'px' prefix is used for all Pega-defined work status properties; 'py' prefix is reserved for custom properties"
+        },
+        {
+          "id": "C",
+          "text": "StatusWork is correct — the prefix is optional in Pega 8.x and later; the compiler resolves it to the system property automatically"
+        },
+        {
+          "id": "D",
+          "text": "workStatus — Pega simplified the property naming in Infinity to 'workStatus'; 'py' prefixed names are deprecated"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The 'py' prefix is the key — what does it signify in Pega's property naming convention?",
+      "rationale": "pyStatusWork is the standard Pega property that stores Case work status and feeds built-in worklists, reports, and dashboards. 'StatusWork' without the 'py' prefix is not a system property."
+    },
+    {
+      "questionId": "m11_q04",
+      "type": "single-select",
+      "scenario": "A team configures Case statuses as: New → In Progress → Manager Review → Approved → Done. A lead SA reviews and says three of these five statuses violate Pega's status conventions or best practices. Which status set is correctly designed?",
+      "options": [
+        {
+          "id": "A",
+          "text": "New → Open-InProgress → Open-ManagerReview → Resolved-Approved → Resolved-Withdrawn (alternate outcome); using Open- prefix for active statuses and Resolved- for closed outcomes follows convention"
+        },
+        {
+          "id": "B",
+          "text": "New, In Progress, Review, Done, Closed — generic names without prefixes are preferred so the application can be localized later without changing status values"
+        },
+        {
+          "id": "C",
+          "text": "New, Open, Pending-Review, Completed, Resolved — mixing status families is acceptable as long as only one status begins with Resolved-"
+        },
+        {
+          "id": "D",
+          "text": "Start, Processing, Awaiting-Approval, End, Resolved-Complete — custom prefixes (Start, End) are allowed and the system treats them identically to Open- and Resolved- prefixes"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Pega uses 'New', 'Open-', and 'Resolved-' conventions. Which set follows all three?",
+      "rationale": "Convention: 'New' for initial state, 'Open-[descriptor]' for in-progress, 'Resolved-[outcome]' for terminal states. The team's statuses incorrectly mixed Open and Resolved conventions in a single status."
+    },
+    {
+      "questionId": "m11_q05",
+      "type": "single-select",
+      "scenario": "An SA wants to guide users through a complex multi-section form by displaying a numbered list of steps on the left with the current step highlighted. Which built-in Pega UI pattern is this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Navigation Panel (Progress Indicator) — shows numbered or named steps with the current step highlighted so users know where they are in the process"
+        },
+        {
+          "id": "B",
+          "text": "A Case Life Cycle Stage indicator — the Stage bar at the top of the screen shows workflow Stages, which serve as the step-by-step navigation panel"
+        },
+        {
+          "id": "C",
+          "text": "A Pulse thread — the collaboration thread on the right shows a history of steps the user has completed"
+        },
+        {
+          "id": "D",
+          "text": "A breadcrumb trail — breadcrumbs at the top of the page display parent-child navigation hierarchy rather than a step-by-step progress list"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Numbered steps on the left with current step highlighted = Navigation Panel / Progress Indicator.",
+      "rationale": "A Navigation Panel (Progress Indicator) displays the steps of a multi-section form with the current step highlighted — the standard wizard-style guidance pattern. Tooltip or help text applies to individual fields, not the overall form flow."
+    },
+    {
+      "questionId": "m11_q06",
+      "type": "single-select",
+      "scenario": "A business stakeholder asks the SA: 'How does Pega help users avoid entering a date in the wrong format?' Which built-in mechanism enforces this on the View?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Field-level validation — configuring a Date field type enforces the correct format automatically and shows an inline error if the format is wrong"
+        },
+        {
+          "id": "B",
+          "text": "A Data Page — the Data Page rejects incorrectly formatted dates before they reach the Case and returns a formatted value to the View"
+        },
+        {
+          "id": "C",
+          "text": "Channel configuration — the channel detects the user's locale and blocks incorrect date formats at the network layer before processing"
+        },
+        {
+          "id": "D",
+          "text": "A Case Life Cycle transition condition — the Stage transition checks the date format and refuses to advance the workflow if it is wrong"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Format enforcement on a form field = field-level validation (built-in on Date field type).",
+      "rationale": "Configuring the field as a Date type triggers built-in format validation — an inline error appears immediately for an incorrect format. Custom validation rules add checks beyond format; they don't replace the type-based format check."
+    },
+    {
+      "questionId": "m11_q07",
+      "type": "single-select",
+      "scenario": "An SA must add a 'Recommended' label badge next to the 'Express Processing' option in a radio button group to steer users toward that choice. Which View element type is used to add this kind of contextual annotation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A decorative/inline label element — a display-only text or badge element placed alongside the field option to annotate it"
+        },
+        {
+          "id": "B",
+          "text": "An Action — an Action is attached to the 'Express Processing' radio option to display a 'Recommended' popup when selected"
+        },
+        {
+          "id": "C",
+          "text": "A Validation rule — the validation rule flags 'Express Processing' as the default and shows 'Recommended' as a validation message"
+        },
+        {
+          "id": "D",
+          "text": "A Data Page — the Data Page includes a 'Recommended' flag field that the field option reads and renders as a badge automatically"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A decorative label/badge = display-only inline element placed next to the field option.",
+      "rationale": "Inline decorative badge elements (e.g., 'Recommended') are display-only View constructs placed next to field options for contextual annotation. They contain no business logic — only visual guidance."
+    },
+    {
+      "questionId": "m11_q08",
+      "type": "single-select",
+      "scenario": "A senior SA states: 'User guidance elements like help text and tooltips must never contain business logic.' A junior SA disagrees. Who is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The senior SA — guidance elements (help text, tooltips, inline messages) are purely presentational; business logic belongs in Automations and decision rules"
+        },
+        {
+          "id": "B",
+          "text": "The junior SA — help text can contain conditional expressions that dynamically change the guidance text based on the Case data"
+        },
+        {
+          "id": "C",
+          "text": "Both — Pega allows simple logic in guidance elements but requires complex logic to be placed in Automations"
+        },
+        {
+          "id": "D",
+          "text": "Neither — business logic in Pega is always defined exclusively in the Case Life Cycle Stage and cannot be placed anywhere else"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Guidance elements = presentational only. Logic = Automations/decision rules.",
+      "rationale": "User guidance elements (help text, tooltips, inline messages) are presentational — they display information only. Business logic belongs in Automations. Mixing logic into guidance elements couples UI to behavior."
+    },
+    {
+      "questionId": "m11_q09",
+      "type": "single-select",
+      "scenario": "A user opens a Case and sees a message: 'This application is pending document verification. Expected completion: 3 business days.' What type of user guidance is this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An inline Case status message — a display-only message embedded in the View to communicate the current Case state and expected next steps to the user"
+        },
+        {
+          "id": "B",
+          "text": "A field-level validation error — the message is triggered by a field validation that caught an incomplete document submission"
+        },
+        {
+          "id": "C",
+          "text": "An email notification — the status message is delivered via email and displayed inside the Case portal by a web hook"
+        },
+        {
+          "id": "D",
+          "text": "A Pulse comment — the Case manager posted the message to the Pulse stream and the View auto-surfaces it as an inline banner"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Informational status message in the View = inline Case status message.",
+      "rationale": "An inline Case status message is a display-only element embedded in the View that communicates the current state and next steps. It is not an action button and does not advance the Case."
+    },
+    {
+      "questionId": "m11_q10",
+      "type": "single-select",
+      "scenario": "An SA is reviewing the guidance element toolkit. A colleague asks: 'Which element would you use for a one-sentence tip that only appears when the user hovers over an information icon next to a field?' What is the answer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A tooltip — a short text that appears on hover over an icon or label, providing contextual information without taking up permanent space on the form"
+        },
+        {
+          "id": "B",
+          "text": "Help text — a short description permanently visible beneath the field label, always displayed whether or not the user hovers"
+        },
+        {
+          "id": "C",
+          "text": "An inline confirmation message — a message shown after the user submits a value, confirming it was accepted"
+        },
+        {
+          "id": "D",
+          "text": "A Pulse notification — a Pulse message appears in the collaboration stream when an information icon is activated"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Appears on hover over an icon = tooltip definition.",
+      "rationale": "A tooltip appears when the user hovers over an information icon — contextual, on-demand, and doesn't permanently occupy form space. Help text is always visible beneath the field label."
+    },
+    {
+      "questionId": "m11_q11",
+      "type": "single-select",
+      "scenario": "A 'Travel Reimbursement' form has a 'Receipt Amount' field. The SA must ensure the user sees an error message directly on the form if they enter a negative number. Which approach is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Configure a field-level validation rule on the field — the validation checks the entered value against the rule and displays an inline error on the form if it is negative"
+        },
+        {
+          "id": "B",
+          "text": "Add a Case Life Cycle transition condition — the Stage will not advance if the value is negative, which prompts the user to correct it"
+        },
+        {
+          "id": "C",
+          "text": "Configure a Data Page — the Data Page rejects negative values before the form saves and returns an error message to the View"
+        },
+        {
+          "id": "D",
+          "text": "Use a Pulse comment template — the system posts a Pulse message when a negative number is entered, visible in the collaboration panel"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Inline error on the form for invalid input = field-level validation rule.",
+      "rationale": "A field-level validation rule checks the value as the user enters or submits it and shows an inline error directly on the form — preventing submission until the constraint is met."
+    },
+    {
+      "questionId": "m11_q12",
+      "type": "single-select",
+      "scenario": "An SA must display a real-time progress bar showing how many of the application's required sections have been completed. Which Pega View element family supports this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Progress Indicator element — displays a visual bar or step counter reflecting section completion status in real time"
+        },
+        {
+          "id": "B",
+          "text": "A Data Page — the Data Page tracks completed sections and returns a progress percentage, which the View converts to a bar"
+        },
+        {
+          "id": "C",
+          "text": "An Action — a Submit Action on each section increments a counter and the action's result populates a progress bar field"
+        },
+        {
+          "id": "D",
+          "text": "A Validation rule — the cumulative count of passed validation rules is displayed as the progress metric"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Real-time visual progress bar for section completion = Progress Indicator.",
+      "rationale": "A Progress Indicator element displays visual progress (bar or step counter) as sections are completed. It is a built-in guidance component, not a custom calculation or reporting widget."
+    },
+    {
+      "questionId": "m11_q13",
+      "type": "single-select",
+      "scenario": "An SA wants to show a red banner at the top of a Claim Case View whenever the claim is flagged as 'High Priority' by a decision rule. Which guidance element type fits best?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A conditional inline alert/banner — a display element with a visibility condition tied to the priority flag that shows a colored alert when the condition is met"
+        },
+        {
+          "id": "B",
+          "text": "A tooltip — a red tooltip appears on the Case title when the case is High Priority, visible only on hover"
+        },
+        {
+          "id": "C",
+          "text": "An email notification — the priority flag triggers an email that includes the red banner image in the email body"
+        },
+        {
+          "id": "D",
+          "text": "Help text — the help text beneath the Case ID field changes color to red when the priority flag is set"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Red banner at top of View based on a condition = conditional inline alert/banner.",
+      "rationale": "A conditional inline alert or banner is configured with a visibility condition — when the priority flag is true, the red banner appears. The condition can reference any field or property in the Case."
+    },
+    {
+      "questionId": "m11_q14",
+      "type": "multi-select",
+      "scenario": "A Pega developer is setting up Case Statuses for a new Claims application. Which TWO of the following are valid Pega Case Status category prefixes?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Open-"
+        },
+        {
+          "id": "B",
+          "text": "Resolved-"
+        },
+        {
+          "id": "C",
+          "text": "Active-"
+        },
+        {
+          "id": "D",
+          "text": "Completed-"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Pega defines specific status category prefixes — recall the four standard categories, not custom naming.",
+      "rationale": "Pega's four Case Status categories are Open, Pending, Resolved, and (Reserved for Pega). Valid prefixes include Open- and Resolved-. Custom prefixes like Active- or Completed- do not conform to Pega conventions and should not be used."
+    },
+    {
+      "questionId": "m11_q15",
+      "type": "multi-select",
+      "scenario": "An SA is designing user guidance for a multi-step Claims process in Pega Constellation. Which TWO elements provide in-context guidance to users completing an Assignment?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Instructions text configured on each Assignment Step"
+        },
+        {
+          "id": "B",
+          "text": "Field-level help text configured on individual fields in the View"
+        },
+        {
+          "id": "C",
+          "text": "Audit history entries visible in the Case Summary panel"
+        },
+        {
+          "id": "D",
+          "text": "Urgency score displayed in the Worklist column"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Focus on elements shown to the user while they are actively completing a step, not after the fact.",
+      "rationale": "Instructions are configured per Assignment Step and display guidance text at the top of the step view as the user works. Field-level help text provides tooltip guidance on individual fields. Audit history and urgency scores are not user guidance mechanisms for completing a step."
+    },
+    {
+      "questionId": "m11_q16",
+      "type": "multi-select",
+      "scenario": "A BA wants to understand Case Status behavior in Pega. Which TWO statements correctly describe how Case Status communicates progress?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case Status is displayed in reports and portals to indicate where a Case is in its life cycle"
+        },
+        {
+          "id": "B",
+          "text": "Case Status changes automatically as the Case moves through Stages and Steps"
+        },
+        {
+          "id": "C",
+          "text": "Case Status is only visible to administrators and not to end users"
+        },
+        {
+          "id": "D",
+          "text": "Case Status must be manually updated by a user at each step to reflect progress"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Think about what Case Status is designed to communicate and whether it updates automatically.",
+      "rationale": "Case Status is visible in portals, reports, and Case views to communicate progress to all stakeholders. Pega automatically updates the Case Status as the Case transitions through stages and steps — users do not need to manually update it."
+    },
+    {
+      "questionId": "m11_q17",
+      "type": "multi-select",
+      "scenario": "An SA is reviewing Case Status values configured in a Pega Claims application. Which TWO statements describe the correct naming convention for Case Status?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case statuses must use one of the four Pega-defined category prefixes: Open-, Pending-, Resolved-, or the Reserved category"
+        },
+        {
+          "id": "B",
+          "text": "Custom status values within a category follow the Category-Description pattern, such as 'Open-Investigation' or 'Resolved-Withdrawn'"
+        },
+        {
+          "id": "C",
+          "text": "Pega allows any freeform status text with no naming convention, and categories are optional"
+        },
+        {
+          "id": "D",
+          "text": "All Case statuses must be prefixed with the application name to prevent conflicts across Case Types in the same Ruleset"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Case Status follows a Category-Description pattern using the four Pega-defined prefixes.",
+      "rationale": "Pega defines four Case Status categories: Open, Pending, Resolved, and Reserved (for Pega internal use). Custom statuses within each category follow the Category-Description naming pattern (e.g., Open-Investigation, Resolved-Withdrawn). Freeform status text and application-name prefixes do not conform to Pega conventions and should be avoided."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Case status",
+      "value": "Communicates where the Case stands; supports reporting/notifications; stored in pyStatusWork."
+    },
+    {
+      "key": "Status prefixes",
+      "value": "New, Open, Pending, Resolved- (Resolved- closes the Case, e.g., Resolved-Completed/Resolved-Rejected)."
+    },
+    {
+      "key": "Setting status",
+      "value": "Set via the life cycle (on Stages/Steps) or a Set/Change Status automation at meaningful points."
+    },
+    {
+      "key": "Step instructions",
+      "value": "Tell the assignee what to do; appear at runtime on the assignment form."
+    },
+    {
+      "key": "Guidance goal",
+      "value": "Status (where it stands) + instructions (what to do) keep users oriented and efficient."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Case status",
+      "url": "https://academy.pega.com/topic/case-status/v5/in/72681/66426/66631",
+      "duration": "5 min"
+    },
+    {
+      "title": "Assignment instructions",
+      "url": "https://academy.pega.com/topic/assignment-instructions/v4/in/72681/66426/66631",
+      "duration": "5 min"
+    }
+  ]
+}

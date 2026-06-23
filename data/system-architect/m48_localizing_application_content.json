@@ -1,0 +1,573 @@
+{
+  "moduleId": "m48",
+  "moduleTitle": "Localizing application content",
+  "moduleUrl": "https://academy.pega.com/module/localizing-application-content/v5/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/localizing-application-content/v5/quiz/in/96211",
+  "learningObjectives": [
+    "Describe how Pega Platform localizes applications using Rulesets, language packs, and locale settings.",
+    "Identify design considerations for localization including picklist properties, dynamic values, Paragraph Rules, and Data Page controls."
+  ],
+  "estTime": "~25 min · 2 topics",
+  "topics": [
+    {
+      "title": "Localization",
+      "url": "https://academy.pega.com/topic/localization/v5/in/96211/38046",
+      "duration": "15 min"
+    },
+    {
+      "title": "Design considerations for localization",
+      "url": "https://academy.pega.com/topic/design-considerations-localization/v3/in/96211/38046",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Localization Fundamentals",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "Localization in Pega is like preparing a restaurant menu for international guests: you translate the text (language), change the currency symbol and date formats (locale-specific components), and flip the layout for right-to-left readers (RTL). The language pack is a pre-translated menu template — it only works if it fits the same restaurant format (UI architecture) and edition (version)."
+        },
+        {
+          "type": "concept",
+          "term": "Localization — 3 aspects",
+          "description": "Adapts an application for a specific language or region by: (1) translating text, (2) converting locale-specific components (currency symbols, calendar settings), (3) adapting the UI for right-to-left (RTL) text direction if relevant."
+        },
+        {
+          "type": "concept",
+          "term": "Locale priority",
+          "description": "Pega first checks the browser locale. If the operator profile specifies a different locale, the profile locale takes precedence. If no Ruleset exists for the selected locale, the UI displays English (default)."
+        },
+        {
+          "type": "concept",
+          "term": "Language packs",
+          "description": "A translated Ruleset with values for fields that typically appear in every application (button labels, prompts). Import via the Localization landing page. The pack must match the same version AND UI architecture (e.g., Constellation v8.8)."
+        },
+        {
+          "type": "concept",
+          "term": "Localization process — 3 steps",
+          "description": "① Generate a translation package (ZIP) from Pega. ② Translate the text (GenAI can assist in Constellation). ③ Import the translated package back into Pega. Pega automatically applies the correct Ruleset based on user locale."
+        },
+        {
+          "type": "concept",
+          "term": "Verifying localization",
+          "description": "Update the default locale on the current operator record in Dev Studio. Log out and back in for the change to take effect. Check labels, notes, instructions, messages, and emails; add missing translations, import, and verify again."
+        },
+        {
+          "type": "concept",
+          "term": "Localization limitations in Constellation",
+          "description": "CAN localize: labels, captions, tooltips, instructions in Views and Portals. CANNOT localize: Decision tables and decision trees, Case Statuses, radio buttons and drop-down controls in a table."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 420 230\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"400\" height=\"210\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"210\" y=\"33\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Localization Process</text><rect x=\"30\" y=\"50\" width=\"100\" height=\"44\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"80\" y=\"70\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"bold\" fill=\"var(--pa-ink)\">1. Generate</text><text x=\"80\" y=\"85\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">translation ZIP</text><line x1=\"130\" y1=\"72\" x2=\"160\" y2=\"72\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"160\" y=\"50\" width=\"100\" height=\"44\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"210\" y=\"70\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"bold\" fill=\"var(--pa-ink)\">2. Translate</text><text x=\"210\" y=\"85\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">(GenAI optional)</text><line x1=\"260\" y1=\"72\" x2=\"290\" y2=\"72\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\" marker-end=\"url(#arr)\"/><rect x=\"290\" y=\"50\" width=\"100\" height=\"44\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"340\" y=\"70\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"bold\" fill=\"var(--pa-ink)\">3. Import</text><text x=\"340\" y=\"85\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Localization page</text><defs><marker id=\"arr\" markerWidth=\"6\" markerHeight=\"6\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 Z\" fill=\"var(--pa-brand)\"/></marker></defs><line x1=\"210\" y1=\"115\" x2=\"210\" y2=\"135\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"210\" y=\"130\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-3)\">Pega auto-selects Ruleset by user locale</text><rect x=\"60\" y=\"145\" width=\"290\" height=\"60\" rx=\"6\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"205\" y=\"163\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"bold\" fill=\"var(--pa-ok)\">Locale Priority</text><text x=\"205\" y=\"178\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Browser locale → Operator profile overrides → No Ruleset match = English</text><text x=\"205\" y=\"193\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-err)\">Pack must match: same version + same UI architecture</text></svg>",
+          "caption": "Localization: Generate ZIP → Translate → Import. Locale priority: browser → operator profile. No matching Ruleset → English default."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Design Considerations for Localization",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Picklist properties — omitted from package",
+          "description": "When generating a translation package, Pega OMITS local properties with multiple values (e.g., picklist properties). You must add these manually by editing the localization file in Dev Studio."
+        },
+        {
+          "type": "concept",
+          "term": "Dynamic values — must also be localized",
+          "description": "Applications may use dynamic values to replace placeholder values in phrases (e.g., inserting the customer's name into UI text). Phrases that use dynamic values must also be localized."
+        },
+        {
+          "type": "concept",
+          "term": "Paragraph Rules — manual translation only",
+          "description": "Step instructions in Paragraph Rules are NOT automatically extracted into the translation package. Localize by editing the <p> tags in the paragraph/translated folder files, then upload the compressed folder, change locale, and verify."
+        },
+        {
+          "type": "concept",
+          "term": "Data Page controls — not auto-included",
+          "description": "Translation packages exclude text from radio buttons/drop-downs sourced from Data Pages (empty at generation). To include: App Studio → Settings → Localization → Additional text. For unreferenced Data Pages, create the localization Rule manually."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 260\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">DESIGN CONSIDERATIONS FOR LOCALIZATION</text><rect x=\"10\" y=\"28\" width=\"215\" height=\"104\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Language Pack Requirements</text><text x=\"117\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Must match Platform VERSION</text><text x=\"117\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">AND UI architecture</text><text x=\"117\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Traditional ≠ Constellation packs</text><text x=\"117\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Both conditions must match</text><rect x=\"253\" y=\"28\" width=\"215\" height=\"104\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Translation Package</text><text x=\"360\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">✓ UI text, field labels</text><text x=\"360\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">✓ Section / view content</text><text x=\"360\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">✗ Picklist values (manual)</text><text x=\"360\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">✗ Paragraph rules (manual)</text><rect x=\"496\" y=\"28\" width=\"215\" height=\"104\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Constellation Restrictions</text><text x=\"603\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">✗ Decision Tables</text><text x=\"603\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">✗ Case Statuses</text><text x=\"603\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">✗ Data Page controls</text><text x=\"603\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Cannot be localized at all</text><rect x=\"10\" y=\"150\" width=\"700\" height=\"96\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"170\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">Locale Priority &amp; Fallback</text><rect x=\"30\" y=\"182\" width=\"200\" height=\"50\" rx=\"8\" fill=\"rgba(109,139,255,0.15)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"130\" y=\"202\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Operator Profile</text><text x=\"130\" y=\"220\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Highest priority (overrides browser)</text><text x=\"265\" y=\"208\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"18\">›</text><rect x=\"285\" y=\"182\" width=\"200\" height=\"50\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"385\" y=\"202\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\">Browser Locale</text><text x=\"385\" y=\"220\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Used only if operator profile unset</text><text x=\"520\" y=\"208\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"18\">›</text><rect x=\"540\" y=\"182\" width=\"160\" height=\"50\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1\"/><text x=\"620\" y=\"202\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"700\">English fallback</text><text x=\"620\" y=\"220\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">No error — silent fallback</text></svg>",
+          "caption": "Localization design: language pack requirements, translation package inclusions/exclusions, Constellation limits, and locale priority chain."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Locale priority: operator profile overrides browser",
+      "trapDescription": "Questions ask which locale setting takes precedence when an operator's profile locale conflicts with the browser locale. Candidates say 'browser' (it is the most visible setting to users). Operator profile locale overrides browser locale.",
+      "bestPractice": "Pega first checks browser locale, but if the operator profile specifies a different locale, the profile locale takes precedence."
+    },
+    {
+      "title": "No matching locale Ruleset → English, not an error",
+      "trapDescription": "A scenario adds a new locale but no Ruleset exists for it. Candidates say the application throws an error or shows blank content. When no matching locale Ruleset exists, Pega silently falls back to English — no error is shown.",
+      "bestPractice": "If the application does not contain a Ruleset for the selected locale, the UI displays the default language: English."
+    },
+    {
+      "title": "Language pack must match both version AND UI architecture",
+      "trapDescription": "Questions ask what must match when installing a language pack. Candidates check only the Pega version. A language pack must match BOTH the Platform version AND the UI architecture (Traditional vs Constellation) — a Constellation pack will not work on Traditional UI.",
+      "bestPractice": "Language packs must match both the same version AND the same UI architecture. A Constellation v8.8 pack cannot be used in a Section-based v8.8 app."
+    },
+    {
+      "title": "Picklist properties are omitted from translation packages",
+      "trapDescription": "A question asks what is included in a Pega translation package export. Candidates expect all text, including picklist options. Picklist property values are explicitly excluded from translation packages and must be translated separately.",
+      "bestPractice": "Properties with multiple values (picklists) are omitted from auto-generated packages. Add them manually by editing the localization file in Dev Studio."
+    },
+    {
+      "title": "Paragraph Rules require manual translation",
+      "trapDescription": "Questions ask which content types are auto-included in translation packages. Candidates include Paragraph rules expecting all UI text is captured. Paragraph rules are NOT auto-included — they require manual translation outside the standard package.",
+      "bestPractice": "Paragraph Rules require manual translation. Edit the <p> tags in the paragraph/translated folder files within the translation ZIP package."
+    },
+    {
+      "title": "Data Page controls not auto-included in translation package",
+      "trapDescription": "A question asks whether Data Page control labels are captured by the translation package export. Candidates say yes. Data Page controls are not auto-included — they must be manually added to the translation scope.",
+      "bestPractice": "In Constellation, controls sourced from Data Pages are NOT auto-included (Data Pages are empty at package generation time). Add them via App Studio > Settings > Localization > Additional text tab."
+    },
+    {
+      "title": "Cannot localize Decision tables, Case Statuses in Constellation",
+      "trapDescription": "Questions ask what content types can be localized in a Constellation application. Candidates include Decision Tables and Case Statuses. Both are explicitly unsupported for localization in Constellation — they cannot be translated.",
+      "bestPractice": "In Constellation, you cannot localize: Decision tables and decision trees, Case Statuses, and radio buttons/drop-down controls in a table."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m48_q01",
+      "type": "single-select",
+      "scenario": "An SA is beginning a project to extend a Pega Claims application to support French and German users in addition to English-speaking users. The project manager asks what localization in Pega Platform actually involves beyond simple text translation. What does localization in Pega Platform involve?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Translating text, converting locale-specific components (currency, calendars), and adapting the UI for RTL text if needed"
+        },
+        {
+          "id": "B",
+          "text": "Only translating the text in the application to the target language"
+        },
+        {
+          "id": "C",
+          "text": "Replacing all English text with translated text and redeploying the application"
+        },
+        {
+          "id": "D",
+          "text": "Configuring user roles to restrict access by region"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Localization covers more than language translation — it includes date, time, and currency formats.",
+      "rationale": "Localization adapts the app for a specific region by: (1) translating text, (2) converting locale-specific components such as currency symbols and calendar settings, and (3) adapting the UI for right-to-left (RTL) text direction when needed."
+    },
+    {
+      "questionId": "m48_q02",
+      "type": "single-select",
+      "scenario": "An operator's browser is set to French, but their Pega operator profile is set to German. Which locale does Pega Platform use?",
+      "options": [
+        {
+          "id": "A",
+          "text": "German — the operator profile locale overrides the browser locale"
+        },
+        {
+          "id": "B",
+          "text": "French — Pega always uses the browser locale"
+        },
+        {
+          "id": "C",
+          "text": "English — Pega defaults to English when there is a conflict"
+        },
+        {
+          "id": "D",
+          "text": "The user is prompted to choose between French and German"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "When browser locale conflicts with operator profile locale, which one takes precedence in Pega?",
+      "rationale": "Pega Platform determines display locale using a two-step resolution: first it reads the user's browser locale setting, then it checks the operator's profile. If the operator's profile specifies a locale different from the browser, the profile locale takes precedence and overrides the browser setting. This allows individuals to maintain their preferred language regardless of the device they log in from."
+    },
+    {
+      "questionId": "m48_q03",
+      "type": "single-select",
+      "scenario": "A user selects Japanese as their locale, but the application does not have a Japanese Ruleset. What does Pega display?",
+      "options": [
+        {
+          "id": "A",
+          "text": "English — the default language"
+        },
+        {
+          "id": "B",
+          "text": "An error message indicating the locale is not supported"
+        },
+        {
+          "id": "C",
+          "text": "A blank application with no text"
+        },
+        {
+          "id": "D",
+          "text": "The application in the closest supported language"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Missing locale Rulesets fall back to the default.",
+      "rationale": "When a user's selected locale does not match any available locale Ruleset in the Pega application, the platform falls back gracefully to its default language — English. No error is displayed to the user; the application simply renders in English. Localization administrators must add the appropriate locale Rulesets to support additional languages beyond the default."
+    },
+    {
+      "questionId": "m48_q04",
+      "type": "single-select",
+      "scenario": "A developer tries to import a language pack into a Constellation v8.8 application, but the pack is for a Section-based v8.8 application. What happens?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The language pack is not supported — it must match the same UI architecture"
+        },
+        {
+          "id": "B",
+          "text": "The language pack works because it's the same Pega version"
+        },
+        {
+          "id": "C",
+          "text": "The language pack is automatically converted to Constellation format"
+        },
+        {
+          "id": "D",
+          "text": "The language pack works but only for button labels and prompts"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Both the version number AND the UI architecture must match when importing a language pack.",
+      "rationale": "Language packs must match both the same version AND the same UI architecture. A Section-based v8.8 pack is not supported in a Constellation v8.8 application."
+    },
+    {
+      "questionId": "m48_q05",
+      "type": "single-select",
+      "scenario": "After updating the operator record locale in Dev Studio, the developer does not see any UI language changes. What should they do?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Log out and log back into the application"
+        },
+        {
+          "id": "B",
+          "text": "Restart the Pega application server"
+        },
+        {
+          "id": "C",
+          "text": "Clear the translation package and re-import"
+        },
+        {
+          "id": "D",
+          "text": "Change the locale in Admin Studio instead of Dev Studio"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A simple session restart resolves locale refresh issues.",
+      "rationale": "Language packs must match both the version (e.g., v8.8) AND the UI architecture (Constellation vs Traditional). Mismatched packs will not import correctly or will produce incorrect translations."
+    },
+    {
+      "questionId": "m48_q06",
+      "type": "single-select",
+      "scenario": "Which of the following content types CANNOT be localized in a Constellation Pega application?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Decision tables and decision trees"
+        },
+        {
+          "id": "B",
+          "text": "Labels and captions in Views"
+        },
+        {
+          "id": "C",
+          "text": "Tooltips in Portals"
+        },
+        {
+          "id": "D",
+          "text": "Instructions in user-facing components"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "One content type has an explicit Constellation localization limitation.",
+      "rationale": "Pega Constellation applications support localization of most user-facing text elements — including labels, captions, tooltips, and instructional text in Views and Portals. However, two Rule types cannot be localized in Constellation: Decision tables and Decision trees. Teams relying on localized business logic output must work around this limitation by using localized field values rather than Decision Rule results."
+    },
+    {
+      "questionId": "m48_q07",
+      "type": "multi-select",
+      "selectCount": 3,
+      "scenario": "Which of the following CANNOT be localized in Constellation applications? (Select 3)",
+      "options": [
+        {
+          "id": "A",
+          "text": "Decision tables and decision trees"
+        },
+        {
+          "id": "B",
+          "text": "Case Statuses"
+        },
+        {
+          "id": "C",
+          "text": "Radio buttons and drop-down controls in a table"
+        },
+        {
+          "id": "D",
+          "text": "Labels and captions in Views"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Three of these are explicitly listed as Constellation localization limitations.",
+      "rationale": "In Pega Constellation, the localization system has specific exclusions. Items that cannot be localized include: Decision tables and trees, Case Status values, and radio button or drop-down controls when they appear inside a table. Labels and captions elsewhere in Views and Portals can be localized. Teams should plan their data model and UI design to accommodate these localization constraints."
+    },
+    {
+      "questionId": "m48_q08",
+      "type": "single-select",
+      "scenario": "A developer generates a translation package but notices that the vehicle type picklist values (car, van, truck, motorcycle) are missing from the package. What is the cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Properties with multiple values (picklists) are omitted from auto-generated translation packages"
+        },
+        {
+          "id": "B",
+          "text": "Picklist properties require a separate Localization Ruleset to be created first"
+        },
+        {
+          "id": "C",
+          "text": "Picklist values are stored in Data Pages and must be translated in App Studio"
+        },
+        {
+          "id": "D",
+          "text": "The package was generated before the picklist Rule was saved"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Multi-value properties have special handling in translation packages.",
+      "rationale": "When generating a translation package, Pega omits local properties that have multiple values (such as picklist properties). These must be added manually by editing the localization file in Dev Studio."
+    },
+    {
+      "questionId": "m48_q09",
+      "type": "single-select",
+      "scenario": "A developer needs to localize step instructions stored in a Paragraph Rule. What is the correct approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Edit the <p> tags in the paragraph/translated folder files within the translation ZIP, then upload and verify"
+        },
+        {
+          "id": "B",
+          "text": "Open the Paragraph Rule in App Studio and type the translated text directly"
+        },
+        {
+          "id": "C",
+          "text": "Use the Localization landing page to automatically translate Paragraph Rule text"
+        },
+        {
+          "id": "D",
+          "text": "Paragraph Rules cannot be localized in Pega Platform"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Paragraph Rules require manual editing in the translation package.",
+      "rationale": "Paragraph Rules require manual translation. The translation ZIP includes a paragraph/base file. Localize by editing the <p> tags in the paragraph/translated folder files. Upload the compressed folder, change locale, and run the app to verify."
+    },
+    {
+      "questionId": "m48_q10",
+      "type": "single-select",
+      "scenario": "In a Constellation application, drop-down controls are sourced from a Data Page. After generating a translation package, a developer notices these controls are not included. What should they do?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Edit the Data Page record via App Studio > Settings > Localization > Additional text tab"
+        },
+        {
+          "id": "B",
+          "text": "Regenerate the translation package after populating the Data Page with test data"
+        },
+        {
+          "id": "C",
+          "text": "Convert the Data Page controls to hardcoded values before generating the package"
+        },
+        {
+          "id": "D",
+          "text": "Nothing — Data Page controls are automatically included after the first application run"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "There's a dedicated place in App Studio Settings to add Data Page controls.",
+      "rationale": "In Constellation, the translation package does not automatically include text from controls sourced from Data Pages (they are empty at generation time). Add them via App Studio > Settings > Localization > Additional text tab."
+    },
+    {
+      "questionId": "m48_q11",
+      "type": "single-select",
+      "scenario": "After all language Rulesets are imported and tested, how does Pega Platform determine which language to display for each user?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Automatically, based on the user's locale — no further configuration is needed"
+        },
+        {
+          "id": "B",
+          "text": "The developer must configure which language to display for each Access Group"
+        },
+        {
+          "id": "C",
+          "text": "Pega always displays the most recently imported language pack"
+        },
+        {
+          "id": "D",
+          "text": "The user selects their language on the login screen each session"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Once Rulesets are imported, Pega handles locale selection automatically.",
+      "rationale": "Once Rulesets for all languages are imported and tested, Pega Platform automatically uses the appropriate Ruleset based on the user's locale. No further work is required."
+    },
+    {
+      "questionId": "m48_q12",
+      "type": "single-select",
+      "scenario": "A Constellation application uses a Data Page for a drop-down control, but the Data Page is not referenced in any View. How should the developer add it to the translation package?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Create the localization Rule for that Data Page manually"
+        },
+        {
+          "id": "B",
+          "text": "Reference the Data Page in at least one View, then regenerate the translation package"
+        },
+        {
+          "id": "C",
+          "text": "Add the Data Page values directly to the translation ZIP file using a text editor"
+        },
+        {
+          "id": "D",
+          "text": "It cannot be localized if not referenced in a View"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "There is a manual fallback for unreferenced Data Pages.",
+      "rationale": "If the Data Page you want to localize is not referenced in any View, you must create the localization Rule for that Data Page manually."
+    },
+    {
+      "questionId": "m48_q13",
+      "type": "multi-select",
+      "scenario": "An SA is implementing localization for a Pega application that must support English and Spanish users. Which TWO Pega components are used to implement language localization?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Language packs — pre-built Pega-provided translation bundles for UI labels, messages, and system-level portal text"
+        },
+        {
+          "id": "B",
+          "text": "Locale-specific Rulesets — containing localized versions of Paragraph rules, correspondence templates, and UI field labels for a target locale"
+        },
+        {
+          "id": "C",
+          "text": "Custom database tables created per language to store all translated field values outside of Pega Rulesets"
+        },
+        {
+          "id": "D",
+          "text": "Separate Pega application installations per language with no shared Rulesets between them"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Pega localizes via language packs (system text) and locale Rulesets (application-specific translated rules).",
+      "rationale": "Pega localization uses language packs for system-level UI text (buttons, labels, portal chrome) and locale-specific Rulesets to contain localized versions of application-specific rules like Paragraph rules and correspondence. Custom database tables and separate application installations are not the Pega-supported localization approach."
+    },
+    {
+      "questionId": "m48_q14",
+      "type": "multi-select",
+      "scenario": "An SA is reviewing design best practices for a Pega application that must support multiple locales. Which TWO design decisions are most important for ensuring proper localization?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use Paragraph Rules for any user-facing text that must appear in correspondence or Case UI, so it can be localized per locale"
+        },
+        {
+          "id": "B",
+          "text": "Avoid hardcoding option values in Picklist fields — use Data Pages or Text rules that can return locale-appropriate values instead"
+        },
+        {
+          "id": "C",
+          "text": "Create a separate Data Model per language to ensure field labels are stored in the correct locale"
+        },
+        {
+          "id": "D",
+          "text": "Standardize all date formats to US MM/DD/YYYY format to ensure data consistency across all locales"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Use Paragraph Rules for localizable text and avoid hardcoded picklist values — both prevent locale-specific rework.",
+      "rationale": "Paragraph Rules allow user-facing text to be translated per locale without changing Case logic. Avoiding hardcoded picklist values by using Data Pages or Text rules ensures dropdown options are locale-aware. Creating separate Data Models per language is unnecessary — the field structure is shared, only the display values differ."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Localization — 3 aspects",
+      "value": "Translate text + convert locale-specific components (currency, calendar) + RTL support."
+    },
+    {
+      "key": "Locale priority",
+      "value": "Browser locale first; operator profile locale overrides. No matching Ruleset → displays English."
+    },
+    {
+      "key": "Language packs",
+      "value": "Pre-translated Rulesets for common fields (buttons, prompts). Must match same version AND same UI architecture."
+    },
+    {
+      "key": "Localization process",
+      "value": "Generate ZIP → Translate (GenAI optional) → Import via Localization landing page. Pega auto-selects Ruleset by user locale."
+    },
+    {
+      "key": "Verify localization",
+      "value": "Update operator locale in Dev Studio; log out/in to apply. Check all labels, messages, emails."
+    },
+    {
+      "key": "Cannot localize (Constellation)",
+      "value": "Decision tables/trees, Case Statuses, radio buttons/drop-downs in a table."
+    },
+    {
+      "key": "Picklists omitted",
+      "value": "Multi-value properties excluded from auto-generated packages. Add manually via Dev Studio localization file."
+    },
+    {
+      "key": "Paragraph Rules",
+      "value": "Manual translation only. Edit <p> tags in paragraph/translated folder in the translation ZIP."
+    },
+    {
+      "key": "Data Page controls",
+      "value": "Not auto-included. Add via App Studio > Settings > Localization > Additional text tab. If not in any View, create localization Rule manually."
+    }
+  ]
+}

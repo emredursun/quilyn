@@ -1,0 +1,594 @@
+{
+  "moduleId": "m14",
+  "moduleTitle": "Cascading approvals",
+  "moduleUrl": "https://academy.pega.com/module/cascading-approvals/v4/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/cascading-approvals/v4/quiz/in/96211",
+  "learningObjectives": [
+    "Identify suitable use cases for cascading approvals versus a single approval",
+    "Compare the advantages of approvals using a reporting structure versus an authority matrix",
+    "Configure cascading approvals with an organizational hierarchy and with an authority matrix",
+    "Build conditional approval levels within a reporting hierarchy"
+  ],
+  "estTime": "15 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Cascading approvals: what and when",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Cascading approval",
+          "description": "Approvals routed SEQUENTIALLY — one approver at a time. The next approver is asked only AFTER the current one approves. Not a parallel vote or majority tally — each level must approve in turn."
+        },
+        {
+          "type": "analogy",
+          "text": "Cascading approvals are like a chain of waterfalls: the case flows from one level of authority to the next, each approver reviewing and passing it downstream. Configure the chain with an authority matrix that maps reporting relationships — like water that must pass through every fall in sequence before reaching the pool at the bottom, with no fall skippable."
+        },
+        {
+          "type": "concept",
+          "term": "Single vs. cascading",
+          "description": "A SINGLE approval has exactly one approver. A CASCADING approval chains multiple approvals together. Configure the Approval Step to cascade when work needs sign-off from a management chain or from several authorities before it can proceed."
+        },
+        {
+          "type": "concept",
+          "term": "Two models for the approver chain",
+          "description": "REPORTING STRUCTURE — climbs the org chart from submitter upward (manager, manager's manager, etc.). AUTHORITY MATRIX — a decision table lists the specific approvers and conditions, including people OUTSIDE the reporting line."
+        },
+        {
+          "type": "concept",
+          "term": "Four design questions",
+          "description": "Answer before configuring: (1) Who approves? (2) How many approvals? (3) Is the entire reporting hierarchy required or only a subset? (4) Are approvers outside the hierarchy needed? Answers 3–4 determine reporting structure vs. authority matrix."
+        },
+        {
+          "type": "concept",
+          "term": "Rejection ends the chain",
+          "description": "A REJECTION at any level stops the cascade immediately — remaining approvers are never asked, and the Case routes to the configured rejection/rework path. Every approver in the chain must approve for the Case to pass."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 300\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Cascading Approval Models</title>\n<desc>Reporting structure climbs the manager hierarchy sequentially; Authority matrix uses a decision table to build an ordered list of approvers including parties outside the hierarchy</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">TWO CASCADING-APPROVAL MODELS</text>\n<rect x=\"20\" y=\"44\" width=\"356\" height=\"236\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"76\" font-size=\"14\" font-weight=\"700\" fill=\"#0E3D28\">Reporting Structure</text>\n<text x=\"40\" y=\"94\" font-size=\"11\" fill=\"#1E8A5B\">Climbs the manager (reports-to) chain in order</text>\n<rect x=\"120\" y=\"110\" width=\"176\" height=\"36\" rx=\"8\" fill=\"#0E3D28\" fill-opacity=\".12\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"208\" y=\"133\" font-size=\"12\" fill=\"#0E3D28\" text-anchor=\"middle\">Direct Manager</text>\n<line x1=\"208\" y1=\"146\" x2=\"208\" y2=\"162\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<polygon points=\"203,162 208,172 213,162\" fill=\"#1E8A5B\"/>\n<rect x=\"120\" y=\"172\" width=\"176\" height=\"36\" rx=\"8\" fill=\"#0E3D28\" fill-opacity=\".12\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"208\" y=\"195\" font-size=\"12\" fill=\"#0E3D28\" text-anchor=\"middle\">Senior Manager</text>\n<line x1=\"208\" y1=\"208\" x2=\"208\" y2=\"224\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<polygon points=\"203,224 208,234 213,224\" fill=\"#1E8A5B\"/>\n<rect x=\"120\" y=\"234\" width=\"176\" height=\"36\" rx=\"8\" fill=\"#0E3D28\" fill-opacity=\".12\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"208\" y=\"257\" font-size=\"12\" fill=\"#0E3D28\" text-anchor=\"middle\">Director (if amount high)</text>\n<text x=\"40\" y=\"282\" font-size=\"10.5\" fill=\"#1E8A5B\">How far up = conditional, set by business logic</text>\n<rect x=\"404\" y=\"44\" width=\"356\" height=\"236\" rx=\"14\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"2\"/>\n<text x=\"424\" y=\"76\" font-size=\"14\" font-weight=\"700\" fill=\"#2B2580\">Authority Matrix</text>\n<text x=\"424\" y=\"94\" font-size=\"11\" fill=\"#534AB7\">Decision table → ordered list of approvers</text>\n<rect x=\"424\" y=\"108\" width=\"316\" height=\"28\" rx=\"5\" fill=\"#534AB7\"/>\n<text x=\"436\" y=\"127\" font-size=\"11\" font-weight=\"700\" fill=\"#ffffff\">Condition (row)</text>\n<text x=\"628\" y=\"127\" font-size=\"11\" font-weight=\"700\" fill=\"#ffffff\">Adds approver</text>\n<rect x=\"424\" y=\"140\" width=\"316\" height=\"28\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\".5\"/>\n<text x=\"436\" y=\"159\" font-size=\"11\" fill=\"#2B2580\">Amount &gt; $50k</text>\n<text x=\"628\" y=\"159\" font-size=\"11\" fill=\"#2B2580\">+ CFO</text>\n<rect x=\"424\" y=\"168\" width=\"316\" height=\"28\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\".5\"/>\n<text x=\"436\" y=\"187\" font-size=\"11\" fill=\"#2B2580\">Contract = vendor</text>\n<text x=\"628\" y=\"187\" font-size=\"11\" fill=\"#2B2580\">+ Legal</text>\n<rect x=\"424\" y=\"196\" width=\"316\" height=\"28\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\".5\"/>\n<text x=\"436\" y=\"215\" font-size=\"11\" fill=\"#2B2580\">Data includes PII</text>\n<text x=\"628\" y=\"215\" font-size=\"11\" fill=\"#2B2580\">+ Compliance</text>\n<text x=\"424\" y=\"258\" font-size=\"10.5\" fill=\"#534AB7\">Each matching row adds a party — incl. ones</text>\n<text x=\"424\" y=\"272\" font-size=\"10.5\" fill=\"#534AB7\">OUTSIDE the reporting line; routed in list order</text>\n</svg>",
+          "caption": "Reporting structure climbs the manager hierarchy in order (how far up is conditional). Authority matrix uses a decision table — each satisfied condition adds an approver to an ordered list, including parties outside the reporting line."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Reporting structure (and conditional levels)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Reporting structure approval",
+          "description": "Configured in Dev Studio: add an Approve/Reject Step, select Cascading → Reporting structure. The approver comes from the operator's ID record (reporting or workgroup manager), and the cascade climbs the org chart automatically."
+        },
+        {
+          "type": "concept",
+          "term": "Number of approvers: One / All / Custom",
+          "description": "Reporting structure offers three climb settings: ONE (immediate manager only), ALL (full hierarchy to the top), or CUSTOM (specific levels driven by When rules, e.g., small expenses stop at manager; large ones cascade further)."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Authority matrix",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Authority matrix approval",
+          "description": "Select Cascading → Authority matrix in Dev Studio. The approver list is populated from a Decision Table, Data Page, Activity, or Data Transform. Each satisfied row adds its approver; Assignments route in list order."
+        },
+        {
+          "type": "concept",
+          "term": "Decision table: set 'Evaluate all rows'",
+          "description": "CRITICAL: an authority matrix Decision table must be set to EVALUATE ALL ROWS — otherwise it stops at the FIRST matching row, returns only ONE approver, and the cascade is incomplete."
+        },
+        {
+          "type": "concept",
+          "term": "When authority matrix beats reporting structure",
+          "description": "Use authority matrix when approvals must include people OUTSIDE the reporting structure — e.g., Legal, Compliance, Procurement. More flexible than reporting structure, which can only reach people in the management hierarchy."
+        },
+        {
+          "type": "interactive",
+          "title": "Cascading approval: pick the right model",
+          "height": 460,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\":\"Fixed hierarchy\",\"scenario\":\"A promotion request must always be approved by the employee's direct manager, then that manager's manager, then the HR director — the same chain every time. Which model?\",\"opts\":[\"Reporting structure — it climbs the manager (reports-to) chain automatically; ideal when the approvers are the submitter's management line\",\"Authority matrix — you must list each manager by name in a decision table\",\"A single approval routed to HR — one approver can stand in for the whole chain\",\"Parallel approval — send to all three at once and take a majority\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. The chain is the org hierarchy, so reporting structure walks the reports-to relationships automatically.\",\"\\u2717 Incorrect. An authority matrix is for approvers OUTSIDE the hierarchy or condition-driven parties — overkill when it is simply the manager chain.\",\"\\u2717 Incorrect. A single approval gives one approver; this needs several in sequence.\",\"\\u2717 Incorrect. Cascading approvals are sequential, not a parallel majority vote.\"]}, {\"label\":\"Conditional depth\",\"scenario\":\"An expense request always goes up the manager chain, but how FAR depends on the amount: under $5k stops at the manager; larger amounts also need a senior manager and a director. Which model and feature?\",\"opts\":[\"Reporting structure with conditional levels — business logic on the amount decides how many levels up the cascade goes\",\"Authority matrix — only a decision table can vary the number of approvers\",\"Two separate Case Types, one per amount band\",\"A parallel approval whose threshold is the dollar amount\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. Reporting structure supports conditional levels: a When condition/threshold on Case data sets how far up the chain to climb.\",\"\\u2717 Incorrect. The approvers here are all in the manager chain, so reporting structure with conditional levels fits — no authority matrix needed.\",\"\\u2717 Incorrect. Splitting into Case Types is heavy and unnecessary; conditional levels handle this in one approval.\",\"\\u2717 Incorrect. Cascading is sequential; there is no dollar-amount 'threshold' vote.\"]}, {\"label\":\"Outside the hierarchy\",\"scenario\":\"A vendor contract needs sign-off from the submitter's manager AND from Legal and Compliance — neither of whom is in the submitter's reporting line, and only when the contract is high-risk. Which model?\",\"opts\":[\"Authority matrix — a decision table adds Legal and Compliance based on conditions; it can include approvers outside the reporting structure\",\"Reporting structure — climbing the manager chain will eventually reach Legal and Compliance\",\"A single approval routed to Legal — Legal can approve for everyone\",\"Reporting structure with conditional levels — set the level count to 3\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. Legal and Compliance are outside the reporting line and required conditionally — exactly what an authority matrix (decision table) handles.\",\"\\u2717 Incorrect. Climbing the manager chain never reaches Legal/Compliance unless they happen to be the submitter's managers.\",\"\\u2717 Incorrect. A single approval gives one approver and ignores the manager + conditional parties.\",\"\\u2717 Incorrect. Conditional levels still only climb the manager chain; they cannot pull in parties outside it.\"]}, {\"label\":\"Rejection\",\"scenario\":\"A 3-level cascade: the direct manager approved, the director rejected. What happens to the VP, who is next?\",\"opts\":[\"The cascade stops — the VP is never asked, and the Case routes to the configured rejection path\",\"The VP still reviews and can override the director's rejection\",\"The cascade restarts from the manager automatically\",\"All three responses are tallied and the majority decides\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. A rejection at any level ends the sequential chain immediately; higher levels are not asked.\",\"\\u2717 Incorrect. Higher levels do not review or override a rejected request — the chain is over.\",\"\\u2717 Incorrect. Restart-on-rejection is not automatic; the SA configures the rejection path (often revise/resubmit).\",\"\\u2717 Incorrect. Cascading is sequential, not a majority tally.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good \\u2014 review the missed items.':'Re-read the module and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m14-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">CASCADING APPROVAL — HIERARCHY-DRIVEN CHAIN</text><rect x=\"10\" y=\"32\" width=\"700\" height=\"50\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Requirement: reports-to field must be set on each operator in the chain</text><text x=\"360\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">If reports-to is empty → chain cannot resolve → routing fails</text><text x=\"100\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"700\">Submitter</text><line x1=\"160\" y1=\"118\" x2=\"218\" y2=\"118\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#m14-arr)\"/><text x=\"280\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"700\">Manager L1</text><line x1=\"340\" y1=\"118\" x2=\"398\" y2=\"118\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#m14-arr)\"/><text x=\"460\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"700\">Manager L2</text><line x1=\"520\" y1=\"118\" x2=\"578\" y2=\"118\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#m14-arr)\"/><text x=\"640\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"700\">VP / Exec</text><text x=\"360\" y=\"150\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Each approver determined by reports-to field — NOT a manually configured list</text><rect x=\"10\" y=\"162\" width=\"700\" height=\"24\" rx=\"6\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"178\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Single approval = named approver | Cascading = org hierarchy chain | Authority matrix = table mapping amount to approval level</text></svg>",
+          "caption": "Cascading approval follows the reports-to hierarchy — each approver is resolved dynamically; an empty reports-to field breaks the chain."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Cascading is SEQUENTIAL, not a parallel vote",
+      "trapDescription": "The biggest trap: thinking cascading approval is an 'any one / majority / 3-of-5' parallel tally. It is a chain — each approver is asked only after the prior one approves.",
+      "bestPractice": "Cascading = sequential levels; every approver in the determined chain must approve in turn."
+    },
+    {
+      "title": "Single vs. cascading",
+      "trapDescription": "A question asks when cascading approval should be used instead of single approval. Candidates choose based on the number of approvers. Cascading approval is appropriate when the approval chain must follow the organizational hierarchy — single approval is for a fixed named approver regardless of org structure.",
+      "bestPractice": "Use cascading approval when sign-off must follow the organizational reporting hierarchy; use single approval when a specific named approver is always correct regardless of org structure."
+    },
+    {
+      "title": "Reporting structure needs reports-to set",
+      "trapDescription": "Questions describe cascading approval failing to route correctly. Candidates blame the flow configuration. Cascading approval relies on the reports-to field in operator records — if it is not set, the chain cannot be resolved and routing fails.",
+      "bestPractice": "Org-hierarchy sign-off → reporting structure; ensure the manager chain is defined."
+    },
+    {
+      "title": "Conditional levels live in reporting structure",
+      "trapDescription": "Varying HOW MANY levels based on Case data (e.g., amount) up the manager chain is a REPORTING-STRUCTURE feature (business logic / When), NOT the authority matrix.",
+      "bestPractice": "Same manager chain, depth varies by data → reporting structure with conditional levels."
+    },
+    {
+      "title": "Authority matrix = decision table + outside-the-hierarchy parties",
+      "trapDescription": "Authority matrix is a decision table whose satisfied rows each add an approver (routed in list order). Its real differentiator is reaching approvers OUTSIDE the reporting line (Legal, Compliance, external).",
+      "bestPractice": "Approvers outside the manager chain, or condition-driven parties → authority matrix."
+    },
+    {
+      "title": "Rejection stops the chain",
+      "trapDescription": "A rejection at any level halts the cascade — higher levels are never asked — and routes to the rejection/rework path.",
+      "bestPractice": "Configure the reject path; remaining approvers are not consulted after a rejection."
+    },
+    {
+      "title": "Authority matrix decision table → 'Evaluate all rows'",
+      "trapDescription": "A decision table feeding an authority matrix must EVALUATE ALL ROWS to return the full list of approvers. By default it returns only the FIRST matching result, so only one approver is added.",
+      "bestPractice": "Set the decision table to 'Evaluate all rows' so every matching condition adds its approver."
+    },
+    {
+      "title": "Reporting structure: One / All / Custom + approver source",
+      "trapDescription": "Reporting structure's number-of-approvers setting is One, All, or Custom (Custom uses When rules). The approver comes from the operator's Reporting Manager OR Workgroup Manager.",
+      "bestPractice": "Conditional depth → Custom (When rules). Approver = Reporting Manager or Workgroup Manager from the operator ID record."
+    },
+    {
+      "title": "Authority matrix can be populated four ways",
+      "trapDescription": "The authority-matrix approver list can come from a Decision table, Data Page, Activity, or Data Transform — not only a decision table.",
+      "bestPractice": "Remember the four population sources; decision table is the most common."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m14_q01",
+      "type": "single-select",
+      "scenario": "A purchase request must be signed off by the submitter's manager, then that manager's manager, before it can proceed — each only after the previous one approves. Which approval configuration models this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A cascading approval using a reporting structure — it climbs the manager chain sequentially, one level after another"
+        },
+        {
+          "id": "B",
+          "text": "A cascading approval with an 'any one approves' parallel threshold — the first manager to respond resolves it"
+        },
+        {
+          "id": "C",
+          "text": "A single approval Step routed to the top manager only"
+        },
+        {
+          "id": "D",
+          "text": "Two unrelated Case Types, one per manager"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Sequential sign-off up the manager chain = reporting-structure cascade.",
+      "rationale": "A reporting-structure cascading approval routes to the manager, then the next manager up, sequentially B is wrong because cascading approval is not a parallel 'any one' vote — approvals happen in sequence.."
+    },
+    {
+      "questionId": "m14_q02",
+      "type": "single-select",
+      "scenario": "An SA configures a reporting-structure cascading approval, but at runtime it fails to find any approver. What is the most likely cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The operators' manager / reports-to relationships are not configured, so Pega cannot climb the hierarchy"
+        },
+        {
+          "id": "B",
+          "text": "The Case has no SLA, which is mandatory for cascading approvals"
+        },
+        {
+          "id": "C",
+          "text": "Cascading approvals require a separate work queue per level, which was not created"
+        },
+        {
+          "id": "D",
+          "text": "The approval threshold was left at 'majority' instead of 'any one'"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Reporting structure walks the org chart — what must exist for that to work?",
+      "rationale": "Reporting-structure cascades follow operators' manager/reports-to relationships; if the org chart is not set, there is no chain to climb B is wrong because an SLA is optional, not required for an approval to find approvers.."
+    },
+    {
+      "questionId": "m14_q03",
+      "type": "single-select",
+      "scenario": "An expense approval always climbs the manager chain, but the NUMBER of levels depends on the amount: small amounts need only the manager; larger amounts also need a senior manager and a director. Which approach implements this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Reporting structure with conditional levels — business logic (a When condition/threshold) on the amount sets how far up the chain to cascade"
+        },
+        {
+          "id": "B",
+          "text": "An authority matrix — only a decision table can vary how many approvers are required"
+        },
+        {
+          "id": "C",
+          "text": "A single approval whose approver changes based on the amount"
+        },
+        {
+          "id": "D",
+          "text": "A parallel approval whose threshold equals the dollar amount"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Same manager chain, depth varies by data — which model owns conditional levels?",
+      "rationale": "Reporting structure supports conditional levels: business logic on Case data decides how far up the manager chain the cascade climbs B is wrong because the approvers here are all in the manager chain, so reporting structure (not an."
+    },
+    {
+      "questionId": "m14_q04",
+      "type": "single-select",
+      "scenario": "A contract needs approval from the submitter's manager AND from Legal and Compliance — neither of whom is in the submitter's reporting line — and only when the contract is high-risk. Which model fits best?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An authority matrix — a decision table adds Legal and Compliance based on conditions and can include approvers outside the reporting structure"
+        },
+        {
+          "id": "B",
+          "text": "Reporting structure — climbing the manager chain will eventually reach Legal and Compliance"
+        },
+        {
+          "id": "C",
+          "text": "Reporting structure with conditional levels set to three"
+        },
+        {
+          "id": "D",
+          "text": "A single approval routed to a shared Legal/Compliance queue"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Approvers outside the manager chain + condition-driven = which model?",
+      "rationale": "An authority matrix (decision table) can require approvers outside the reporting line, adding Legal and Compliance based on conditions B is wrong because the manager chain never reaches Legal/Compliance unless they are the submitter's managers.."
+    },
+    {
+      "questionId": "m14_q05",
+      "type": "single-select",
+      "scenario": "In an authority-matrix cascading approval, how are the required approvers determined and ordered at runtime?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A decision table is evaluated; each satisfied row adds its approver to a list, and Assignments are routed to them in the order they appear in the list"
+        },
+        {
+          "id": "B",
+          "text": "All operators in the application receive the approval and the majority decides"
+        },
+        {
+          "id": "C",
+          "text": "The matrix picks one approver at random to keep load balanced"
+        },
+        {
+          "id": "D",
+          "text": "The matrix climbs the reporting structure and ignores its own rows"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Each matching condition adds a party; routing follows list order.",
+      "rationale": "The authority matrix is a decision table: every satisfied row adds its party to the approver list, and approvals are routed in list order B is wrong because there is no application-wide majority vote.."
+    },
+    {
+      "questionId": "m14_q06",
+      "type": "single-select",
+      "scenario": "A three-level cascade is in progress: the direct manager approved; the director just rejected. What happens to the VP, who is next in the chain?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The cascade stops immediately — the VP is never asked an Assignment, and the Case routes to the configured rejection/rework path"
+        },
+        {
+          "id": "B",
+          "text": "The VP still receives the approval and can override the director's rejection"
+        },
+        {
+          "id": "C",
+          "text": "The cascade automatically restarts from the direct manager"
+        },
+        {
+          "id": "D",
+          "text": "All three responses are tallied and the majority outcome wins"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "In a sequential chain, what does a single rejection trigger for the cascade?",
+      "rationale": "A rejection at any level ends the sequential cascade; higher levels are not asked and the Case follows the rejection path B is wrong because higher levels do not review or override a rejected request.."
+    },
+    {
+      "questionId": "m14_q07",
+      "type": "single-select",
+      "scenario": "A BA claims: 'Cascading approval sends the request to all approvers at once and proceeds when most of them approve.' Why is this incorrect?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Cascading approvals are sequential — the next approver is asked only after the current one approves; there is no simultaneous send or majority tally"
+        },
+        {
+          "id": "B",
+          "text": "It is correct — cascading is Pega's parallel majority-vote feature"
+        },
+        {
+          "id": "C",
+          "text": "It is incorrect only because approvers are always work queues, never individuals"
+        },
+        {
+          "id": "D",
+          "text": "It is incorrect because cascading approvals never reject — they only approve"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall the defining sequential behavior of a cascading approval flow.",
+      "rationale": "Cascading approval is a sequential chain: each level is asked in turn, and a rejection stops it — there is no parallel 'most of them approve' vote B is wrong because that parallel majority model is not how Pega cascading approvals work.."
+    },
+    {
+      "questionId": "m14_q08",
+      "type": "multi-select",
+      "scenario": "A BA is explaining approval routing models to a client manager choosing between reporting-structure and authority-matrix approaches. Which TWO statements correctly contrast the reporting-structure and authority-matrix approval models?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Reporting structure climbs the manager (reports-to) chain; the number of levels can be made conditional with business logic"
+        },
+        {
+          "id": "B",
+          "text": "Authority matrix is a decision table that can require approvers outside the reporting line, adding each based on a condition"
+        },
+        {
+          "id": "C",
+          "text": "Reporting structure can include approvers from any department regardless of the org chart"
+        },
+        {
+          "id": "D",
+          "text": "Authority matrix sends the request to everyone at once and resolves on a majority vote"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "One climbs the org chart (conditionally); the other is a decision table reaching outside it.",
+      "rationale": "Reporting structure climbs the manager chain with optional conditional levels, and the authority matrix is a decision table that can add approvers outside the hierarchy by condition C is wrong because reporting structure is limited to the manager chain — it cannot reach arbitrary departments..",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m14_q09",
+      "type": "single-select",
+      "scenario": "An authority-matrix cascading approval is backed by a decision table, but at runtime only ONE approver is ever added even though several rows should match. What is the most likely fix?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Set the decision table to 'Evaluate all rows' so it returns the full list of approvers instead of stopping at the first match"
+        },
+        {
+          "id": "B",
+          "text": "Switch the approval from cascading to single, because authority matrices support only one approver"
+        },
+        {
+          "id": "C",
+          "text": "Add an SLA so the table re-evaluates and collects more approvers"
+        },
+        {
+          "id": "D",
+          "text": "Move the decision table into the reporting structure model"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A decision table returns one result by default — how do you make it return a list?",
+      "rationale": "By default a decision table returns only the first matching row's result; setting 'Evaluate all rows' makes it return the full list of approvers the authority matrix needs."
+    },
+    {
+      "questionId": "m14_q10",
+      "type": "single-select",
+      "scenario": "For a reporting-structure cascade, an SA wants approvals to climb the ENTIRE management hierarchy to the top — no conditions. Which 'number of approvers' setting is correct, and where does the approver come from?",
+      "options": [
+        {
+          "id": "A",
+          "text": "'All' — the cascade climbs the full manager hierarchy; the approver is the operator's Reporting Manager or Workgroup Manager from the operator ID record"
+        },
+        {
+          "id": "B",
+          "text": "'Custom' — you must always write a When rule even to climb the whole hierarchy"
+        },
+        {
+          "id": "C",
+          "text": "'One' — selecting one approver automatically continues to the top"
+        },
+        {
+          "id": "D",
+          "text": "There is no such setting; you must list each manager by name"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "One / All / Custom — which one means 'whole hierarchy'?",
+      "rationale": "'All' climbs the entire manager hierarchy, and the approver at each level is the operator's Reporting Manager or Workgroup Manager B is wrong because 'All' needs no When rule — Custom is only for a conditional number of."
+    },
+    {
+      "questionId": "m14_q11",
+      "type": "single-select",
+      "scenario": "Where and how do you configure a cascading approval (either model) according to the academy module?",
+      "options": [
+        {
+          "id": "A",
+          "text": "In Dev Studio: add an Approve/Reject Step to the Case Life Cycle, select Cascading, then choose Reporting structure or Authority matrix"
+        },
+        {
+          "id": "B",
+          "text": "In App Studio only: cascading is a checkbox on the Case Type's data model"
+        },
+        {
+          "id": "C",
+          "text": "In Admin Studio: cascading approvals are a runtime system setting"
+        },
+        {
+          "id": "D",
+          "text": "In Prediction Studio: an adaptive model selects approvers automatically"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Approve/Reject Step + Cascading + model — in which studio?",
+      "rationale": "The module configures cascading approvals in Dev Studio: add an Approve/Reject Step, select Cascading, then Reporting structure or Authority matrix. B is wrong because it is not a data-model checkbox. C is wrong because Admin Studio handles runtime administration, not approval design. D is wrong because Prediction Studio builds ML models, not approval chains."
+    },
+    {
+      "questionId": "m14_q12",
+      "type": "single-select",
+      "scenario": "A Pega application uses cascading approvals. The authority matrix is configured to resolve the approval chain based on the 'ReportingManager' relationship in the operator directory. After a front-line employee submits a request, the system must determine who the first approver is. Which data source does Pega consult to identify the first approver?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The operator directory (operator record of the submitting user), which contains the ReportingManager relationship used by the authority matrix"
+        },
+        {
+          "id": "B",
+          "text": "The Access Group of the submitting user, which lists approvers in order of seniority"
+        },
+        {
+          "id": "C",
+          "text": "The SLA rule attached to the case, which names the escalation targets who also serve as approvers"
+        },
+        {
+          "id": "D",
+          "text": "The Work Group configuration, which stores the approval chain for all members of that group"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What data source does the authority matrix query to find the first cascading approver?",
+      "rationale": "The authority matrix traverses the ReportingManager relationship starting from the submitter, climbing the org chart until all required approvers have acted. The chain is dynamic — it adapts to each submitter's actual reporting structure."
+    },
+    {
+      "questionId": "m14_q13",
+      "type": "multi-select",
+      "scenario": "An SA is deciding between Cascading Approval and a single-level Approval Step for a contract sign-off process. Which TWO statements correctly identify when Cascading Approval is the appropriate choice?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Cascading Approval is appropriate when multiple levels of authority must each independently review and approve the same request"
+        },
+        {
+          "id": "B",
+          "text": "Cascading Approval allows conditional levels so that not every Case requires the same number of approvers"
+        },
+        {
+          "id": "C",
+          "text": "Cascading Approval is the only option when two approvers must review simultaneously in parallel"
+        },
+        {
+          "id": "D",
+          "text": "Single-level Approval is always preferred because Cascading Approval cannot be configured in App Studio"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Cascading Approval is for sequential multi-level sign-offs, with optional conditional levels to skip tiers.",
+      "rationale": "Cascading Approval is designed for sequential multi-level sign-offs where each approver acts one after another. Conditional approval levels allow tiers to be skipped based on Case data (e.g., loan amount). Cascading Approval is not for simultaneous parallel reviews, and it can be configured in App Studio."
+    },
+    {
+      "questionId": "m14_q14",
+      "type": "multi-select",
+      "scenario": "An SA configures a Cascading Approval using a reporting hierarchy with up to three management levels. Which TWO behaviors correctly describe this configuration at runtime?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The approval routes first to the submitter's direct reporting manager, then escalates upward if the manager approves and the next level is required"
+        },
+        {
+          "id": "B",
+          "text": "Conditional approval levels can skip a management tier when a Case condition (such as contract value) is not met"
+        },
+        {
+          "id": "C",
+          "text": "All three management levels are notified simultaneously at the time the approval is submitted"
+        },
+        {
+          "id": "D",
+          "text": "A reporting-structure cascade always requires an authority matrix to define which approver handles each level"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Reporting-structure cascades are sequential from the direct manager upward, with conditions able to bypass levels.",
+      "rationale": "In a reporting-structure cascade, the approval starts with the direct manager and escalates upward level by level. Conditional levels allow specific tiers to be bypassed when Case conditions (like contract value) are not met. All levels are not notified simultaneously, and an authority matrix is an alternative approach, not a requirement for reporting-structure cascades."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Cascading approval",
+      "value": "A SEQUENTIAL chain of approvers (one level at a time) — not a parallel any-one/majority vote."
+    },
+    {
+      "key": "Single vs cascading",
+      "value": "One approver → single; multiple approvers in sequence → cascading."
+    },
+    {
+      "key": "Reporting structure",
+      "value": "Climbs the manager (reports-to) chain automatically; org chart must be configured."
+    },
+    {
+      "key": "Conditional levels",
+      "value": "Business logic on Case data (e.g., amount) sets HOW FAR up the reporting cascade goes."
+    },
+    {
+      "key": "Number of approvers",
+      "value": "Reporting structure: One (manager) / All (whole hierarchy) / Custom (When rules for conditional levels). Approver = Reporting or Workgroup Manager."
+    },
+    {
+      "key": "Authority matrix",
+      "value": "A decision table; each satisfied row adds an approver (routed in list order). Reaches parties OUTSIDE the reporting line (Legal, Compliance, external)."
+    },
+    {
+      "key": "Authority matrix sources",
+      "value": "Approver list from a Decision table, Data Page, Activity, or Data Transform. Decision table must 'Evaluate all rows' to return the full list (else only the first result)."
+    },
+    {
+      "key": "Which to use",
+      "value": "Manager chain → reporting structure; approvers outside the hierarchy / condition-driven parties → authority matrix."
+    },
+    {
+      "key": "Rejection",
+      "value": "A rejection at any level stops the chain; higher levels are not asked; routes to the rejection path."
+    },
+    {
+      "key": "Configure (Dev Studio)",
+      "value": "Approve/Reject Step → Cascading → Reporting structure OR Authority matrix. First ask: who, how many, whole hierarchy or subset, anyone outside it?"
+    }
+  ],
+  "topics": [
+    {
+      "title": "Cascading approvals",
+      "url": "https://academy.pega.com/topic/cascading-approvals/v4/in/96211/73586",
+      "duration": "20 min"
+    }
+  ]
+}

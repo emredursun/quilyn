@@ -1,0 +1,519 @@
+{
+  "moduleId": "m30",
+  "moduleTitle": "Identifying duplicate Cases",
+  "moduleUrl": "https://academy.pega.com/module/identifying-duplicate-cases/v6/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/identifying-duplicate-cases/v6/quiz/in/96211",
+  "learningObjectives": [
+    "Explain how the Search duplicate Cases logic identifies potential duplicates using basic and weighted conditions.",
+    "Configure a Search duplicate Cases Step and describe how users resolve identified duplicates."
+  ],
+  "estTime": "~10 min · 1 topic",
+  "topics": [
+    {
+      "title": "Duplicate search",
+      "url": "https://academy.pega.com/topic/duplicate-search/v7/in/72681/66901/67036",
+      "duration": "5 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Duplicate Search",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Search duplicate cases",
+          "description": "Automation Step that identifies potential duplicate Cases by comparing field values. A duplicate occurs when a submitted Case matches an existing one. Example: same insurance authorization received twice — once online, once by fax."
+        },
+        {
+          "type": "analogy",
+          "text": "Duplicate case detection in Pega is like a hotel reservation system that warns 'a booking already exists for this guest on these dates.' When a new case is submitted, Pega searches existing cases for matching criteria — if a match is found, the operator decides to proceed (create a new reservation) or merge (link to the existing booking). The search runs automatically; the human makes the final call."
+        },
+        {
+          "type": "concept",
+          "term": "Basic conditions — mandatory match",
+          "description": "Conditions that MUST match exactly for a Case to be flagged as a duplicate. If ANY basic condition fails to match, the Case is NOT flagged — regardless of how many other fields match."
+        },
+        {
+          "type": "concept",
+          "term": "Weighted conditions — scored match",
+          "description": "Each weighted condition carries a numeric score. When basic conditions match, the system evaluates weighted conditions and totals the score. Cases with sufficiently high scores are presented as potential duplicates for user review."
+        },
+        {
+          "type": "concept",
+          "term": "Resolving a duplicate",
+          "description": "When the user determines the current Case IS a duplicate, they resolve it with the status 'Resolved-Duplicate'. This closes the duplicate Case and keeps the original."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 420 220\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"400\" height=\"200\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"210\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Duplicate Case Detection Flow</text><rect x=\"150\" y=\"45\" width=\"120\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"210\" y=\"63\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">New case submitted</text><line x1=\"210\" y1=\"73\" x2=\"210\" y2=\"93\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr30)\"/><rect x=\"140\" y=\"93\" width=\"140\" height=\"28\" rx=\"6\" fill=\"var(--pa-brand)\" opacity=\"0.2\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"210\" y=\"111\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Duplicate search runs</text><line x1=\"210\" y1=\"121\" x2=\"210\" y2=\"141\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr30)\"/><rect x=\"130\" y=\"141\" width=\"160\" height=\"28\" rx=\"6\" fill=\"var(--pa-brand)\" opacity=\"0.15\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"210\" y=\"159\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Match found?</text><line x1=\"130\" y1=\"155\" x2=\"70\" y2=\"155\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr30)\"/><text x=\"98\" y=\"148\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ok)\">No</text><rect x=\"20\" y=\"143\" width=\"50\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1\"/><text x=\"45\" y=\"161\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink)\">Create new</text><line x1=\"290\" y1=\"155\" x2=\"350\" y2=\"155\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr30)\"/><text x=\"322\" y=\"148\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-err)\">Yes</text><rect x=\"350\" y=\"141\" width=\"55\" height=\"28\" rx=\"6\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"377\" y=\"153\" text-anchor=\"middle\" font-size=\"8\" fill=\"var(--pa-ink)\">Operator</text><text x=\"377\" y=\"165\" text-anchor=\"middle\" font-size=\"8\" fill=\"var(--pa-ink)\">decides</text><text x=\"210\" y=\"200\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Operator can proceed (new case) or link to existing duplicate.</text><defs><marker id=\"arr30\" markerWidth=\"6\" markerHeight=\"6\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 Z\" fill=\"var(--pa-ink-3)\"/></marker></defs></svg>",
+          "caption": "Duplicate search runs automatically at case creation; operator decides whether to proceed or link to the existing case."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Basic conditions MUST all match — one failure = no duplicate",
+      "trapDescription": "Candidates think basic conditions are scored like weighted ones, or that a near-match on a basic condition still flags a potential duplicate.",
+      "bestPractice": "Basic conditions are binary and mandatory — ALL must match exactly. If even one basic condition fails to match, the Case is not considered a duplicate at all, regardless of weighted condition scores."
+    },
+    {
+      "title": "Weighted conditions are scored — not mandatory",
+      "trapDescription": "Questions ask whether ALL weighted conditions must match for a case to be flagged as a potential duplicate. Candidates say yes. Weighted conditions assign a score — a case is flagged when the cumulative score exceeds the threshold, not when all conditions match.",
+      "bestPractice": "Weighted conditions each carry a numeric weight. They are scored and summed — higher total score = higher likelihood of duplicate. A candidate doesn't need to match ALL weighted conditions to be flagged."
+    },
+    {
+      "title": "Resolution status is 'Resolved-Duplicate' — not 'Closed' or 'Cancelled'",
+      "trapDescription": "A question asks what status is set when a case is resolved as a duplicate. Candidates say 'Closed' or 'Cancelled.' The system sets the Case Status to 'Resolved-Duplicate' — this is the specific system-defined status for duplicate resolution.",
+      "bestPractice": "When a user confirms a Case is a duplicate, the correct resolution status is 'Resolved-Duplicate'. Not 'Closed', 'Cancelled', or any other status."
+    },
+    {
+      "title": "The automation is called 'Search duplicate cases' — it is an Automation Step",
+      "trapDescription": "Questions ask how duplicate detection is configured in the Case Life Cycle. Candidates describe adding a condition or a service. Duplicate detection is added as an Automation Step called 'Search duplicate cases' — it is a built-in step type, not a custom condition.",
+      "bestPractice": "'Search duplicate cases' is a specific Automation Step provided by Pega Platform. It is added to a Process to automatically search for potential duplicates based on configured conditions."
+    },
+    {
+      "title": "Both basic AND weighted conditions must be configured together",
+      "trapDescription": "A question asks whether weighted conditions alone are sufficient for duplicate detection. Candidates say yes. Basic conditions (exact match criteria) are required alongside weighted conditions — weighted conditions alone cannot be used without at least one basic condition.",
+      "bestPractice": "The search uses basic conditions first (mandatory filter), then applies weighted conditions to score the remaining candidates. Both types work together — basic conditions narrow the field, weighted conditions rank the results."
+    },
+    {
+      "title": "Duplicate detection is user-confirmed — not automatic resolution",
+      "trapDescription": "Questions describe a duplicate detection scenario and ask if the case is automatically closed. Candidates say yes. Pega surfaces potential duplicates to the user — the user must confirm whether the case is a duplicate and manually resolve it; no automatic closure occurs.",
+      "bestPractice": "The 'Search duplicate cases' Step presents potential duplicates to the USER for review. The user decides whether the Case is actually a duplicate and manually resolves it with 'Resolved-Duplicate' status."
+    },
+    {
+      "title": "Weighted conditions produce a ranked list — the user decides from candidates",
+      "trapDescription": "Candidates think only one exact duplicate can be found — or that the system picks the most likely duplicate automatically.",
+      "bestPractice": "Multiple Cases may be presented as potential duplicates, ranked by weighted score. The user reviews the candidates and decides which (if any) is the actual duplicate."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m30_q01",
+      "type": "single-select",
+      "scenario": "A health care application receives the same insurance authorization request twice — once online and once by fax. What Pega feature helps prevent processing both as separate Cases?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The 'Search duplicate cases' Automation Step, which identifies potential duplicates using basic and weighted conditions"
+        },
+        {
+          "id": "B",
+          "text": "A When Condition on the Create Stage that blocks Case creation if matching data is detected"
+        },
+        {
+          "id": "C",
+          "text": "A Decision table that routes duplicate submissions to an Alternate Stage"
+        },
+        {
+          "id": "D",
+          "text": "A Declare Expression that automatically merges Cases with identical field values"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which specific Pega automation is designed for duplicate Case detection?",
+      "rationale": "'Search duplicate cases' is the Pega Automation Step for this purpose. B, C, and D describe mechanisms that don't exist for duplicate detection in this form."
+    },
+    {
+      "questionId": "m30_q02",
+      "type": "single-select",
+      "scenario": "In a duplicate search configuration, 'Patient date of birth' is set as a basic condition. Two Cases have all other fields matching, but different dates of birth. Are they flagged as potential duplicates?",
+      "options": [
+        {
+          "id": "A",
+          "text": "No — basic conditions must ALL match exactly; a mismatch on any one eliminates the Case as a duplicate candidate"
+        },
+        {
+          "id": "B",
+          "text": "Yes — the weighted conditions still score highly enough to flag the Case as a likely duplicate"
+        },
+        {
+          "id": "C",
+          "text": "Yes — basic conditions are advisory; the system still presents the Case if weighted scores are sufficient"
+        },
+        {
+          "id": "D",
+          "text": "No — but the Case is put in a 'Possible duplicate' queue for manual review"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Basic conditions = mandatory match. Any failure = no duplicate.",
+      "rationale": "Basic conditions are mandatory — ALL must match exactly. A mismatch on even one basic condition means the Case is not flagged as a duplicate, regardless of weighted scores. B and C incorrectly apply weighted logic to basic conditions. D describes a queue that doesn't exist for basic condition failures."
+    },
+    {
+      "questionId": "m30_q03",
+      "type": "single-select",
+      "scenario": "A duplicate search has three weighted conditions with scores 30, 40, and 30. An existing Case matches two of the three (total score 70). Is it presented as a potential duplicate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It depends on the configured threshold score — if 70 meets or exceeds the threshold, it is presented"
+        },
+        {
+          "id": "B",
+          "text": "No — all weighted conditions must match for a Case to be flagged"
+        },
+        {
+          "id": "C",
+          "text": "Yes — any positive weighted score is sufficient to flag a Case"
+        },
+        {
+          "id": "D",
+          "text": "No — weighted conditions require a perfect 100 score to flag a duplicate"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Weighted conditions are scored and summed — the threshold determines what's flagged.",
+      "rationale": "Weighted conditions contribute scores that are summed and compared to a threshold. Whether a 70 score flags a duplicate depends on the configured threshold. B is wrong — weighted conditions don't all need to match. C is wrong — a threshold, not any positive score, determines flagging. D is wrong — 100 is not a required score."
+    },
+    {
+      "questionId": "m30_q04",
+      "type": "single-select",
+      "scenario": "A user reviews a potential duplicate presented by the Search duplicate cases Step and confirms the current Case IS a duplicate. What action resolves it?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Set the Case status to 'Resolved-Duplicate'"
+        },
+        {
+          "id": "B",
+          "text": "Set the Case status to 'Closed-Duplicate'"
+        },
+        {
+          "id": "C",
+          "text": "Click 'Merge' in the duplicate Case panel to combine the two Cases"
+        },
+        {
+          "id": "D",
+          "text": "Delete the duplicate Case from Dev Studio"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "There is a specific status for resolving confirmed duplicates.",
+      "rationale": "'Resolved-Duplicate' is the correct status for resolving a confirmed duplicate Case. B uses 'Closed' which is not the documented status. C and D describe actions that don't exist for this purpose."
+    },
+    {
+      "questionId": "m30_q05",
+      "type": "single-select",
+      "scenario": "What is the role of a basic condition in the Search duplicate cases Step?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It must match exactly — any Case that doesn't match the basic condition is excluded from duplicate candidates"
+        },
+        {
+          "id": "B",
+          "text": "It contributes a fixed score that is added to the weighted condition total"
+        },
+        {
+          "id": "C",
+          "text": "It defines the Case Type to search — basic conditions specify which Case Type to compare against"
+        },
+        {
+          "id": "D",
+          "text": "It is a fallback condition used when no weighted conditions match"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Basic = mandatory exact match. Failure = excluded from candidates.",
+      "rationale": "Basic conditions must match exactly — failure excludes the Case from all further comparison. B describes weighted condition behavior. C and D are incorrect descriptions of basic conditions."
+    },
+    {
+      "questionId": "m30_q06",
+      "type": "single-select",
+      "scenario": "What is the role of a weighted condition in the Search duplicate cases Step?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It carries a numeric weight — matching cases accumulate scores, and high-scoring cases are presented as potential duplicates"
+        },
+        {
+          "id": "B",
+          "text": "It must match exactly — any failure eliminates the Case as a duplicate candidate"
+        },
+        {
+          "id": "C",
+          "text": "It defines the maximum number of duplicate results returned to the user"
+        },
+        {
+          "id": "D",
+          "text": "It is evaluated only when the basic conditions produce no results"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Weighted = scored and summed. Higher score = more likely duplicate.",
+      "rationale": "Weighted conditions each have a numeric weight. Matching conditions accumulate a total score, and cases meeting the threshold are presented as potential duplicates. B describes basic condition behavior. C and D are fabricated."
+    },
+    {
+      "questionId": "m30_q07",
+      "type": "single-select",
+      "scenario": "Does the Search duplicate cases automation automatically close or merge duplicate Cases when it finds a match?",
+      "options": [
+        {
+          "id": "A",
+          "text": "No — it presents potential duplicates to the user for review; the user decides and manually resolves with 'Resolved-Duplicate'"
+        },
+        {
+          "id": "B",
+          "text": "Yes — Cases scoring above the threshold are automatically merged with the existing Case"
+        },
+        {
+          "id": "C",
+          "text": "Yes — the system automatically sets the status to 'Resolved-Duplicate' when the score exceeds 100"
+        },
+        {
+          "id": "D",
+          "text": "No — duplicate detection only logs a warning in the guardrails report"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Duplicate detection is user-confirmed — not automatic resolution.",
+      "rationale": "The automation presents candidates to the user — the user reviews and manually resolves confirmed duplicates. B and C describe automatic resolution that doesn't happen. D describes incorrect behavior."
+    },
+    {
+      "questionId": "m30_q08",
+      "type": "multi-select",
+      "scenario": "Which TWO statements correctly describe how basic and weighted conditions differ in duplicate search?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Basic conditions must all match exactly — any mismatch eliminates the candidate"
+        },
+        {
+          "id": "B",
+          "text": "Weighted conditions carry a score — candidates are ranked by total score"
+        },
+        {
+          "id": "C",
+          "text": "Basic conditions are optional — you can configure a duplicate search with weighted conditions only"
+        },
+        {
+          "id": "D",
+          "text": "Weighted conditions must all match — partial matches are not counted"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Basic conditions must all match exactly; weighted conditions contribute a numeric score.",
+      "rationale": "A and B are both correct. C is wrong — basic conditions serve as the mandatory filter. D is wrong — weighted conditions are scored proportionally, not binary.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m30_q09",
+      "type": "single-select",
+      "scenario": "A duplicate search Step is configured with one basic condition ('Policy number' must match) and two weighted conditions ('Customer name' = 20 points, 'Incident date' = 30 points). An existing Case has the same policy number, same customer name, but a different incident date. Is it presented as a potential duplicate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Yes — the basic condition matches (policy number), and the weighted score is 20, which may meet the threshold"
+        },
+        {
+          "id": "B",
+          "text": "No — all conditions (basic and weighted) must match to flag a duplicate"
+        },
+        {
+          "id": "C",
+          "text": "Yes — the basic condition alone is sufficient to flag a duplicate regardless of weighted conditions"
+        },
+        {
+          "id": "D",
+          "text": "No — both weighted conditions must match for the Case to qualify"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Basic condition passes; weighted conditions are scored (not all required to match).",
+      "rationale": "The basic condition (policy number) matches — so the Case is not eliminated. The weighted score is 20 (customer name matched, incident date didn't). Whether 20 meets the threshold determines if it's presented."
+    },
+    {
+      "questionId": "m30_q10",
+      "type": "single-select",
+      "scenario": "Multiple potential duplicates are identified for a new Case. What does the user see?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A ranked list of potential duplicate Cases — the user reviews each and decides whether any is a true duplicate"
+        },
+        {
+          "id": "B",
+          "text": "A single best-match duplicate automatically selected by the system"
+        },
+        {
+          "id": "C",
+          "text": "A warning banner only — no specific Cases are shown"
+        },
+        {
+          "id": "D",
+          "text": "The Cases are automatically merged into one without user confirmation"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The user sees candidates and decides — the system doesn't auto-select.",
+      "rationale": "Basic conditions MUST all match for a potential duplicate to be flagged. Weighted conditions each contribute a score, and the Case is surfaced only if the total score meets the threshold."
+    },
+    {
+      "questionId": "m30_q11",
+      "type": "single-select",
+      "scenario": "An SA adds the 'Search duplicate cases' feature to a Case Type. Where in the Case lifecycle does this Step belong?",
+      "options": [
+        {
+          "id": "A",
+          "text": "As an Automation Step within a Process in the Case Life Cycle"
+        },
+        {
+          "id": "B",
+          "text": "As a Stage-level configuration in the Stage properties panel"
+        },
+        {
+          "id": "C",
+          "text": "As a Case Type-level setting in the App Studio settings panel"
+        },
+        {
+          "id": "D",
+          "text": "As a When Rule attached to the Create Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "'Search duplicate cases' is an Automation Step — it belongs in a Process.",
+      "rationale": "The 'Search duplicate cases' Step is an Automation shape added directly to a Process in the Case Life Cycle — typically in the Create Stage — so Pega checks for duplicates as soon as a new Case is submitted. It cannot be added as a standalone Stage or configured as a global application setting. Options B, C, and D all describe incorrect locations."
+    },
+    {
+      "questionId": "m30_q12",
+      "type": "single-select",
+      "scenario": "Why is it important to configure at least one basic condition in a duplicate search?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Basic conditions narrow the candidate pool to meaningful matches — without them, every Case in the system would be compared against weighted conditions"
+        },
+        {
+          "id": "B",
+          "text": "Basic conditions are required by Pega Platform — the Search duplicate cases Step cannot be saved without at least one"
+        },
+        {
+          "id": "C",
+          "text": "Basic conditions replace weighted conditions when the weighted score is zero"
+        },
+        {
+          "id": "D",
+          "text": "Basic conditions define the Case Type to search — without them, the Step searches all Case Types"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Basic conditions act as a mandatory filter that limits the search scope.",
+      "rationale": "Basic conditions serve as a mandatory pre-filter. Without them, every existing Case would be scored against weighted conditions, creating performance and accuracy problems. B may be partially true from a UI perspective but is not the documented reason. C and D mischaracterize basic condition behavior."
+    },
+    {
+      "questionId": "m30_q13",
+      "type": "multi-select",
+      "scenario": "A Pega developer is reviewing how users interact with detected duplicates at runtime. Which TWO statements correctly describe the user resolution experience?",
+      "options": [
+        {
+          "id": "A",
+          "text": "When a potential duplicate is detected, the user is shown the matching records and can decide whether to proceed with the new Case or link to an existing one"
+        },
+        {
+          "id": "B",
+          "text": "Users can choose to create a new Case even when a strong duplicate match is found, if the business scenario warrants it"
+        },
+        {
+          "id": "C",
+          "text": "Pega automatically merges the new Case into the duplicate and closes the new submission without any user decision"
+        },
+        {
+          "id": "D",
+          "text": "Duplicate resolution always transfers all data from the new Case into the existing matching Case automatically"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Duplicate detection surfaces matches for the user to decide — Pega does not auto-merge without user action.",
+      "rationale": "When the Search Duplicate Cases step detects a potential duplicate, users are presented with the matching records and given the choice to proceed with the new Case or link/close it. Users retain decision authority — Pega does not automatically merge or transfer data. The user can always opt to create a new Case if the situation warrants it."
+    },
+    {
+      "questionId": "m30_q14",
+      "type": "multi-select",
+      "scenario": "An SA is designing duplicate detection for a Home Insurance Claims application. Which TWO configuration choices improve the accuracy and flexibility of duplicate detection?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Combining basic conditions (which must all match) with weighted conditions (which contribute a score) for flexible detection"
+        },
+        {
+          "id": "B",
+          "text": "Configuring multiple weighted conditions with appropriate scores so a high cumulative score is required to flag a strong duplicate"
+        },
+        {
+          "id": "C",
+          "text": "Setting the minimum weighted score threshold to zero so that any partial match is automatically flagged as a duplicate"
+        },
+        {
+          "id": "D",
+          "text": "Using a Report Definition as the primary source for the duplicate search instead of configuring conditions directly on the step"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Good duplicate detection combines required basic conditions with scored weighted conditions above a meaningful threshold.",
+      "rationale": "Effective duplicate detection uses basic conditions (mandatory matches) to filter the candidate pool, then weighted conditions (with scores) to rank the remaining candidates. Configuring meaningful score thresholds ensures only strong matches are flagged. A threshold of zero would flag nearly everything, and Report Definitions are not used as the source for duplicate search configuration."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Search duplicate cases",
+      "value": "Automation Step that identifies potential duplicate Cases using basic and weighted conditions."
+    },
+    {
+      "key": "Basic conditions",
+      "value": "Mandatory exact match. ANY mismatch → Case excluded from all duplicate candidates. Example: patient date of birth must match."
+    },
+    {
+      "key": "Weighted conditions",
+      "value": "Each carries a numeric score. Total score of matching conditions determines if Case is presented as a potential duplicate."
+    },
+    {
+      "key": "User-confirmed resolution",
+      "value": "The automation presents candidates — the user reviews and decides. Confirmed duplicates are resolved with status 'Resolved-Duplicate'."
+    },
+    {
+      "key": "Resolution status",
+      "value": "'Resolved-Duplicate' — not 'Closed', 'Cancelled', or 'Merged'."
+    },
+    {
+      "key": "Multiple candidates",
+      "value": "Multiple potential duplicates can be ranked by weighted score and presented to the user simultaneously."
+    },
+    {
+      "key": "Step type",
+      "value": "'Search duplicate cases' is an Automation Step added to a Process in the Case Life Cycle."
+    }
+  ]
+}

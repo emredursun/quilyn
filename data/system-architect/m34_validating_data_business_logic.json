@@ -1,0 +1,548 @@
+{
+  "moduleId": "m34",
+  "moduleTitle": "Validating data against business logic",
+  "moduleUrl": "https://academy.pega.com/module/validating-data-against-business-logic/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/validating-data-against-business-logic/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Identify the role of business logic validation in Case processing",
+    "Configure data validation on a form and on a Stage using App Studio"
+  ],
+  "estTime": "15 min",
+  "topics": [
+    {
+      "title": "Data validation",
+      "url": "https://academy.pega.com/topic/data-validation/v6/in/72681/66901/67096",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Data Validation — Overview",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Why validate data?",
+          "description": "Valid data is required for error-free processing. Three requirements: (1) correct TYPE (e.g., number in 'Total units'); (2) restricted to POSSIBLE VALUES (e.g., valid loan type from a list); (3) meets BUSINESS CONSTRAINTS (e.g., start date in the past)."
+        },
+        {
+          "type": "concept",
+          "term": "Field Type/control vs. Business logic validation",
+          "description": "Field Type/controls handle FORMAT validation (e.g., a calendar ensures a date format is entered). Business logic handles BUSINESS RULE validation (e.g., ensuring a start date is in the past). Both are needed and serve different purposes."
+        },
+        {
+          "type": "analogy",
+          "text": "Think of Field Type validation as a passport scanner — it checks that the document is a valid passport format. Business logic validation is the customs officer — they check whether you're actually allowed to enter (right age, valid visa, not on a watchlist). Format ≠ business validity."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox='0 0 700 170' xmlns='http://www.w3.org/2000/svg' style='width:100%;font-family:system-ui,sans-serif'><text x='350' y='20' text-anchor='middle' style='fill:var(--pa-ink);font-size:13px;font-weight:700'>Two Validation Levels</text><rect x='8' y='30' width='332' height='132' rx='10' style='fill:var(--pa-surface-2);stroke:var(--pa-brand);stroke-width:1.5'/><text x='174' y='52' text-anchor='middle' style='fill:var(--pa-brand);font-size:12px;font-weight:700'>Field Type / Control</text><line x1='8' y1='60' x2='340' y2='60' style='stroke:var(--pa-brand);stroke-width:0.5;opacity:0.4'/><text x='174' y='80' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:11px'>Validates DATA TYPE and FORMAT</text><text x='174' y='98' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Calendar → ensures date format entered</text><text x='174' y='114' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Dropdown → restricts to valid options</text><text x='174' y='130' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Number field → ensures numeric input</text><text x='174' y='152' text-anchor='middle' style='fill:var(--pa-warn);font-size:10px;font-weight:600'>Cannot enforce business rules</text><rect x='360' y='30' width='332' height='132' rx='10' style='fill:var(--pa-surface-2);stroke:var(--pa-ok);stroke-width:1.5'/><text x='526' y='52' text-anchor='middle' style='fill:var(--pa-ok);font-size:12px;font-weight:700'>Business Logic Validation</text><line x1='360' y1='60' x2='692' y2='60' style='stroke:var(--pa-ok);stroke-width:0.5;opacity:0.4'/><text x='526' y='80' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:11px'>Validates BUSINESS RULES</text><text x='526' y='98' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Start date must be in the past</text><text x='526' y='114' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Date of birth not in the future</text><text x='526' y='130' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Credit score valid before underwriting</text><text x='526' y='152' text-anchor='middle' style='fill:var(--pa-ok);font-size:10px;font-weight:600'>Configured in App Studio</text></svg>",
+          "caption": "Field Type/controls validate format. Business logic validation enforces business rules — both are needed."
+        }
+      ],
+      "bulletPoints": [
+        "3 data requirements: right type, possible values, business constraints.",
+        "Field Type/control = validates format (date, number, dropdown options).",
+        "Business logic = validates business rules (date in past, credit score range).",
+        "Both are needed — they serve different purposes."
+      ]
+    },
+    {
+      "sectionTitle": "Validation on a Form vs. Validation on a Stage",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Validation on a FORM",
+          "description": "Triggered when the user submits the form. If invalid, an error displays inline and submission is blocked until corrected. Use when the user CAN immediately fix the issue (e.g., entered a future date → correct it and resubmit)."
+        },
+        {
+          "type": "concept",
+          "term": "Validation on a STAGE",
+          "description": "Triggered when the Case enters a Stage. If invalid, entry is blocked. Use when the user CANNOT immediately fix the issue themselves — the developer must configure a resolution path (e.g., return to prior Stage, close Case)."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox='0 0 700 200' xmlns='http://www.w3.org/2000/svg' style='width:100%;font-family:system-ui,sans-serif'><text x='350' y='20' text-anchor='middle' style='fill:var(--pa-ink);font-size:13px;font-weight:700'>When to Use Each Validation Type</text><rect x='8' y='30' width='332' height='162' rx='10' style='fill:var(--pa-surface-2);stroke:var(--pa-brand);stroke-width:1.5'/><text x='174' y='52' text-anchor='middle' style='fill:var(--pa-brand);font-size:12px;font-weight:700'>Form Validation</text><line x1='8' y1='60' x2='340' y2='60' style='stroke:var(--pa-brand);stroke-width:0.5;opacity:0.4'/><text x='174' y='78' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:11px'>Triggered on: form SUBMIT</text><text x='174' y='96' text-anchor='middle' style='fill:var(--pa-ok);font-size:10px;font-weight:600'>Use when: user CAN fix it immediately</text><text x='174' y='114' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Error shown on form</text><text x='174' y='130' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>User corrects and resubmits</text><text x='174' y='152' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:10px;font-style:italic'>Ex: DOB cannot be in the future</text><text x='174' y='168' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:10px;font-style:italic'>Ex: employment start date in the past</text><text x='174' y='184' text-anchor='middle' style='fill:var(--pa-brand);font-size:9px'>Configured on: Step (form) in App Studio</text><rect x='360' y='30' width='332' height='162' rx='10' style='fill:var(--pa-surface-2);stroke:var(--pa-brand-2);stroke-width:1.5'/><text x='526' y='52' text-anchor='middle' style='fill:var(--pa-brand-2);font-size:12px;font-weight:700'>Stage Validation</text><line x1='360' y1='60' x2='692' y2='60' style='stroke:var(--pa-brand-2);stroke-width:0.5;opacity:0.4'/><text x='526' y='78' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:11px'>Triggered on: Case ENTERING a Stage</text><text x='526' y='96' text-anchor='middle' style='fill:var(--pa-warn);font-size:10px;font-weight:600'>Use when: user CANNOT fix it immediately</text><text x='526' y='114' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Dev must configure resolution path</text><text x='526' y='130' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>(return to Stage, close Case, etc.)</text><text x='526' y='152' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:10px;font-style:italic'>Ex: credit score valid before Underwriting</text><text x='526' y='168' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:10px;font-style:italic'>User verifies credit history or cancels</text><text x='526' y='184' text-anchor='middle' style='fill:var(--pa-brand-2);font-size:9px'>Configured on: Stage entry in App Studio</text></svg>",
+          "caption": "Form validation: triggered on Submit, user fixes immediately. Stage validation: triggered on Stage entry, developer must provide resolution options."
+        },
+        {
+          "type": "concept",
+          "term": "Configuring business logic validation in App Studio",
+          "description": "Configure form and Stage validations in App Studio. Create conditions defining INVALID data values — when met, an error displays and blocks the user from proceeding. Configured in the Case Type Data Model or on the Step/Stage."
+        }
+      ],
+      "bulletPoints": [
+        "Form validation → triggered on SUBMIT. User fixes value and resubmits.",
+        "Stage validation → triggered when Case ENTERS Stage. Dev provides resolution path.",
+        "Key decision: can the user fix it immediately? Yes → form. No → Stage.",
+        "Both configured in App Studio.",
+        "Condition defines what is INVALID — error shown when condition is MET."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Form validation triggers on SUBMIT — not on field change",
+      "trapDescription": "Questions ask when form-level validation fires. Candidates say 'immediately when the user leaves the field.' Form validation runs when the user submits the form — not on individual field change or blur events.",
+      "bestPractice": "Business logic validation on a form is triggered when the user SUBMITS the form — not on individual field changes."
+    },
+    {
+      "title": "Stage validation triggers when the Case ENTERS the Stage — not on form submit",
+      "trapDescription": "A question asks when Stage validation runs. Candidates say 'when the user submits a form inside the Stage.' Stage validation fires when the Case ENTERS the Stage — before any Assignment is created or presented to the user.",
+      "bestPractice": "Stage validation fires when the Case ENTERS the Stage. Form validation fires when the user submits the form. These are two different trigger points."
+    },
+    {
+      "title": "Use form validation when the user CAN fix the issue immediately",
+      "trapDescription": "Questions present a scenario and ask whether form or Stage validation is appropriate. Candidates always pick Stage validation for 'important' rules. Form validation is correct when the error can be fixed by the user on the current form — Stage validation is for conditions that must be met before the Stage begins.",
+      "bestPractice": "Use form validation when the user can perform an immediate action to correct the data (e.g., enter a valid date). Use Stage validation when the issue may not be immediately resolvable by the user."
+    },
+    {
+      "title": "Stage validation requires developer-configured resolution options",
+      "trapDescription": "A question asks what happens when Stage validation fails. Candidates say 'the user sees an error and fixes it.' When Stage validation fails, the Case follows a developer-configured exception path — the system does not automatically offer a fix form to the user.",
+      "bestPractice": "When Stage validation fails, the developer must configure the functionality that allows users to resolve the error — such as returning to a previous Stage or closing the Case. Pega does not do this automatically."
+    },
+    {
+      "title": "Field Type validates FORMAT — business logic validates BUSINESS RULES",
+      "trapDescription": "Questions ask whether Field Type constraints (like Integer) count as validation. Candidates say yes — they replace separate validation rules. Field Type validation enforces data format (e.g., must be a number); business logic validation enforces business rules (e.g., value must be greater than zero).",
+      "bestPractice": "A calendar control only ensures the format is a valid date. Business logic validation is needed to enforce business rules like 'date must be in the past' or 'date cannot be in the future'."
+    },
+    {
+      "title": "Validation condition defines INVALID data — error fires when condition IS met",
+      "trapDescription": "Questions describe a validation condition and ask when the error shows. Candidates say 'when the condition is false.' The validation condition defines what makes data INVALID — the error is shown when the condition IS true (data matches the invalid pattern), not when it is false.",
+      "bestPractice": "The condition defines what constitutes INVALID data. When the condition IS met (i.e., the data is invalid), the error message is displayed. Think of it as: 'show error when [invalid condition] is true'."
+    },
+    {
+      "title": "Both validation types configured in App Studio",
+      "trapDescription": "A question asks whether a developer needs Dev Studio to configure Stage validation. Candidates say yes. Both form validation and Stage validation are configured in App Studio — no Dev Studio access is required for these standard validation types.",
+      "bestPractice": "Both form validation and Stage validation are configured in App Studio. Dev Studio is not required for this feature."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m34_q01",
+      "type": "single-select",
+      "scenario": "A form has a 'Date of Birth' field. A calendar control ensures the user enters a valid date format. An SA wants to also ensure the date is not in the future. What additional configuration is needed?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A business logic validation on the form that shows an error if the submitted date is in the future"
+        },
+        {
+          "id": "B",
+          "text": "Configure the calendar control to restrict future dates by setting a max-date property"
+        },
+        {
+          "id": "C",
+          "text": "A Stage validation that checks the date when the Case enters the next Stage"
+        },
+        {
+          "id": "D",
+          "text": "A Decision Table that returns an error code when the date is in the future"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Calendar controls validate format — business rules need business logic validation.",
+      "rationale": "A calendar control only ensures a valid date format is entered. To enforce the business rule that the date cannot be in the future, a business logic validation on the form is needed — triggered on Submit, it shows an error if the condition (date in future) is met."
+    },
+    {
+      "questionId": "m34_q02",
+      "type": "single-select",
+      "scenario": "A Pega developer has configured business logic validation on an Assignment form to ensure that an applicant's age is at least 18 before the form can be submitted. At what point during user interaction is form-level business logic validation triggered?",
+      "options": [
+        {
+          "id": "A",
+          "text": "When the user submits the form"
+        },
+        {
+          "id": "B",
+          "text": "When the user changes a field value"
+        },
+        {
+          "id": "C",
+          "text": "When the Case enters the next Stage"
+        },
+        {
+          "id": "D",
+          "text": "When the Case is created"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The trigger is the user's explicit action to complete the form.",
+      "rationale": "Form-level business logic validation in App Studio fires when the operator clicks Submit — after all fields have been filled but before the Case advances. It does not trigger on individual field changes (which is field-level validation) or when a Stage is entered. Understanding this timing prevents misconfigured validation rules that run at the wrong point in the workflow."
+    },
+    {
+      "questionId": "m34_q03",
+      "type": "single-select",
+      "scenario": "An SA has configured a Stage-level validation rule on the Review Stage of a Claims Case to ensure all required documentation fields are populated before the Case can advance to Settlement. When is Stage-level business logic validation triggered in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "When the Case enters the Stage"
+        },
+        {
+          "id": "B",
+          "text": "When the user submits a form within the Stage"
+        },
+        {
+          "id": "C",
+          "text": "When the Case is created"
+        },
+        {
+          "id": "D",
+          "text": "When a user clicks a field inside the Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Stage validation fires at the transition point between Stages.",
+      "rationale": "Stage validation in Pega is evaluated when the Case first enters the Stage — before any user interaction within that Stage. This is distinct from form-level validation, which fires on Submit. Stage validation is useful for checking prerequisite conditions or data completeness before work within that Stage begins, ensuring the Case is in a valid state to proceed."
+    },
+    {
+      "questionId": "m34_q04",
+      "type": "single-select",
+      "scenario": "A mortgage application requires a valid credit score before the Case can enter the Underwriting Stage. The user cannot update the credit score themselves — it comes from an external system. Which validation type should be used?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Stage validation — triggered when the Case enters the Underwriting Stage; user is given resolution options"
+        },
+        {
+          "id": "B",
+          "text": "Form validation — triggered when the user submits the credit score entry form"
+        },
+        {
+          "id": "C",
+          "text": "Field Type validation — configure the credit score field to restrict invalid values"
+        },
+        {
+          "id": "D",
+          "text": "Form validation — triggered when the user enters the Underwriting Stage manually"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The user cannot fix this immediately — that signals Stage validation.",
+      "rationale": "When the user cannot immediately resolve the issue (credit score comes from external system), use Stage validation. It triggers when the Case enters the Stage and the developer must configure resolution options (verify history, cancel the Case, etc.)."
+    },
+    {
+      "questionId": "m34_q05",
+      "type": "single-select",
+      "scenario": "An employment form has a Start Date field. An SA needs to ensure the start date is in the past (for employment history). The user can easily correct an invalid date by entering a new one. Which validation type is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Form validation — the user can immediately correct the date and resubmit"
+        },
+        {
+          "id": "B",
+          "text": "Stage validation — ensures the date is verified before the Case enters the next Stage"
+        },
+        {
+          "id": "C",
+          "text": "Field Type validation — configure the date field to restrict future dates"
+        },
+        {
+          "id": "D",
+          "text": "A Decision Table that flags invalid dates for manager review"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "If the user can immediately fix it, form validation is the right choice.",
+      "rationale": "Because the user can immediately enter a corrected date and resubmit, form validation is appropriate. Stage validation is used when the user cannot immediately fix the issue."
+    },
+    {
+      "questionId": "m34_q06",
+      "type": "single-select",
+      "scenario": "A business logic validation condition is defined as 'Total Amount > 10000'. A user submits a form with Total Amount = 15000. What happens?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An error is displayed and the user cannot proceed — the condition for invalid data is met"
+        },
+        {
+          "id": "B",
+          "text": "The form is submitted successfully — 15000 is valid as it is greater than 10000"
+        },
+        {
+          "id": "C",
+          "text": "A warning is displayed but the user can still proceed"
+        },
+        {
+          "id": "D",
+          "text": "The Case is automatically routed to a manager for approval"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The condition defines what is INVALID — when it is true, the error fires.",
+      "rationale": "The condition 'Total Amount > 10000' defines the INVALID state. When Total Amount = 15000, the condition is true (data is invalid), so the error is displayed and the user cannot proceed."
+    },
+    {
+      "questionId": "m34_q07",
+      "type": "single-select",
+      "scenario": "Stage validation fails when a Case tries to enter a Stage. What does Pega do automatically to help the user resolve the issue?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Nothing automatically — the developer must configure resolution options (e.g., return to previous Stage, close Case)"
+        },
+        {
+          "id": "B",
+          "text": "Pega automatically returns the Case to the previous Stage"
+        },
+        {
+          "id": "C",
+          "text": "Pega displays a list of corrective actions the user can choose from"
+        },
+        {
+          "id": "D",
+          "text": "Pega closes the Case and sends an email notification to the user"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The developer is responsible for configuring what happens after Stage validation fails.",
+      "rationale": "When Stage validation fails, Pega does not automatically provide a resolution path. The developer must configure the options available to the user — such as returning to a previous Stage, closing the Case, or verifying data from an external source."
+    },
+    {
+      "questionId": "m34_q08",
+      "type": "single-select",
+      "scenario": "A new BA is unsure whether to use App Studio or Dev Studio to set up business logic validation rules for a new Case Type. Where is business logic validation — both form-level and Stage-level — configured in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "App Studio"
+        },
+        {
+          "id": "B",
+          "text": "Dev Studio — Validate rules"
+        },
+        {
+          "id": "C",
+          "text": "Admin Studio — Data validation settings"
+        },
+        {
+          "id": "D",
+          "text": "App Studio for forms; Dev Studio for Stage validation"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Both field-type format validation and business logic validation are configurable in App Studio.",
+      "rationale": "In Pega Platform, both form-level and Stage-level business logic validations are configured entirely within App Studio — BAs and SAs do not need Dev Studio for this work. App Studio provides a UI that generates the underlying Validate Rules automatically. Dev Studio is only required for advanced validation scenarios such as Edit Validate Rules with custom Java."
+    },
+    {
+      "questionId": "m34_q09",
+      "type": "single-select",
+      "scenario": "What is the key factor in deciding whether to use form validation vs. Stage validation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Whether the user can perform an immediate action to resolve the invalid data"
+        },
+        {
+          "id": "B",
+          "text": "Whether the field is on the Create Stage or a later Stage"
+        },
+        {
+          "id": "C",
+          "text": "Whether the data comes from a user input or an external system"
+        },
+        {
+          "id": "D",
+          "text": "Whether the validation is a required field check or a business rule"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think: can the user immediately correct the validation error and resubmit the form?",
+      "rationale": "The key factor is whether the user CAN perform an immediate action to resolve the issue. If yes → form validation (user fixes and resubmits). If no → Stage validation (developer configures resolution path)."
+    },
+    {
+      "questionId": "m34_q10",
+      "type": "single-select",
+      "scenario": "A user submits a form with a date of birth that is in the future. Form validation is configured with condition 'Date of Birth > Today'. What does the user see?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An error message on the form; the user cannot proceed until they enter a past date and resubmit"
+        },
+        {
+          "id": "B",
+          "text": "A warning message; the user can still proceed by clicking Confirm"
+        },
+        {
+          "id": "C",
+          "text": "The form is submitted successfully; Stage validation will catch the error later"
+        },
+        {
+          "id": "D",
+          "text": "The Case is automatically cancelled and the user is notified by email"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Condition 'DOB > Today' is true → invalid → error blocks proceeding.",
+      "rationale": "When the condition 'Date of Birth > Today' is true (i.e., the date is in the future), the validation condition is met, an error is displayed, and the user cannot continue until they enter a valid past date and resubmit."
+    },
+    {
+      "questionId": "m34_q11",
+      "type": "single-select",
+      "scenario": "Which scenario best illustrates when Stage validation is more appropriate than form validation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A credit score must be valid before entering Underwriting — the score comes from an external system the user cannot directly update"
+        },
+        {
+          "id": "B",
+          "text": "A user enters their email address incorrectly and must re-enter it before submitting"
+        },
+        {
+          "id": "C",
+          "text": "A user enters a negative value in a numeric field"
+        },
+        {
+          "id": "D",
+          "text": "A user leaves a required field empty before submitting"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Stage validation is for situations where the user cannot immediately fix the issue.",
+      "rationale": "The credit score scenario is ideal for Stage validation — the user cannot immediately update the credit score (it comes from an external system), so the developer must configure resolution options. B, C, and D all describe issues the user can fix immediately on the form."
+    },
+    {
+      "questionId": "m34_q12",
+      "type": "multi-select",
+      "scenario": "Which THREE of the following are valid data requirements that validations address?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Data must be the right type (e.g., number in a numeric field)"
+        },
+        {
+          "id": "B",
+          "text": "Data must be restricted to possible values (e.g., valid loan type from a list)"
+        },
+        {
+          "id": "C",
+          "text": "Data must meet business constraints (e.g., date must be in the past)"
+        },
+        {
+          "id": "D",
+          "text": "Data must be encrypted before storage"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "C"
+      ],
+      "selectCount": 3,
+      "hint": "Three of the four relate to data validity, not security.",
+      "rationale": "The three valid data requirements are: (A) right type, (B) restricted to possible values, (C) meets business constraints. D (encryption) is a security requirement, not a data validation requirement."
+    },
+    {
+      "questionId": "m34_q13",
+      "type": "multi-select",
+      "scenario": "A Pega developer is designing validation for a loan application. Which TWO statements correctly describe when data validation executes in Pega Case processing?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Validation can be configured to run when a user submits a form at an Assignment step, preventing submission if invalid"
+        },
+        {
+          "id": "B",
+          "text": "Validation can be configured at the Stage boundary to prevent the Case from advancing until all Stage conditions are met"
+        },
+        {
+          "id": "C",
+          "text": "Pega automatically applies all validation rules at the moment any field is entered, with no configuration required"
+        },
+        {
+          "id": "D",
+          "text": "Validation in Pega can only be applied to text fields and is not supported for date or numeric field types"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Validation fires at form submission and at Stage transitions — it does not fire automatically on every keystroke.",
+      "rationale": "In Pega, validation is triggered at two configurable points: at form submission within an Assignment step (blocking the user from proceeding if conditions fail) and at Stage transitions (blocking the Case from advancing until all required data conditions are satisfied). Validation is not applied automatically on every field entry, and it supports all field types including dates and numbers."
+    },
+    {
+      "questionId": "m34_q14",
+      "type": "multi-select",
+      "scenario": "An SA is configuring validation for a loan application where applicant age must be 18 or older and income must exceed $20,000 before submission. Which TWO App Studio approaches can implement this requirement?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Configure form-level validation on the Assignment step with conditions on each required field"
+        },
+        {
+          "id": "B",
+          "text": "Configure Stage-level validation to prevent the Case from exiting the Stage until both conditions are satisfied"
+        },
+        {
+          "id": "C",
+          "text": "Create a Declare Expression that automatically corrects invalid field values to the minimum threshold at submission"
+        },
+        {
+          "id": "D",
+          "text": "Use a Report Definition to identify invalid records in a nightly batch and email the results to the SA"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "App Studio supports both form-level (step) and Stage-level validation — both prevent advancement when conditions fail.",
+      "rationale": "App Studio allows validation to be applied at the Assignment step (form-level) to block submission, or at the Stage level to block stage progression. Both enforce that required conditions (age ≥ 18 and income > $20,000) are met before the Case proceeds."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Why validate",
+      "value": "Valid data is required for error-free processing. 3 requirements: right type, possible values, business constraints."
+    },
+    {
+      "key": "Field Type/control",
+      "value": "Validates FORMAT (date format, numeric type, dropdown options). Cannot enforce business rules."
+    },
+    {
+      "key": "Business logic validation",
+      "value": "Validates BUSINESS RULES (date in past, credit score range). Configured in App Studio. Condition defines INVALID state — error fires when condition is true."
+    },
+    {
+      "key": "Form validation",
+      "value": "Triggered on form SUBMIT. Use when user CAN immediately fix the issue. Error blocks the form until corrected."
+    },
+    {
+      "key": "Stage validation",
+      "value": "Triggered when Case ENTERS a Stage. Use when user CANNOT immediately fix the issue. Developer must configure resolution path (return to Stage, close Case, etc.)."
+    },
+    {
+      "key": "Key decision",
+      "value": "Can the user fix it immediately? Yes → form validation. No → Stage validation."
+    },
+    {
+      "key": "Both configured in",
+      "value": "App Studio — no Dev Studio needed."
+    }
+  ]
+}

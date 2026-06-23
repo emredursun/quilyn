@@ -1,0 +1,519 @@
+{
+  "moduleId": "m29",
+  "moduleTitle": "Adding optional Actions to a workflow",
+  "moduleUrl": "https://academy.pega.com/module/adding-optional-actions-workflow/v8/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/adding-optional-actions-workflow/v8/quiz/in/96211",
+  "learningObjectives": [
+    "Identify the role of optional Actions and optional Processes in a Case workflow.",
+    "Configure Case-wide and Stage-only optional Actions and explain how Promoted Actions behave at runtime."
+  ],
+  "estTime": "~15 min · 1 topic",
+  "topics": [
+    {
+      "title": "Optional Actions",
+      "url": "https://academy.pega.com/topic/optional-actions/v6/in/72681/66901/66966",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Optional Actions",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Optional Action vs. Optional Process",
+          "description": "OPTIONAL ACTION — a single Step users can invoke anytime. OPTIONAL PROCESS — a series of Steps users can optionally trigger. Both are user-initiated additions to the Case workflow, not mandatory steps."
+        },
+        {
+          "type": "analogy",
+          "text": "Optional Actions in Pega are like condiment choices at a burger restaurant: the core burger (required process) is always served, but ketchup, mustard, and pickles (optional actions) are available at any time — never forced. The kitchen (Pega) makes each condiment available through the case action menu without putting it on every burger automatically."
+        },
+        {
+          "type": "concept",
+          "term": "Case-wide vs. Stage-only",
+          "description": "Case-wide — available throughout the entire Case lifecycle. Stage-only — available only during a specified Stage. Configure both on the Workflow tab in the Case Life Cycle designer under 'Optional Actions'."
+        },
+        {
+          "type": "concept",
+          "term": "Runtime access — Actions menu",
+          "description": "At runtime, optional Actions are accessible from the Actions menu in the Case. Users choose whether to invoke them during Case processing."
+        },
+        {
+          "type": "concept",
+          "term": "Promoted Actions",
+          "description": "Optional Actions promoted to the Case Page for higher visibility — they appear as buttons on the Case summary rather than only in the Actions menu. Examples: 'Edit details', 'Update contact'. Gives users quicker access without opening the menu."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 420 210\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"400\" height=\"190\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"210\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Optional Actions vs. Required Process</text><rect x=\"30\" y=\"50\" width=\"340\" height=\"40\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"200\" y=\"68\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Required Process (always runs)</text><text x=\"200\" y=\"82\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Stage 1 → Stage 2 → Stage 3 → Resolved</text><text x=\"200\" y=\"115\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-brand)\">Optional Actions (available at any time)</text><rect x=\"50\" y=\"125\" width=\"90\" height=\"28\" rx=\"6\" fill=\"var(--pa-brand)\" opacity=\"0.2\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"95\" y=\"143\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Request Info</text><rect x=\"160\" y=\"125\" width=\"90\" height=\"28\" rx=\"6\" fill=\"var(--pa-brand)\" opacity=\"0.2\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"205\" y=\"143\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Add Note</text><rect x=\"270\" y=\"125\" width=\"90\" height=\"28\" rx=\"6\" fill=\"var(--pa-brand)\" opacity=\"0.2\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"315\" y=\"143\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Escalate</text><text x=\"210\" y=\"178\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Operator triggers optional actions from the case action menu — they do not</text><text x=\"210\" y=\"192\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">interrupt or replace the required process.</text></svg>",
+          "caption": "Optional Actions are available alongside the required process — triggered by the operator, never mandatory."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Optional Action (single Step) vs. Optional Process (series of Steps)",
+      "trapDescription": "Questions ask which optional type to use when the user needs to perform a multi-step sub-workflow. Candidates select Optional Action for both. An Optional Action contains a single Step; an Optional Process contains a series of Steps — use the Process for multi-step optional sub-workflows.",
+      "bestPractice": "Optional Action = single Step/View. Optional Process = series of Steps. When a multi-step optional workflow is needed (e.g., 'Cancel Order' with multiple Steps), use an optional Process."
+    },
+    {
+      "title": "Stage-only Actions are only available in a specific Stage",
+      "trapDescription": "A question asks how to restrict an Optional Action to be available only while the case is in a specific Stage. Candidates configure it as a standard Optional Action. Stage-only Optional Actions must be configured at the Stage level — they disappear from the Actions menu once the case leaves that Stage.",
+      "bestPractice": "Case-wide = available at ANY point in the Case. Stage-only = available ONLY when the Case is in that specific Stage. Example: 'Cancel Order' is Stage-only in 'Confirm Billing Details' Stage."
+    },
+    {
+      "title": "Optional Actions are user-initiated — not automatically triggered",
+      "trapDescription": "Questions describe a scenario and ask whether an Optional Action will run automatically when a condition is met. Candidates say yes. Optional Actions are always user-initiated — they appear in the Actions menu for the user to choose; they do not fire automatically based on conditions.",
+      "bestPractice": "Optional Actions are always user-initiated. The user decides whether to invoke them from the Actions menu. They are NOT triggered automatically by the Case workflow."
+    },
+    {
+      "title": "Promoted Actions appear as buttons on the Case Page — not just in the Actions menu",
+      "trapDescription": "A question asks where a Promoted Action appears. Candidates say 'in the Actions dropdown menu only.' Promoted Actions appear as buttons directly on the Case page header — they are surfaced prominently, not buried in the dropdown.",
+      "bestPractice": "Regular optional Actions appear only in the Actions menu. PROMOTED optional Actions are elevated to the Case Page as visible buttons — more prominent, quicker to access."
+    },
+    {
+      "title": "Configuration location: Workflow tab → Optional Actions (upper-right)",
+      "trapDescription": "Questions ask where Optional Actions are configured in App Studio. Candidates look in the Stages panel. Optional Actions are configured in the Workflow tab using the Optional Actions button in the upper-right area of the Case Life Cycle — not within a Stage's step list.",
+      "bestPractice": "Optional Actions are configured from the upper-right corner of the Workflow tab in the Case Life Cycle by clicking 'Optional Actions'. Not in the Stage properties or a separate form."
+    },
+    {
+      "title": "Optional Actions do NOT interrupt required Case flow",
+      "trapDescription": "A question asks what happens to the required Case flow when a user runs an Optional Action. Candidates say 'it pauses until the Optional Action completes.' Optional Actions run as a side activity — the required case flow is not interrupted or paused.",
+      "bestPractice": "Optional Actions are supplemental — they run alongside the required workflow without interrupting or redirecting the standard Case flow. The Case continues its normal progression."
+    },
+    {
+      "title": "Built-in optional Actions: 'Edit details' and 'Change Stage'",
+      "trapDescription": "Questions ask which Optional Actions come pre-built with every Case Type. Candidates list custom ones. Every Case Type includes two built-in Optional Actions: 'Edit details' (edit case fields) and 'Change Stage' (manually move the case to a different Stage).",
+      "bestPractice": "Pega Platform includes built-in optional Actions like 'Edit details' and 'Change Stage'. These are Case-wide by default and appear in the Optional Actions tab alongside any custom ones you add."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m29_q01",
+      "type": "single-select",
+      "scenario": "A loan application allows a customer service agent to update the customer's contact information at any point during the application process. This is an optional, user-initiated single-step action. What should the SA configure?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An optional Action — a single Action users can invoke at any point during Case processing"
+        },
+        {
+          "id": "B",
+          "text": "An optional Process — a series of Steps users can invoke at any point during Case processing"
+        },
+        {
+          "id": "C",
+          "text": "A Change Stage Automation that redirects to an 'Update Contact' Stage when triggered"
+        },
+        {
+          "id": "D",
+          "text": "A conditional Process that runs whenever the Case reaches the contact update Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Single Step, user-initiated, not required = optional Action.",
+      "rationale": "A single optional user-initiated action uses an optional Action (not a Process). B is wrong because an optional Process is for multi-step workflows. C uses an automation, which is triggered automatically, not user-initiated. D describes a conditional Process in the required workflow, not an optional user-initiated action."
+    },
+    {
+      "questionId": "m29_q02",
+      "type": "single-select",
+      "scenario": "An online shopping Case needs an optional 'Cancel Order' flow that involves multiple Steps: confirming cancellation reason, issuing a refund, and sending notification. What should the SA configure?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An optional Process — a series of Steps users can optionally invoke"
+        },
+        {
+          "id": "B",
+          "text": "An optional Action — a single Action covering all three Steps"
+        },
+        {
+          "id": "C",
+          "text": "An Alternate Stage named 'Cancel Order' that users can manually trigger"
+        },
+        {
+          "id": "D",
+          "text": "A When Condition that activates the cancellation Processes automatically"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A series of user-initiated optional Steps constitutes an optional Process, not an Action.",
+      "rationale": "A multi-step optional user-initiated workflow uses an optional Process. B is wrong because an optional Action handles a single Step. C uses an Alternate Stage with a Change Stage automation — different mechanism, not user-initiated from the Actions menu. D uses a When Condition which is automatic, not user-initiated."
+    },
+    {
+      "questionId": "m29_q03",
+      "type": "single-select",
+      "scenario": "A 'Cancel Order' optional Process should only be available when the Case is in the 'Confirm Billing Details' Stage. What scope should the SA configure?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Stage-only — available only when the Case is in that specific Stage"
+        },
+        {
+          "id": "B",
+          "text": "Case-wide — available throughout the entire Case lifecycle"
+        },
+        {
+          "id": "C",
+          "text": "Process-scoped — linked to a specific Process within the Stage"
+        },
+        {
+          "id": "D",
+          "text": "User-scoped — available only to users with the Manager Persona"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Available only in a specific Stage = Stage-only.",
+      "rationale": "Stage-only restricts the optional Action/Process to a specific Stage. B (Case-wide) makes it available everywhere. C and D describe non-existent scope types for optional Actions."
+    },
+    {
+      "questionId": "m29_q04",
+      "type": "single-select",
+      "scenario": "An 'Update Contact' optional Action should be available at any point during the loan application — not restricted to a specific Stage. What scope is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case-wide — available throughout the entire Case lifecycle"
+        },
+        {
+          "id": "B",
+          "text": "Stage-only — configured on every Stage individually"
+        },
+        {
+          "id": "C",
+          "text": "Global — available across all Case Types in the application"
+        },
+        {
+          "id": "D",
+          "text": "Assignment-scoped — available only during the Assignment where it is configured"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Available at any point throughout the Case = Case-wide.",
+      "rationale": "Case-wide optional Actions are available throughout the entire Case lifecycle — at any Stage or Step. B would require adding it to every Stage separately. C and D describe non-existent scope types."
+    },
+    {
+      "questionId": "m29_q05",
+      "type": "single-select",
+      "scenario": "At runtime, a user needs to invoke an optional Action to update their address during Case processing. Where do they find available optional Actions?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Actions menu in the Case"
+        },
+        {
+          "id": "B",
+          "text": "The Case Life Cycle Workflow tab — they click 'Optional Actions' in the upper-right"
+        },
+        {
+          "id": "C",
+          "text": "The Stage header — a dropdown appears on the current Stage"
+        },
+        {
+          "id": "D",
+          "text": "The Assignment form — optional Actions appear as extra tabs on the current Assignment"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Runtime access to optional Actions is through the Actions menu.",
+      "rationale": "At runtime, optional Actions are accessible from the Actions menu in the Case. B is the design-time configuration location — not the runtime access point. C and D are incorrect runtime locations."
+    },
+    {
+      "questionId": "m29_q06",
+      "type": "single-select",
+      "scenario": "An SA wants the 'Update Contact' optional Action to be immediately visible on the Case summary page as a button — not buried in the Actions menu. What feature enables this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Promoted Actions — elevates the optional Action to appear as a button on the Case Page"
+        },
+        {
+          "id": "B",
+          "text": "Pinned Actions — pins the Action to the top of the Actions menu"
+        },
+        {
+          "id": "C",
+          "text": "Configure the optional Action as Case-wide — Case-wide Actions automatically appear as buttons"
+        },
+        {
+          "id": "D",
+          "text": "Set the Action priority to 'High' in the Optional Actions configuration"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A specific feature promotes optional Actions to the Case Page as visible buttons.",
+      "rationale": "Promoted Actions are elevated to appear as buttons on the Case Page, giving greater visibility than the Actions menu. B, C, and D describe features that don't exist in Pega Platform as described."
+    },
+    {
+      "questionId": "m29_q07",
+      "type": "single-select",
+      "scenario": "A user invokes the 'Update Contact' optional Action mid-Case. What happens to the required Case workflow (ongoing Stages and Processes)?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The required workflow continues uninterrupted — optional Actions run supplementally without redirecting the Case"
+        },
+        {
+          "id": "B",
+          "text": "The Case is paused until the optional Action is completed"
+        },
+        {
+          "id": "C",
+          "text": "The current Stage restarts from the beginning after the optional Action completes"
+        },
+        {
+          "id": "D",
+          "text": "The Case moves to an Alternate Stage to process the optional Action, then returns"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Optional Actions are supplemental — they don't interrupt the standard Case flow.",
+      "rationale": "Optional Actions are supplemental — they run alongside the required workflow without interrupting, pausing, or redirecting the standard Case flow. B, C, and D describe interruptions that don't happen."
+    },
+    {
+      "questionId": "m29_q08",
+      "type": "single-select",
+      "scenario": "Where in App Studio does an SA configure optional Actions for a Case Type?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Workflow tab → click 'Optional Actions' in the upper-right corner of the Case Life Cycle"
+        },
+        {
+          "id": "B",
+          "text": "Stage properties panel → 'Optional' section for each Stage"
+        },
+        {
+          "id": "C",
+          "text": "A separate 'Optional Actions' form under Case Type settings"
+        },
+        {
+          "id": "D",
+          "text": "Users > User Management in App Studio"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Optional Actions are configured from the Workflow tab's upper-right corner.",
+      "rationale": "Optional Actions are configured by clicking 'Optional Actions' in the upper-right corner of the Workflow tab in the Case Life Cycle. B, C, D describe incorrect locations."
+    },
+    {
+      "questionId": "m29_q09",
+      "type": "multi-select",
+      "scenario": "Which TWO are examples of built-in optional Actions that Pega Platform provides by default?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Edit details"
+        },
+        {
+          "id": "B",
+          "text": "Change Stage"
+        },
+        {
+          "id": "C",
+          "text": "Cancel Order"
+        },
+        {
+          "id": "D",
+          "text": "Update Contact"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Pega provides built-in optional Actions — not all are custom-created.",
+      "rationale": "'Edit details' and 'Change Stage' are built-in optional Actions that Pega Platform provides by default. 'Cancel Order' and 'Update Contact' are examples from the Academy lesson — they are custom optional Actions configured by the SA.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m29_q10",
+      "type": "single-select",
+      "scenario": "An SA is deciding between an optional Action and an optional Process for a 'Request Expedited Review' feature. This feature requires the user to (1) fill in a reason form, (2) select a reviewer, and (3) confirm the request. Which is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Optional Process — three Steps are required, so a Process is the right choice"
+        },
+        {
+          "id": "B",
+          "text": "Optional Action — the entire flow is considered one 'request' action"
+        },
+        {
+          "id": "C",
+          "text": "Either — optional Actions can contain multiple Steps through sub-forms"
+        },
+        {
+          "id": "D",
+          "text": "Neither — multi-step user-initiated flows must be implemented as Alternate Stages"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Multiple Steps = optional Process. Single Step = optional Action.",
+      "rationale": "An optional Action handles exactly one Step presented to the user — useful for a simple ad-hoc capture. When the optional work requires multiple Steps (such as capturing a reason, selecting a reviewer, and confirming), you must use an optional Process, which can contain multiple Steps and its own subprocess flow. Options C and D describe incorrect alternatives not supported by Pega."
+    },
+    {
+      "questionId": "m29_q11",
+      "type": "single-select",
+      "scenario": "A car accident insurance Case has an optional Action to file a medical injury claim. This should only appear when the Case is in the 'Initial Filing' Stage. Which configuration is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Add the optional Action as Stage-only, scoped to the 'Initial Filing' Stage"
+        },
+        {
+          "id": "B",
+          "text": "Add the optional Action as Case-wide and add a When Condition to hide it in other Stages"
+        },
+        {
+          "id": "C",
+          "text": "Add the optional Action to each individual Assignment within 'Initial Filing'"
+        },
+        {
+          "id": "D",
+          "text": "Create a Promoted Action for 'Initial Filing' that automatically converts to a standard Action in other Stages"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "An optional Action available only during one specific Stage has Stage-only scope.",
+      "rationale": "Stage-only scope restricts the optional Action to only the specified Stage. B uses a workaround (When Condition with Case-wide) that's more complex and not the designated approach. C applies it at Assignment level, not Stage level. D describes a feature that doesn't exist."
+    },
+    {
+      "questionId": "m29_q12",
+      "type": "single-select",
+      "scenario": "Which statement best describes the relationship between optional Actions and the required Case workflow?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Optional Actions are supplemental — users invoke them alongside the required workflow without interrupting Case progression"
+        },
+        {
+          "id": "B",
+          "text": "Optional Actions temporarily replace required Steps — the Case resumes required Steps after the optional Action completes"
+        },
+        {
+          "id": "C",
+          "text": "Optional Actions are pre-conditions — the required workflow cannot advance until all available optional Actions are invoked"
+        },
+        {
+          "id": "D",
+          "text": "Optional Actions run in parallel with required Processes as separate Case threads"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Optional Actions are user-initiated, supplemental, and non-blocking to the main Case workflow.",
+      "rationale": "Optional Actions are supplemental and user-initiated — they don't interrupt, replace, or block the required Case workflow. B, C, and D all describe mandatory or blocking relationships that don't apply to optional Actions."
+    },
+    {
+      "questionId": "m29_q13",
+      "type": "multi-select",
+      "scenario": "An SA is configuring Case-wide optional Actions for a Claims application. Which TWO statements correctly describe Case-wide optional Actions in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case-wide optional Actions are available to users throughout the entire Case life cycle, regardless of the current Stage"
+        },
+        {
+          "id": "B",
+          "text": "Case-wide optional Actions can be promoted to the top-level action menu so they are more prominent for users"
+        },
+        {
+          "id": "C",
+          "text": "Case-wide optional Actions are only available during the first Stage of a Case and disappear afterward"
+        },
+        {
+          "id": "D",
+          "text": "Case-wide optional Actions automatically create a child Case each time a user triggers them"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Case-wide means available everywhere in the Case — promoted Actions appear in the top action menu.",
+      "rationale": "Case-wide optional Actions are accessible at any point in the Case life cycle, not limited to a specific Stage. They can be promoted to appear prominently in the top-level action menu for easy user access. They do not disappear after the first Stage, and they do not automatically create child Cases when triggered."
+    },
+    {
+      "questionId": "m29_q14",
+      "type": "multi-select",
+      "scenario": "A developer configures a 'Request Additional Documents' optional Action as Stage-only for the Review Stage of a Claims Case. Which TWO behaviors does this optional Action exhibit at runtime?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The optional Action is only available to users while the Case is in the Review Stage"
+        },
+        {
+          "id": "B",
+          "text": "When the Case exits the Review Stage, the optional Action is no longer visible to users"
+        },
+        {
+          "id": "C",
+          "text": "The optional Action remains available in all Stages indefinitely once it has been triggered once"
+        },
+        {
+          "id": "D",
+          "text": "Stage-only optional Actions automatically reset the Stage SLA timer each time they are triggered"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Stage-only Actions are visible only while that Stage is active — they disappear when the Case leaves the Stage.",
+      "rationale": "A Stage-only optional Action is visible to users only while the Case is actively in the configured Stage. Once the Case transitions to the next Stage, the optional Action is no longer accessible. It does not persist across all Stages after being triggered, and it does not interact with SLA timers."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Optional Action vs. Optional Process",
+      "value": "Optional Action = single Step (e.g., 'Update customer info'). Optional Process = series of Steps (e.g., 'Cancel Order'). Both are user-initiated, not required."
+    },
+    {
+      "key": "Case-wide vs. Stage-only",
+      "value": "Case-wide = available at any point in the Case lifecycle. Stage-only = available only when Case is in a specific Stage."
+    },
+    {
+      "key": "Runtime access",
+      "value": "Actions menu in the Case. Promoted Actions also appear as buttons on the Case Page for higher visibility."
+    },
+    {
+      "key": "Promoted Actions",
+      "value": "Elevated optional Actions displayed as buttons on the Case summary (e.g., 'Edit details', 'Update contact') — not just in the Actions menu."
+    },
+    {
+      "key": "Configuration location",
+      "value": "Workflow tab → 'Optional Actions' button (upper-right corner of Case Life Cycle). No separate Rule form."
+    },
+    {
+      "key": "Built-in optional Actions",
+      "value": "'Edit details' and 'Change Stage' are provided by Pega by default as Case-wide optional Actions."
+    },
+    {
+      "key": "Workflow impact",
+      "value": "Optional Actions are supplemental — invoking one does NOT interrupt, pause, or redirect the required Case workflow."
+    }
+  ]
+}

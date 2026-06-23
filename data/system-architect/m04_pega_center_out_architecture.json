@@ -1,0 +1,797 @@
+{
+  "moduleId": "m04",
+  "moduleTitle": "Pega Center-out architecture",
+  "moduleUrl": "https://academy.pega.com/module/pega-center-out-architecture/v1/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/pega-center-out-architecture/v1/quiz/in/96211",
+  "learningObjectives": [
+    "Describe the problems with traditional inside-out software architecture",
+    "Explain how Pega's Center-out approach separates the business layer from channels and systems",
+    "Identify and explain each of the five Center-out principles (I-O-U-D-V)",
+    "Explain how Model-driven UI generates channel-appropriate interfaces from one model",
+    "Describe how Center-out architecture supports accessibility"
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Traditional Software Architecture (and its problems)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Top-down approach",
+          "description": "Designs applications around the PRESENTATION layer's delivery Channels (web, mobile, digital messaging, voice-AI). Its most significant disadvantage: the same business logic must be implemented MULTIPLE TIMES to deliver a consistent experience across the different Channels."
+        },
+        {
+          "type": "concept",
+          "term": "Bottom-up approach",
+          "description": "Designs applications around the DATA access layer. Risk: each system has its own data view; legacy systems built in silos duplicate data, and no single solution provides a complete view of a business entity like a Customer."
+        },
+        {
+          "type": "analogy",
+          "text": "Roof-first vs. pipes-first vs. core-first: Top-down builds from the roof (Channels) — every new roof re-runs the plumbing (logic). Bottom-up starts from foundation pipes (data) — every room gets a different blueprint. Center-out starts from the living core (business logic) and connects up to roofs and down to pipes, so neither can break the home's logic."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 320\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Traditional vs Center-out Architecture</title>\n<desc>Side-by-side comparison of inside-out architecture (channel-specific silos) vs Center-out (single business layer with multiple channels)</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">ARCHITECTURE COMPARISON</text>\n<!-- Traditional side -->\n<rect x=\"20\" y=\"44\" width=\"350\" height=\"256\" rx=\"14\" fill=\"var(--t)\" opacity=\".05\" stroke=\"var(--t)\" stroke-width=\"1\" stroke-opacity=\".2\"/>\n<text x=\"40\" y=\"72\" font-size=\"14\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".9\">Traditional (Inside-out)</text>\n<rect x=\"36\" y=\"86\" width=\"148\" height=\"60\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/>\n<text x=\"56\" y=\"116\" font-size=\"12\" font-weight=\"600\" fill=\"#5A3200\">Web App</text>\n<text x=\"56\" y=\"133\" font-size=\"10.5\" fill=\"#BA7517\">own logic copy</text>\n<rect x=\"202\" y=\"86\" width=\"148\" height=\"60\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/>\n<text x=\"222\" y=\"116\" font-size=\"12\" font-weight=\"600\" fill=\"#5A3200\">Mobile App</text>\n<text x=\"222\" y=\"133\" font-size=\"10.5\" fill=\"#BA7517\">own logic copy</text>\n<rect x=\"36\" y=\"168\" width=\"148\" height=\"60\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/>\n<text x=\"56\" y=\"198\" font-size=\"12\" font-weight=\"600\" fill=\"#5A3200\">CRM System</text>\n<text x=\"56\" y=\"213\" font-size=\"10.5\" fill=\"#BA7517\">own logic copy</text>\n<rect x=\"202\" y=\"168\" width=\"148\" height=\"60\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/>\n<text x=\"222\" y=\"198\" font-size=\"12\" font-weight=\"600\" fill=\"#5A3200\">ERP System</text>\n<text x=\"222\" y=\"213\" font-size=\"10.5\" fill=\"#BA7517\">own logic copy</text>\n<text x=\"40\" y=\"272\" font-size=\"11\" fill=\"#BA7517\">Each silo duplicates business logic</text>\n<!-- Center-out side -->\n<rect x=\"410\" y=\"44\" width=\"350\" height=\"256\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"430\" y=\"72\" font-size=\"14\" font-weight=\"700\" fill=\"#0E3D28\">Center-out</text>\n<!-- Center business box -->\n<rect x=\"490\" y=\"86\" width=\"190\" height=\"76\" rx=\"10\" fill=\"#1E8A5B\"/>\n<text x=\"585\" y=\"122\" font-size=\"13\" font-weight=\"700\" fill=\"#ffffff\" text-anchor=\"middle\">Business Logic</text>\n<text x=\"585\" y=\"140\" font-size=\"10.5\" fill=\"#A7F3D0\" text-anchor=\"middle\">single shared model</text>\n<!-- Channels -->\n<rect x=\"426\" y=\"192\" width=\"90\" height=\"38\" rx=\"7\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/>\n<text x=\"471\" y=\"215\" font-size=\"11\" fill=\"#2B2580\" text-anchor=\"middle\">Web</text>\n<rect x=\"540\" y=\"192\" width=\"90\" height=\"38\" rx=\"7\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/>\n<text x=\"585\" y=\"215\" font-size=\"11\" fill=\"#2B2580\" text-anchor=\"middle\">Mobile</text>\n<rect x=\"654\" y=\"192\" width=\"90\" height=\"38\" rx=\"7\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/>\n<text x=\"699\" y=\"215\" font-size=\"11\" fill=\"#2B2580\" text-anchor=\"middle\">API</text>\n<!-- Connecting lines from center box bottom to each channel top -->\n<line x1=\"471\" y1=\"162\" x2=\"471\" y2=\"192\" stroke=\"#6d8bff\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/>\n<line x1=\"585\" y1=\"162\" x2=\"585\" y2=\"192\" stroke=\"#6d8bff\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/>\n<line x1=\"699\" y1=\"162\" x2=\"699\" y2=\"192\" stroke=\"#6d8bff\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/>\n<text x=\"430\" y=\"252\" font-size=\"11\" fill=\"#1E8A5B\">One model serves all channels</text>\n</svg>",
+          "caption": "Traditional inside-out architecture creates channel-specific silos that each duplicate business logic. Center-out maintains a single business layer serving all channels."
+        },
+        {
+          "type": "interactive",
+          "title": "Retrieval Check",
+          "height": 165,
+          "html": "<!doctype html><html><head><meta charset=\"utf-8\"><style>body{margin:0;padding:14px 16px;font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.55;font-size:.9rem}.q{margin-bottom:10px;color:#f1f5f9}button{background:#3b82f6;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.83rem}button:hover{background:#2563eb}.a{display:none;margin-top:10px;background:#1e293b;border-left:3px solid #22d3ee;padding:9px 13px;border-radius:0 6px 6px 0;color:#94a3b8}.a.v{display:block}.a b{color:#22d3ee}</style></head><body><p class=\"q\">❓ What is <em>Top-down approach</em> and what is its primary role in Pega?</p><button onclick=\"document.getElementById('a').className='a v';this.style.display='none'\">Show answer</button><p id=\"a\" class=\"a\">✅ <b>Designs applications around the PRESENTATION layer's delivery Channels (web, mobile, digital messaging, voice-AI). Its most significant disadvantage: the same business logic must be implemented MULTIPLE TIMES to deliver a consistent experience across the different Channels.</b></p></body></html>"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Pega's Center-out Approach",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Center-out business architecture",
+          "description": "Puts the BUSINESS LOGIC layer at the center, with customer outcome at the core. Presentation and data-access layers stay SEPARATE from business logic — so Channels and databases can change without touching the logic."
+        },
+        {
+          "type": "concept",
+          "term": "Presentation layer (connects UP)",
+          "description": "The business logic is connected up into the presentation layer so delivery Channels dynamically RESPOND to changes in the central business logic — no recoding per channel."
+        },
+        {
+          "type": "concept",
+          "term": "Application & business logic layer (the hub)",
+          "description": "The central hub containing all the business logic needed to achieve the desired strategic outcome for the organization."
+        },
+        {
+          "type": "concept",
+          "term": "Data access layer (connects DOWN)",
+          "description": "Connections down to data are insulated from the business logic, so changes in systems of record — for example, moving from on-premise to Cloud storage — do NOT require changes in the application's business logic."
+        },
+        {
+          "type": "analogy",
+          "text": "Hub-and-spoke wheel: business logic is the hub; Channels and data systems are spokes. Replace any spoke (a new mobile channel, a migrated database) and the hub keeps the wheel true — the logic never has to be rebuilt."
+        },
+        {
+          "type": "interactive",
+          "title": "Retrieval Check",
+          "height": 165,
+          "html": "<!doctype html><html><head><meta charset=\"utf-8\"><style>body{margin:0;padding:14px 16px;font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.55;font-size:.9rem}.q{margin-bottom:10px;color:#f1f5f9}button{background:#3b82f6;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.83rem}button:hover{background:#2563eb}.a{display:none;margin-top:10px;background:#1e293b;border-left:3px solid #22d3ee;padding:9px 13px;border-radius:0 6px 6px 0;color:#94a3b8}.a.v{display:block}.a b{color:#22d3ee}</style></head><body><p class=\"q\">❓ What is <em>Center-out business architecture</em> and what is its primary role in Pega?</p><button onclick=\"document.getElementById('a').className='a v';this.style.display='none'\">Show answer</button><p id=\"a\" class=\"a\">✅ <b>Puts the BUSINESS LOGIC layer at the center of application design, with the customer and the strategic outcome at the core. The business logic layer maintains all information needed to achieve the outcome.</b></p></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">PEGA CENTER-OUT — 5 PRINCIPLES</text><rect x=\"10\" y=\"30\" width=\"134\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"77\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Customer</text><text x=\"77\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Journey</text><text x=\"77\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Design around</text><text x=\"77\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">the end-to-end</text><text x=\"77\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">customer path</text><rect x=\"152\" y=\"30\" width=\"134\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"219\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Outcome-</text><text x=\"219\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">focused</text><text x=\"219\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Define success</text><text x=\"219\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">by business</text><text x=\"219\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">outcomes first</text><rect x=\"294\" y=\"30\" width=\"134\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"361\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Microjourney</text><text x=\"361\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Scope into small</text><text x=\"361\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">goal-focused</text><text x=\"361\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">interactions</text><rect x=\"436\" y=\"30\" width=\"134\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"503\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Model-</text><text x=\"503\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">driven</text><text x=\"503\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Configure rules;</text><text x=\"503\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">let Pega generate</text><text x=\"503\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">the UI &amp; logic</text><rect x=\"578\" y=\"30\" width=\"133\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"644\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Low-code</text><text x=\"644\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Citizen devs +</text><text x=\"644\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">IT collaborate</text><text x=\"644\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">visually</text></svg>",
+          "caption": "The five Center-out principles: Customer Journey, Outcome-focused, Microjourney, Model-driven, Low-code."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "The Five Center-out Principles (I-O-U-D-V)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "1. Manage intelligence centrally",
+          "description": "Start with the business logic. Business outcomes are guided by real-time customer information; rules are consistently enforced; every recommended action is on target."
+        },
+        {
+          "type": "concept",
+          "term": "2. Focus on outcomes, align your process",
+          "description": "Get the work done using Case Management and a MICROJOURNEY approach — implementing a part of the customer journey that is tied to a specific outcome."
+        },
+        {
+          "type": "concept",
+          "term": "3. Connect experiences up to your Channels",
+          "description": "Provide a consistent user experience by keeping front-end and back-end logic coordinated; changes are reflected dynamically without recoding."
+        },
+        {
+          "type": "concept",
+          "term": "4. Connect down to your data, keep logic nimble",
+          "description": "Access data without adding complexity — quickly and easily define the data needed and access it in running applications without worrying about how or where the data is stored or accessed."
+        },
+        {
+          "type": "concept",
+          "term": "5. Manage variations to be scale-ready",
+          "description": "Start small and fast, then scale big and broad and stay future-proof by adapting to different customer types, lines of business, and geographies using Pega's SITUATIONAL LAYER CAKE."
+        },
+        {
+          "type": "analogy",
+          "text": "Memory hook 'I-O-U-D-V': Intelligence central, Outcomes/process, Up to Channels, Down to data, Variations to scale — all organized around the customer and the strategic outcome."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 290\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Five Center-out Principles: I-O-U-D-V</title>\n<desc>Five cards for Intention-driven, Outside-in, Unified, Directly related, Value in business</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">THE FIVE CENTER-OUT PRINCIPLES</text>\n<rect x=\"20\" y=\"44\" width=\"136\" height=\"220\" rx=\"12\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"80\" font-size=\"22\" font-weight=\"800\" fill=\"#0E3D28\">I</text>\n<text x=\"40\" y=\"100\" font-size=\"12\" font-weight=\"700\" fill=\"#1E8A5B\">Intention-driven</text>\n<text x=\"40\" y=\"120\" font-size=\"11\" fill=\"#0E3D28\">Design around</text>\n<text x=\"40\" y=\"136\" font-size=\"11\" fill=\"#0E3D28\">customer intent,</text>\n<text x=\"40\" y=\"152\" font-size=\"11\" fill=\"#0E3D28\">not system fields</text>\n\n<rect x=\"168\" y=\"44\" width=\"136\" height=\"220\" rx=\"12\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"2\"/>\n<text x=\"188\" y=\"80\" font-size=\"22\" font-weight=\"800\" fill=\"#2B2580\">O</text>\n<text x=\"188\" y=\"100\" font-size=\"12\" font-weight=\"700\" fill=\"#534AB7\">Outside-in</text>\n<text x=\"188\" y=\"120\" font-size=\"11\" fill=\"#2B2580\">Channel/customer</text>\n<text x=\"188\" y=\"136\" font-size=\"11\" fill=\"#2B2580\">needs drive the</text>\n<text x=\"188\" y=\"152\" font-size=\"11\" fill=\"#2B2580\">business design</text>\n\n<rect x=\"316\" y=\"44\" width=\"136\" height=\"220\" rx=\"12\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"336\" y=\"80\" font-size=\"22\" font-weight=\"800\" fill=\"#5A3200\">U</text>\n<text x=\"336\" y=\"100\" font-size=\"12\" font-weight=\"700\" fill=\"#BA7517\">Unified</text>\n<text x=\"336\" y=\"120\" font-size=\"11\" fill=\"#5A3200\">One model for</text>\n<text x=\"336\" y=\"136\" font-size=\"11\" fill=\"#5A3200\">all channels and</text>\n<text x=\"336\" y=\"152\" font-size=\"11\" fill=\"#5A3200\">systems</text>\n\n<rect x=\"464\" y=\"44\" width=\"136\" height=\"220\" rx=\"12\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"484\" y=\"80\" font-size=\"22\" font-weight=\"800\" fill=\"#0D3560\">D</text>\n<text x=\"484\" y=\"100\" font-size=\"12\" font-weight=\"700\" fill=\"#185FA5\">Directly related</text>\n<text x=\"484\" y=\"120\" font-size=\"11\" fill=\"#0D3560\">Business rules stay</text>\n<text x=\"484\" y=\"136\" font-size=\"11\" fill=\"#0D3560\">close to the data</text>\n<text x=\"484\" y=\"152\" font-size=\"11\" fill=\"#0D3560\">they govern</text>\n\n<rect x=\"612\" y=\"44\" width=\"148\" height=\"220\" rx=\"12\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"632\" y=\"80\" font-size=\"22\" font-weight=\"800\" fill=\"#0E3D28\">V</text>\n<text x=\"632\" y=\"100\" font-size=\"12\" font-weight=\"700\" fill=\"#1E8A5B\">Value in business</text>\n<text x=\"632\" y=\"120\" font-size=\"11\" fill=\"#0E3D28\">Measured by</text>\n<text x=\"632\" y=\"136\" font-size=\"11\" fill=\"#0E3D28\">business outcomes,</text>\n<text x=\"632\" y=\"152\" font-size=\"11\" fill=\"#0E3D28\">not tech metrics</text>\n</svg>",
+          "caption": "The five I-O-U-D-V principles that define Center-out architecture."
+        },
+        {
+          "type": "interactive",
+          "title": "Arrange the Five Center-out Principles",
+          "height": 520,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}\nbody{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}\n.label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.scenario{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:14px}\n.opt{display:block;width:100%;text-align:left;margin:6px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}\n.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}\n.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}\n.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;color:var(--soft);border-left:3px solid var(--line);padding-left:10px}\n.fb.ok{border-color:var(--ok);color:var(--ink)}\n.fb.bad{border-color:var(--bad);color:var(--ink)}\n.progress{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:12px}\n.btn{margin-top:12px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}\n.btn:hover{border-color:var(--brand);color:var(--ink)}\n.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}\n.btn.primary:hover{opacity:.88}\n.score-big{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}\n.score-msg{font-size:13px;color:var(--soft);text-align:center}\n\n.drag-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}\n.drag-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:var(--card);cursor:grab;font-size:13px;font-weight:500;user-select:none}\n.drag-item:active{cursor:grabbing;opacity:.7}\n.drag-item.locked{cursor:default}\n.drag-handle{color:var(--soft);font-size:16px;flex-shrink:0}\n.drag-item .num{font-size:11px;font-weight:700;color:var(--brand);width:18px;flex-shrink:0}\n.check-row{display:flex;gap:10px;align-items:center}\n.result-row{padding:8px 12px;border-radius:7px;font-size:12.5px;margin:4px 0;display:flex;gap:8px;align-items:flex-start}\n.result-row.ok{background:var(--okbg)}\n.result-row.bad{background:var(--badbg)}\n.result-row .pos{font-weight:700;flex-shrink:0;min-width:22px}\n</style></head><body>\n<div class=\"progress\" id=\"prog\">Arrange the 5 Center-out Principles in order (I-O-U-D-V)</div>\n<div class=\"card\">\n  <div class=\"label\">Sequencing Challenge</div>\n  <div class=\"scenario\" id=\"intro\">Drag the five Center-out principles into their correct order (1 = first, 5 = last). The mnemonic I-O-U-D-V will help you. Click Check when ready.</div>\n  <div class=\"drag-list\" id=\"drag-list\"></div>\n  <div class=\"check-row\">\n    <button class=\"btn primary\" id=\"checkBtn\" onclick=\"checkOrder()\">Check order</button>\n    <button class=\"btn\" onclick=\"shuffle()\">Shuffle</button>\n  </div>\n  <div id=\"result\"></div>\n</div>\n\n<script>\n(function(){\n  var root=document.documentElement;\n  function apply(t){root.setAttribute('data-theme',t);}\n  apply('__THEME__');\n  window.addEventListener('message',function(e){\n    if(e.data&&e.data.type==='pa-theme') apply(e.data.theme);\n  });\n})();\n</script>\n\n<script>\nvar PRINCIPLES = [\n  { letter: \"I\", text: \"Manage Intelligence centrally — put all AI, decisioning, and business rules in the application layer, not scattered in channels or data systems\" },\n  { letter: \"O\", text: \"Focus on Outcomes, align your process — use Case Management and Microjourneys to deliver specific customer outcomes\" },\n  { letter: \"U\", text: \"Connect Up to Channels — presentation and channel interfaces connect up to the central business logic layer\" },\n  { letter: \"D\", text: \"Connect Down to data, keep it clean — the data access layer connects downward to systems of record without exposing implementation details\" },\n  { letter: \"V\", text: \"Manage Variations to be scale-ready — handle geographies, business lines, and customer-type variations through the Situational Layer Cake\" }\n];\n\nvar order = []; // indices into PRINCIPLES, in current displayed order\nvar checked = false;\n\nfunction shuffle() {\n  if (checked) { checked = false; document.getElementById('result').innerHTML = ''; }\n  order = [0,1,2,3,4].sort(function(){ return Math.random()-.5; });\n  renderList();\n}\n\nfunction renderList() {\n  var dl = document.getElementById('drag-list');\n  dl.innerHTML = '';\n  order.forEach(function(pi, displayIdx) {\n    var item = document.createElement('div');\n    item.className = 'drag-item' + (checked ? ' locked' : '');\n    item.draggable = !checked;\n    item.dataset.pi = pi;\n    item.dataset.di = displayIdx;\n    item.innerHTML = '<span class=\"drag-handle\">' + (checked ? '' : '⠿') + '</span>' +\n                     '<span class=\"num\">' + (displayIdx+1) + '.</span>' +\n                     '<span>' + PRINCIPLES[pi].text + '</span>';\n    item.addEventListener('dragstart', onDragStart);\n    item.addEventListener('dragover', onDragOver);\n    item.addEventListener('drop', onDrop);\n    dl.appendChild(item);\n  });\n}\n\nvar dragSrc = null;\nfunction onDragStart(e){ dragSrc = this; }\nfunction onDragOver(e){ e.preventDefault(); }\nfunction onDrop(e){\n  e.preventDefault();\n  if (!dragSrc || dragSrc === this) return;\n  var a = parseInt(dragSrc.dataset.di), b = parseInt(this.dataset.di);\n  var tmp = order[a]; order[a] = order[b]; order[b] = tmp;\n  renderList();\n}\n\nfunction checkOrder() {\n  checked = true;\n  var resultHtml = '<div style=\"margin-top:14px\">';\n  var correct = 0;\n  order.forEach(function(pi, di) {\n    var isCorrect = pi === di;\n    if (isCorrect) correct++;\n    var p = PRINCIPLES[pi];\n    resultHtml += '<div class=\"result-row ' + (isCorrect ? 'ok' : 'bad') + '\">' +\n      '<span class=\"pos\">' + (isCorrect ? '✓' : '✗') + '</span>' +\n      '<span><b>You placed:</b> ' + p.text.split(' — ')[0] + ' at position ' + (di+1) +\n      (isCorrect ? '' : ' — should be position ' + (pi+1) + ' (' + PRINCIPLES[di].letter + ')') +\n      '</span></div>';\n  });\n  var pct = Math.round(correct/5*100);\n  var msg = correct === 5 ? 'I-O-U-D-V locked in. You have the sequence.' :\n            correct >= 3 ? 'Getting there. Focus on the ' + (5-correct) + ' misplaced principle(s).' :\n            'Review the five principles and their mnemonic, then try again.';\n  resultHtml += '<div style=\"margin-top:12px\"><div class=\"score-big\">' + correct + '/5 (' + pct + '%)</div><div class=\"score-msg\">' + msg + '</div></div>';\n  resultHtml += '<button class=\"btn\" onclick=\"shuffle()\" style=\"margin-top:10px\">Try again</button>';\n  resultHtml += '</div>';\n  document.getElementById('result').innerHTML = resultHtml;\n  renderList();\n}\n\nshuffle();\n</script></body></html>"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Benefits of Center-out Architecture",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Efficiency",
+          "description": "Developers define business rules ONCE in a central location, eliminating duplication and reducing inconsistencies across channels and applications."
+        },
+        {
+          "type": "concept",
+          "term": "Agility",
+          "description": "When business requirements change, you update the CENTRAL logic and the system applies those changes across all channel interfaces — making applications more responsive to evolving needs."
+        },
+        {
+          "type": "concept",
+          "term": "Governance",
+          "description": "Centralized business logic means rules are defined once and enforced consistently across all channels — simplifying auditing, monitoring, and policy enforcement."
+        },
+        {
+          "type": "concept",
+          "term": "Scalability",
+          "description": "As the organization adds new channel interfaces or customer touchpoints, you REUSE existing business logic to maintain consistency."
+        },
+        {
+          "type": "interactive",
+          "title": "Retrieval Check",
+          "height": 165,
+          "html": "<!doctype html><html><head><meta charset=\"utf-8\"><style>body{margin:0;padding:14px 16px;font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.55;font-size:.9rem}.q{margin-bottom:10px;color:#f1f5f9}button{background:#3b82f6;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.83rem}button:hover{background:#2563eb}.a{display:none;margin-top:10px;background:#1e293b;border-left:3px solid #22d3ee;padding:9px 13px;border-radius:0 6px 6px 0;color:#94a3b8}.a.v{display:block}.a b{color:#22d3ee}</style></head><body><p class=\"q\">❓ What is <em>Efficiency</em> and what is its primary role in Pega?</p><button onclick=\"document.getElementById('a').className='a v';this.style.display='none'\">Show answer</button><p id=\"a\" class=\"a\">✅ <b>Developers define business rules ONCE in a central location, eliminating duplication and reducing inconsistencies across channels and applications.</b></p></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 180\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">FOUR BENEFITS OF CENTER-OUT ARCHITECTURE</text><rect x=\"10\" y=\"30\" width=\"162\" height=\"134\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"91\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Faster Delivery</text><text x=\"91\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Low-code + reuse</text><text x=\"91\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">accelerates build</text><rect x=\"192\" y=\"30\" width=\"162\" height=\"134\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"273\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Better Outcomes</text><text x=\"273\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Outcome-first design</text><text x=\"273\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">aligns IT &amp; business</text><rect x=\"374\" y=\"30\" width=\"162\" height=\"134\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"455\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Lower Change Cost</text><text x=\"455\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Insulated data layer;</text><text x=\"455\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">change one rule once</text><rect x=\"556\" y=\"30\" width=\"154\" height=\"134\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"633\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Better CX</text><text x=\"633\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Customer Journey</text><text x=\"633\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">design improves UX</text></svg>",
+          "caption": "Four Center-out benefits: faster delivery, better outcomes, lower cost of change, improved customer experience."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Model-driven UI and Patterns",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Model-driven UI",
+          "description": "An approach in which the underlying data models and business rules GENERATE the user interface. In Center-out, these models reside at the core and the system dynamically generates the UI from them."
+        },
+        {
+          "type": "concept",
+          "term": "Patterns",
+          "description": "Reusable templates for model-driven UIs. Define the Data Model and business rules at the center, then SELECT and CONFIGURE patterns to render the interface — maintaining consistency and keeping business logic centralized across devices and channels."
+        },
+        {
+          "type": "concept",
+          "term": "Separation of logic and presentation",
+          "description": "A key advantage of patterns: when business rules change, the UI ADAPTS AUTOMATICALLY without manual updates. Pattern-based UIs also support responsive design across devices and channels."
+        },
+        {
+          "type": "analogy",
+          "text": "Patterns are cookie cutters: define the dough once (data model + rules at the center), then stamp consistent cookies (forms, lists, dashboards) across every channel. Change the dough recipe and every future cookie updates automatically."
+        },
+        {
+          "type": "interactive",
+          "title": "Retrieval Check",
+          "height": 165,
+          "html": "<!doctype html><html><head><meta charset=\"utf-8\"><style>body{margin:0;padding:14px 16px;font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.55;font-size:.9rem}.q{margin-bottom:10px;color:#f1f5f9}button{background:#3b82f6;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.83rem}button:hover{background:#2563eb}.a{display:none;margin-top:10px;background:#1e293b;border-left:3px solid #22d3ee;padding:9px 13px;border-radius:0 6px 6px 0;color:#94a3b8}.a.v{display:block}.a b{color:#22d3ee}</style></head><body><p class=\"q\">❓ What is <em>Model-driven UI</em> and what is its primary role in Pega?</p><button onclick=\"document.getElementById('a').className='a v';this.style.display='none'\">Show answer</button><p id=\"a\" class=\"a\">✅ <b>An approach in which the underlying data models and business rules GENERATE the user interface. In Center-out, these models reside at the core and the system dynamically generates the UI from them.</b></p></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 180\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">MODEL-DRIVEN UI — HOW IT WORKS</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"130\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Data Model</text><text x=\"117\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Properties with data types</text><text x=\"117\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">define what data exists</text><text x=\"253\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"20\">→</text><rect x=\"268\" y=\"30\" width=\"215\" height=\"130\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"375\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Pega Generates</text><text x=\"375\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Auto-selects UI controls</text><text x=\"375\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">based on property type</text><text x=\"375\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Date → DatePicker</text><text x=\"375\" y=\"112\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Boolean → Checkbox</text><text x=\"506\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"20\">→</text><rect x=\"521\" y=\"30\" width=\"190\" height=\"130\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"616\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">WCAG 2.1 AA</text><text x=\"616\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Pega accessibility standard</text><text x=\"616\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">(not ADA / ISO)</text><text x=\"616\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Applied automatically by</text><text x=\"616\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">model-driven patterns</text></svg>",
+          "caption": "Model-driven UI: data type → auto-generated control → WCAG 2.1 AA accessibility compliance."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Accessibility in Center-out Development",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Centralized accessibility",
+          "description": "By centralizing UI generation and using standardized patterns, accessibility requirements implemented ONCE at the core propagate throughout the application — consistent compliance across all channels and touchpoints, with reduced effort and simpler governance."
+        },
+        {
+          "type": "concept",
+          "term": "Standards supported",
+          "description": "The architecture supports compliance with major standards including Web Content Accessibility Guidelines (WCAG) 2.1 and Section 508 requirements, embedded into the core patterns and components."
+        },
+        {
+          "type": "concept",
+          "term": "Evolving standards",
+          "description": "When accessibility standards evolve, updates made to the central components and patterns automatically bring all applications into compliance — without changing each individual screen or form."
+        },
+        {
+          "type": "analogy",
+          "text": "Accessibility as building code in the master blueprint: instead of inspecting every room separately, embed the code in the blueprint — every room built from it is compliant, and updating the blueprint updates every room at once."
+        },
+        {
+          "type": "interactive",
+          "title": "Retrieval Check",
+          "height": 165,
+          "html": "<!doctype html><html><head><meta charset=\"utf-8\"><style>body{margin:0;padding:14px 16px;font-family:system-ui,sans-serif;background:#0f172a;color:#e2e8f0;line-height:1.55;font-size:.9rem}.q{margin-bottom:10px;color:#f1f5f9}button{background:#3b82f6;color:#fff;border:none;padding:6px 16px;border-radius:6px;cursor:pointer;font-weight:600;font-size:.83rem}button:hover{background:#2563eb}.a{display:none;margin-top:10px;background:#1e293b;border-left:3px solid #22d3ee;padding:9px 13px;border-radius:0 6px 6px 0;color:#94a3b8}.a.v{display:block}.a b{color:#22d3ee}</style></head><body><p class=\"q\">❓ What is <em>Centralized accessibility</em> and what is its primary role in Pega?</p><button onclick=\"document.getElementById('a').className='a v';this.style.display='none'\">Show answer</button><p id=\"a\" class=\"a\">✅ <b>By centralizing UI generation and using standardized patterns, accessibility requirements implemented ONCE at the core propagate throughout the application — consistent compliance across all channels and touchpoints, with reduced effort and simpler governance.</b></p></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 160\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">ACCESSIBILITY — PEGA STANDARD</text><rect x=\"120\" y=\"30\" width=\"480\" height=\"112\" rx=\"12\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"58\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"16\" font-weight=\"700\">WCAG 2.1 AA</text><text x=\"360\" y=\"82\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\">Web Content Accessibility Guidelines — Level AA</text><text x=\"360\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Applied automatically through model-driven UI patterns</text><text x=\"360\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">NOT ADA (US law) | NOT ISO standard | NOT WCAG 2.0</text><text x=\"360\" y=\"135\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Know the exact standard name for the exam</text></svg>",
+          "caption": "Pega follows WCAG 2.1 AA — not ADA, not ISO, not WCAG 2.0."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Which layer is at the center?",
+      "trapDescription": "Distractors place the presentation (Channels) or data layer at the center. In Center-out, the BUSINESS LOGIC (application) layer is central; presentation connects up, data connects down.",
+      "bestPractice": "Anchor on the core: business logic in the middle, Channels up, data down — both kept separate so either can change without touching the logic."
+    },
+    {
+      "title": "Matching the pain to the approach",
+      "trapDescription": "Questions present a business problem and ask which Center-out principle addresses it. Candidates match keywords superficially. Each principle (Customer Journey, Outcome, Microjourney, Model-driven, Low-code) has a specific problem domain — read the scenario carefully for the key signal word.",
+      "bestPractice": "Top-down (starts at Channels) → duplicated business logic per Channel. Bottom-up (starts at data) → siloed/duplicated data with no single entity view."
+    },
+    {
+      "title": "Naming the five principles",
+      "trapDescription": "Questions ask which options are Center-out principles. Candidates confuse marketing terms with the five official principles. The five are: Customer Journey, Outcome-focused, Microjourney, Model-driven, and Low-code — not variations like 'Agile' or 'Lean.'",
+      "bestPractice": "Use 'I-O-U-D-V': Intelligence central, Outcomes/process (Microjourney), Up to Channels, Down to data, Variations (Situational Layer Cake)."
+    },
+    {
+      "title": "Microjourney vs. Situational Layer Cake",
+      "trapDescription": "A question asks where the Microjourney concept fits in enterprise Pega architecture. Candidates select Situational Layer Cake. The Layer Cake governs rule inheritance and reuse across regions/channels — Microjourney is a UX scoping concept, not an architecture layer.",
+      "bestPractice": "Microjourney → Principle 2 (focus on outcomes via Case Management). Situational Layer Cake → Principle 5 (manage variation to scale)."
+    },
+    {
+      "title": "Telling the four benefits apart",
+      "trapDescription": "Questions list outcomes (speed, quality, cost, experience) and ask which are Center-out benefits. Candidates mix up descriptions. Center-out benefits are faster delivery, better outcomes, lower cost of change, and improved customer experience — know all four.",
+      "bestPractice": "Match each Center-out benefit to its keyword: define-once=Efficiency, change-propagates=Agility, audit/enforce=Governance, reuse-as-touchpoints-grow=Scalability."
+    },
+    {
+      "title": "Model-driven UI and patterns",
+      "trapDescription": "Candidates miss that the UI is GENERATED from data models and rules, and that patterns let the UI adapt automatically when rules change.",
+      "bestPractice": "Models + rules at the center → patterns render the UI → change rules and the UI updates without manual edits."
+    },
+    {
+      "title": "Accessibility standards specifics",
+      "trapDescription": "A question asks which standard governs Pega's accessibility compliance. Candidates say 'ADA' or 'ISO.' Pega follows WCAG 2.1 AA — the Web Content Accessibility Guidelines — not generic legal standards.",
+      "bestPractice": "WCAG 2.1 and Section 508 are embedded in core patterns; update once at the core to propagate compliance across all channels."
+    },
+    {
+      "title": "Insulation of the data layer",
+      "trapDescription": "Questions ask why Pega separates the data layer from the process layer. Candidates say 'for performance.' The reason is insulation — changing backend systems should not break the business process or the UI layer.",
+      "bestPractice": "Because the data-access layer is insulated from business logic, changing the system of record requires little/no change to application logic."
+    },
+    {
+      "title": "Cross-module connections",
+      "trapDescription": "Center-out architecture determines where business logic should live — misunderstanding this leads to wrong answers about where to configure rules.",
+      "bestPractice": "SA-M08 (Data Model): data layer connects DOWN, business logic is central. SA-M24 (Automations): automation shapes are the central-logic tier. SA-M28 (Skip Stage): skipping uses the same center-out layering principle."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m04_q01",
+      "type": "single-select",
+      "scenario": "A financial firm built separate web, mobile, and voice channel apps independently. All three perform identity verification, but each team hard-coded the rules differently. A compliance change now requires updating all three separately. Which top-down design disadvantage does this illustrate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Business logic must be implemented separately in each channel, so changes require redundant updates everywhere and risk inconsistency"
+        },
+        {
+          "id": "B",
+          "text": "Each channel keeps its own siloed copy of the customer data in a separate database, making data consistency impossible"
+        },
+        {
+          "id": "C",
+          "text": "The business logic layer in top-down design cannot connect to any external channel interface by design"
+        },
+        {
+          "id": "D",
+          "text": "Accessibility standards such as WCAG can never be met in a top-down architecture because the channel layer does not support them"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The compliance change requiring 3 separate updates exposes which top-down weakness?",
+      "rationale": "Top-down architecture embeds business logic inside each channel app — the same compliance logic must be updated redundantly in all three channel apps. Center-out places logic once at the center, eliminating this duplication."
+    },
+    {
+      "questionId": "m04_q02",
+      "type": "single-select",
+      "scenario": "A Pega consultant reviews a client's architecture and observes: (1) No single system holds a complete Customer record — address is in CRM, account balance in the core banking system, and contact history in a call-centre tool. (2) Business rules are coded separately inside each system, so a regulatory fee change requires updates in three places. (3) New channels are added by duplicating the business logic into channel-specific apps. Which architectural pattern does this describe, and what is its primary failure mode?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Bottom-up architecture — data is the foundation, but siloed storage prevents a unified customer view and forces logic duplication when systems disagree"
+        },
+        {
+          "id": "B",
+          "text": "Top-down architecture — starting from channel interfaces (web, mobile) means logic is duplicated per channel, but data remains unified in a master system of record"
+        },
+        {
+          "id": "C",
+          "text": "Center-out architecture — the business logic layer is the hub, but the presentation layer is missing, preventing channel deployment"
+        },
+        {
+          "id": "D",
+          "text": "Model-driven architecture — patterns generate UI automatically, but the absence of a unified data model breaks pattern rendering"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which architecture starts with the data layer and works upward — with data silos as the characteristic symptom?",
+      "rationale": "Bottom-up centers on the data layer; when data is siloed, there is no unified customer view and business logic must be duplicated across systems. The three symptoms described (data silos, logic duplication, inconsistent views) are defining bottom-up failures."
+    },
+    {
+      "questionId": "m04_q03",
+      "type": "single-select",
+      "scenario": "An SA presents Pega's Center-out architecture to a new team. A developer asks: 'Which layer sits at the CENTER, and why?' What is the correct answer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The application and business logic layer — all channels connect up to it and all data sources connect down from it, making it the authoritative hub"
+        },
+        {
+          "id": "B",
+          "text": "The presentation (Channels) layer — channels are the primary customer interface and logically occupy the center of the architecture"
+        },
+        {
+          "id": "C",
+          "text": "The data access layer — data is the most critical asset in any application so it occupies the central position"
+        },
+        {
+          "id": "D",
+          "text": "The database storage layer — all other layers ultimately read from and write to the database, making it the foundational center"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "'Center-out' names the design: which layer is in the center that the others radiate out from?",
+      "rationale": "In Center-out, the application and business logic layer sits at the CENTER: channels connect up to it and data sources connect down from it. Channels are not the center; they are consumers of central logic."
+    },
+    {
+      "questionId": "m04_q04",
+      "type": "single-select",
+      "scenario": "A bank moves its customer database from on-premises Oracle to a cloud data warehouse. The Pega Case design, business rules, and channel interfaces all continue working without modification. What Center-out principle enables this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The data access layer is separated from the business logic layer and connects down from it, insulating the Case design from infrastructure changes"
+        },
+        {
+          "id": "B",
+          "text": "The presentation layer stores a cached copy of all business rules, so it continues working even when the underlying data changes"
+        },
+        {
+          "id": "C",
+          "text": "Business logic is duplicated in every channel interface, so each channel can fall back to its local copy when the data layer changes"
+        },
+        {
+          "id": "D",
+          "text": "The database schema is embedded in the Pega Ruleset, allowing Pega to automatically remap rules when the database migrates"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Center-out separates the data access layer from the logic layer — what does that separation enable?",
+      "rationale": "In Center-out, the data access layer is independently replaceable — only the data layer connector needs updating for an infrastructure migration. Business logic and channels remain untouched."
+    },
+    {
+      "questionId": "m04_q05",
+      "type": "multi-select",
+      "scenario": "An SA explains how Center-out enables consistent UI across channels using 'Patterns'. Which TWO statements accurately describe Patterns in Center-out?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Patterns are reusable UI templates that render the interface from the central data model and business rules"
+        },
+        {
+          "id": "B",
+          "text": "When business rules change centrally, Pattern-based UIs adapt automatically — no manual UI rebuild is required"
+        },
+        {
+          "id": "C",
+          "text": "Patterns require a developer to hand-code a separate UI for each delivery channel to ensure channel-specific rendering"
+        },
+        {
+          "id": "D",
+          "text": "Patterns store the system-of-record data permanently, replacing the need for a data access layer"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Model-driven + auto-adapt: which two statements describe pattern behavior?",
+      "rationale": "Patterns are reusable, model-driven UI templates that render from the central data model and rules; when those rules change, the Patterns re-render automatically across channels C is wrong because Patterns explicitly eliminate the need to hand-code per-channel UIs — that is one of.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m04_q06",
+      "type": "single-select",
+      "scenario": "A bank wants to start with retail banking in one country, then extend to wealth management and corporate banking across multiple geographies — without rebuilding each time. Which Center-out principle and supporting capability address this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "'Manage variations to be scale-ready' — supported by the Situational Layer Cake, which layers rules so business-line and geography variations can be added without duplicating the core"
+        },
+        {
+          "id": "B",
+          "text": "'Manage intelligence centrally' — supported by the Next-Best-Action Designer, which personalizes the experience per customer type and geography"
+        },
+        {
+          "id": "C",
+          "text": "'Connect experiences up to your Channels' — supported by Constellation UI patterns that auto-adapt to each geography's device preferences"
+        },
+        {
+          "id": "D",
+          "text": "'Connect down to your data, keep logic nimble' — supported by the data access layer, which stores geo-specific business rules in the system of record"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Variations across business lines and geographies → which of the five principles covers this?",
+      "rationale": "'Manage variations to be scale-ready' directly addresses extending one application to multiple business lines and geographies via the Situational Layer Cake. The other principles address different architecture concerns."
+    },
+    {
+      "questionId": "m04_q07",
+      "type": "single-select",
+      "scenario": "An SA explains the Center-out principle 'Focus on outcomes, align your process.' A BA asks which Pega capability delivers this principle. What is the correct answer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case Management with a Microjourney approach — defines the outcome, then builds the process (Stages, Steps) that reliably delivers it"
+        },
+        {
+          "id": "B",
+          "text": "The Situational Layer Cake — organizes process rules in layers that prioritize business-line outcomes over channel preferences"
+        },
+        {
+          "id": "C",
+          "text": "Theme Cosmos Ruleset — the UI framework that keeps screens outcome-focused by reducing visual complexity"
+        },
+        {
+          "id": "D",
+          "text": "Unattended RPA — automates repetitive process steps so human effort is redirected toward outcome-driven decisions"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which Pega capability is built specifically around defining and delivering a specific, meaningful outcome?",
+      "rationale": "'Focus on outcomes, align your process' is delivered through Case Management and the Microjourney: define the desired outcome first, then design the Case Life Cycle that achieves it."
+    },
+    {
+      "questionId": "m04_q08",
+      "type": "multi-select",
+      "scenario": "An SA must demonstrate to a government auditor how the application meets WCAG 2.1 and Section 508 accessibility requirements. Which TWO statements correctly describe how Center-out supports accessibility?",
+      "options": [
+        {
+          "id": "A",
+          "text": "WCAG 2.1 and Section 508 compliance is embedded into Pega's core Constellation patterns and components"
+        },
+        {
+          "id": "B",
+          "text": "Updating accessibility standards centrally in the core patterns propagates compliance across all applications and channels automatically — no per-screen rework needed"
+        },
+        {
+          "id": "C",
+          "text": "Accessibility must be coded manually on every screen and form by a front-end developer to ensure consistent compliance"
+        },
+        {
+          "id": "D",
+          "text": "Pega accessibility compliance requires the purchase of a separate add-on module licensed per channel"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Embedded in core patterns + centrally updated — two statements about Center-out's accessibility approach.",
+      "rationale": "Center-out embeds WCAG 2.1 and Section 508 into its core Constellation patterns; when standards update, a central change propagates automatically to all applications — no per-screen rework C is wrong because it describes the pre-Center-out (top-down) approach where compliance is coded per-screen; Center-out eliminates this..",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m04_q09",
+      "type": "single-select",
+      "scenario": "A bank updates its interest-rate calculation rule in Pega and the change automatically appears across the web portal, mobile app, call-centre screen, and chatbot — with no per-channel code change. A compliance auditor asks: 'Which of the four Center-out business benefits explains this specific capability?' An SA must pick the ONE most direct match.",
+      "options": [
+        {
+          "id": "A",
+          "text": "Agility — central logic updates propagate automatically to all channel interfaces, so changes take effect everywhere without per-channel rework"
+        },
+        {
+          "id": "B",
+          "text": "Efficiency — rules are defined once in a central location, eliminating duplication; this is efficiency in the authoring phase, not the propagation of changes to channels"
+        },
+        {
+          "id": "C",
+          "text": "Scalability — the architecture scales logic reuse to new geographies and business lines, which is about growth, not about a single-change reaching existing channels"
+        },
+        {
+          "id": "D",
+          "text": "Governance — centralized rules simplify audit and enforcement, which is about policy consistency and monitoring rather than about propagation speed of a change"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Agility, Efficiency, Governance, and Scalability each have a specific primary definition — match the scenario to the one it.",
+      "rationale": "Agility in Center-out means updating central logic once so the change propagates immediately to all channel interfaces. The scenario is a textbook agility example — one update, instant effect everywhere."
+    },
+    {
+      "questionId": "m04_q10",
+      "type": "single-select",
+      "scenario": "A Center-out SA explains to a CIO that defining business rules once in a central location removes duplicate implementations across five channel apps. Which Center-out benefit does this describe?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Efficiency — centrally defining rules once eliminates redundant implementations and the inconsistency risks of maintaining parallel copies"
+        },
+        {
+          "id": "B",
+          "text": "Agility — updating the central logic propagates changes to all channels instantly, reducing time-to-market"
+        },
+        {
+          "id": "C",
+          "text": "Governance — the central rule store enables auditors to monitor and enforce policies uniformly across all channels"
+        },
+        {
+          "id": "D",
+          "text": "Scalability — the define-once approach lets the application grow to new business lines without rebuilding"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which benefit is specifically about removing duplicate rule implementations?",
+      "rationale": "Efficiency describes eliminating the redundancy of defining the same logic in five separate channel implementations B is wrong because Agility is about the speed of propagating changes once made — this question is."
+    },
+    {
+      "questionId": "m04_q11",
+      "type": "single-select",
+      "scenario": "An SA updates a business rule that changes the discount calculation. All web, mobile, and chatbot interfaces immediately reflect the new calculation without any UI changes. Which statement best explains this Center-out behavior?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Channels connect up to the central business logic layer and dynamically respond to changes in it — UI updates propagate automatically"
+        },
+        {
+          "id": "B",
+          "text": "The presentation layer stores the master copy of all business rules, so each channel updates its local rule copy independently"
+        },
+        {
+          "id": "C",
+          "text": "The data access layer holds the discount calculation and pushes updates to all connected channels via a publish-subscribe event"
+        },
+        {
+          "id": "D",
+          "text": "Each channel must be manually redeployed after a rule change — the automatic update observed is a result of caching, not architecture"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "In Center-out, the presentation layer connects UP to the center — what does that mean when the center changes?",
+      "rationale": "Channels connect UP to the central logic and dynamically render from it. When the central rule changes, all channels reflect the change because they consume the central definition — not copies of it."
+    },
+    {
+      "questionId": "m04_q12",
+      "type": "multi-select",
+      "scenario": "A developer joins a Center-out team and asks how the UI is generated. Which TWO statements correctly describe model-driven UI in Center-out?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The underlying data models and business rules at the core generate the user interface dynamically"
+        },
+        {
+          "id": "B",
+          "text": "When models are updated at the core, the system regenerates the UI automatically across all channels"
+        },
+        {
+          "id": "C",
+          "text": "Developers must manually rebuild the UI whenever a business rule changes — the model only defines data structure, not presentation"
+        },
+        {
+          "id": "D",
+          "text": "The UI is generated from the database schema alone; business rules in the logic layer have no influence on the generated UI"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Core models + auto-generation: two true statements about model-driven UI.",
+      "rationale": "In Center-out, data models and business rules at the core generate the UI dynamically, and changes to those models propagate automatically to all channel interfaces C is wrong because manual UI rebuilds are precisely what Center-out eliminates — the model-driven approach auto-generates the.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m04_q13",
+      "type": "single-select",
+      "scenario": "A financial regulator requires the bank to demonstrate that risk-assessment rules are applied consistently across web, mobile, and IVR channels. Which Center-out benefit most directly enables this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Governance — centralizing rules enables consistent policy enforcement across all channels, with a single authoritative source auditors can examine"
+        },
+        {
+          "id": "B",
+          "text": "Efficiency — defining the risk rule once eliminates the need to test it in multiple places"
+        },
+        {
+          "id": "C",
+          "text": "Scalability — the architecture can grow to accommodate more channels, making it easier to apply the rule as the bank expands"
+        },
+        {
+          "id": "D",
+          "text": "Agility — the central rule can be updated quickly to respond to new regulatory requirements"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Consistent enforcement across channels + single audit source = which benefit?",
+      "rationale": "Governance describes Center-out's ability to enforce policies consistently across all channels from a single central source — exactly what a regulator needs for audit B is wrong because Efficiency is about eliminating duplicate effort, not demonstrating consistent enforcement to an auditor.."
+    },
+    {
+      "questionId": "m04_q14",
+      "type": "single-select",
+      "scenario": "WCAG 3.0 introduces a new minimum color-contrast requirement. An SA must bring the bank's entire Pega application portfolio into compliance. What is the most efficient approach in Center-out?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Update the accessibility standard in the core Constellation patterns once — the change propagates automatically to all applications and channels"
+        },
+        {
+          "id": "B",
+          "text": "Manually review and update the color values on every screen and form across all applications — Center-out does not handle accessibility propagation"
+        },
+        {
+          "id": "C",
+          "text": "Purchase an accessibility compliance add-on for each application and configure the new contrast values per application"
+        },
+        {
+          "id": "D",
+          "text": "Disable the affected web and mobile channels until a front-end team can rebuild them with the new color specifications"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Central update in core patterns → automatic propagation across all applications.",
+      "rationale": "Updating the central Constellation accessibility patterns once propagates the new contrast requirements to all applications and channels automatically B is wrong because manual per-screen updates describe the top-down (pre-Center-out) approach; Center-out explicitly eliminates this.."
+    },
+    {
+      "questionId": "m04_q15",
+      "type": "multi-select",
+      "scenario": "During a Center-out architecture review, a BA asks which principles underpin the design. Which THREE are genuine Center-out principles?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Manage intelligence centrally — centralize business rules and logic as the authoritative single source"
+        },
+        {
+          "id": "B",
+          "text": "Connect down to your data, keep logic nimble — insulate business logic from data infrastructure changes"
+        },
+        {
+          "id": "C",
+          "text": "Manage variations to be scale-ready — use the Situational Layer Cake to handle business-line and geography variations"
+        },
+        {
+          "id": "D",
+          "text": "Eliminate the data access layer entirely — connect channels directly to the system of record for maximum performance"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Four real Center-out principles are partially represented; one option contradicts Center-out's layered architecture.",
+      "rationale": "The five Center-out principles are: manage Intelligence centrally; focus on Outcomes; connect Up to Channels; connect Down to data (keep logic nimble); and manage Variations (scale-ready). D is wrong because it directly contradicts Center-out — the architecture specifically includes a data access layer that insulates logic from data infrastructure. Eliminating it would collapse Center-out's separation of concerns.",
+      "selectCount": 3
+    },
+    {
+      "questionId": "m04_q16",
+      "type": "single-select",
+      "scenario": "An SA must teach the five Center-out principles to five junior team members using the mnemonic 'I-O-U-D-V'. One team member maps it as: I = Integration, O = Operations, U = User experience, D = Data, V = Versioning. The SA says this is entirely wrong. What does 'I-O-U-D-V' correctly stand for, and which of the following pairings is accurate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "I = manage Intelligence centrally; O = focus on Outcomes, align your process; U = connect Up to Channels; D = connect Down to data; V = manage Variations to be scale-ready"
+        },
+        {
+          "id": "B",
+          "text": "I = Integration connectors; O = Operator access; U = UI patterns; D = Data Pages; V = Versioning (Ruleset versions)"
+        },
+        {
+          "id": "C",
+          "text": "I = Insights (Pega Insights reporting); O = Orchestration (Case Management); U = UX (Constellation); D = Deployment (DevOps); V = Visibility (SLAs)"
+        },
+        {
+          "id": "D",
+          "text": "I = Intelligent Automation (RPA); O = Omnichannel; U = Users (Operators); D = Dev Studio; V = Validate rules"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The five principles describe an architecture philosophy, not Pega product features or tools.",
+      "rationale": "The five Center-out principles: manage Intelligence centrally; focus on Outcomes; connect Up to channels; connect Down to data; manage Variations to be scale-ready. Mnemonic: I-O-U-D-V for the exam."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Center-out core",
+      "value": "Business logic (application) layer at the center; presentation connects up, data connects down — both separate from logic."
+    },
+    {
+      "key": "Top-down problem",
+      "value": "Built around Channels → business logic duplicated per Channel."
+    },
+    {
+      "key": "Bottom-up problem",
+      "value": "Built around data → siloed, duplicated data, no single entity view."
+    },
+    {
+      "key": "Five principles (I-O-U-D-V)",
+      "value": "Manage intelligence centrally; Focus on outcomes (Microjourney/Case Mgmt); Connect up to Channels; Connect down to data; Manage variations (Situational Layer Cake)."
+    },
+    {
+      "key": "Four benefits",
+      "value": "Efficiency (define once), Agility (change propagates), Governance (audit/enforce), Scalability (reuse as touchpoints grow)."
+    },
+    {
+      "key": "Model-driven UI + patterns",
+      "value": "Core models/rules generate the UI; patterns render it; rule changes update the UI automatically; responsive across devices."
+    },
+    {
+      "key": "Accessibility",
+      "value": "Centralized; supports WCAG 2.1 and Section 508; update once at the core to propagate compliance across channels; screen-reader & localization support by default."
+    },
+    {
+      "key": "Data layer insulation",
+      "value": "Changing a system of record (on-prem → Cloud) requires little/no change to business logic."
+    },
+    {
+      "key": "Mnemonic: Center-out vs. Outside-in",
+      "value": "Center-out = business logic lives in the Pega center and surfaces to any channel. Outside-in = channels dictate the logic. Center-out is Pega's approach — one change in the center propagates everywhere."
+    },
+    {
+      "key": "Mnemonic: What lives in the center?",
+      "value": "Case Types, decision logic, data, and services. Channels (web, mobile, chatbot) consume the center via APIs — they don't contain business rules."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Pega's Center-out business architecture",
+      "url": "https://academy.pega.com/topic/pegas-center-out-business-architecture/v3/in/93701/102391",
+      "duration": "15 min"
+    },
+    {
+      "title": "Accessibility in Center-out development",
+      "url": "https://academy.pega.com/topic/accessibility-center-out-development/v1/in/96211/102391",
+      "duration": "10 min"
+    }
+  ]
+}

@@ -1,0 +1,677 @@
+{
+  "moduleId": "m38",
+  "moduleTitle": "Accessing sourced data in a Case",
+  "moduleUrl": "https://academy.pega.com/module/accessing-sourced-data-case/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/accessing-sourced-data-case/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Configure Data Pages with the correct structure, object type, edit mode, scope, data source, and refresh strategy.",
+    "Choose between referencing and copying Data Page data, and apply simulated data sources for development and testing."
+  ],
+  "estTime": "~60 min · 6 topics",
+  "topics": [
+    {
+      "title": "Data Pages",
+      "url": "https://academy.pega.com/topic/data-pages/v6/in/96211/67581",
+      "duration": "10 min"
+    },
+    {
+      "title": "Data sources",
+      "url": "https://academy.pega.com/topic/data-sources/v1/in/96211/67581",
+      "duration": "10 min"
+    },
+    {
+      "title": "Refresh strategies for Data Pages",
+      "url": "https://academy.pega.com/topic/refresh-strategies-data-pages/v4/in/96211/67581",
+      "duration": "10 min"
+    },
+    {
+      "title": "Page autopopulation",
+      "url": "https://academy.pega.com/topic/page-autopopulation/v4/in/96211/67581",
+      "duration": "10 min"
+    },
+    {
+      "title": "Data access in UI controls",
+      "url": "https://academy.pega.com/topic/data-access-ui-controls/v4/in/96211/67581",
+      "duration": "10 min"
+    },
+    {
+      "title": "Simulated external data sources",
+      "url": "https://academy.pega.com/topic/simulated-external-data-sources/v7/in/96211/67581",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Data Pages — Structure and Edit Modes",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "A Data Page is like a whiteboard in a meeting room. The first person to need the information fetches it and writes it up. Everyone else reads from the whiteboard (cached). When the whiteboard gets stale, someone erases it and writes fresh data — but only once per meeting (one refresh per interaction)."
+        },
+        {
+          "type": "concept",
+          "term": "Data Page — what it is",
+          "description": "A Data Page caches data from external systems in Pega's Clipboard memory. It is populated ON-DEMAND — only when first accessed. If it already exists and is not stale, Pega reuses the cached version."
+        },
+        {
+          "type": "concept",
+          "term": "Structure: Page vs List",
+          "description": "Page = holds a single item (e.g., one customer record). List = holds multiple items in the pxResults ordered array. Access list items via DataPageName.pxResults(n)."
+        },
+        {
+          "type": "concept",
+          "term": "Edit Mode: Read-Only",
+          "description": "Data stays cached — no changes written back to the source. Appears in the 'Data Pages' category of the Clipboard tool. Example: DMV record lookup."
+        },
+        {
+          "type": "concept",
+          "term": "Edit Mode: Editable",
+          "description": "Users can modify the cached data within the session. Appears in 'User Pages' category of the Clipboard tool. Example: a shipping address a user updates during checkout."
+        },
+        {
+          "type": "concept",
+          "term": "Edit Mode: Savable",
+          "description": "Changes made to the Data Page can be pushed back to the system of record via a save plan. Use when Pega must update the external source after user edits. Example: push-back approval updates the external HR system."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 560 260\" xmlns=\"http://www.w3.org/2000/svg\"><defs><marker id=\"m38-arr\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-2)\"/></marker></defs><rect x=\"10\" y=\"10\" width=\"540\" height=\"240\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"280\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Data Page Scope</text><rect x=\"30\" y=\"48\" width=\"500\" height=\"60\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok)\" stroke-width=\"1.5\"/><text x=\"280\" y=\"68\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"bold\" fill=\"var(--pa-ok)\">NODE — All users on the system share one instance</text><text x=\"280\" y=\"90\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">Example: vehicle makes/models list; common reference data</text><rect x=\"60\" y=\"122\" width=\"440\" height=\"56\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"280\" y=\"142\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"bold\" fill=\"var(--pa-brand)\">REQUESTOR — One instance per user session</text><text x=\"280\" y=\"162\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">Example: user's list of privileged shipping addresses</text><rect x=\"110\" y=\"190\" width=\"340\" height=\"52\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-err)\" stroke-width=\"1.5\"/><text x=\"280\" y=\"211\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"bold\" fill=\"var(--pa-err)\">THREAD — One instance per Case</text><text x=\"280\" y=\"232\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">Example: stock prices during a single buy/sell transaction</text></svg>",
+          "caption": "Data Page scope hierarchy: Node (broadest) → Requestor (per session) → Thread (per Case)"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Data Pages — Scope",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Scope: Thread",
+          "description": "Unique to a single Case — each Case gets its own Data Page instance. Use for Case-specific data. Example: real-time stock price during one buy/sell transaction."
+        },
+        {
+          "type": "concept",
+          "term": "Scope: Requestor",
+          "description": "Shared across all Cases created by one user in a single session. Use for user-specific data reused across Cases. Example: a list of the user's privileged shipping addresses."
+        },
+        {
+          "type": "concept",
+          "term": "Scope: Node",
+          "description": "Shared by ALL users on the system. Use for common static data. Example: list of vehicle makes and models that never changes per user."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Data Sources and Parameters",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "9 data source types",
+          "description": "Data Transform, Activity, Connector, Report definition, Database lookup, Robotic Automation, Robotic desktop Automation, Aggregate sources, Lookup. Each specifies where Pega fetches data for the Data Page."
+        },
+        {
+          "type": "concept",
+          "term": "When a Data Transform mapping is required",
+          "description": "A Data Transform must map source output to the Data Page's Data Model when using: Report definition (page structure), Lookup (list structure), Robotic Automation, or Robotic desktop Automation. The other 5 source types map automatically."
+        },
+        {
+          "type": "concept",
+          "term": "Aggregate sources",
+          "description": "Combines data from multiple sources into a single Data Page. Sources are populated in the listed order. Use when data must be merged from two or more systems."
+        },
+        {
+          "type": "concept",
+          "term": "Conditional sourcing",
+          "description": "When a Data Page has multiple sources, configure a condition on each to determine which Pega uses. Pega evaluates in order and uses the first matching condition. The last source has no condition — it acts as the 'Otherwise' fallback."
+        },
+        {
+          "type": "concept",
+          "term": "Parameters — purpose and syntax",
+          "description": "Parameters filter or limit what a Data Page loads. Example: load only auto insurance policies for one customer. Reference syntax: DataPageName[Param1_Name:Param1_Value, Param2_Name:Param2_Value]."
+        },
+        {
+          "type": "concept",
+          "term": "Parameters — Clipboard instances CAUTION",
+          "description": "Each unique combination of parameter values creates a separate Clipboard instance. High-cardinality parameters can consume significant memory. Use 'Limit to a single Data Page' on the Load Management tab to force one instance (Pega overwrites it when parameters change)."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 310\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"18\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">DATA PAGE — SOURCE TYPES &amp; CONDITIONAL SOURCING</text><rect x=\"10\" y=\"28\" width=\"700\" height=\"60\" rx=\"8\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">9 Data Source Types</text><text x=\"30\" y=\"66\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Data Transform · Activity · Connector · Report Definition · Database lookup · REST/SOAP service · Data Page · System</text><text x=\"30\" y=\"80\" fill=\"var(--pa-ink-2)\" font-size=\"10\">→ If source output doesn't match Data Page model: add a Data Transform mapping step</text><rect x=\"10\" y=\"102\" width=\"220\" height=\"80\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"120\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Conditional Sourcing</text><text x=\"120\" y=\"136\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">&gt;1 source? Add a condition</text><text x=\"120\" y=\"150\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">on each. First true</text><text x=\"120\" y=\"164\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">condition's source fires.</text><rect x=\"244\" y=\"102\" width=\"220\" height=\"80\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"354\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Aggregate Sources</text><text x=\"354\" y=\"136\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Combines multiple sources</text><text x=\"354\" y=\"150\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">into ONE Data Page.</text><text x=\"354\" y=\"164\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Each source adds its fields.</text><rect x=\"478\" y=\"102\" width=\"232\" height=\"80\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"594\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Parameters</text><text x=\"594\" y=\"136\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Filter what the page loads.</text><text x=\"594\" y=\"150\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">⚠ Each unique param set</text><text x=\"594\" y=\"164\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">= separate Clipboard instance</text><text x=\"360\" y=\"208\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"700\">STRUCTURE → ACCESS PATTERN</text><rect x=\"10\" y=\"220\" width=\"340\" height=\"52\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"180\" y=\"238\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"700\">Page structure</text><text x=\"180\" y=\"256\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Single object — access properties directly: DataPage.PropertyName</text><rect x=\"370\" y=\"220\" width=\"340\" height=\"52\" rx=\"8\" fill=\"rgba(251,190,0,0.12)\" stroke=\"rgba(180,130,0,0.5)\" stroke-width=\"1.5\"/><text x=\"540\" y=\"238\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">List structure</text><text x=\"540\" y=\"256\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Array of items — access via: DataPage.pxResults(n).PropertyName</text><text x=\"360\" y=\"296\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Use 'Limit to single Data Page' checkbox to cap parameterized pages to one Clipboard instance</text></svg>",
+          "caption": "Data Page source types, conditional sourcing, and structure-driven access patterns."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Refresh Strategies",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Refresh strategy — overview",
+          "description": "Defines when cached Data Page contents are considered stale and must be reloaded. Optional but strongly recommended. If at least one configured condition is met, Pega reloads the page from the data source."
+        },
+        {
+          "type": "concept",
+          "term": "Reload once per interaction",
+          "description": "Reloads the Data Page every time it is accessed — but only once per interaction. Only available for Thread or Requestor scope. Cannot be combined with other refresh options. Example: travel reservation Case reloads seating availability for each interaction."
+        },
+        {
+          "type": "concept",
+          "term": "Do not reload when",
+          "description": "Uses a When Condition. If the condition returns TRUE → data is considered current, no reload occurs. Example: stock prices after trading day ends — condition 'marketClosed = true' prevents pointless reloads."
+        },
+        {
+          "type": "concept",
+          "term": "Reload if older than",
+          "description": "Reloads after a fixed time interval. After the interval expires, the next access triggers a reload. Example: seating inventory with a 10-min interval — if loaded at 12:00, it becomes stale at 12:10 and reloads on first access after."
+        },
+        {
+          "type": "concept",
+          "term": "Key rule: max ONE reload per interaction",
+          "description": "Regardless of the refresh strategy, Pega Platform NEVER refreshes a Data Page more than once per interaction. If accessed 5 times in one interaction, it reloads at most once — subsequent accesses use the already-refreshed version."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 580 220\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"560\" height=\"200\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"290\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Reference vs. Copy from a Data Page</text><rect x=\"30\" y=\"50\" width=\"240\" height=\"140\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok)\" stroke-width=\"1.5\"/><text x=\"150\" y=\"74\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"bold\" fill=\"var(--pa-ok)\">REFER (Reference)</text><text x=\"150\" y=\"96\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">Property → points to Data Page</text><text x=\"150\" y=\"114\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">Reloads per refresh strategy</text><text x=\"150\" y=\"132\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">Always shows CURRENT data</text><text x=\"150\" y=\"158\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-3)\">Example: live phone number</text><text x=\"150\" y=\"176\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-3)\">from CRM system</text><rect x=\"310\" y=\"50\" width=\"240\" height=\"140\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"430\" y=\"74\" text-anchor=\"middle\" font-size=\"12\" font-weight=\"bold\" fill=\"var(--pa-brand)\">COPY (Snapshot)</text><text x=\"430\" y=\"96\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">Data copied INTO the Case</text><text x=\"430\" y=\"114\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">Data Page NOT accessed again</text><text x=\"430\" y=\"132\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">Frozen at point-in-time</text><text x=\"430\" y=\"158\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-3)\">Example: customer info at</text><text x=\"430\" y=\"176\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-3)\">insurance claim creation</text></svg>",
+          "caption": "Reference = live pointer to Data Page (always current). Copy = frozen snapshot stored in the Case."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Autopopulation, UI Controls, and Simulated Data",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Refer to a Data Page",
+          "description": "The Case points to the Data Page (no copy). Data reloads per the refresh strategy. When a parameter changes, Pega creates a new instance and the property points to it. Use when you always need the most current data."
+        },
+        {
+          "type": "concept",
+          "term": "Copy data from a Data Page",
+          "description": "Data is copied into the Case at a specific point in time. Once copied, the Data Page is NOT accessed again (unless request parameters change). Use for historical snapshots. Example: customer info captured at insurance claim creation."
+        },
+        {
+          "type": "concept",
+          "term": "UI list from a Data Page",
+          "description": "Populate a dropdown or list from a Data Page instead of hardcoding values — avoids re-releasing the app when values change. Only the SELECTED value is saved to the Case's Data Model; the full list stays in the Data Page."
+        },
+        {
+          "type": "concept",
+          "term": "Displayed value vs. copied value in UI lists",
+          "description": "The value copied to the Case does not need to match what is displayed. Example: a dropdown shows country names, but the country CODE is what gets copied to the Data Model when the user selects."
+        },
+        {
+          "type": "concept",
+          "term": "Simulated external data sources",
+          "description": "Pega lets you simulate any external data source using sample data. Use when: the external system is unavailable, the API is under development, or the source has no data yet. Allows full dev/test without interruption."
+        },
+        {
+          "type": "concept",
+          "term": "Simulated data sources for unit testing",
+          "description": "Simulation lets you dictate the exact response returned by a source. This is valuable for unit testing — you control the response to verify different processing scenarios without depending on a live system."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 280\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">REFER vs COPY — AND UI LIST BEHAVIOUR</text><rect x=\"10\" y=\"28\" width=\"340\" height=\"110\" rx=\"10\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"180\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">Refer to Data Page</text><text x=\"180\" y=\"68\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Case POINTS to the Data Page</text><text x=\"180\" y=\"82\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">No local copy — live reference</text><text x=\"180\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Data stays fresh if page refreshes</text><text x=\"180\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">✓ Use for auto-populated + savable DPs</text><text x=\"180\" y=\"126\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">(save plan can write back to SOR)</text><rect x=\"370\" y=\"28\" width=\"340\" height=\"110\" rx=\"10\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"540\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">Copy from Data Page</text><text x=\"540\" y=\"68\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Data is copied AT ONE POINT IN TIME</text><text x=\"540\" y=\"82\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Snapshot — won't update if page refreshes</text><text x=\"540\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Saved with the Case permanently</text><text x=\"540\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">✓ Use when a historical record is needed</text><text x=\"540\" y=\"126\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">(e.g., customer address at time of claim)</text><rect x=\"10\" y=\"158\" width=\"700\" height=\"80\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"176\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">UI List from Data Page (dropdown / radio)</text><text x=\"360\" y=\"194\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Full list stays in the Data Page only. When user selects a value and submits —</text><text x=\"360\" y=\"210\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">ONLY the selected value is copied to the Case Data Model.</text><text x=\"360\" y=\"226\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">⚠ Saved value does NOT need to match displayed label (code vs. name pattern is valid)</text><text x=\"360\" y=\"262\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Simulation: override any source with sample data — dictate exact response for unit testing</text></svg>",
+          "caption": "Refer vs Copy Data Page patterns, and how UI list controls save selected values."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Data Pages are populated ON-DEMAND — not at application startup",
+      "trapDescription": "Questions ask when a Data Page's data is loaded. Candidates say 'when the application starts.' Data Pages are loaded on-demand — when the clipboard first requests the page during a user session, not at application or session startup.",
+      "bestPractice": "Data Pages are populated on-demand: when a Case needs data, Pega checks the Clipboard for a valid (non-stale) instance. If missing or stale, it queries the data source at that moment — NOT at startup."
+    },
+    {
+      "title": "List structure uses pxResults — not direct access on the Data Page name",
+      "trapDescription": "An exam question asks how to access the third item in a list Data Page. Candidates write DataPageName(3) instead of DataPageName.pxResults(3), missing the required pxResults array that holds all list items.",
+      "bestPractice": "When structure is 'List', items are stored in the pxResults ordered array. Access via DataPageName.pxResults(n). A 'Page' structure holds a single item accessed directly by property name."
+    },
+    {
+      "title": "Edit mode determines Clipboard category: Read-Only ≠ Editable",
+      "trapDescription": "Questions ask which Clipboard category a Read-Only Data Page appears under. Candidates choose 'Data Pages' for both modes, not realizing Editable Data Pages move to 'User Pages' in the Clipboard Viewer.",
+      "bestPractice": "Read-Only → 'Data Pages' Clipboard category. Editable → 'User Pages' Clipboard category. Savable enables write-back to the system of record via a save plan."
+    },
+    {
+      "title": "Requestor scope ≠ Thread scope — they are different granularities",
+      "trapDescription": "Candidates think Requestor scope creates a separate instance per Case (like Thread), or that Thread scope is shared across a user's Cases (like Requestor).",
+      "bestPractice": "Thread = one unique instance per Case. Requestor = one instance shared across ALL Cases for one user in a session. Node = one instance shared by ALL users system-wide."
+    },
+    {
+      "title": "Pega refreshes a Data Page at most ONCE per interaction — regardless of strategy",
+      "trapDescription": "A question asks whether a Data Page with 'Reload if older than' strategy can be refreshed multiple times in one interaction. Candidates say yes. Pega enforces a one-refresh-per-interaction limit — regardless of the refresh strategy, a Data Page is refreshed at most once per interaction.",
+      "bestPractice": "No matter how many times a Data Page is accessed in a single interaction, it is refreshed at most ONCE. Subsequent accesses in the same interaction always use the already-refreshed cached version."
+    },
+    {
+      "title": "Parameterized Data Pages: each unique parameter set = a separate Clipboard instance",
+      "trapDescription": "Five users each open a different customer record. Candidates calculate one shared Data Page instance. Each unique parameter combination creates a separate Clipboard instance — memory usage can grow significantly.",
+      "bestPractice": "Each unique parameter combination creates a separate Clipboard instance. Use 'Limit to a single Data Page' checkbox to maintain a single instance Pega overwrites when params change — reducing memory usage."
+    },
+    {
+      "title": "UI list from Data Page: only the SELECTED value saves to the Case — not the full list",
+      "trapDescription": "Questions ask what data is saved to the Case when a user selects from a dropdown sourced from a Data Page. Candidates say 'the full Data Page list is embedded in the Case.' Only the selected value is saved — the full list is not embedded in the Case work object.",
+      "bestPractice": "When a dropdown is populated from a Data Page, only the value the user selects is copied to the Data Model. The full list remains in the Data Page only. Also: the saved value does not need to match the displayed label (e.g., code vs. name)."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m38_q01",
+      "type": "single-select",
+      "scenario": "A Data Page must store a list of dental insurance plans with multiple entries. Which structure should be selected?",
+      "options": [
+        {
+          "id": "A",
+          "text": "List — stores multiple items in an ordered pxResults array"
+        },
+        {
+          "id": "B",
+          "text": "Page — stores multiple items in a named property set"
+        },
+        {
+          "id": "C",
+          "text": "Collection — groups related pages together"
+        },
+        {
+          "id": "D",
+          "text": "Array — stores raw values without a wrapper class"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Multiple items = List; single item = Page.",
+      "rationale": "List structure stores multiple items in the pxResults ordered array. Page holds a single item. C and D are not valid Data Page structure options in Pega."
+    },
+    {
+      "questionId": "m38_q02",
+      "type": "single-select",
+      "scenario": "A Data Page appears in the 'User Pages' section of the Clipboard tool. What edit mode is it set to?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Editable"
+        },
+        {
+          "id": "B",
+          "text": "Read-Only"
+        },
+        {
+          "id": "C",
+          "text": "Savable"
+        },
+        {
+          "id": "D",
+          "text": "Thread-only"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Editable = User Pages; Read-Only = Data Pages (Clipboard categories).",
+      "rationale": "Editable Data Pages appear in the 'User Pages' Clipboard category. Read-Only appears in 'Data Pages'. Savable enables write-back to a system of record. D is not an edit mode."
+    },
+    {
+      "questionId": "m38_q03",
+      "type": "single-select",
+      "scenario": "A Data Page holds a list of vehicle makes and models shared by all users in the system. Which scope is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Node — all users and system tasks on the server share the same instance"
+        },
+        {
+          "id": "B",
+          "text": "Requestor — each user's session has its own instance"
+        },
+        {
+          "id": "C",
+          "text": "Thread — each Case gets its own instance"
+        },
+        {
+          "id": "D",
+          "text": "Application — shared across all deployed applications"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Shared by ALL users across the system: common, static data = Node-scope Data Page.",
+      "rationale": "Node scope is shared by all users system-wide — ideal for common static data like vehicle models. Requestor is per user session. Thread is per Case. D is not a valid Data Page scope."
+    },
+    {
+      "questionId": "m38_q04",
+      "type": "single-select",
+      "scenario": "A Data Page must combine pricing data from two different external APIs into one page. Which data source option handles this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Aggregate sources — combine data from multiple sources into one Data Page"
+        },
+        {
+          "id": "B",
+          "text": "Conditional sourcing — switch between sources based on a condition"
+        },
+        {
+          "id": "C",
+          "text": "Two separate Data Pages merged with a Data Transform"
+        },
+        {
+          "id": "D",
+          "text": "Database lookup — query both databases simultaneously"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Merge data from multiple sources = Aggregate sources.",
+      "rationale": "Aggregate sources combines data from multiple sources into a single Data Page. Conditional sourcing selects which ONE source to use — it does not combine them. C and D are workarounds, not the documented feature."
+    },
+    {
+      "questionId": "m38_q05",
+      "type": "single-select",
+      "scenario": "A Data Page holds stock pricing data. After market close, prices no longer change. Which refresh strategy prevents unnecessary reloads during off-hours?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Do not reload when — use a When Condition that is true when the market is closed"
+        },
+        {
+          "id": "B",
+          "text": "Reload once per interaction — loads fresh data on every user interaction"
+        },
+        {
+          "id": "C",
+          "text": "Reload if older than — set a 1-minute interval to keep data fresh"
+        },
+        {
+          "id": "D",
+          "text": "No refresh strategy — let the Data Page expire naturally"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Condition-based prevention of reload = 'Do not reload when'.",
+      "rationale": "'Do not reload when' uses a When Condition — if the condition is true (market closed), the Data Page is NOT reloaded. B reloads on every interaction regardless. C reloads on a fixed time interval that doesn't account for market state. D provides no control at all."
+    },
+    {
+      "questionId": "m38_q06",
+      "type": "single-select",
+      "scenario": "A user accesses the same Data Page 5 times within a single interaction. The Data Page is configured with 'Reload once per interaction'. How many times does Pega refresh the Data Page?",
+      "options": [
+        {
+          "id": "A",
+          "text": "At most once — Pega never refreshes a Data Page more than once per interaction"
+        },
+        {
+          "id": "B",
+          "text": "5 times — once per access as the name implies"
+        },
+        {
+          "id": "C",
+          "text": "0 times — the Data Page is cached indefinitely"
+        },
+        {
+          "id": "D",
+          "text": "Depends on the refresh strategy — could be 0 to 5 times"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Key rule: max ONCE per interaction regardless of access count.",
+      "rationale": "Pega Platform never refreshes a Data Page more than once per interaction. After the first refresh, all subsequent accesses in that interaction use the already-refreshed cached version. B misreads 'once per interaction' as 'once per access'."
+    },
+    {
+      "questionId": "m38_q07",
+      "type": "single-select",
+      "scenario": "Case workers must always see the most up-to-date phone number for a customer whose record lives in a CRM system. Which page autopopulation method should be used?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Refer to the Data Page — data reloads per refresh strategy, always showing the current value"
+        },
+        {
+          "id": "B",
+          "text": "Copy from the Data Page — captures the phone number at the time of Case creation"
+        },
+        {
+          "id": "C",
+          "text": "Use a Declare Expression — recalculates the field whenever the CRM updates"
+        },
+        {
+          "id": "D",
+          "text": "Use pyDefault — sets the phone number once at Case creation"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Always current = Reference. Frozen snapshot = Copy.",
+      "rationale": "Referencing the Data Page ensures the property always shows the latest value according to the refresh strategy. Copying creates a snapshot — if the CRM updates afterward, the Case still shows the old number. C and D are different mechanisms not designed for live external data."
+    },
+    {
+      "questionId": "m38_q08",
+      "type": "single-select",
+      "scenario": "When an insurance claim is created, customer information must be preserved as it existed at that moment — even if the customer later changes their address. Which autopopulation method is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Copy data from the Data Page — stores a snapshot at the time of claim creation"
+        },
+        {
+          "id": "B",
+          "text": "Refer to the Data Page — always shows the most current customer information"
+        },
+        {
+          "id": "C",
+          "text": "Use Thread scope — restricts data to the current Case only"
+        },
+        {
+          "id": "D",
+          "text": "Use 'Reload if older than' to prevent updates after the first load"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which operation creates a point-in-time snapshot vs. a live reference?",
+      "rationale": "Copy stores the data as it existed at claim creation — subsequent source changes do not affect the Case. B (Reference) would show the updated address. C and D are configuration options unrelated to the snapshot-vs-live distinction."
+    },
+    {
+      "questionId": "m38_q09",
+      "type": "single-select",
+      "scenario": "A dropdown on a form is populated from a Data Page containing 50 vehicle models. The user selects 'Sedan'. What is saved to the Case's Data Model?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Only 'Sedan' — the selected value is copied to the Data Model"
+        },
+        {
+          "id": "B",
+          "text": "All 50 vehicle models — the entire list is stored in the Case"
+        },
+        {
+          "id": "C",
+          "text": "The first 10 vehicle models — the default page list size"
+        },
+        {
+          "id": "D",
+          "text": "Nothing — the list is display-only and no data is saved"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "UI list from Data Page: only the selected value saves to the Data Model.",
+      "rationale": "When a list UI control is populated from a Data Page, only the selected value is copied to the Data Model. The full list remains in the Data Page. B, C, and D are incorrect."
+    },
+    {
+      "questionId": "m38_q10",
+      "type": "single-select",
+      "scenario": "A development team is building a weather widget for a Pega app. The weather API is still under development. How can the team build and test the UI now?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Simulate the external data source — provide sample data so the team can build and test without the real API"
+        },
+        {
+          "id": "B",
+          "text": "Create a Read-Only Data Page with hardcoded placeholder values"
+        },
+        {
+          "id": "C",
+          "text": "Wait until the API is ready to avoid integration issues"
+        },
+        {
+          "id": "D",
+          "text": "Use a Declare Expression to generate test weather data automatically"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "When an API is not ready yet, simulate the data source with a stub Data Page.",
+      "rationale": "Pega's simulated external data sources allow development and testing without the real API — sample data is provided to simulate the response. B is a workaround not using the simulation feature. C delays development unnecessarily. D is a different mechanism."
+    },
+    {
+      "questionId": "m38_q11",
+      "type": "multi-select",
+      "scenario": "An SA is configuring Data Pages for a Pega application and needs to select the correct scope for reference data shared across all users versus per-user cached data. Which TWO statements correctly describe Data Page scope behavior in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Thread scope creates a separate Data Page instance for each Case"
+        },
+        {
+          "id": "B",
+          "text": "Node scope is shared by all users on the system"
+        },
+        {
+          "id": "C",
+          "text": "Requestor scope creates a separate Data Page instance for each Case for the same user"
+        },
+        {
+          "id": "D",
+          "text": "Node scope is per-user — each user gets their own Node instance"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Thread = per Case; Node = all users on system. Requestor = per user SESSION (not per Case).",
+      "rationale": "Conditional sourcing evaluates each source in order and uses the first matching condition. The last source has no condition — it acts as the default fallback when all others fail.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m38_q12",
+      "type": "multi-select",
+      "scenario": "Which TWO scenarios are valid uses for simulated external data sources in Pega Platform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Testing when the source system has no data available yet"
+        },
+        {
+          "id": "B",
+          "text": "Unit testing by dictating specific response values to verify different processing paths"
+        },
+        {
+          "id": "C",
+          "text": "Permanently replacing a production data source with simulated data"
+        },
+        {
+          "id": "D",
+          "text": "Automatically refreshing Data Pages when real source data changes"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Simulation = development and testing only — not a production replacement.",
+      "rationale": "A (testing when source has no data) and B (unit testing with controlled responses) are both documented valid uses. C is wrong — simulation is for development/testing, not permanent production use. D describes a refresh strategy, not simulation.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m38_q13",
+      "type": "multi-select",
+      "scenario": "An SA is configuring a Data Page to retrieve customer account data from a REST API. Which TWO configuration elements must be set correctly for the Data Page to work as expected?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The data source — specifying the connector and operation that retrieves the data from the external system"
+        },
+        {
+          "id": "B",
+          "text": "The refresh strategy — defining when the cached data is invalidated and re-fetched from the source"
+        },
+        {
+          "id": "C",
+          "text": "The class hierarchy level — specifying which parent class in the hierarchy the Data Page should delegate to"
+        },
+        {
+          "id": "D",
+          "text": "The Ruleset version — locking the Data Page to a specific Ruleset minor version to prevent version conflicts"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Data Pages need a data source (where to get data) and a refresh strategy (when to re-fetch it).",
+      "rationale": "A functional Data Page requires a correctly configured data source (the connector and operation that retrieves data from the external system) and an appropriate refresh strategy (which controls when cached data expires and is re-fetched). Class hierarchy delegation and Ruleset version locking are not required Data Page configuration elements."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Data Page — 4 properties",
+      "value": "Structure (Page/List), Object Type, Edit Mode (Read-Only/Editable/Savable), Scope (Thread/Requestor/Node)."
+    },
+    {
+      "key": "Structure",
+      "value": "Page = single item. List = multiple items in pxResults array. Access: DataPageName.pxResults(n)."
+    },
+    {
+      "key": "Edit Mode → Clipboard category",
+      "value": "Read-Only → 'Data Pages'. Editable → 'User Pages'. Savable → pushes data back to system of record."
+    },
+    {
+      "key": "Scope",
+      "value": "Thread = per Case. Requestor = per user session. Node = all users on system."
+    },
+    {
+      "key": "Data sources requiring Data Transform mapping",
+      "value": "Report definition (page structure), Lookup (list structure), Robotic Automation, Robotic desktop Automation."
+    },
+    {
+      "key": "Aggregate vs. Conditional sources",
+      "value": "Aggregate = combine data from multiple sources. Conditional = pick ONE source based on conditions (last = 'Otherwise' fallback)."
+    },
+    {
+      "key": "Parameters CAUTION",
+      "value": "Each unique parameter set = separate Clipboard instance. Use 'Limit to single Data Page' to keep one instance."
+    },
+    {
+      "key": "3 refresh strategies",
+      "value": "Reload once per interaction (Thread/Requestor only). Do not reload when (When Condition). Reload if older than (time interval)."
+    },
+    {
+      "key": "Max refreshes per interaction",
+      "value": "At most ONCE per interaction, regardless of how many times the Data Page is accessed."
+    },
+    {
+      "key": "Reference vs. Copy",
+      "value": "Reference = always current, reloads per strategy. Copy = frozen snapshot — Data Page not accessed again."
+    },
+    {
+      "key": "UI list from Data Page",
+      "value": "Only the SELECTED VALUE is saved to the Data Model. Displayed label ≠ saved value (e.g., country name displayed, country code saved)."
+    },
+    {
+      "key": "Simulated data sources",
+      "value": "Dev/test without real API or data. Use when: API not ready, source empty, unit testing with controlled responses."
+    }
+  ]
+}

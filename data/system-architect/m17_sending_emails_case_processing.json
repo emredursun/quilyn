@@ -1,0 +1,567 @@
+{
+  "moduleId": "m17",
+  "moduleTitle": "Sending emails during Case processing",
+  "moduleUrl": "https://academy.pega.com/module/sending-emails-during-case-processing/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/sending-emails-during-case-processing/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Identify correspondence recipients: a specific address, a field, a user reference, or participants",
+    "Compose email with the rich text editor and out-of-the-box correspondence templates that reuse Case data",
+    "Send email with a Send email automation, or via case-level notifications when an Assignment is routed to a worklist"
+  ],
+  "estTime": "15 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "With whom? (recipients / Send to)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Three questions for correspondence",
+          "description": "Pega can send automated email to relevant parties. To configure it, answer three questions: (1) WITH WHOM must I communicate? (2) HOW is the message composed? (3) WHEN must it be sent?"
+        },
+        {
+          "type": "analogy",
+          "text": "Email correspondence rules in Pega are like pre-written letter templates at a law firm: the partner (developer) writes the template once with [CLIENT_NAME] and [CASE_NUMBER] placeholders. When a case reaches the trigger point, Pega merges the template with real case data and sends the letter — 500 personalized letters without retyping each one."
+        },
+        {
+          "type": "concept",
+          "term": "Recipient (Send to) options",
+          "description": "Send to a SPECIFIC email address (fragile if the address changes), or resolve at runtime from a FIELD value (e.g., Customer email field), a USER REFERENCE, or a PARTICIPANT. Runtime resolution is preferred."
+        },
+        {
+          "type": "concept",
+          "term": "User reference (incl. Create/Update Operator)",
+          "description": "A field pointing to one specific user, defined in the Case Type data model. CREATE OPERATOR and UPDATE OPERATOR are user-reference fields automatically defined for every data type associated with the Case Type."
+        },
+        {
+          "type": "concept",
+          "term": "Participants (Owner / Customer / Interested)",
+          "description": "People/orgs involved in a Case; Pega resolves their email from participant info. Defaults: OWNER (created the Case), CUSTOMER (whom it is for), INTERESTED (tracks progress only). Configure additional participants on the Case Type SETTINGS tab."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">SEND EMAIL — WHOM / HOW / WHEN + PARTICIPANT DEFAULTS</text><rect x=\"10\" y=\"30\" width=\"165\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"92\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">WHOM</text><text x=\"92\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Reference a property</text><text x=\"92\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">holding the address</text><text x=\"92\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"9\" font-weight=\"600\">Hardcoded = violation</text><text x=\"92\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"9\" font-weight=\"600\">pyEmailAddress, etc.</text><rect x=\"193\" y=\"30\" width=\"165\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"275\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">HOW</text><text x=\"275\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Correspondence template</text><text x=\"275\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">References .pyID, .pyStatusWork</text><text x=\"275\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Props must be populated</text><text x=\"275\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">before Send Email fires</text><rect x=\"376\" y=\"30\" width=\"165\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"458\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">WHEN</text><text x=\"458\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Send Email shape (flow)</text><text x=\"458\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">vs. Notify shape</text><text x=\"458\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"9\" font-weight=\"600\">Send Email = correspondence</text><text x=\"458\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Notify = system notification</text><rect x=\"559\" y=\"30\" width=\"152\" height=\"150\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"635\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Defaults</text><text x=\"635\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Case owner +</text><text x=\"635\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Case creator</text><text x=\"635\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Others: explicit config</text><text x=\"635\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Built-in: Create Operator</text><text x=\"635\" y=\"132\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">&amp; Update Operator templates</text></svg>",
+          "caption": "Send Email requires Whom (property ref), How (correspondence template), When (shape). Defaults: Case owner + creator. Hardcoded addresses are guardrail violations."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "How? (compose the message)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Rich text editor",
+          "description": "Pega provides a RICH TEXT EDITOR to create formatted email and REUSE Case data — e.g., greet the customer by referencing the first-name and last-name fields captured in the Case."
+        },
+        {
+          "type": "concept",
+          "term": "Correspondence templates",
+          "description": "You can reuse out-of-the-box CORRESPONDENCE TEMPLATES that include Case processing data such as the Case ID (.pyID) and Case status (.pyStatusWork), instead of composing every email from scratch."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "When? (send the email)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Send email automation",
+          "description": "Add a SEND EMAIL automation Step to the Case. When the Case reaches that Step, the email is automatically sent to the selected parties and the Case continues (no user Assignment). Example: confirm an order once the user submits it."
+        },
+        {
+          "type": "concept",
+          "term": "Case-level notifications",
+          "description": "Configure email via Case Type Settings → Notifications → 'Email user when assignment is routed to worklist'. Default message: pyLabel + '(' + pyID + ') moved to your worklist'. Sends when the Case enters the routed Assignment."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 270\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Send Email Step Configuration</title>\n<desc>Send Email is a yellow automation step with recipient, subject, body, and sender account configuration</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">SEND EMAIL STEP — CONFIGURATION</text>\n<!-- Step badge -->\n<rect x=\"20\" y=\"48\" width=\"180\" height=\"52\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"110\" y=\"76\" font-size=\"13\" font-weight=\"700\" fill=\"#5A3200\" text-anchor=\"middle\">Send Email</text>\n<text x=\"110\" y=\"92\" font-size=\"10.5\" fill=\"#BA7517\" text-anchor=\"middle\">Automation Step (yellow)</text>\n<!-- Arrow -->\n<line x1=\"202\" y1=\"74\" x2=\"242\" y2=\"74\" stroke=\"#6d8bff\" stroke-width=\"2\"/>\n<polygon points=\"242,68 254,74 242,80\" fill=\"#6d8bff\"/>\n<!-- Config panel -->\n<rect x=\"256\" y=\"44\" width=\"500\" height=\"210\" rx=\"12\" fill=\"var(--t)\" opacity=\".05\" stroke=\"var(--t)\" stroke-width=\"1\" stroke-opacity=\".2\"/>\n<text x=\"276\" y=\"72\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".8\">Configuration</text>\n<!-- Recipients -->\n<rect x=\"276\" y=\"82\" width=\"460\" height=\"36\" rx=\"7\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"1.5\"/>\n<text x=\"292\" y=\"104\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0D3560\">To / Cc / Bcc:</text>\n<text x=\"392\" y=\"104\" font-size=\"11\" fill=\"#185FA5\">Case property (e.g. .Customer.Email) or fixed address</text>\n<!-- Subject -->\n<rect x=\"276\" y=\"124\" width=\"460\" height=\"36\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"292\" y=\"146\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0E3D28\">Subject:</text>\n<text x=\"356\" y=\"146\" font-size=\"11\" fill=\"#1E8A5B\">Static text + Case property values (e.g. Claim #{.ID})</text>\n<!-- Body -->\n<rect x=\"276\" y=\"166\" width=\"460\" height=\"36\" rx=\"7\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/>\n<text x=\"292\" y=\"188\" font-size=\"11.5\" font-weight=\"700\" fill=\"#2B2580\">Body:</text>\n<text x=\"336\" y=\"188\" font-size=\"11\" fill=\"#534AB7\">Reusable template + dynamic Case property inserts</text>\n<!-- Sender account note -->\n<rect x=\"20\" y=\"224\" width=\"736\" height=\"34\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1\"/>\n<text x=\"36\" y=\"246\" font-size=\"11\" fill=\"#5A3200\" font-weight=\"600\">Prerequisite:</text>\n<text x=\"120\" y=\"246\" font-size=\"11\" fill=\"#BA7517\">A configured outbound sender email account must exist (set up by SA/admin)</text>\n</svg>",
+          "caption": "A Send Email Step is a yellow automation Step. It runs automatically, requires To/Subject/Body configuration using Case properties, and needs a pre-configured sender account."
+        },
+        {
+          "type": "interactive",
+          "title": "Correspondence Configuration Decisions",
+          "height": 420,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"When to Use Correspondence Step\", \"scenario\": \"A Case requires a confirmation email sent automatically to the customer immediately after they submit a service request \\u2014 no human review of the email content is needed. Which Step type handles this?\", \"opts\": [\"Send Email automation Step \\u2014 fires automatically when the Case reaches that point in the flow, no user action required\", \"Assignment Step with an email template \\u2014 assigns a Task to a CSR to review and send the email manually\", \"Wait Step configured to wait 0 seconds, then send the email \\u2014 the Wait provides a pause for async email delivery\", \"Approval Step where the system auto-approves and the approval notification is the email sent to the customer\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Send Email automation fires automatically \\u2014 no Assignment needed, no human action, the email goes out as soon as the Case reaches that Step.\", \"\\u2717 Incorrect. An Assignment Step creates a human Task \\u2014 the CSR would need to open the Assignment and send the email manually. The scenario requires full automation.\", \"\\u2717 Incorrect. Wait Steps pause the Case; they do not send emails. A 0-second wait immediately resolves and still does not send any email.\", \"\\u2717 Incorrect. Approval Steps generate approval Assignments for approvers \\u2014 the notification email in an approval flow is a side effect, not the primary mechanism for sending confirmation emails.\"]}, {\"label\": \"Template vs Inline\", \"scenario\": \"An SA needs to create a 'Welcome to Premium' email that will be sent from 3 different Case Types and needs to be updated annually when the marketing team refreshes content. What is the most maintainable design?\", \"opts\": [\"Create a reusable Correspondence rule (email template) referenced from all 3 Case Types \\u2014 updating the template once propagates to all 3\", \"Write the email content inline in each Case Type's Send Email Step \\u2014 each Case Type owns its own copy for independence\", \"Create 3 separate Correspondence rules (one per Case Type) so each team can update their copy independently\", \"Use a Decision Table that returns the full HTML email body as a string, making it easy to update the HTML in one place\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. A reusable Correspondence rule (template) is the right pattern \\u2014 single source of truth, updated once by marketing, reflected in all 3 Case Types immediately.\", \"\\u2717 Incorrect. 3 inline copies = 3 maintenance events per year when marketing updates the content. Risk of inconsistency when one is updated and another is forgotten.\", \"\\u2717 Incorrect. 3 separate rules is the same problem as 3 inline copies \\u2014 maintenance burden multiplied by 3.\", \"\\u2717 Incorrect. A Decision Table returning full HTML strings is an unusual anti-pattern \\u2014 Correspondence rules are the designed mechanism for email templates with token substitution.\"]}, {\"label\": \"Dynamic Recipients\", \"scenario\": \"A claim denial email must be sent to the claimant whose email address is stored in the Case's 'ClaimantEmail' property. The email also needs a CC to the assigned claims adjuster (stored in the Assignment). How are these two recipients configured?\", \"opts\": [\"Configure the To field using the Case property reference for ClaimantEmail, and the CC field using the assigned operator's email \\u2014 both are dynamic property references in the Correspondence configuration\", \"Hard-code the email addresses in the template body as HTML mailto links \\u2014 the system extracts the addresses from the HTML to route the email\", \"Create two separate email Steps (one for To, one for CC) and use a Data Transform to merge the delivery results\", \"Use a Work Queue for email routing \\u2014 the claimant's email and the adjuster's email are added to the Work Queue's notification list\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Both To and CC fields in Pega's email configuration support dynamic property references \\u2014 the actual values are resolved at send time from the Case's current data.\", \"\\u2717 Incorrect. Email routing uses the configured address fields, not HTML links parsed from the body. Hard-coding addresses in the body would require manual copy-paste sending.\", \"\\u2717 Incorrect. Two separate Steps for one email (one for To, one for CC) is not how email configuration works \\u2014 a single Send Email Step handles all recipients (To, CC, BCC).\", \"\\u2717 Incorrect. Work Queues are for Assignment routing, not email delivery. Email recipients are configured in the Correspondence rule or Send Email Step directly.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Whom / How / When",
+      "trapDescription": "Questions ask what three things must be defined to configure a Send Email step. Candidates list only the recipient and body. A complete Send Email configuration requires defining WHOM to notify, HOW (template or inline), and WHEN (the event that triggers the email).",
+      "bestPractice": "Decide recipient (field/user ref/participant), composition (editor/template), and trigger (Send email step / case-level notification)."
+    },
+    {
+      "title": "Avoid a fixed email address",
+      "trapDescription": "A question asks whether it is acceptable to hardcode a recipient's email address in a correspondence rule. Candidates say yes for simple cases. Hardcoding an email address is a guardrail violation — always reference a property that holds the address so it can be updated without changing the rule.",
+      "bestPractice": "Prefer Field, User reference, or Participant over a specific address."
+    },
+    {
+      "title": "Create Operator & Update Operator",
+      "trapDescription": "Questions ask which correspondence templates update operator data. Candidates name custom templates. 'Create Operator' and 'Update Operator' are the two built-in system templates for operator lifecycle notifications — they are pre-built, not custom.",
+      "bestPractice": "Use Create/Update Operator when you must email whoever created or last updated a record."
+    },
+    {
+      "title": "Default participants",
+      "trapDescription": "A question asks which participants receive case-level notifications by default. Candidates list all stakeholders. The default participants are the Case owner and the Case creator — other participants must be explicitly configured.",
+      "bestPractice": "Pick the participant role that matches who must be notified; manage on the Settings tab."
+    },
+    {
+      "title": "Correspondence templates use .pyID / .pyStatusWork",
+      "trapDescription": "Questions ask how to reference the Case ID in a correspondence template. Candidates write a custom expression. Standard correspondence templates use the system properties .pyID (Case ID) and .pyStatusWork (Case Status) — these are the canonical references.",
+      "bestPractice": "Reference system properties .pyID and .pyStatusWork in correspondence templates — they are already populated by Pega and require no custom mapping or data transform."
+    },
+    {
+      "title": "Case-level notification specifics",
+      "trapDescription": "Case-level email fires when an Assignment is ROUTED TO A WORKLIST; blank message uses the default '.pyLabel (.pyID) moved to your worklist'; only on routed Assignments.",
+      "bestPractice": "Enable 'Email user when the assignment is routed to worklist' on Settings → Notifications."
+    },
+    {
+      "title": "Correspondence rules vs. Notification rules",
+      "trapDescription": "A question asks the difference between a Correspondence rule and a Notification rule. Candidates treat them as the same. Correspondence rules generate formatted email content; Notification rules define the event trigger and delivery channel — they work together but are separate artifacts.",
+      "bestPractice": "Correspondence rules define email content (HTML template with property references). They are triggered by the Send Email automation shape. Notification rules deliver in-app Pega notifications (bell icon) — not external emails. For 'send email at a case step': Correspondence rule + Send Email shape."
+    },
+    {
+      "title": "Property references must be populated before Send Email fires",
+      "trapDescription": "A scenario describes an email with a property reference showing blank in the sent message. Candidates blame the template. Property references in email templates are resolved at send time — if the property is not populated on the clipboard before the Send Email step fires, the reference will be blank.",
+      "bestPractice": "If a referenced property (.CustomerEmail, .PolicyNumber) is not on the clipboard when Send Email runs, it resolves to blank. Ensure data-population steps (Data Transform, assignment) occur BEFORE the Send Email automation shape in the process."
+    },
+    {
+      "title": "Send Email shape vs. Notify shape",
+      "trapDescription": "Questions ask which shape to use to send an email as part of a case flow. Candidates select Notify. The Send Email shape sends a formatted correspondence; the Notify shape sends a system notification — for email correspondence, use Send Email.",
+      "bestPractice": "Send Email fires a Correspondence rule and sends an external email via SMTP. Notify sends an in-app notification visible in the Pega portal. Use Send Email for external recipients; use Notify for internal Pega users."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m17_q01",
+      "type": "single-select",
+      "scenario": "A confirmation email must be sent automatically when a Case reaches a certain point in the workflow, with no user action. What do you add?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Send email automation Step — when the Case reaches it, the email is sent to the selected parties and the Case continues"
+        },
+        {
+          "id": "B",
+          "text": "A Collect information Step that asks a user to send the email"
+        },
+        {
+          "id": "C",
+          "text": "An Access Role that emails users on login"
+        },
+        {
+          "id": "D",
+          "text": "A Data Page that emails when refreshed"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Automatic email at a workflow point = Send email automation.",
+      "rationale": "A Send email automation Step sends the email automatically when reached. B is wrong because it requires a user action. C is wrong because Access Roles govern permissions. D is wrong because Data Pages source data, not send email."
+    },
+    {
+      "questionId": "m17_q02",
+      "type": "single-select",
+      "scenario": "An SA wants the recipient of a confirmation email to always be whatever address the customer typed into the Customer email field. Which 'Send to' option fits?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Send to a Field — Pega uses the value in the Customer email field at run time"
+        },
+        {
+          "id": "B",
+          "text": "Send to a specific email address typed into the rule"
+        },
+        {
+          "id": "C",
+          "text": "Send to an Access Group"
+        },
+        {
+          "id": "D",
+          "text": "Send to the Ruleset owner"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Resolve the email recipient from a Case field value at runtime.",
+      "rationale": "Sending to a Field uses the field's value (Customer email) as the recipient. B is wrong because a hard-coded address is fragile and not customer-specific. C and D are wrong because Access Groups/Ruleset owners are not correspondence recipients."
+    },
+    {
+      "questionId": "m17_q03",
+      "type": "single-select",
+      "scenario": "An SA must email whoever CREATED a particular record. Which user-reference field is available without being manually defined?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Create Operator — automatically defined in the data model for each data type (alongside Update Operator)"
+        },
+        {
+          "id": "B",
+          "text": "You must build a custom 'Creator' field from scratch"
+        },
+        {
+          "id": "C",
+          "text": "pyStatusWork holds the creator's email"
+        },
+        {
+          "id": "D",
+          "text": "The Owner participant is the only way to reach a record's creator"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Two operator fields are auto-defined per data type.",
+      "rationale": "Create Operator (and Update Operator) are automatically defined user-reference fields per data type. B is wrong because no custom build is needed. C is wrong because pyStatusWork holds Case status. D is wrong because the Owner participant is the Case creator, not necessarily a specific record's creator."
+    },
+    {
+      "questionId": "m17_q04",
+      "type": "multi-select",
+      "scenario": "A BA is configuring email notifications for a Case and needs to know which participants are available as recipients by default. Which TWO are valid DEFAULT participants you can email in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Owner — the person who created the Case"
+        },
+        {
+          "id": "B",
+          "text": "Interested — a person who tracks the Case but does not process it"
+        },
+        {
+          "id": "C",
+          "text": "Approver — the next person in the approval chain"
+        },
+        {
+          "id": "D",
+          "text": "Ruleset — the versioned rule container"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "selectCount": 2,
+      "hint": "Three default participant types: Owner, Customer, and Interested — recall them.",
+      "rationale": "Owner and Interested are default participants (with Customer). C is wrong because 'Approver' is an approval role, not a default participant. D is wrong because a Ruleset is not a participant."
+    },
+    {
+      "questionId": "m17_q05",
+      "type": "single-select",
+      "scenario": "To avoid composing identical emails repeatedly and to embed the Case ID and status, what should an SA reuse?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An out-of-the-box correspondence template that includes Case data such as .pyID and .pyStatusWork"
+        },
+        {
+          "id": "B",
+          "text": "A Decision Table that returns email text"
+        },
+        {
+          "id": "C",
+          "text": "A Data Transform that prints the email to the log"
+        },
+        {
+          "id": "D",
+          "text": "An Access Role with an email body field"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Reusable formatted email with Case data = correspondence template.",
+      "rationale": "Correspondence templates embed Case data like .pyID and .pyStatusWork and are reusable. B/C/D are wrong because Decision Tables, Data Transforms, and Access Roles do not compose reusable email correspondence."
+    },
+    {
+      "questionId": "m17_q06",
+      "type": "single-select",
+      "scenario": "A team wants users to be emailed automatically whenever an Assignment lands in their worklist. How is this configured?",
+      "options": [
+        {
+          "id": "A",
+          "text": "On the Case Type Settings tab → Notifications, enable 'Email user when the assignment is routed to worklist'"
+        },
+        {
+          "id": "B",
+          "text": "Add a Send email Step before every Assignment"
+        },
+        {
+          "id": "C",
+          "text": "Configure it on each operator's record individually"
+        },
+        {
+          "id": "D",
+          "text": "It happens automatically and cannot be configured"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Find Case-level notification settings on the Case Type Settings tab.",
+      "rationale": "Case-level notifications are enabled on Settings → Notifications with the 'Email user when the assignment is routed to worklist' checkbox. B is wrong because that is manual and per-step. C is wrong because it is configured at the Case level, not per operator. D is wrong because it must be explicitly enabled."
+    },
+    {
+      "questionId": "m17_q07",
+      "type": "single-select",
+      "scenario": "A case-level notification is enabled but the message is left blank. What does the user receive?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The default message: .pyLabel + \"(\" + .pyID + \") moved to your worklist\" — e.g., 'Onboarding (O-2183) moved to your worklist'"
+        },
+        {
+          "id": "B",
+          "text": "No email at all, because a blank message disables the notification"
+        },
+        {
+          "id": "C",
+          "text": "A blank email with only a subject line"
+        },
+        {
+          "id": "D",
+          "text": "An error is logged and the Case stalls"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Leaving the email message blank triggers a built-in default worklist message.",
+      "rationale": "With a blank message Pega sends the default '.pyLabel (.pyID) moved to your worklist'. B is wrong because the notification still fires. C and D are wrong because a usable default message is sent, not a blank/error."
+    },
+    {
+      "questionId": "m17_q08",
+      "type": "single-select",
+      "scenario": "After a Send email automation Step fires, does the Case wait for the recipient to read or reply?",
+      "options": [
+        {
+          "id": "A",
+          "text": "No — Send email is fire-and-forget; the Case continues immediately after the email is sent"
+        },
+        {
+          "id": "B",
+          "text": "Yes — the Case pauses until the recipient opens the email"
+        },
+        {
+          "id": "C",
+          "text": "Yes — the Case waits for a reply before advancing"
+        },
+        {
+          "id": "D",
+          "text": "The Case resolves as soon as the email is sent"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Remember: Send Email automation does not pause Case processing — it fires and continues.",
+      "rationale": "Send email is fire-and-forget — the Case advances right after sending. B and C are wrong because the Case does not wait on the recipient. D is wrong because sending an email does not resolve the Case."
+    },
+    {
+      "questionId": "m17_q09",
+      "type": "single-select",
+      "scenario": "What is the difference between Send email correspondence and a Pulse post?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Send email delivers an external email to a recipient; Pulse is an in-application collaboration feed attached to the Case"
+        },
+        {
+          "id": "B",
+          "text": "They are the same feature with different names"
+        },
+        {
+          "id": "C",
+          "text": "Pulse sends external emails; Send email posts in-app only"
+        },
+        {
+          "id": "D",
+          "text": "Both require the recipient to be logged in to Pega"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which channel does each notification type use — external email inbox vs. in-app collaboration feed?",
+      "rationale": "Send email is external correspondence; Pulse is an in-app, Case-attached collaboration feed. B is wrong because they are distinct. C reverses them. D is wrong because email recipients need not be Pega users."
+    },
+    {
+      "questionId": "m17_q10",
+      "type": "single-select",
+      "scenario": "A developer must send an automated email to a customer when their insurance claim enters the Under Review stage, including the claim number and customer name. Which combination is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Correspondence rule with property references + Send Email automation shape at the start of Under Review stage"
+        },
+        {
+          "id": "B",
+          "text": "Notification rule with email body + Notify shape at the start of Under Review stage"
+        },
+        {
+          "id": "C",
+          "text": "SLA Goal action configured to trigger email after 0 minutes at stage entry"
+        },
+        {
+          "id": "D",
+          "text": "Send Email shape with claim number and customer name typed as static text directly in the shape"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What rule defines email content, and what shape triggers it?",
+      "rationale": "Correspondence rules (dynamic templates) define the email Subject, Body, and recipients; the Send Email Automation shape triggers delivery via SMTP. Together they are the only pattern that generates and routes external emails in Pega. Option B is wrong because Notify sends only in-platform alerts, not external SMTP email — it never leaves the application."
+    },
+    {
+      "questionId": "m17_q11",
+      "type": "single-select",
+      "scenario": "A Correspondence rule references .CustomerEmail. The email fires but the To field is blank. What is the most likely cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": ".CustomerEmail is not populated on the clipboard when the Send Email shape fires"
+        },
+        {
+          "id": "B",
+          "text": "Correspondence rules must be re-saved after adding each property reference"
+        },
+        {
+          "id": "C",
+          "text": "The Send Email shape requires a static address; property references are not supported in the To field"
+        },
+        {
+          "id": "D",
+          "text": "The email server rejected the blank address and rerouted the message to the developer inbox"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What happens when a referenced property is empty at send time?",
+      "rationale": "Unpopulated properties resolve to blank at runtime. Ensure the upstream step sets .CustomerEmail before Send Email fires B is wrong because templates resolve at runtime, not at save time.."
+    },
+    {
+      "questionId": "m17_q12",
+      "type": "single-select",
+      "scenario": "A developer needs to alert a team leader within Pega (not external email) when a high-priority case is created. Which is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Notify shape + Notification rule — delivers an in-app notification (bell icon) to the team leader"
+        },
+        {
+          "id": "B",
+          "text": "Send Email shape + Correspondence rule — sends an SMTP email to the team leader"
+        },
+        {
+          "id": "C",
+          "text": "Utility shape + custom email activity — calls the SendEmail API to push an in-app alert"
+        },
+        {
+          "id": "D",
+          "text": "Decision shape + Notification rule — evaluates priority and sends in-app alert only when the condition is met"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which shape combination delivers an in-app non-email alert to users?",
+      "rationale": "Notify + Notification rule = in-app bell notification. B delivers external email, not in-app. C also sends external email and bypasses declarative tools. D is wrong because Decision shape evaluates conditions and routes flow — it does not send notifications on its own."
+    },
+    {
+      "questionId": "m17_q13",
+      "type": "multi-select",
+      "scenario": "A Pega developer is designing a Claims process that must notify stakeholders at key milestones. Which TWO are valid ways to trigger an email from a Pega Case?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Send Email automation step configured in the Case workflow at the desired milestone"
+        },
+        {
+          "id": "B",
+          "text": "Case-level notifications that automatically send an email when an Assignment is routed to a Worklist"
+        },
+        {
+          "id": "C",
+          "text": "A Report Definition scheduled to email results daily after detecting unresolved Cases"
+        },
+        {
+          "id": "D",
+          "text": "A Declare Expression configured to trigger an email whenever a field value changes"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Two email triggers exist in Pega: a step-based automation and a routing-event notification.",
+      "rationale": "Pega supports two primary email triggers during Case processing: a Send Email automation step placed in the workflow, and case-level notifications that fire when an Assignment is routed to a Worklist. Report Definition emails and Declare Expression-triggered emails are not standard email automation mechanisms in Case processing."
+    },
+    {
+      "questionId": "m17_q14",
+      "type": "multi-select",
+      "scenario": "A developer is building an email correspondence template in Pega. Which TWO features are available in the Pega correspondence editor for composing emails?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A rich text editor for formatting the email body with headings, bullet lists, and bold or italic text"
+        },
+        {
+          "id": "B",
+          "text": "Property references that insert live Case data values (such as the applicant's name) into the email body at runtime"
+        },
+        {
+          "id": "C",
+          "text": "A live preview that sends a test email to an external inbox during template composition to verify delivery"
+        },
+        {
+          "id": "D",
+          "text": "An auto-translation feature that converts the email body into the recipient's preferred locale on send"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Pega's correspondence editor provides rich text formatting and dynamic Case data insertion via property references.",
+      "rationale": "The Pega correspondence editor includes a rich text editor for formatting and property references (using the @ symbol or property picker) to insert live Case field values at send time. It does not send live test emails to external inboxes during composition, and auto-translation of email body content is not a built-in feature."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Three questions",
+      "value": "Whom (recipients) · How (compose) · When (send)."
+    },
+    {
+      "key": "Recipients",
+      "value": "Specific address (fragile) → prefer Field · User reference · Participant. Create/Update Operator auto-defined per data type."
+    },
+    {
+      "key": "Participants",
+      "value": "Owner (creator) · Customer (the person the Case is for) · Interested (tracker) · or All. Managed on Settings tab."
+    },
+    {
+      "key": "Compose",
+      "value": "Rich text editor reuses Case fields; OOTB correspondence templates embed .pyID and .pyStatusWork."
+    },
+    {
+      "key": "Send email automation",
+      "value": "A Step that auto-sends when reached; fire-and-forget, Case continues."
+    },
+    {
+      "key": "Case-level notification",
+      "value": "Settings → Notifications → 'Email user when assignment is routed to worklist'. Blank → '.pyLabel (.pyID) moved to your worklist'; only on routed Assignments."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Email correspondence",
+      "url": "https://academy.pega.com/topic/email-correspondence/v6/in/96211/66721",
+      "duration": "20 min"
+    }
+  ]
+}

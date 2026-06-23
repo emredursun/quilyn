@@ -1,0 +1,575 @@
+{
+  "moduleId": "m25",
+  "moduleTitle": "Automating workflow decisions",
+  "moduleUrl": "https://academy.pega.com/module/automating-workflow-decisions/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/automating-workflow-decisions/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Explain the relationship between a Process in the Case Life Cycle and a Process diagram in the Process Modeler",
+    "Identify Process diagram shapes by color and purpose, and distinguish Connector Actions from Local Actions"
+  ],
+  "estTime": "15 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Processes and Process diagrams",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Process",
+          "description": "A series of Steps expected to occur in a logical, sequential order. When you add a Process to a Case Type in the Case Life Cycle designer, the Steps are configured in the typical sequence to completion."
+        },
+        {
+          "type": "analogy",
+          "text": "Decision shapes in a process flow are like railroad switches: when a train (case) arrives at a switch point, the switch (decision) checks the rail conditions (data values) and automatically routes the train down track A or track B — no driver needed, no delay. The correct track is always taken as long as the conditions are correctly configured."
+        },
+        {
+          "type": "concept",
+          "term": "Process diagram",
+          "description": "Pega's visual canvas for advanced flow control. Shapes include Assignments, Automations, Decisions, and Subprocesses. Use the Process diagram when the Case Life Cycle's stage/step view doesn't support the required branching or parallel logic."
+        },
+        {
+          "type": "concept",
+          "term": "Accessing the Process diagram",
+          "description": "Click the CONFIGURE PROCESS icon located on the Process in the Case Life Cycle. This opens the PROCESS MODELER, where you add, edit, and remove shapes in the Process diagram to build configurations that deviate from the logical sequential order."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 320\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Process diagram shapes and colors</title>\n<desc>Legend of the Process diagram shapes: Start green circle, End red circle, Collect information / Assignment green rectangle, Subprocess blue rectangle, Automation yellow rectangle, Decision orange diamond</desc>\n<text x=\"20\" y=\"26\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">PROCESS DIAGRAM — SHAPES &amp; COLORS</text>\n<!-- Start circle -->\n<circle cx=\"60\" cy=\"80\" r=\"22\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2.5\"/>\n<text x=\"100\" y=\"78\" font-size=\"12.5\" font-weight=\"700\" fill=\"var(--t)\">Start</text>\n<text x=\"100\" y=\"94\" font-size=\"11\" fill=\"var(--t)\" opacity=\".7\">Green circle — default in every diagram</text>\n<!-- End circle -->\n<circle cx=\"60\" cy=\"140\" r=\"22\" fill=\"#FFE4E4\" stroke=\"#DC2626\" stroke-width=\"2.5\"/>\n<text x=\"100\" y=\"138\" font-size=\"12.5\" font-weight=\"700\" fill=\"var(--t)\">End</text>\n<text x=\"100\" y=\"154\" font-size=\"11\" fill=\"var(--t)\" opacity=\".7\">Red circle — default in every diagram</text>\n<!-- Collect info / Assignment green rectangle -->\n<rect x=\"38\" y=\"182\" width=\"44\" height=\"34\" rx=\"6\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"100\" y=\"196\" font-size=\"12.5\" font-weight=\"700\" fill=\"var(--t)\">Collect information / Assignment</text>\n<text x=\"100\" y=\"212\" font-size=\"11\" fill=\"var(--t)\" opacity=\".7\">Green rectangle</text>\n<!-- Subprocess blue rectangle -->\n<rect x=\"38\" y=\"234\" width=\"44\" height=\"34\" rx=\"6\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"100\" y=\"248\" font-size=\"12.5\" font-weight=\"700\" fill=\"var(--t)\">Subprocess (e.g. Approve/Reject)</text>\n<text x=\"100\" y=\"264\" font-size=\"11\" fill=\"var(--t)\" opacity=\".7\">Blue rectangle</text>\n<!-- Automation yellow rectangle -->\n<rect x=\"440\" y=\"60\" width=\"44\" height=\"34\" rx=\"6\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"500\" y=\"74\" font-size=\"12.5\" font-weight=\"700\" fill=\"var(--t)\">Automation</text>\n<text x=\"500\" y=\"90\" font-size=\"11\" fill=\"var(--t)\" opacity=\".7\">Yellow rectangle — Create Case, Send email, Change Stage</text>\n<!-- Decision orange diamond -->\n<polygon points=\"462,128 486,150 462,172 438,150\" fill=\"#FBE4C6\" stroke=\"#D9820A\" stroke-width=\"2\"/>\n<text x=\"500\" y=\"146\" font-size=\"12.5\" font-weight=\"700\" fill=\"var(--t)\">Decision</text>\n<text x=\"500\" y=\"162\" font-size=\"11\" fill=\"var(--t)\" opacity=\".7\">Orange diamond — conditional path, &gt;1 outcome</text>\n<!-- Connector -->\n<line x1=\"440\" y1=\"212\" x2=\"486\" y2=\"212\" stroke=\"var(--t)\" stroke-width=\"2\" opacity=\".75\"/>\n<polygon points=\"486,206 498,212 486,218\" fill=\"var(--t)\" opacity=\".75\"/>\n<text x=\"512\" y=\"210\" font-size=\"12.5\" font-weight=\"700\" fill=\"var(--t)\">Connector</text>\n<text x=\"512\" y=\"226\" font-size=\"11\" fill=\"var(--t)\" opacity=\".7\">Arrow / line between shapes</text>\n<!-- Bottom note -->\n<rect x=\"20\" y=\"288\" width=\"740\" height=\"24\" rx=\"6\" fill=\"var(--t)\" opacity=\".05\"/>\n<text x=\"390\" y=\"305\" font-size=\"10.5\" fill=\"var(--t)\" opacity=\".65\" text-anchor=\"middle\">Each Step type in the Case Life Cycle has a matching shape and color in the Process diagram.</text>\n</svg>",
+          "caption": "Every Process diagram includes a Start (green circle) and End (red circle) by default. Collect information / Assignment = green rectangle; Subprocess = blue rectangle; Automation = yellow rectangle; Decision = orange diamond. Connectors are the arrows linking shapes."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Decision shapes",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Decision shape (orange diamond)",
+          "description": "Orange diamond that adds conditional branching or skipping to a Process. Advances the Case automatically based on one or more conditions — no user action required at this shape. Supports more than one outcome path."
+        },
+        {
+          "type": "concept",
+          "term": "Automating vs human expertise",
+          "description": "Automating complex decisions lets users focus on those requiring human expertise. Example: a loan applicant with low credit but high salary and passing background check may still need an officer to assess qualifying factors that cannot be automated."
+        },
+        {
+          "type": "concept",
+          "term": "Decision flow variations",
+          "description": "(1) Cases move forward but may include ANOTHER STEP as needed — you choose when extra processing supports the Case. (2) Cases go to ANOTHER STAGE using the Change Stage shape; by skipping a Stage you support out-of-sequence processing."
+        },
+        {
+          "type": "interactive",
+          "title": "Process Shape & Flow Action Identifier",
+          "height": 440,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Identify the shape\", \"scenario\": \"In a Process diagram you see an ORANGE DIAMOND. It adds a conditional path that supports more than one outcome and advances the Process automatically based on business logic. Which shape is this?\", \"opts\": [\"A Decision shape \\u2014 orange diamonds model branching or skipping a Step based on Conditions\", \"A Subprocess \\u2014 it calls a reusable Process such as Approve/Reject\", \"An Automation shape \\u2014 it performs an action such as Send email or Create Case\", \"An Assignment shape \\u2014 it pauses the Case for a user to act\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Decision shapes are orange diamonds. They add a conditional path supporting more than one outcome and advance the Process automatically based on business logic or Conditions.\", \"\\u2717 Incorrect. A Subprocess is a BLUE rectangle, not an orange diamond.\", \"\\u2717 Incorrect. Automation shapes (Create Case, Send email, Change Stage) are YELLOW rectangles, not orange diamonds.\", \"\\u2717 Incorrect. An Assignment shape is a GREEN rectangle that pauses for a user \\u2014 not an orange diamond.\"]}, {\"label\": \"Connector vs Local Action\", \"scenario\": \"At an Assignment, clicking a button should COMPLETE the Assignment and ADVANCE the Case to the next shape. Which Flow Action type is this, and how is it configured?\", \"opts\": [\"A Connector Action \\u2014 configured as a line shape (the connector/arrow) in the Process Modeler\", \"A Local Action \\u2014 configured in the properties pane of the Assignment shape\", \"A Decision shape \\u2014 configured as an orange diamond in the Process Modeler\", \"An Automation \\u2014 configured as a yellow rectangle in the Process Modeler\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. A Connector Action completes the Assignment and advances the Case; it is configured as a line shape (the connector) in the Process Modeler.\", \"\\u2717 Incorrect. A Local Action UPDATES the Assignment but does NOT advance the Case \\u2014 the opposite of what's needed here.\", \"\\u2717 Incorrect. A Decision shape automates branching \\u2014 it is not a Flow Action that a user performs at an Assignment.\", \"\\u2717 Incorrect. An Automation runs a system action \\u2014 it is not the Flow Action that completes and advances an Assignment.\"]}, {\"label\": \"Skipping a Stage\", \"scenario\": \"A Decision must move the Case to a DIFFERENT Stage in the Case Life Cycle, skipping a Stage to support out-of-sequence processing. Which shape does the Decision flow use to do this?\", \"opts\": [\"The Change Stage shape \\u2014 moves a Case to a different Stage, supporting out-of-sequence processing\", \"The End shape \\u2014 a red circle that resolves the Case immediately\", \"A Local Action \\u2014 updates the Assignment without advancing the Case\", \"A Collect information Step \\u2014 a green rectangle that gathers user input\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. One Decision flow variation uses the Change Stage shape to move the Case to another Stage; skipping a Stage supports out-of-sequence processing.\", \"\\u2717 Incorrect. The End shape resolves the Case \\u2014 it does not move the Case to another Stage.\", \"\\u2717 Incorrect. A Local Action updates an Assignment in place; it does not move the Case between Stages.\", \"\\u2717 Incorrect. A Collect information Step gathers input \\u2014 it does not change the Case's Stage.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good \\u2014 review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m25-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">DECISION SHAPES — ROUTER, CONNECTOR &amp; LOCAL ACTION</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Router</text><text x=\"117\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Evaluates a When condition</text><text x=\"117\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Directs flow to one of</text><text x=\"117\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">multiple branches</text><text x=\"117\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Stays in same flow</text><rect x=\"253\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Connector</text><text x=\"360\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Transfers control to</text><text x=\"360\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">another flow/subprocess</text><text x=\"360\" y=\"104\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Original flow does NOT resume</text><text x=\"360\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Control fully transferred</text><rect x=\"496\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Local Action</text><text x=\"603\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Runs subprocess THEN</text><text x=\"603\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">RETURNS to calling step</text><text x=\"603\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Like a subroutine call</text><text x=\"603\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Contrast with Connector</text></svg>",
+          "caption": "Router: branching within same flow. Connector: transfers control, original flow does NOT resume. Local Action: runs subprocess then RETURNS to caller."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Flow Actions",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Flow Action",
+          "description": "Defines what a user can do at a specific Assignment Step — which form appears, which fields are shown, and what submit options are available. Controls user interaction within a Step, not the path between Steps."
+        },
+        {
+          "type": "concept",
+          "term": "Associating a Flow Action",
+          "description": "Within a Process, you associate a Flow Action with a CONNECTOR (the arrow between shapes) or an ASSIGNMENT shape (a green rectangle in the Process diagram)."
+        },
+        {
+          "type": "concept",
+          "term": "Connector Action",
+          "description": "Completes the Assignment AND advances the Case to the next shape. A Connector Action is configured as a LINE shape (the connector) in the Process Modeler."
+        },
+        {
+          "type": "concept",
+          "term": "Local Action",
+          "description": "Updates the Assignment but does NOT advance the Case to the next shape. A Local Action is configured in the PROPERTIES PANE of an Assignment shape in the Process Modeler."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">FLOW ACTIONS — TYPES &amp; CONFIGURATION</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Standard Flow Action</text><text x=\"117\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">User acts on Assignment</text><text x=\"117\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">(Submit, Approve, Reject)</text><text x=\"117\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Defined on Assignment step</text><text x=\"117\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Routes case based on user choice</text><rect x=\"253\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Local Action (optional)</text><text x=\"360\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">User-initiated side action</text><text x=\"360\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Does not advance main flow</text><text x=\"360\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Returns to current step</text><text x=\"360\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">e.g., \"Edit Details\" without submitting</text><rect x=\"496\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Utility Action</text><text x=\"603\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Reusable action</text><text x=\"603\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">shared across Cases</text><text x=\"603\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Created as standalone rule</text><text x=\"603\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Referenced from multiple steps</text></svg>",
+          "caption": "Flow Actions: Standard (advances case), Local Action (returns to step without advancing), Utility Action (reusable across Cases)."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Process vs Process diagram",
+      "trapDescription": "A Process is a series of Steps in logical sequential order; the Process diagram is the advanced view used when the path is NOT sequential.",
+      "bestPractice": "Use the Process diagram (Process Modeler) when Steps must branch or skip the typical order."
+    },
+    {
+      "title": "Opening the Process Modeler",
+      "trapDescription": "You access the Process diagram from the Configure Process icon on the Process — not from a separate menu or App Studio settings.",
+      "bestPractice": "Click the Configure Process icon on the Process in the Case Life Cycle to open the Process Modeler."
+    },
+    {
+      "title": "Shape colors get swapped",
+      "trapDescription": "Exam swaps shape colors: Decision = orange diamond, Automation = yellow rectangle, Subprocess = blue rectangle, Collect information / Assignment = green rectangle.",
+      "bestPractice": "Memorize: orange diamond = Decision; yellow = Automation; blue = Subprocess; green = Collect/Assignment; Start = green circle, End = red circle."
+    },
+    {
+      "title": "Decision shapes advance automatically",
+      "trapDescription": "A Decision shape advances the Process automatically based on business logic or Conditions — it is not a user picking a path.",
+      "bestPractice": "Use a Decision shape to add a conditional path that supports more than one outcome without human input."
+    },
+    {
+      "title": "Connector vs Local Action behavior",
+      "trapDescription": "Questions describe a flow that uses a Connector and ask what happens when it fires. Candidates say it sends the case to a subprocess and continues the main flow after. A Connector transfers control to the target — the original flow does not resume. A Local Action, by contrast, executes a subprocess and then returns to the calling step.",
+      "bestPractice": "Need to move to the next shape → Connector Action. Need to update in place → Local Action."
+    },
+    {
+      "title": "Where each Flow Action is configured",
+      "trapDescription": "Connector Action = configured as a line shape (the connector); Local Action = configured in the properties pane of an Assignment shape.",
+      "bestPractice": "Connector → the line between shapes; Local → the Assignment shape's properties pane."
+    },
+    {
+      "title": "Skipping a Stage = Change Stage shape",
+      "trapDescription": "Out-of-sequence processing is achieved by a Decision flow that uses the Change Stage shape to move the Case to a different Stage.",
+      "bestPractice": "Use the Change Stage shape to skip a Stage and support out-of-sequence processing."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m25_q01",
+      "type": "single-select",
+      "scenario": "A Business Architect new to Pega is learning about Case Life Cycle design and asks an SA to explain what a Process represents within a Case Life Cycle, and how it relates to the Steps inside it. How does Pega Platform define a Process within a Case Life Cycle?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A series of Steps expected to occur in a logical, sequential order"
+        },
+        {
+          "id": "B",
+          "text": "A reusable Decision Table that returns one of several outcomes"
+        },
+        {
+          "id": "C",
+          "text": "A single user form displayed during an Assignment"
+        },
+        {
+          "id": "D",
+          "text": "A graphical diagram that always processes Steps out of sequence"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall the official Pega definition of a Process — what order do Steps follow within it?",
+      "rationale": "A Process is a series of Steps expected to occur in a logical, sequential order. B is a decision rule, not a Process. C is a Flow Action/form, not a Process. D is wrong — sequential order is the default; the Process diagram is what enables non-sequential paths."
+    },
+    {
+      "questionId": "m25_q02",
+      "type": "single-select",
+      "scenario": "An SA is explaining to a new developer why Pega introduced the Process diagram in addition to the standard Case Life Cycle Stage structure. The developer wants to understand the problem the Process diagram was designed to solve. Why did Pega Platform introduce the Process diagram as part of Case design?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Because business processes do not often follow a sequential path, the Process diagram allows advanced configurations that control the path to resolution"
+        },
+        {
+          "id": "B",
+          "text": "To replace the Case Life Cycle designer entirely with a diagram-only authoring model"
+        },
+        {
+          "id": "C",
+          "text": "To store reusable Decision Tables and Decision Trees in one place"
+        },
+        {
+          "id": "D",
+          "text": "To let users manually choose every path the Case takes at run time"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think about why the Process diagram was introduced — what limitation of sequential flow does it address?",
+      "rationale": "Because business processes often deviate from a sequential path, the Process diagram provides advanced configurations that control the path toward resolution. B is wrong — the Case Life Cycle and Process diagram work together. C describes decision rules, not the Process diagram. D is wrong — the diagram automates the path, it doesn't force manual selection."
+    },
+    {
+      "questionId": "m25_q03",
+      "type": "single-select",
+      "scenario": "How do you open the Process diagram to add, edit, and remove shapes?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Click the Configure Process icon on the Process in the Case Life Cycle, which opens the Process Modeler"
+        },
+        {
+          "id": "B",
+          "text": "Open the Records Explorer and edit the Flow rule XML directly"
+        },
+        {
+          "id": "C",
+          "text": "Switch to App Studio Settings and enable diagram mode"
+        },
+        {
+          "id": "D",
+          "text": "Click the Start shape in the Case summary panel at run time"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Click the Configure Process icon on a Step to open the Process Modeler.",
+      "rationale": "You access the Process diagram by clicking the Configure Process icon on the Process in the Case Life Cycle, which opens the Process Modeler. B, C, and D are not how the Process Modeler is opened."
+    },
+    {
+      "questionId": "m25_q04",
+      "type": "single-select",
+      "scenario": "A new Pega developer opens the Process Modeler for the first time after creating a new Process and wants to understand what shapes are present by default before any Steps are added. Which two shapes does every newly created Pega Process diagram include by default?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Start shape (green circle) and an End shape (red circle)"
+        },
+        {
+          "id": "B",
+          "text": "A Decision shape (orange diamond) and an Automation shape (yellow rectangle)"
+        },
+        {
+          "id": "C",
+          "text": "A Subprocess (blue rectangle) and an Assignment (green rectangle)"
+        },
+        {
+          "id": "D",
+          "text": "Two Collect information Steps (green rectangles)"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Every Process flow has exactly one green Start circle and one red End circle.",
+      "rationale": "By default, every Process diagram includes a Start shape (green circle) and an End shape (red circle). The other shapes are added only when the configuration requires them."
+    },
+    {
+      "questionId": "m25_q05",
+      "type": "single-select",
+      "scenario": "A SA is reviewing a Pega Process diagram with a new team member who asks how to identify Decision shapes at a glance. In a Pega Process diagram, what color and shape represent a Decision?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An orange diamond"
+        },
+        {
+          "id": "B",
+          "text": "A yellow rectangle"
+        },
+        {
+          "id": "C",
+          "text": "A blue rectangle"
+        },
+        {
+          "id": "D",
+          "text": "A green rectangle"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall the shape and color used to represent a Decision node in a Pega Process diagram.",
+      "rationale": "In the Pega Process diagram, shape color and geometry encode meaning: orange diamonds represent Decision shapes that branch the flow based on conditions. Yellow rectangles are Automation shapes that execute system logic. Blue rectangles are Subprocesses such as Approve/Reject. Green rectangles are Collect Information or Assignment shapes that require user interaction."
+    },
+    {
+      "questionId": "m25_q06",
+      "type": "single-select",
+      "scenario": "Create Case, Send email, and Change Stage appear in a Process diagram as which shape?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Yellow rectangles (Automation shapes)"
+        },
+        {
+          "id": "B",
+          "text": "Orange diamonds (Decision shapes)"
+        },
+        {
+          "id": "C",
+          "text": "Blue rectangles (Subprocesses)"
+        },
+        {
+          "id": "D",
+          "text": "Red circles (End shapes)"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Identify the color and shape category for automation steps like Send Email and Create Case.",
+      "rationale": "Automation shapes such as Create Case, Send email, and Change Stage are yellow rectangles. Decisions are orange diamonds, Subprocesses are blue rectangles, and the End shape is a red circle."
+    },
+    {
+      "questionId": "m25_q07",
+      "type": "single-select",
+      "scenario": "An Approve/Reject Step appears in the Process diagram. What is its shape and color, and what category is it?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A blue rectangle — a Subprocess"
+        },
+        {
+          "id": "B",
+          "text": "An orange diamond — a Decision shape"
+        },
+        {
+          "id": "C",
+          "text": "A yellow rectangle — an Automation shape"
+        },
+        {
+          "id": "D",
+          "text": "A green circle — a Start shape"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall the shape color and category assigned to Approve/Reject Steps in the Process diagram.",
+      "rationale": "In the Pega Process diagram, Subprocess shapes — including the Approve/Reject Step — are rendered as blue rectangles. This distinguishes them clearly from orange diamond Decisions, yellow rectangle Automations, and green Collect Information shapes. Knowing shape colors is essential for reading and troubleshooting any Process diagram in Pega."
+    },
+    {
+      "questionId": "m25_q08",
+      "type": "single-select",
+      "scenario": "What is the purpose of a Decision shape in a Process diagram?",
+      "options": [
+        {
+          "id": "A",
+          "text": "To add a conditional path supporting more than one outcome, advancing the Process automatically based on business logic or one or more Conditions"
+        },
+        {
+          "id": "B",
+          "text": "To pause the Case until a user manually selects which path to follow"
+        },
+        {
+          "id": "C",
+          "text": "To send an outbound notification when a Step completes"
+        },
+        {
+          "id": "D",
+          "text": "To define what a user can do on the form at a specific Step"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A conditional path supporting more than one automatic outcome uses the Decision shape.",
+      "rationale": "Decision shapes add a conditional path supporting more than one outcome and advance the Process automatically based on business logic or Conditions. B describes manual selection (the opposite). C is an Automation (Send notification). D describes a Flow Action."
+    },
+    {
+      "questionId": "m25_q09",
+      "type": "single-select",
+      "scenario": "A Decision flow needs to move the Case to a different Stage, skipping a Stage to support out-of-sequence processing. Which shape accomplishes this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Change Stage shape"
+        },
+        {
+          "id": "B",
+          "text": "The End shape"
+        },
+        {
+          "id": "C",
+          "text": "A Local Action on the Assignment"
+        },
+        {
+          "id": "D",
+          "text": "A Connector Action line shape"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which specific shape in the Process diagram transitions a Case to a different Stage out of sequence?",
+      "rationale": "One Decision flow variation uses the Change Stage shape to move the Case to a different Stage; skipping a Stage supports out-of-sequence processing. The End shape resolves the Case; Local and Connector Actions are Flow Actions, not Stage movers."
+    },
+    {
+      "questionId": "m25_q10",
+      "type": "single-select",
+      "scenario": "A Pega System Architect is configuring an Assignment Step and explains to a junior developer the purpose of a Flow Action in the context of user interaction during Case processing. What does a Flow Action define in a Pega Process?",
+      "options": [
+        {
+          "id": "A",
+          "text": "What a user can do at a specific Step — controlling how users interact with forms while performing an Assignment"
+        },
+        {
+          "id": "B",
+          "text": "The full beginning-to-end path of a Process"
+        },
+        {
+          "id": "C",
+          "text": "The business logic that automatically branches the Case without user input"
+        },
+        {
+          "id": "D",
+          "text": "The Stage to which a Case is moved when it is created"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What a user can do at a Step.",
+      "rationale": "Flow Actions define what a user does at an Assignment: which form shows, which fields appear, and which submit options are available. They control the user interaction, not the flow path."
+    },
+    {
+      "questionId": "m25_q11",
+      "type": "single-select",
+      "scenario": "A user clicks a button that completes the Assignment AND advances the Case to the next shape. Which Flow Action type is this, and how is it configured?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Connector Action — configured as a line shape (the connector) in the Process Modeler"
+        },
+        {
+          "id": "B",
+          "text": "A Local Action — configured in the properties pane of the Assignment shape"
+        },
+        {
+          "id": "C",
+          "text": "A Decision shape — configured as an orange diamond"
+        },
+        {
+          "id": "D",
+          "text": "An Automation — configured as a yellow rectangle"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which Flow Action type both completes the current Assignment and advances the Case to the next shape?",
+      "rationale": "A Connector Action completes the Assignment and advances the Case to the next shape; it is configured as a line shape (the connector) in the Process Modeler. A Local Action does not advance the Case. Decision shapes and Automations are not Flow Actions."
+    },
+    {
+      "questionId": "m25_q12",
+      "type": "multi-select",
+      "scenario": "A BA is evaluating whether to use Local Actions or optional Processes for single-step ad-hoc work in a Case workflow. Which TWO statements correctly describe a Local Action in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It updates the Assignment but does NOT advance the Case to the next shape"
+        },
+        {
+          "id": "B",
+          "text": "It is configured in the properties pane of an Assignment shape in the Process Modeler"
+        },
+        {
+          "id": "C",
+          "text": "It completes the Assignment and advances the Case to the next shape"
+        },
+        {
+          "id": "D",
+          "text": "It is configured as a line shape (the connector) between two shapes"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Local = updates in place; lives on the Assignment shape.",
+      "rationale": "A Local Action updates the Assignment but does NOT advance the Case (A), and it is configured in the properties pane of an Assignment shape (B). C and D describe a Connector Action — it completes and advances the Case and is configured as a line shape.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m25_q13",
+      "type": "multi-select",
+      "scenario": "A Pega System Architect is reviewing Process diagram shapes with a new developer. Which TWO statements correctly describe how shapes communicate their purpose in a Pega Process diagram?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Each shape type uses a specific color to indicate its purpose — for example, blue shapes represent utility Assignments"
+        },
+        {
+          "id": "B",
+          "text": "Connectors between shapes can carry Actions that execute as the flow transitions between steps"
+        },
+        {
+          "id": "C",
+          "text": "All Process diagram shapes are interchangeable and differ only in their visual label text"
+        },
+        {
+          "id": "D",
+          "text": "Decision shapes must always appear at the bottom of a Process diagram by design convention"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Shape color signals purpose in Pega Process diagrams, and Connectors can carry execution logic.",
+      "rationale": "Pega Process diagram shapes are color-coded by type — for example, blue for Assignment steps, green for Subprocess steps, making the flow's intent visually clear. Connector Actions execute business logic (such as setting a property) during a flow transition. Shapes are not interchangeable and Decision shapes have no positional requirement."
+    },
+    {
+      "questionId": "m25_q14",
+      "type": "multi-select",
+      "scenario": "A developer asks about the relationship between the Case Life Cycle and Process diagrams in Pega. Which TWO statements are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Each Process in the Case Life Cycle corresponds to a Process diagram in the Process Modeler that defines the steps within it"
+        },
+        {
+          "id": "B",
+          "text": "Editing the Process diagram in the Process Modeler directly changes the Case processing logic at runtime"
+        },
+        {
+          "id": "C",
+          "text": "A Process diagram in the Process Modeler is documentation only and has no effect on what actually executes at runtime"
+        },
+        {
+          "id": "D",
+          "text": "Multiple Case Life Cycle Processes can share one Process diagram without any configuration"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "The Process diagram IS the rule that executes — it is not just a visual document.",
+      "rationale": "Each Process in the Case Life Cycle is backed by a Process (Flow) rule that is visualized as a Process diagram in the Process Modeler. Editing the diagram modifies the actual rule that executes at runtime — it is not merely documentation. Multiple independent Case Life Cycle Processes each require their own Process diagram."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Process",
+      "value": "A series of Steps expected to occur in a logical, sequential order."
+    },
+    {
+      "key": "Process diagram",
+      "value": "Advanced shapes-and-connectors view (Process Modeler) for non-sequential paths to resolution."
+    },
+    {
+      "key": "Access",
+      "value": "Click the Configure Process icon on the Process → opens the Process Modeler."
+    },
+    {
+      "key": "Shape colors",
+      "value": "Start = green circle; End = red circle; Collect/Assignment = green rect; Subprocess = blue rect; Automation = yellow rect; Decision = orange diamond."
+    },
+    {
+      "key": "Decision shape",
+      "value": "Adds a conditional path supporting >1 outcome; advances automatically by business logic/Conditions; can include another Step or Change Stage (skip a Stage)."
+    },
+    {
+      "key": "Flow Action",
+      "value": "Defines what a user can do at a Step; associated with a connector or an Assignment shape."
+    },
+    {
+      "key": "Connector vs Local",
+      "value": "Connector Action completes + advances (line shape); Local Action updates but does NOT advance (Assignment shape properties pane)."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Process modeling fundamentals",
+      "url": "https://academy.pega.com/topic/process-modeling-fundamentals/v1/in/96211/102556",
+      "duration": "20 min"
+    }
+  ]
+}

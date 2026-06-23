@@ -1,0 +1,524 @@
+{
+  "moduleId": "m28",
+  "moduleTitle": "Skipping a Process or a Stage",
+  "moduleUrl": "https://academy.pega.com/module/skipping-process-or-stage/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/skipping-process-or-stage/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Configure a Condition on a Process or Stage to control whether it runs in a given Case.",
+    "Distinguish the default run behavior of Processes and Stages and when each is appropriate to override."
+  ],
+  "estTime": "~10 min · 1 topic",
+  "topics": [
+    {
+      "title": "Conditional execution of processes and stages",
+      "url": "https://academy.pega.com/topic/conditional-execution-processes-and-stages/v6/in/96211/67056",
+      "duration": "20 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Conditional Execution of Processes and Stages",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Purpose",
+          "description": "Define conditions to control whether a Process or Stage runs in a Case. A condition consists of a property, an operator, and a value — evaluated at runtime against Case data."
+        },
+        {
+          "type": "analogy",
+          "text": "Conditional execution in Pega is like the fast lane at an airport checkpoint: regular passengers go through full screening (all stages/processes run), but pre-approved travelers skip directly to the gate (the stage/process is skipped). The fast lane is configured by the airport authority (the Skip condition), not by the traveler — the system evaluates the condition at runtime and decides automatically."
+        },
+        {
+          "type": "concept",
+          "term": "Default Stage behavior: Never skipped",
+          "description": "By default, Stages are NEVER skipped. To make a Stage conditional, select it in the Case Life Cycle and configure a skip condition. When the condition = true, the Stage and ALL Processes within it are bypassed."
+        },
+        {
+          "type": "concept",
+          "term": "Default Process behavior: Always starts",
+          "description": "By default, Processes ALWAYS start. To make a Process conditional, select the Process in the Case Life Cycle and configure a run condition. When the condition is not met, that specific Process is skipped."
+        },
+        {
+          "type": "concept",
+          "term": "Multiple conditions — AND logic",
+          "description": "You can add more than one condition to a Stage or Process. ALL conditions must be true simultaneously. Example: 'File personal injury claim' Process runs only when 'Was a party injured' = Yes AND 'Expense total' > USD50."
+        },
+        {
+          "type": "concept",
+          "term": "Configuration location",
+          "description": "Both Stage and Process conditions are configured inline in the Case Life Cycle — select the Stage or Process to access its condition panel. No separate Rule form is required."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 420 200\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"400\" height=\"180\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"210\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Conditional Stage/Process Execution</text><rect x=\"30\" y=\"50\" width=\"70\" height=\"30\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"65\" y=\"70\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Stage A</text><line x1=\"100\" y1=\"65\" x2=\"130\" y2=\"65\" stroke=\"var(--pa-ink-2)\" stroke-width=\"1.5\" marker-end=\"url(#arr28)\"/><rect x=\"130\" y=\"50\" width=\"80\" height=\"30\" rx=\"6\" fill=\"var(--pa-brand)\" opacity=\"0.25\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"170\" y=\"66\" text-anchor=\"middle\" font-size=\"9\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Stage B</text><text x=\"170\" y=\"77\" text-anchor=\"middle\" font-size=\"8\" fill=\"var(--pa-ink-2)\">[Skip if VIP]</text><line x1=\"210\" y1=\"65\" x2=\"240\" y2=\"65\" stroke=\"var(--pa-ink-2)\" stroke-width=\"1.5\" marker-end=\"url(#arr28)\"/><rect x=\"240\" y=\"50\" width=\"70\" height=\"30\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"275\" y=\"70\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Stage C</text><path d=\"M130,50 Q170,20 210,50\" stroke=\"var(--pa-err)\" stroke-width=\"1.5\" fill=\"none\" stroke-dasharray=\"5,3\" marker-end=\"url(#arr28r)\"/><text x=\"170\" y=\"28\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-err)\">VIP=true → skip B</text><text x=\"210\" y=\"120\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-2)\">Skip condition evaluated at runtime. Stage B is</text><text x=\"210\" y=\"136\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-2)\">bypassed for VIP cases; executed for all others.</text><text x=\"210\" y=\"160\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-brand)\">Can also skip individual Processes within a Stage.</text><defs><marker id=\"arr28\" markerWidth=\"6\" markerHeight=\"6\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 Z\" fill=\"var(--pa-ink-2)\"/></marker><marker id=\"arr28r\" markerWidth=\"6\" markerHeight=\"6\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 Z\" fill=\"var(--pa-err)\"/></marker></defs></svg>",
+          "caption": "Skip condition bypasses Stage B for VIP cases at runtime — all other cases run it normally."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Stage default = 'never skipped'; Process default = 'always starts'",
+      "trapDescription": "A question asks which default behavior applies to Stages and Processes when no skip/run condition is configured. Candidates say both default to always run. Stages default to 'never skipped' (always enter); Processes default to 'always starts' (always run) — the terminology differs between the two.",
+      "bestPractice": "Stage = NEVER skipped (skip condition needed to bypass). Process = ALWAYS starts (run condition needed to restrict). Different defaults, different condition types."
+    },
+    {
+      "title": "Stage condition = skip trigger; Process condition = run trigger",
+      "trapDescription": "Questions ask what a condition on a Stage does vs. a condition on a Process. Candidates say both define when the element 'should run.' A Stage condition defines WHEN to SKIP the Stage (evaluated on entry); a Process condition defines WHEN to RUN the Process — opposite logic.",
+      "bestPractice": "Stage: configure a SKIP condition (condition = true → Stage skipped). Process: configure a RUN/START condition (condition = false → Process skipped)."
+    },
+    {
+      "title": "Multiple conditions use AND logic — not OR",
+      "trapDescription": "A question describes two skip conditions on a Stage and asks whether the Stage skips if either condition is true. Candidates say yes (OR). When multiple conditions are configured, ALL conditions must be true to trigger the skip — AND logic applies, not OR.",
+      "bestPractice": "ALL conditions must be true. To achieve OR logic, a different approach is needed (e.g., Decision table, separate Processes)."
+    },
+    {
+      "title": "Skipping a Stage bypasses ALL Processes within it",
+      "trapDescription": "Questions ask what happens to Processes inside a skipped Stage. Candidates say some Processes may still run. Skipping a Stage bypasses the entire Stage including ALL Processes, steps, and assignments inside it — none of them execute.",
+      "bestPractice": "Skipping a Stage skips everything within it. Skipping a Process only affects that one Process — the Stage and other Processes continue."
+    },
+    {
+      "title": "No separate Rule form — conditions configured inline in Case Life Cycle",
+      "trapDescription": "A question asks where skip conditions are defined. Candidates navigate to a separate Skip Rule form. Skip and run conditions are configured inline on the Stage or Process within the Case Life Cycle view — there is no separate rule form for them.",
+      "bestPractice": "Select the Stage or Process directly in the Case Life Cycle and configure the condition in its properties panel. No separate Rule form is needed."
+    },
+    {
+      "title": "Conditions evaluate at runtime — not at design time",
+      "trapDescription": "Questions ask when skip/run conditions are evaluated. Candidates say 'when the Case Type is saved.' Conditions evaluate at RUNTIME when the case flow reaches that Stage or Process — never at design time or app save time.",
+      "bestPractice": "Conditions evaluate at runtime when the Case reaches the Stage or Process, using current Case field values. Each Case instance can have a different outcome."
+    },
+    {
+      "title": "Stage skip and Process skip are independent",
+      "trapDescription": "A question asks whether skipping a Stage also applies the Stage's skip logic to its individual Processes. Candidates say yes. Stage skip and Process skip are independent — each is configured and evaluated separately. Skipping a Stage bypasses all Processes by containment, not by applying Process skip logic.",
+      "bestPractice": "Stage skip and Process skip are entirely independent. Skipping a Process has no effect on the Stage. Only a Stage-level skip condition can skip the Stage."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m28_q01",
+      "type": "single-select",
+      "scenario": "A 'Personal Injury Assessment' Stage has no skip condition configured. What happens when a Case reaches this Stage?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Stage always runs — it is never skipped unless a skip condition is configured"
+        },
+        {
+          "id": "B",
+          "text": "The Stage is skipped until a run condition is explicitly set to true"
+        },
+        {
+          "id": "C",
+          "text": "The Stage runs only if the previous Stage completed without errors"
+        },
+        {
+          "id": "D",
+          "text": "The Stage is skipped by default and must be activated per Case"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall the default behavior of a Stage that has no skip condition configured.",
+      "rationale": "Stages are never skipped by default. Without a skip condition, the Stage always executes. B, C, and D invert or add conditions that don't exist in the default configuration."
+    },
+    {
+      "questionId": "m28_q02",
+      "type": "single-select",
+      "scenario": "A 'File Injury Claim' Process has no run condition. What is its default behavior?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Process always starts every time the Case reaches it"
+        },
+        {
+          "id": "B",
+          "text": "The Process never starts until a run condition evaluates to true"
+        },
+        {
+          "id": "C",
+          "text": "The Process runs once, then requires manual re-activation"
+        },
+        {
+          "id": "D",
+          "text": "The Process inherits the skip condition of its parent Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall the default behavior of a Process that has no run condition configured.",
+      "rationale": "By default, every Process in a Pega Case Life Cycle is configured to Always start — meaning no skip condition is applied and the Process always executes when the Case reaches that point in the flow. Adding a Skip condition (via a When Rule) allows the Process to be bypassed based on Case data at runtime. B is the opposite; C and D describe behaviors that don't exist."
+    },
+    {
+      "questionId": "m28_q03",
+      "type": "single-select",
+      "scenario": "An SA needs to skip the 'Medical Review' Stage when 'Injury severity' = 'None'. Where is this configured?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Select the 'Medical Review' Stage in the Case Life Cycle → set skip condition: Injury severity = None"
+        },
+        {
+          "id": "B",
+          "text": "Create a When Rule in Dev Studio named 'No Injury' → attach it to the Stage Rule form"
+        },
+        {
+          "id": "C",
+          "text": "Add a Decision shape before the Stage → route to the next Stage when condition is true"
+        },
+        {
+          "id": "D",
+          "text": "Configure each Process in the Stage with an individual run condition"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Stage skip conditions are set inline — select the Stage in the Case Life Cycle.",
+      "rationale": "Select the Stage in the Case Life Cycle and configure the skip condition in its properties panel. B, C, and D all use separate mechanisms that are not the designated approach."
+    },
+    {
+      "questionId": "m28_q04",
+      "type": "single-select",
+      "scenario": "A Process must run only when 'Was a party injured' = Yes AND 'Expense total' > USD50. Both conditions are added. When does the Process run?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Only when BOTH conditions are simultaneously true"
+        },
+        {
+          "id": "B",
+          "text": "When EITHER condition is true"
+        },
+        {
+          "id": "C",
+          "text": "When the first condition is true — the second is only checked if the first fails"
+        },
+        {
+          "id": "D",
+          "text": "The user selects which condition to apply at runtime"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "When multiple run conditions are added to a Process, what logical operator combines them?",
+      "rationale": "Multiple conditions use AND logic — all must be true for the Process to run. B describes OR logic. C describes sequential short-circuit evaluation. D is fabricated."
+    },
+    {
+      "questionId": "m28_q05",
+      "type": "single-select",
+      "scenario": "A Stage's skip condition evaluates to true. What happens to the Processes inside that Stage?",
+      "options": [
+        {
+          "id": "A",
+          "text": "All Processes within the Stage are bypassed — the entire Stage is skipped"
+        },
+        {
+          "id": "B",
+          "text": "Only the first Process is skipped; the remaining Processes still execute"
+        },
+        {
+          "id": "C",
+          "text": "The Processes run but all Assignments are auto-completed"
+        },
+        {
+          "id": "D",
+          "text": "A user must manually confirm whether to skip each Process"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Skipping a Stage = skipping everything inside it.",
+      "rationale": "Stage-level and Process-level skip conditions are independent. A Stage skip bypasses the entire Stage including all Processes. A Process skip only bypasses that Process within an otherwise active Stage."
+    },
+    {
+      "questionId": "m28_q06",
+      "type": "single-select",
+      "scenario": "A Process 'Collect Additional Documents' is skipped because its run condition is false. What happens to its parent Stage?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Stage continues running — other Processes in the Stage are unaffected"
+        },
+        {
+          "id": "B",
+          "text": "The Stage is also skipped — skipping a Process automatically skips its parent Stage"
+        },
+        {
+          "id": "C",
+          "text": "The Stage is paused until the Process condition changes"
+        },
+        {
+          "id": "D",
+          "text": "The Stage generates a guardrail violation for the skipped Process"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Stage-level skip and Process-level skip are independently configured and can coexist.",
+      "rationale": "Skipping a Process does not affect the Stage. The Stage continues and other Processes still run. Only a Stage-level skip condition can bypass the Stage."
+    },
+    {
+      "questionId": "m28_q07",
+      "type": "single-select",
+      "scenario": "What are the three components of a skip or run condition on a Stage or Process?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A property, an operator, and a value"
+        },
+        {
+          "id": "B",
+          "text": "A When Rule name, a result type, and a target Stage"
+        },
+        {
+          "id": "C",
+          "text": "A field name, a Data Page reference, and a fallback value"
+        },
+        {
+          "id": "D",
+          "text": "A Decision table, a column selector, and an expected result"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Conditions follow the same structure throughout Pega: property + operator + value.",
+      "rationale": "A Pega condition (When Rule) is composed of exactly three parts: a Property (the data field being evaluated), an Operator (the comparison function, such as equals or is greater than), and a Value (the comparison target). This three-part structure is evaluated against live Case data at runtime to determine whether a branch or skip applies. B, C, D are incorrect structures."
+    },
+    {
+      "questionId": "m28_q08",
+      "type": "multi-select",
+      "scenario": "A Pega developer is deciding whether to add Skip or Run conditions to a set of Stages and Processes in a Claims Case and wants to understand what happens if no conditions are configured. Which TWO statements correctly describe the default execution behavior of Stages and Processes in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Stages are never skipped by default"
+        },
+        {
+          "id": "B",
+          "text": "Processes always start by default"
+        },
+        {
+          "id": "C",
+          "text": "Stages always require an explicit run condition to execute"
+        },
+        {
+          "id": "D",
+          "text": "Processes are skipped by default and need activation"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Stage default = never skipped. Process default = always starts.",
+      "rationale": "Stage skip (A) and Process skip (B) are both correct answers and form the key contrast with each other. Options C and D both invert the default configurations and are therefore incorrect.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m28_q09",
+      "type": "single-select",
+      "scenario": "An SA configures a Skip Condition on a Review Stage that evaluates the claim amount property. A developer asks at what point during Case processing this condition is actually evaluated to determine whether the Stage should be skipped. When are skip and run conditions evaluated in a Pega Case?",
+      "options": [
+        {
+          "id": "A",
+          "text": "At runtime, when the Case reaches the Stage or Process — using current Case field values"
+        },
+        {
+          "id": "B",
+          "text": "At design time, when the Case Type is saved in App Studio"
+        },
+        {
+          "id": "C",
+          "text": "Once at Case creation — conditions are not re-evaluated after the Case opens"
+        },
+        {
+          "id": "D",
+          "text": "During a nightly batch process that pre-computes Case routing"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Conditions use live Case data — they must be evaluated at runtime.",
+      "rationale": "Conditions evaluate at runtime when the Case reaches the configured Stage or Process. Each Case instance evaluates independently based on its own data. B, C, D all describe incorrect timing."
+    },
+    {
+      "questionId": "m28_q10",
+      "type": "single-select",
+      "scenario": "A Process must run when 'Claim type' = 'Auto' OR 'Claim type' = 'Property'. Can this be expressed with two conditions added to the Process?",
+      "options": [
+        {
+          "id": "A",
+          "text": "No — multiple conditions use AND logic; OR logic requires a different approach"
+        },
+        {
+          "id": "B",
+          "text": "Yes — multiple conditions default to OR logic"
+        },
+        {
+          "id": "C",
+          "text": "Yes — select 'Match any' in the condition builder to switch to OR logic"
+        },
+        {
+          "id": "D",
+          "text": "No — only one condition per Process is supported"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Multiple conditions = AND. OR logic cannot be expressed this way.",
+      "rationale": "Multiple Process conditions use AND logic — all must be true. OR logic requires a different mechanism. B inverts the logic. C describes an option not documented in this topic. D is wrong because multiple conditions are supported, just with AND logic."
+    },
+    {
+      "questionId": "m28_q11",
+      "type": "single-select",
+      "scenario": "An automobile accident Case has a 'File personal injury claim' Process. It should run when there is a personal injury. Which field and value correctly form the run condition?",
+      "options": [
+        {
+          "id": "A",
+          "text": "'Was a party injured' = Yes"
+        },
+        {
+          "id": "B",
+          "text": "'Accident type' = Personal injury"
+        },
+        {
+          "id": "C",
+          "text": "'Claim status' ≠ Closed"
+        },
+        {
+          "id": "D",
+          "text": "'Process type' = Personal injury claim"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The Pega Academy example uses 'Was a party injured' = Yes.",
+      "rationale": "'Was a party injured' = Yes is the documented Pega Academy example for this Process condition. B, C, D reference fields or values not in the documented example."
+    },
+    {
+      "questionId": "m28_q12",
+      "type": "single-select",
+      "scenario": "An SA skips a Process in Stage 3. Will the Stage 3 skip condition also need updating?",
+      "options": [
+        {
+          "id": "A",
+          "text": "No — Stage and Process conditions are independent; the Stage runs normally regardless of the Process skip"
+        },
+        {
+          "id": "B",
+          "text": "Yes — the Stage skip condition must be updated to reflect the Process being skipped"
+        },
+        {
+          "id": "C",
+          "text": "Yes — skipping a Process invalidates the Stage's default run behavior"
+        },
+        {
+          "id": "D",
+          "text": "Only if the skipped Process is the first Process in the Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Process skip has no effect on the parent Stage.",
+      "rationale": "Stage and Process conditions are completely independent. Skipping a Process within a Stage does not affect the Stage itself — Stage 3 will still run (and run any other Processes within it). B, C, D all incorrectly imply a dependency between Process skip and Stage skip."
+    },
+    {
+      "questionId": "m28_q13",
+      "type": "multi-select",
+      "scenario": "An SA needs to configure a Stage that should be skipped entirely for low-value Claims (under $1,000) but must execute for all other Claims. Which TWO elements are required to implement this conditional execution?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Skip Condition on the Stage that evaluates whether the claim amount is below $1,000 at runtime"
+        },
+        {
+          "id": "B",
+          "text": "A When Condition or expression that returns true when the claim amount is less than $1,000"
+        },
+        {
+          "id": "C",
+          "text": "A Declare Expression that sets a separate Boolean property to skip the stage automatically"
+        },
+        {
+          "id": "D",
+          "text": "A separate Case Type created exclusively for low-value Claims to avoid conditional stage configuration"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Conditional stage skipping requires both a Skip Condition on the Stage and the expression that evaluates the rule.",
+      "rationale": "To conditionally skip a Stage, the SA configures a Skip Condition directly on the Stage, referencing a When Condition or expression that evaluates the qualifying criteria (claim amount < $1,000). When the condition is true at runtime, the Stage is bypassed. Declare Expressions and separate Case Types are not required for this pattern."
+    },
+    {
+      "questionId": "m28_q14",
+      "type": "multi-select",
+      "scenario": "A Pega developer asks about the behavior of a Process configured with a run condition. Which TWO statements correctly describe what happens when a run condition is applied to a Process?",
+      "options": [
+        {
+          "id": "A",
+          "text": "If the run condition evaluates to false at runtime, the entire Process is skipped and none of its Steps execute"
+        },
+        {
+          "id": "B",
+          "text": "A run condition can reference any Case property, allowing the skip decision to be made dynamically at runtime"
+        },
+        {
+          "id": "C",
+          "text": "A false run condition on a Process automatically skips the entire Stage that contains it"
+        },
+        {
+          "id": "D",
+          "text": "Run conditions on Processes can only be configured in Dev Studio — App Studio does not support them"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "A false run condition skips only the Process, not the Stage — and it can use any Case property.",
+      "rationale": "When a Process's run condition evaluates to false, only that Process is skipped — the Stage and other Processes within it continue. The condition can reference any Case property for dynamic evaluation. Run conditions on Processes are available in App Studio, not exclusively in Dev Studio."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Stage default",
+      "value": "NEVER skipped. Add a skip condition (property + operator + value) to bypass it. When condition = true → entire Stage and all Processes within it are skipped."
+    },
+    {
+      "key": "Process default",
+      "value": "ALWAYS starts. Add a run condition to restrict execution. When condition = false → that Process is skipped."
+    },
+    {
+      "key": "Multiple conditions",
+      "value": "AND logic — ALL must be true. Cannot express OR logic with multiple conditions."
+    },
+    {
+      "key": "Skipping a Stage vs. a Process",
+      "value": "Stage skip → all Processes inside bypassed. Process skip → only that Process skipped; Stage and other Processes unaffected."
+    },
+    {
+      "key": "Configuration location",
+      "value": "Case Life Cycle → select Stage or Process → set condition inline. No separate Rule form needed."
+    },
+    {
+      "key": "Condition evaluation",
+      "value": "Runtime — evaluated when Case reaches the Stage or Process, using current Case field values."
+    },
+    {
+      "key": "Key example",
+      "value": "'File personal injury claim' Process runs only when 'Was a party injured' = Yes (AND 'Expense total' > USD50 when a second condition is added)."
+    }
+  ]
+}

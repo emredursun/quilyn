@@ -1,0 +1,511 @@
+{
+  "moduleId": "BA-M13",
+  "moduleTitle": "Managing Case relationships for the Business Architect",
+  "moduleUrl": "https://academy.pega.com/module/managing-case-relationships/v2/in/93701",
+  "moduleQuizUrl": "https://academy.pega.com/module/managing-case-relationships/v2/quiz/in/93701",
+  "learningObjectives": [
+    "Describe the role of the parent and child Case relationship for managing workflow complexity.",
+    "Explain the business value in creating child Cases.",
+    "Identify the context for using Wait steps to manage Case dependencies.",
+    "Explain how the search duplicate Case logic identifies duplicate Cases."
+  ],
+  "estTime": "40 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Creating Case Relationships (Parent and Child Cases)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Parent and child Cases",
+          "description": "Case relationships let you decompose complex business processes into focused, modular Case Types that work together. A parent Case orchestrates child Cases and waits on their completion."
+        },
+        {
+          "type": "concept",
+          "term": "Business value of child Cases",
+          "description": "Child Cases break a large, complex workflow into smaller, manageable, reusable units that can run in PARALLEL, be owned by different teams, carry their own data/SLAs, and be reused across applications — reducing complexity and improving operational efficiency."
+        },
+        {
+          "type": "analogy",
+          "text": "A parent Case is the general contractor; child Cases are the specialized subcontractors (plumbing, electrical) working in parallel. The contractor coordinates them and finishes once their work is done."
+        }
+      ],
+      "bulletPoints": [
+        "Parent/child relationships manage workflow COMPLEXITY by decomposing work into modular Case Types.",
+        "Child Cases enable parallelism, specialization, independent ownership/SLAs, and reuse.",
+        "A child Case can be created automatically (an automation that creates a Case) within the parent's flow."
+      ]
+    },
+    {
+      "sectionTitle": "Managing Case Workflow Dependency (Wait Steps)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Wait Step",
+          "description": "A Wait Step PAUSES a Case until a defined condition is met, which is how you manage dependencies between Cases (e.g., a parent waiting on its child Cases) or time-based pauses."
+        },
+        {
+          "type": "concept",
+          "term": "Two Wait types",
+          "description": "(1) Case-dependency Wait — pauses until one or more specified Cases reach a particular status. (2) Timer Wait — pauses until a specific date and time is reached, then continues automatically."
+        },
+        {
+          "type": "analogy",
+          "text": "A Wait Step is a relay handoff: the parent runner pauses at the line until the child runners finish their legs (case dependency) or until the official's clock hits a set time (timer), then continues."
+        }
+      ],
+      "bulletPoints": [
+        "Use a case-dependency Wait when the parent must not proceed until child Cases reach a status (e.g., Resolved).",
+        "Use a timer Wait when the Case must pause until a specific date/time or for a set duration."
+      ]
+    },
+    {
+      "sectionTitle": "Duplicate Case Search",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Why detect duplicates",
+          "description": "A user might create a Case with the same data values as an existing Case (e.g., same customer, request date, items). Identifying and resolving duplicates saves time and money, so it is important to know how Pega detects them."
+        },
+        {
+          "type": "concept",
+          "term": "Search duplicate Cases Step",
+          "description": "Pega provides the Search duplicate Cases Process, implemented as a Search duplicate Cases Step. When a Case enters the Step, the system uses BASIC conditions and WEIGHTED conditions to compare specific property values against Cases already in the system."
+        },
+        {
+          "type": "concept",
+          "term": "Basic vs. weighted conditions & threshold",
+          "description": "Basic conditions MUST match (mandatory). Weighted conditions each carry a numeric score; the sum must reach a configured threshold. Both can appear in a Search duplicate Cases Step."
+        },
+        {
+          "type": "concept",
+          "term": "Resolving a duplicate",
+          "description": "When a user decides the current Case is a duplicate, they resolve it with a Resolved-Duplicate status and processing ends; the flow can be customized to let the user open the original Case to make updates."
+        },
+        {
+          "type": "analogy",
+          "text": "Duplicate detection is airport security: basic conditions are the mandatory ID check (must pass), and weighted conditions are points on a watchlist — once your points cross the threshold, you're pulled aside as a likely match."
+        }
+      ],
+      "bulletPoints": [
+        "Example: date of birth = basic condition; surgeon name, surgical type, procedure, procedure date = weighted conditions (25 each), threshold 50. A match totaling 100 exceeds 50 → flagged duplicate.",
+        "Resolved-Duplicate ends processing; the user continues with the original Case."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Why use child Cases",
+      "trapDescription": "Child Cases exist to manage complexity through modular, parallel, reusable Case Types — not merely to add layers.",
+      "bestPractice": "Decompose complex work into child Cases for parallelism, specialization, independent SLAs, and reuse."
+    },
+    {
+      "title": "Wait Step: dependency vs. timer",
+      "trapDescription": "The two Wait types are swapped: case-dependency (wait for other/child Cases to reach a status) vs. timer (wait until a date/time).",
+      "bestPractice": "Waiting on child Cases → case-dependency Wait; waiting until a date/time → timer Wait."
+    },
+    {
+      "title": "Basic vs. weighted conditions",
+      "trapDescription": "Basic conditions MUST match; weighted conditions accumulate toward a threshold. Candidates conflate the two.",
+      "bestPractice": "Mandatory match = basic; scored match summed against a threshold = weighted."
+    },
+    {
+      "title": "Threshold logic",
+      "trapDescription": "A Case is flagged only when basic conditions match AND the summed weighted value meets/exceeds the threshold.",
+      "bestPractice": "Add the matching weighted condition values; compare to the threshold (e.g., 100 ≥ 50 → duplicate)."
+    },
+    {
+      "title": "Resolved-Duplicate status",
+      "trapDescription": "The specific resolution status for a confirmed duplicate is Resolved-Duplicate, after which processing ends.",
+      "bestPractice": "Confirmed duplicate → resolve as Resolved-Duplicate; optionally open the original Case to update it."
+    },
+    {
+      "title": "Search duplicate Cases is a Step/Process",
+      "trapDescription": "Duplicate detection is implemented as the Search duplicate Cases Step (from the Search duplicate Cases Process) in the Life Cycle.",
+      "bestPractice": "When a question asks how duplicates are detected, the answer is the Search duplicate Cases Step using basic + weighted conditions."
+    },
+    {
+      "title": "Parent waits for children",
+      "trapDescription": "To make a parent depend on child completion, use a Wait Step configured for case dependency — not an SLA.",
+      "bestPractice": "Parent must not proceed until children reach a status → case-dependency Wait Step."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A complex claims workflow is decomposed so that investigation, payment, and document collection each run as their own focused Case Type contributing to the overall claim. What relationship is being used?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Parent and child Case relationships"
+        },
+        {
+          "id": "B",
+          "text": "A single monolithic Case Type"
+        },
+        {
+          "id": "C",
+          "text": "A Work Queue hierarchy"
+        },
+        {
+          "id": "D",
+          "text": "A Ruleset stack"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Parent/child Case relationships decompose complex work into modular Case Types that collaborate.",
+      "rationale": "Decomposing complex work into focused, modular Case Types that collaborate uses parent/child Case relationships. The parent orchestrates child Cases and waits on their completion. The other options describe unrelated features."
+    },
+    {
+      "questionId": "Q2",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "A BA is recommending a child Case architecture to a client managing a complex multi-party insurance Claims process. Which TWO are key business benefits of creating child Cases?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Work can run in parallel and be owned by different teams with their own SLAs"
+        },
+        {
+          "id": "B",
+          "text": "Complex workflows are broken into modular, reusable units"
+        },
+        {
+          "id": "C",
+          "text": "They eliminate the need for any data"
+        },
+        {
+          "id": "D",
+          "text": "They remove the parent Case entirely"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Child Cases enable parallel, independent work streams and reusable sub-processes across Case Types.",
+      "rationale": "Child Cases enable parallel, independently-owned work with separate SLAs and decompose complex processes into reusable, focused units. They do not eliminate data from the parent Case or remove the parent's oversight. No partial credit."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A parent Case must NOT advance until all of its child Cases are resolved. Which configuration achieves this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Wait Step configured for a case dependency (wait until the child Cases reach a status)"
+        },
+        {
+          "id": "B",
+          "text": "An SLA deadline on the parent"
+        },
+        {
+          "id": "C",
+          "text": "Routing the parent to a Work Queue"
+        },
+        {
+          "id": "D",
+          "text": "A duplicate Case search"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A case-dependency Wait pauses the parent Case until specified child Cases reach a target status.",
+      "rationale": "A case-dependency Wait Step pauses the parent Case until one or more specified Cases — typically child Cases — reach a particular status such as Resolved-Completed. SLAs, routing, and duplicate-search Steps do not enforce inter-Case dependencies."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A Case must pause until the first business day of next month before continuing. Which Wait Step type fits?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A timer Wait (wait until a specific date/time)"
+        },
+        {
+          "id": "B",
+          "text": "A case-dependency Wait"
+        },
+        {
+          "id": "C",
+          "text": "A cascading approval"
+        },
+        {
+          "id": "D",
+          "text": "A Decision Table"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A timer Wait Step pauses the Case until a specific date and time arrives, not until another Case resolves.",
+      "rationale": "Pausing until a specific date and time uses a timer Wait Step. A case-dependency Wait pauses on another Case's status. The other options — Change Stage and SLA — serve different workflow purposes."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "In the Search duplicate Cases Step, which condition type MUST match for a Case to be considered a potential duplicate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A basic condition"
+        },
+        {
+          "id": "B",
+          "text": "A weighted condition"
+        },
+        {
+          "id": "C",
+          "text": "An SLA condition"
+        },
+        {
+          "id": "D",
+          "text": "An Access Role condition"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Basic conditions must ALL match (mandatory); weighted conditions accumulate a score toward a threshold.",
+      "rationale": "Basic conditions are mandatory — all must match for a duplicate to be flagged. Weighted conditions accumulate scores that must reach a threshold but are not individually mandatory. The other options are not part of duplicate-detection logic."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "A duplicate search uses date of birth as a basic condition and four weighted conditions worth 25 each, with a threshold of 50. A new Case matches the DOB and all four weighted conditions. What happens?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It is flagged a potential duplicate (basic matches and 100 ≥ 50 threshold)"
+        },
+        {
+          "id": "B",
+          "text": "It is ignored because weighted conditions never matter"
+        },
+        {
+          "id": "C",
+          "text": "It is auto-deleted"
+        },
+        {
+          "id": "D",
+          "text": "It is flagged only if the threshold were 200"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Weighted conditions add up their scores and the total must cross the configured threshold value.",
+      "rationale": "The basic condition (DOB) matches and the weighted total is 4×25=100, which meets/exceeds the threshold of 50, so the Case is flagged as a potential duplicate."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "A user confirms a Case is a duplicate. How is it resolved?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Resolve it with a Resolved-Duplicate status, ending processing"
+        },
+        {
+          "id": "B",
+          "text": "Delete the original Case"
+        },
+        {
+          "id": "C",
+          "text": "Route it to a Work Queue indefinitely"
+        },
+        {
+          "id": "D",
+          "text": "Increase its SLA urgency"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A resolved child Case reaches a specific resolution status, such as Resolved-Completed, to signal completion.",
+      "rationale": "A confirmed duplicate is resolved as Resolved-Duplicate and processing ends; the flow can be customized so the user opens the original Case to update it."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "How does the Search duplicate Cases Step compare a new Case to existing ones?",
+      "options": [
+        {
+          "id": "A",
+          "text": "By evaluating basic conditions (must match) and weighted conditions (summed against a threshold)"
+        },
+        {
+          "id": "B",
+          "text": "By comparing only the Case ID"
+        },
+        {
+          "id": "C",
+          "text": "By checking the Ruleset version"
+        },
+        {
+          "id": "D",
+          "text": "By routing to the customer for review"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A Search duplicate Cases Step uses two condition types: mandatory basic conditions and scored weighted conditions.",
+      "rationale": "The Step uses basic conditions (mandatory matches) plus weighted conditions whose matching weights are summed and compared to a threshold. Case ID/Ruleset checks aren't the mechanism."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "A BA is reviewing a proposed Case architecture where one parent Case will spawn multiple independently-managed child Cases. Which statement about parent/child Case design is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Child Cases are focused, modular Case Types that can run in parallel and contribute to the parent's outcome"
+        },
+        {
+          "id": "B",
+          "text": "A parent Case can never spawn more than one child"
+        },
+        {
+          "id": "C",
+          "text": "Child Cases must always be created manually by the customer"
+        },
+        {
+          "id": "D",
+          "text": "Parent and child Cases must share a single Worklist item"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Child Cases are modular, can run in parallel, and contribute their resolved outcomes back to the parent Case.",
+      "rationale": "Child Cases are focused, modular Case Types (one or many) that can run in parallel and feed the parent's outcome. The other statements are false."
+    },
+    {
+      "questionId": "Q11",
+      "type": "single-select",
+      "scenario": "A BA is designing a mortgage approval Case that has separate child Cases for appraisal and title search that must complete before closing. Which scenario represents the BEST fit for using a case-dependency Wait Step?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A loan parent Case must wait for its appraisal and title child Cases to be resolved before closing"
+        },
+        {
+          "id": "B",
+          "text": "A Case should pause until 9 AM tomorrow"
+        },
+        {
+          "id": "C",
+          "text": "A Case needs a duplicate search"
+        },
+        {
+          "id": "D",
+          "text": "A Case should route to a specific user"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Waiting on one or more related Cases to reach a status is the case-dependency Wait's specific purpose.",
+      "rationale": "Waiting for child Cases (appraisal, title) to resolve before proceeding is a case-dependency Wait. The 9 AM scenario is a timer Wait; the others are different features."
+    },
+    {
+      "questionId": "Q12",
+      "type": "single-select",
+      "scenario": "A BA is presenting the value of duplicate Case detection to a client operations manager who processes thousands of requests weekly. What is the main operational reason organizations implement duplicate Case detection?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It saves time and money by identifying and resolving duplicate work"
+        },
+        {
+          "id": "B",
+          "text": "It increases the number of Cases created"
+        },
+        {
+          "id": "C",
+          "text": "It replaces the need for SLAs"
+        },
+        {
+          "id": "D",
+          "text": "It eliminates parent/child relationships"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Detecting duplicate Cases before processing them avoids redundant work and wasted resources.",
+      "rationale": "Detecting and resolving duplicate Cases avoids processing the same request twice, saving time and money. It does not increase Case volumes, replace SLAs, or alter parent/child relationships."
+    },
+    {
+      "questionId": "Q14",
+      "type": "single-select",
+      "scenario": "After a Case is resolved as Resolved-Duplicate, what can the workflow be customized to let the user do?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Open the original Case to make any necessary updates"
+        },
+        {
+          "id": "B",
+          "text": "Permanently lock all Rulesets"
+        },
+        {
+          "id": "C",
+          "text": "Create ten more duplicates automatically"
+        },
+        {
+          "id": "D",
+          "text": "Delete the original Case"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "When a potential duplicate is found, the workflow should continue with only the genuine, original Case.",
+      "rationale": "Processing can be customized so the user opens the original Case to update it, then continues with that genuine Case. The other options are incorrect."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Parent/child Cases",
+      "value": "Decompose complex work into focused, modular Case Types that work together; child Cases enable parallelism, specialization, independent SLAs, and reuse."
+    },
+    {
+      "key": "Wait Step",
+      "value": "Pauses a Case. Case dependency = wait until other/child Cases reach a status; Timer = wait until a date/time."
+    },
+    {
+      "key": "Duplicate detection",
+      "value": "Search duplicate Cases Step compares property values using basic conditions (must match) + weighted conditions (summed vs. a threshold)."
+    },
+    {
+      "key": "Threshold example",
+      "value": "DOB (basic) + 4 weighted @25 each, threshold 50; full match = 100 ≥ 50 → flagged duplicate."
+    },
+    {
+      "key": "Resolution",
+      "value": "Confirmed duplicate → Resolved-Duplicate status (processing ends); optionally open the original Case to update it."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Creating Case relationships",
+      "url": "https://academy.pega.com/topic/creating-case-relationships/v2/in/93701/80791",
+      "duration": "15 min"
+    },
+    {
+      "title": "Managing Case workflow dependency",
+      "url": "https://academy.pega.com/topic/managing-case-workflow-dependency/v2/in/93701/80791",
+      "duration": "10 min"
+    },
+    {
+      "title": "Duplicate Case search",
+      "url": "https://academy.pega.com/topic/duplicate-case-search/v2/in/93701/80791",
+      "duration": "5 min"
+    }
+  ]
+}

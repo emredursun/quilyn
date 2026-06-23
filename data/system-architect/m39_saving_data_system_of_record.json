@@ -1,0 +1,576 @@
+{
+  "moduleId": "m39",
+  "moduleTitle": "Saving data to a system of record",
+  "moduleUrl": "https://academy.pega.com/module/saving-data-system-record/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/saving-data-system-record/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Configure a savable Data Page with the correct data save options to write data back to a system of record.",
+    "Trigger the save plan using a Save Data Page Automation Step and configure explicit or implicit Data Page references."
+  ],
+  "estTime": "~30 min · 2 topics",
+  "topics": [
+    {
+      "title": "Savable Data Pages",
+      "url": "https://academy.pega.com/topic/savable-data-pages/v5/in/72681/67491/67621",
+      "duration": "15 min"
+    },
+    {
+      "title": "Save Data Page Automation",
+      "url": "https://academy.pega.com/topic/save-data-page-automation/v5/in/72681/67491/67621",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Savable Data Pages — Purpose and Configuration",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "A savable Data Page is like a shared spreadsheet with a 'Submit' button. Users edit values in memory (the spreadsheet). Nothing hits the system of record until someone clicks Submit (triggers the save plan). If the submit fails halfway — say the network drops — transaction handling rolls back both sides so neither system ends up in a half-updated state."
+        },
+        {
+          "type": "concept",
+          "term": "Savable Data Page — purpose",
+          "description": "Pushes data FROM a Data Page TO a System of Record (SOR). Works for both Pega Platform's internal database and external SORs. Edit mode must be set to 'Savable'. A data save plan specifies how and where data is saved."
+        },
+        {
+          "type": "concept",
+          "term": "Transaction handling",
+          "description": "Pega's built-in transaction handling ensures that if any part of the save fails (e.g., network outage), the entire operation rolls back. Both the Pega side and the SOR side return to their pre-update state — no partial commits."
+        },
+        {
+          "type": "concept",
+          "term": "When Conditions in the data save plan",
+          "description": "Configure When Conditions on each save target to commit to multiple data tables simultaneously. If a When Condition is true → the data commit runs. If all When Conditions are false → the Otherwise Condition runs."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Savable Data Pages — Save Options",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Save option: Database save",
+          "description": "Saves a single page to one database row in the internal SOR. Requires a Data Transform to map data before persistence. Supports page structure ONLY (not list). Ensures transactional integrity — the entire save succeeds or fails as a unit."
+        },
+        {
+          "type": "concept",
+          "term": "Save options: Database update and Database delete",
+          "description": "Database update: modifies an existing record in the internal SOR within the same transaction scope. Database delete: removes a record from the internal SOR."
+        },
+        {
+          "type": "concept",
+          "term": "Save option: Connector (REST only)",
+          "description": "Saves data to an external SOR using REST-based integration. REST ONLY — not SOAP. Use when the external system exposes a REST API."
+        },
+        {
+          "type": "concept",
+          "term": "Save options: Robotic Automation and Robotic Desktop Automation",
+          "description": "Robotic Automation: unattended RPA to write to an external system. Robotic Desktop Automation: desktop-driven RDA for UI-based external systems that have no API."
+        },
+        {
+          "type": "concept",
+          "term": "Save option: Activity",
+          "description": "Custom persistence logic via an Activity Rule. Limit its use when possible — prefer the other dedicated options for standard integration patterns."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Savable Data Pages — Data Handling",
+      "elements": [
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 600 200\" xmlns=\"http://www.w3.org/2000/svg\"><defs><marker id=\"m39-arr\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-2)\"/></marker></defs><rect x=\"10\" y=\"10\" width=\"580\" height=\"180\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"300\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Savable Data Page — Save Flow</text><rect x=\"30\" y=\"50\" width=\"130\" height=\"50\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok)\" stroke-width=\"1.5\"/><text x=\"95\" y=\"72\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-ok)\">User Edits</text><text x=\"95\" y=\"90\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-2)\">Data Page (Savable)</text><line x1=\"162\" y1=\"75\" x2=\"220\" y2=\"75\" stroke=\"var(--pa-ink-2)\" stroke-width=\"1.5\" marker-end=\"url(#m39-arr)\"/><rect x=\"222\" y=\"50\" width=\"140\" height=\"50\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"292\" y=\"72\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-brand)\">Save Plan</text><text x=\"292\" y=\"90\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-2)\">Automation Step triggers</text><line x1=\"364\" y1=\"75\" x2=\"422\" y2=\"75\" stroke=\"var(--pa-ink-2)\" stroke-width=\"1.5\" marker-end=\"url(#m39-arr)\"/><rect x=\"424\" y=\"50\" width=\"140\" height=\"50\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-err)\" stroke-width=\"1.5\"/><text x=\"494\" y=\"72\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-err)\">SOR Updated</text><text x=\"494\" y=\"90\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-2)\">Pega DB or External</text><text x=\"300\" y=\"135\" text-anchor=\"middle\" font-size=\"11\" fill=\"var(--pa-ink-2)\">If any step fails → transaction rolls back both sides</text><text x=\"300\" y=\"158\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-3)\">Trigger: Save Data Page Step | Flow Action post-processing | Activity Save-DataPage method</text></svg>",
+          "caption": "Savable Data Page flow: user edits → save plan triggered → SOR updated with transaction safety"
+        },
+        {
+          "type": "concept",
+          "term": "Update vs. Create — key and source",
+          "description": "Updating: key IS PRESENT → use Lookup as source. Creating: key NOT PRESENT → use Data Transform as source. One savable Data Page supports BOTH via conditional sourcing — Lookup when a record exists; Data Transform when it doesn't."
+        },
+        {
+          "type": "concept",
+          "term": "Auto-populated property + savable Data Page: must REFER, not Copy",
+          "description": "Use 'Refer to a Data Page' — not 'Copy data'. Copying snapshots the data; later user edits are invisible to the save plan and won't reach the SOR. Referring keeps a live connection so edits flow through."
+        },
+        {
+          "type": "concept",
+          "term": "Update Details Action",
+          "description": "Provides a simple way to update data object information without complex configuration. Supports additional validation and pre/post-processing of data."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Save Data Page Automation",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "3 ways to trigger the save plan",
+          "description": "① Add a Save Data Page Automation Step in a flow (AFTER an Assignment). ② Add post-processing for a Flow Action. ③ Call Save-DataPage in an Activity. When triggered from a flow or Flow Action, Pega manages transaction handling automatically."
+        },
+        {
+          "type": "concept",
+          "term": "Save Data Page Step — placement",
+          "description": "Place the Save Data Page Automation Step AFTER an Assignment Step in the flow. This ensures data is saved to the SOR after the user has entered or updated information. Placing it before would save stale or empty data."
+        },
+        {
+          "type": "concept",
+          "term": "Multiple SOR commits in one flow",
+          "description": "To commit to multiple data sources, add MULTIPLE Save Data Page Automation Steps to the flow — one per SOR. A single step commits to only one data source."
+        },
+        {
+          "type": "concept",
+          "term": "Explicit vs. Implicit Data Page reference",
+          "description": "Explicit: enter the Data Page Name directly — any parameters can be specified. Implicit ('Use associated property'): select a property whose associated savable Data Page is resolved automatically. Both allow adding an Audit Note."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 290\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m39-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">SAVE DATA PAGE — TRIGGER METHODS &amp; FLOW PLACEMENT</text><rect x=\"10\" y=\"26\" width=\"210\" height=\"80\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"115\" y=\"46\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">① Automation Step</text><text x=\"115\" y=\"62\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Add 'Save Data Page'</text><text x=\"115\" y=\"76\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Step in flow AFTER</text><text x=\"115\" y=\"90\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Assignment Step</text><rect x=\"255\" y=\"26\" width=\"210\" height=\"80\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"360\" y=\"46\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">② Navigation action</text><text x=\"360\" y=\"62\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Configured on a flow</text><text x=\"360\" y=\"76\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">action to trigger save</text><text x=\"360\" y=\"90\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">on user navigation</text><rect x=\"500\" y=\"26\" width=\"210\" height=\"80\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"605\" y=\"46\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">③ Case Close action</text><text x=\"605\" y=\"62\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Triggered when the</text><text x=\"605\" y=\"76\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Case resolves</text><text x=\"605\" y=\"90\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">(Resolution Stage)</text><text x=\"360\" y=\"132\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"700\">FLOW PLACEMENT — CRITICAL RULE</text><rect x=\"60\" y=\"144\" width=\"120\" height=\"44\" rx=\"8\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"120\" y=\"162\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"600\">Assignment</text><text x=\"120\" y=\"178\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">(user enters data)</text><line x1=\"180\" y1=\"166\" x2=\"260\" y2=\"166\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#m39-arr)\"/><rect x=\"260\" y=\"144\" width=\"140\" height=\"44\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"2\"/><text x=\"330\" y=\"162\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"700\">Save Data Page</text><text x=\"330\" y=\"178\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">commits to SOR</text><text x=\"550\" y=\"158\" fill=\"var(--pa-err)\" font-size=\"11\" font-weight=\"700\">✗ Wrong order:</text><text x=\"550\" y=\"174\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Save BEFORE Assignment</text><text x=\"550\" y=\"188\" fill=\"var(--pa-ink-2)\" font-size=\"10\">saves empty/stale data</text><rect x=\"10\" y=\"224\" width=\"700\" height=\"50\" rx=\"8\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"244\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">Multiple SOR Targets = Multiple Steps</text><text x=\"360\" y=\"262\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">One Save Data Page Step commits to exactly ONE SOR. Add a second Step for a second target.</text></svg>",
+          "caption": "Three ways to trigger a save plan, correct flow placement, and multi-SOR pattern."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Savable Data Pages work for BOTH Pega Platform and external SORs",
+      "trapDescription": "Questions ask which save target requires a Savable Data Page. Candidates answer 'external systems only,' not realizing a Savable Data Page also writes to the internal Pega Platform database via the Database save option.",
+      "bestPractice": "Savable Data Pages push data to ANY system of record — internal Pega Platform database or external systems. The save plan's save option (Database save, Connector, etc.) determines the target."
+    },
+    {
+      "title": "Connector data save option uses REST ONLY — not SOAP",
+      "trapDescription": "A scenario describes a SOAP web service and asks which save option to use. Candidates select 'Connector' because the target is external. Connector is REST-only — SOAP requires a different approach.",
+      "bestPractice": "The Connector save option works with REST-based integrations ONLY. SOAP or other protocols require a different approach (e.g., Activity)."
+    },
+    {
+      "title": "Database save: page structure only, requires Data Transform mapping",
+      "trapDescription": "Questions ask whether a Save Data Page step automatically writes all clipboard properties to the database. Candidates say yes. The database save writes the PAGE STRUCTURE — each clipboard property must be explicitly mapped to a database column via a Data Transform.",
+      "bestPractice": "Database save writes a single page to one database row. It supports page structure ONLY (not list). A Data Transform is required to map the response to the Data Model."
+    },
+    {
+      "title": "Auto-populated property + savable Data Page: must REFER — not Copy",
+      "trapDescription": "A question asks how to set a Case property so that saving the Data Page also saves the property value. Candidates say 'use Copy data.' When an auto-populated property needs to be persisted via a savable Data Page, you must REFER to the Data Page property — copying creates a snapshot that is not connected to the savable page.",
+      "bestPractice": "Must use 'Refer to a Data Page'. Copying creates a snapshot — edits made afterward are invisible to the save plan and won't be pushed to the SOR. Referring keeps the live connection."
+    },
+    {
+      "title": "Update = Lookup (key present); Create = Data Transform (key absent)",
+      "trapDescription": "A question describes a savable Data Page handling both new and existing records. Candidates use Data Transform for both paths. Lookup (not Data Transform) handles the update path when the record key is already present.",
+      "bestPractice": "Key present → Lookup (update existing). Key absent → Data Transform (create new). One savable Data Page supports both via conditional sourcing."
+    },
+    {
+      "title": "Save Data Page Step goes AFTER an Assignment — not before",
+      "trapDescription": "Questions ask where in the Case Life Cycle to place the Save Data Page Step. Candidates place it before the Assignment. The Save Data Page Step must be placed AFTER the Assignment that collects the data — placing it before means no user data has been entered yet.",
+      "bestPractice": "Save Data Page Automation Step must come AFTER an Assignment. Placing it before saves stale or empty data to the SOR before the user enters anything."
+    },
+    {
+      "title": "Multiple SOR commits require multiple Save Data Page Steps",
+      "trapDescription": "A scenario requires writing to two external systems in one flow. Candidates add one Save Data Page Step expecting it to commit to both. One Save Data Page Step = exactly one SOR commit — two targets need two Steps.",
+      "bestPractice": "One Save Data Page Step = one SOR commit. To commit to two external systems, add two separate Save Data Page Automation Steps in the flow."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m39_q01",
+      "type": "single-select",
+      "scenario": "An SA needs to write updated HR seat assignment data from a Pega Case to an external database. Which Data Page edit mode is required?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Savable — enables a save plan to push Data Page contents to a system of record"
+        },
+        {
+          "id": "B",
+          "text": "Editable — allows the application to modify the Data Page contents in memory"
+        },
+        {
+          "id": "C",
+          "text": "Read-Only — streams data to the external system automatically"
+        },
+        {
+          "id": "D",
+          "text": "Requestor — persists data across all of the user's Cases"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Writing back to a SOR requires Savable mode.",
+      "rationale": "Savable mode enables a data save plan that pushes Data Page contents to a SOR (internal or external). Editable allows in-memory editing but doesn't write back. Read-Only prevents modification. Requestor is a scope, not an edit mode."
+    },
+    {
+      "questionId": "m39_q02",
+      "type": "single-select",
+      "scenario": "An SA needs to save data from a savable Data Page to an external REST API. Which data save option is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Connector — saves to external SOR via REST-based integration"
+        },
+        {
+          "id": "B",
+          "text": "Database save — saves a single page to a database row"
+        },
+        {
+          "id": "C",
+          "text": "Robotic Automation — unattended RPA for external system writes"
+        },
+        {
+          "id": "D",
+          "text": "Activity — custom persistence logic via an Activity Rule"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Saving to an external REST API uses the Connector save option, not Database save.",
+      "rationale": "The Connector option saves to external SORs using REST integration. Database save writes to an internal Pega database. Robotic Automation is for systems with no API. Activity is for custom logic and should be limited."
+    },
+    {
+      "questionId": "m39_q03",
+      "type": "single-select",
+      "scenario": "When is a Lookup used as the source for a savable Data Page operation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "When a key is present — the record exists and needs to be updated"
+        },
+        {
+          "id": "B",
+          "text": "When no key is present — creating a new record for the first time"
+        },
+        {
+          "id": "C",
+          "text": "When the Data Page uses list structure instead of page structure"
+        },
+        {
+          "id": "D",
+          "text": "When the SOR is Pega Platform's internal database"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Key IS present = existing record = use Lookup as the Data Page source.",
+      "rationale": "Lookup is used when the key is present (updating an existing record). Data Transform is used when the key is absent (creating a new record). C and D are not the determining factors for source selection."
+    },
+    {
+      "questionId": "m39_q04",
+      "type": "multi-select",
+      "scenario": "Which TWO methods can trigger the save plan for a savable Data Page?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Add a Save Data Page Automation Step in a flow Rule"
+        },
+        {
+          "id": "B",
+          "text": "Add post-processing for a Flow Action Rule"
+        },
+        {
+          "id": "C",
+          "text": "Configure a Stage validation in the Case Life Cycle"
+        },
+        {
+          "id": "D",
+          "text": "Set the Data Page scope to Thread"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "3 trigger methods: Automation Step, Flow Action post-processing, Activity Save-DataPage method.",
+      "rationale": "A (Save Data Page Automation Step in a flow) and B (Flow Action post-processing) are both documented trigger methods. The third is calling Save-DataPage in an Activity Rule. C (Stage validation) and D (Thread scope) are unrelated.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m39_q05",
+      "type": "single-select",
+      "scenario": "A form field is auto-populated from a savable Data Page. The user edits the field. To ensure the save plan can push changes to the SOR, how must the autopopulation be configured?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Refer to a Data Page — keeps the live connection so the save plan sees the changes"
+        },
+        {
+          "id": "B",
+          "text": "Copy data from a Data Page — stores the value for the save plan to read"
+        },
+        {
+          "id": "C",
+          "text": "Either Refer or Copy — both work the same for savable Data Pages"
+        },
+        {
+          "id": "D",
+          "text": "Copy data — required specifically when using the Database save option"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Auto-populated property sourced from a savable Data Page: always REFER, never copy.",
+      "rationale": "'Refer to a Data Page' keeps the property connected to the savable Data Page — edits made by the user are reflected in the Data Page and the save plan can push them to the SOR. Copy creates a snapshot; edits after the copy are invisible to the save plan."
+    },
+    {
+      "questionId": "m39_q06",
+      "type": "single-select",
+      "scenario": "Where should the Save Data Page Automation Step be placed in a flow relative to an Assignment?",
+      "options": [
+        {
+          "id": "A",
+          "text": "After the Assignment — saves data after the user has entered or updated information"
+        },
+        {
+          "id": "B",
+          "text": "Before the Assignment — pre-populates the SOR before the user sees the form"
+        },
+        {
+          "id": "C",
+          "text": "At the start of the flow — saves data when the Case is created"
+        },
+        {
+          "id": "D",
+          "text": "At the end of the flow only — saves when the Case resolves"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Place the Save Data Page Step AFTER the user enters data in their Assignment.",
+      "rationale": "The step is placed AFTER an Assignment so data is saved after the user enters or updates it. Placing it before saves stale or empty data to the SOR."
+    },
+    {
+      "questionId": "m39_q07",
+      "type": "single-select",
+      "scenario": "An SA needs to commit updated data to TWO different external REST APIs in one flow. How is this configured?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Add two separate Save Data Page Automation Steps — one per external API"
+        },
+        {
+          "id": "B",
+          "text": "Configure a single Save Data Page Step with both APIs listed as targets"
+        },
+        {
+          "id": "C",
+          "text": "Use Aggregate sources in the save plan to write to both APIs simultaneously"
+        },
+        {
+          "id": "D",
+          "text": "Use a When Condition in the save plan to alternate between the two APIs"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "One Save Data Page Step = one SOR commit.",
+      "rationale": "To commit to multiple SORs, add multiple Save Data Page Automation Steps — one per SOR. A single step handles one data source only. B and C don't reflect how multi-SOR commits are documented."
+    },
+    {
+      "questionId": "m39_q08",
+      "type": "single-select",
+      "scenario": "A Save Data Page Automation Step references a Data Page implicitly. What must the SA configure?",
+      "options": [
+        {
+          "id": "A",
+          "text": "'Use associated property' — select an autopopulated property; its associated Data Page is referenced automatically"
+        },
+        {
+          "id": "B",
+          "text": "The Data Page Name field — enter the Data Page name directly"
+        },
+        {
+          "id": "C",
+          "text": "'Copy data from Data Page' — specify the source Data Page"
+        },
+        {
+          "id": "D",
+          "text": "The Audit Note field — specify the SOR to write to"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Implicit Data Page reference selects 'Use associated property' to resolve automatically.",
+      "rationale": "'Use associated property' is the implicit option — select an autopopulated property and Pega resolves the associated savable Data Page automatically. B (Data Page Name) is the explicit option. C is a Data Page autopopulation setting. D mischaracterizes the Audit Note field."
+    },
+    {
+      "questionId": "m39_q09",
+      "type": "single-select",
+      "scenario": "Which database save option removes a record from the internal SOR as part of a transactional operation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Database delete"
+        },
+        {
+          "id": "B",
+          "text": "Database update"
+        },
+        {
+          "id": "C",
+          "text": "Database save"
+        },
+        {
+          "id": "D",
+          "text": "Connector"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which database save operation removes an existing record from the system of record?",
+      "rationale": "The implicit reference option uses the property's associated savable Data Page. The explicit option requires entering the Data Page name directly. Both allow adding an Audit Note."
+    },
+    {
+      "questionId": "m39_q10",
+      "type": "single-select",
+      "scenario": "Pega Platform automatically manages transaction handling when the save plan is triggered from which source?",
+      "options": [
+        {
+          "id": "A",
+          "text": "From a flow Rule or Flow Action — Pega manages transaction handling automatically"
+        },
+        {
+          "id": "B",
+          "text": "From an Activity Rule only — Activities provide built-in transaction management"
+        },
+        {
+          "id": "C",
+          "text": "All three trigger methods manage transactions identically"
+        },
+        {
+          "id": "D",
+          "text": "Transaction management must always be configured manually by the SA"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Flow or Flow Action triggers = automatic transaction handling.",
+      "rationale": "When triggered from a flow Rule or Flow Action (post-processing), Pega automatically manages transaction handling. B and C are incorrect. D is wrong — automatic handling is available via flow/Flow Action triggers."
+    },
+    {
+      "questionId": "m39_q11",
+      "type": "single-select",
+      "scenario": "A savable Data Page must support both creating new customer records and updating existing ones. Which sourcing approach is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Conditional: Lookup when key exists (update); Data Transform when key absent (create)"
+        },
+        {
+          "id": "B",
+          "text": "Always use Data Transform — it handles both create and update"
+        },
+        {
+          "id": "C",
+          "text": "Always use Lookup — it creates new records when none exist"
+        },
+        {
+          "id": "D",
+          "text": "Create two separate savable Data Pages — one for create, one for update"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Key present → Lookup (update). Key absent → Data Transform (create).",
+      "rationale": "Conditional sourcing on a single savable Data Page: Lookup when the record exists, Data Transform when creating new. B and C each handle only one operation. D is unnecessarily complex."
+    },
+    {
+      "questionId": "m39_q12",
+      "type": "multi-select",
+      "scenario": "An SA is designing a Savable Data Page to write customer address updates back to an external CRM system and needs to verify the available save options and how the save is triggered. Which TWO statements correctly describe how Savable Data Pages are configured to write data?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Savable Data Pages can write to both Pega Platform's internal database and external SORs"
+        },
+        {
+          "id": "B",
+          "text": "The Connector save option supports both REST and SOAP integrations"
+        },
+        {
+          "id": "C",
+          "text": "When Conditions in the data save plan allow committing to multiple data tables"
+        },
+        {
+          "id": "D",
+          "text": "The save plan can only be triggered by a Save Data Page Automation Step"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "C"
+      ],
+      "hint": "Connector = REST only. 3 trigger methods, not 1.",
+      "rationale": "A is correct — savable Data Pages work for both internal and external SORs. C is correct — When/Otherwise conditions in the save plan enable multi-table commits. B is wrong — Connector is REST only (not SOAP). D is wrong — there are 3 trigger methods.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m39_q13",
+      "type": "multi-select",
+      "scenario": "A developer is configuring a Savable Data Page to write updated customer contact information back to an external CRM system. Which TWO statements correctly describe how Savable Data Pages work?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Savable Data Page is configured with data save options that define how and where the data is written back to the system of record"
+        },
+        {
+          "id": "B",
+          "text": "A Save Data Page Automation Step in the Case workflow explicitly triggers the save plan to commit the changes to the external system"
+        },
+        {
+          "id": "C",
+          "text": "A Savable Data Page automatically writes all changes to the source system whenever any property on the page is modified"
+        },
+        {
+          "id": "D",
+          "text": "The Save Data Page Automation Step must always be placed in the first Step of the first Stage to function correctly"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Savable Data Pages define how to write data; a Save Data Page step explicitly triggers the write at the.",
+      "rationale": "Savable Data Pages are configured with save options that describe the connector and operation to write data back to the source system. The actual write is triggered explicitly by a Save Data Page Automation Step in the workflow — data is not automatically written on every property change."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Savable Data Page",
+      "value": "Pushes data FROM Data Page TO SOR (Pega or external). Edit mode = Savable. Requires a data save plan."
+    },
+    {
+      "key": "7 save options",
+      "value": "Database save (page + Data Transform), Database update, Database delete, Connector (REST only), Robotic Automation, Robotic Desktop Automation, Activity (limit use)."
+    },
+    {
+      "key": "Database save constraints",
+      "value": "Page structure only (not list). Requires Data Transform mapping. Transactional integrity."
+    },
+    {
+      "key": "3 trigger methods",
+      "value": "① Save Data Page Automation Step in flow (after Assignment). ② Flow Action post-processing. ③ Save-DataPage Activity method."
+    },
+    {
+      "key": "Update vs. Create",
+      "value": "Key present → Lookup (update existing). Key absent → Data Transform (create new)."
+    },
+    {
+      "key": "Auto-populated property + savable Data Page",
+      "value": "Must use 'Refer to Data Page' — NOT Copy. Refer keeps the live connection for the save plan."
+    },
+    {
+      "key": "Multiple SOR commits",
+      "value": "Add multiple Save Data Page Steps to the flow — one per SOR."
+    },
+    {
+      "key": "Explicit vs. Implicit reference",
+      "value": "Explicit = Data Page Name field. Implicit = 'Use associated property' (resolves automatically)."
+    }
+  ]
+}

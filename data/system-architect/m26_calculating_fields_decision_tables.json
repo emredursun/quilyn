@@ -1,0 +1,555 @@
+{
+  "moduleId": "m26",
+  "moduleTitle": "Calculating fields using Decision tables",
+  "moduleUrl": "https://academy.pega.com/module/calculating-fields-using-decision-tables/v6/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/calculating-fields-using-decision-tables/v6/quiz/in/96211",
+  "learningObjectives": [
+    "Explain what a calculated field is and how the calculation network keeps dependent fields current",
+    "Choose among the three App Studio calculation types — Functions, Expressions, and Decision tables — and apply each correctly"
+  ],
+  "estTime": "15 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Calculated values and the calculation network",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Calculation / calculated field",
+          "description": "A calculation sets a field's value based on one or more other fields (e.g., Total = Quantity × Price). The calculated field is read-only — the system owns it. Calculations update automatically when any input field changes."
+        },
+        {
+          "type": "analogy",
+          "text": "A Decision Table is like a tax bracket chart: find the row where your income falls (condition), intersect with the column for your filing status (second condition), and the cell gives your tax rate (result). Pega evaluates exactly the same way — no code, just organized rows of conditions and a corresponding output. When tax law changes, you update the table, not the code."
+        },
+        {
+          "type": "concept",
+          "term": "Where calculated fields live",
+          "description": "Create the calculated field in the Data model of a CASE TYPE or DATA OBJECT, depending on the use case. Configuration includes field name, type (e.g., Currency), and the 'This is a calculated field (read-only)' option."
+        },
+        {
+          "type": "concept",
+          "term": "Calculation network",
+          "description": "A calculated field can be the input to another calculation, creating a dependency chain. Pega resolves the chain in the correct order — downstream fields update automatically when upstream inputs change."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 250\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Calculation network</title>\n<desc>Updating quantity cascades through dependent calculated fields: line total, order total, tax, final charge</desc>\n<text x=\"20\" y=\"26\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">CALCULATION NETWORK — DEPENDENT CALCULATIONS</text>\n<!-- input -->\n<rect x=\"20\" y=\"96\" width=\"110\" height=\"44\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"75\" y=\"114\" font-size=\"11.5\" font-weight=\"700\" fill=\"#5A3200\" text-anchor=\"middle\">Quantity</text>\n<text x=\"75\" y=\"130\" font-size=\"10\" fill=\"#BA7517\" text-anchor=\"middle\">input field</text>\n<!-- arrow -->\n<line x1=\"130\" y1=\"118\" x2=\"168\" y2=\"118\" stroke=\"var(--t)\" stroke-width=\"2\" opacity=\".6\"/>\n<polygon points=\"168,112 180,118 168,124\" fill=\"var(--t)\" opacity=\".6\"/>\n<!-- line total -->\n<rect x=\"182\" y=\"96\" width=\"120\" height=\"44\" rx=\"8\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"242\" y=\"114\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0D3560\" text-anchor=\"middle\">Line total</text>\n<text x=\"242\" y=\"130\" font-size=\"10\" fill=\"#185FA5\" text-anchor=\"middle\">calculated</text>\n<line x1=\"302\" y1=\"118\" x2=\"340\" y2=\"118\" stroke=\"var(--t)\" stroke-width=\"2\" opacity=\".6\"/>\n<polygon points=\"340,112 352,118 340,124\" fill=\"var(--t)\" opacity=\".6\"/>\n<!-- order total -->\n<rect x=\"354\" y=\"96\" width=\"120\" height=\"44\" rx=\"8\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"414\" y=\"114\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0D3560\" text-anchor=\"middle\">Order total</text>\n<text x=\"414\" y=\"130\" font-size=\"10\" fill=\"#185FA5\" text-anchor=\"middle\">calculated</text>\n<line x1=\"474\" y1=\"118\" x2=\"512\" y2=\"118\" stroke=\"var(--t)\" stroke-width=\"2\" opacity=\".6\"/>\n<polygon points=\"512,112 524,118 512,124\" fill=\"var(--t)\" opacity=\".6\"/>\n<!-- tax -->\n<rect x=\"526\" y=\"60\" width=\"110\" height=\"44\" rx=\"8\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"581\" y=\"78\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0D3560\" text-anchor=\"middle\">Tax</text>\n<text x=\"581\" y=\"94\" font-size=\"10\" fill=\"#185FA5\" text-anchor=\"middle\">calculated</text>\n<!-- final charge -->\n<rect x=\"526\" y=\"132\" width=\"130\" height=\"44\" rx=\"8\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"591\" y=\"150\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0E3D28\" text-anchor=\"middle\">Final charge</text>\n<text x=\"591\" y=\"166\" font-size=\"10\" fill=\"#1E8A5B\" text-anchor=\"middle\">calculated</text>\n<line x1=\"474\" y1=\"118\" x2=\"520\" y2=\"82\" stroke=\"var(--t)\" stroke-width=\"1.5\" opacity=\".4\"/>\n<line x1=\"636\" y1=\"96\" x2=\"636\" y2=\"130\" stroke=\"var(--t)\" stroke-width=\"1.5\" opacity=\".4\"/>\n<line x1=\"474\" y1=\"118\" x2=\"520\" y2=\"154\" stroke=\"var(--t)\" stroke-width=\"1.5\" opacity=\".4\"/>\n<rect x=\"20\" y=\"206\" width=\"740\" height=\"30\" rx=\"7\" fill=\"var(--t)\" opacity=\".05\"/>\n<text x=\"390\" y=\"226\" font-size=\"11\" fill=\"var(--t)\" opacity=\".7\" text-anchor=\"middle\">Changing one input field cascades updates through every dependent calculated field automatically.</text>\n</svg>",
+          "caption": "A calculated field can feed another calculation. Pega maintains a calculation network so that updating one input (Quantity) cascades through all dependent calculated fields (Line total → Order total → Tax → Final charge)."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "The three App Studio calculation types",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Functions",
+          "description": "Functions iterate over a data relationship (list) and aggregate values. Supported for Decimal, Currency, and Integer. App Studio provides Sum, Count, Average, Maximum, Minimum."
+        },
+        {
+          "type": "concept",
+          "term": "Expressions",
+          "description": "An expression calculates a field value from a combination of fields, functions, and data relationships. Reference fields with the dot operator (.FieldName). Expressions are evaluated at runtime whenever their inputs change."
+        },
+        {
+          "type": "concept",
+          "term": "Concatenation (text expressions)",
+          "description": "Assembles a string by joining field references and static text with '+'. Example: \"Appraiser \" + .AppraiserID + \" appraised \" + .ItemName + \" at \" + .AppraisedAmount + \".\". Field references are replaced with live values at runtime."
+        },
+        {
+          "type": "concept",
+          "term": "Decision tables",
+          "description": "A Decision table evaluates conditions to return an appropriate result — for example, select a discount percentage based on customer tier. Rows define conditions; the matching row's result is returned. Check 'Evaluate all rows' to return multiple matching results."
+        },
+        {
+          "type": "concept",
+          "term": "Constellation caveat",
+          "description": "Only applications based on CONSTELLATION support the creation of CUSTOM decision tables directly in App Studio. In non-Constellation apps, the Dev Studio decision table (marked as a relevant record) is how you make the logic available to App Studio."
+        },
+        {
+          "type": "interactive",
+          "title": "Pick the calculation type",
+          "height": 440,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Sum across a list\", \"scenario\": \"An online cart must keep an ORDER TOTAL equal to the sum of every line item's cost as customers add, remove, or change items. Which calculation type fits?\", \"opts\": [\"A Function \\u2014 the Sum of function iterates over the list of line items and adds their costs\", \"An Expression \\u2014 reference a single field with the dot operator\", \"A Decision table \\u2014 test conditions to return the total\", \"A When condition \\u2014 return true when the total is reached\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Functions iterate over items in a list; Sum of adds all the line-item costs to produce the order total.\", \"\\u2717 Incorrect. An expression references named fields with the dot operator; it does not iterate over a list of instances to add them up \\u2014 that is a Function.\", \"\\u2717 Incorrect. A Decision table returns a result from logical tests on conditions, not a running sum over a list.\", \"\\u2717 Incorrect. A When condition returns true/false; it is not one of the three App Studio calculation types.\"]}, {\"label\": \"Formula from fields\", \"scenario\": \"Order tax must equal the tax rate multiplied by the order total: .TaxRate * .OrderTotal. Which calculation type is this?\", \"opts\": [\"An Expression \\u2014 it references fields with the dot operator and supports multiplication\", \"A Function \\u2014 Maximum of returns the product of two fields\", \"A Decision table \\u2014 multiplication is a logical test on conditions\", \"Concatenation \\u2014 joining .TaxRate and .OrderTotal produces the tax\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. An expression references fields by name (dot operator) and supports operations like multiplication \\u2014 .TaxRate * .OrderTotal.\", \"\\u2717 Incorrect. Maximum of finds the largest item in a list; it does not multiply two fields.\", \"\\u2717 Incorrect. A Decision table returns a result from conditions; multiplication is an expression operation.\", \"\\u2717 Incorrect. Concatenation assembles TEXT strings, not a numeric product.\"]}, {\"label\": \"Result from conditions\", \"scenario\": \"The interest rate for a loan must be selected from the loan type using a set of logical tests. The app is NOT based on Constellation. How do you make this work in App Studio?\", \"opts\": [\"Build the Decision table in Dev Studio, mark it as a relevant record, then reference it from App Studio\", \"Create a custom Decision table directly in App Studio \\u2014 always available regardless of UI architecture\", \"Use the Sum of function on the loan type list\", \"Use a concatenation expression to join loan type and rate\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Custom Decision tables in App Studio require Constellation. Otherwise, build it in Dev Studio and mark it as a relevant record so App Studio can reference it.\", \"\\u2717 Incorrect. Creating a CUSTOM Decision table directly in App Studio is supported only on Constellation-based applications.\", \"\\u2717 Incorrect. Sum of adds list items \\u2014 it cannot select a rate from the loan type via logical tests.\", \"\\u2717 Incorrect. Concatenation builds text strings; it does not perform conditional rate selection.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=67?'Good \\u2014 review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">THREE APP STUDIO CALCULATION TYPES</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"148\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Calculated Value</text><text x=\"117\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Formula-based expression</text><text x=\"117\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Recomputed every time</text><text x=\"117\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">referenced property changes</text><text x=\"117\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Always read-only</text><text x=\"117\" y=\"136\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Limited to Text, Integer,</text><text x=\"117\" y=\"150\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Double, Date, Boolean types</text><rect x=\"253\" y=\"30\" width=\"215\" height=\"148\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Default Value</text><text x=\"360\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Applied ONCE at Case creation</text><text x=\"360\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Can be overwritten by user</text><text x=\"360\" y=\"104\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Static or expression-based</text><text x=\"360\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Different from Calculated:</text><text x=\"360\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">does not update dynamically</text><rect x=\"496\" y=\"30\" width=\"215\" height=\"148\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Decision Table</text><text x=\"603\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Rule-based lookup table</text><text x=\"603\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Condition rows → result</text><text x=\"603\" y=\"104\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Custom tables need</text><text x=\"603\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Constellation UI</text><text x=\"603\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Traditional: Dev Studio only</text></svg>",
+          "caption": "3 App Studio calculation types: Calculated Value (dynamic, read-only), Default Value (once at creation), Decision Table (rule-based lookup; custom tables need Constellation)."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Three calculation types, not four",
+      "trapDescription": "App Studio allows exactly three calculation types: Functions, Expressions, and Decision tables. Watch for distractors that add 'Decision tree' or 'When' to this list.",
+      "bestPractice": "Memorize all three App Studio calculation types and their use case: Functions (aggregate a list), Expressions (formula on single values), Decision Tables (rule-based lookup)."
+    },
+    {
+      "title": "Functions iterate over a list",
+      "trapDescription": "Functions (Sum/Average/Maximum/Minimum of) operate over items in a data relationship and are supported only for Decimal, Currency, and Integer fields.",
+      "bestPractice": "Use a Function when the value aggregates a list of instances; use an Expression for a formula across named fields."
+    },
+    {
+      "title": "Expression field-type limits",
+      "trapDescription": "Questions ask which field types support formula expressions. Candidates say all types. Expressions are supported only for specific field types (Text, Integer, Double, Date, Boolean) — complex types like Page or Page List cannot use a formula expression directly.",
+      "bestPractice": "Don't expect an expression to compute Email, Phone, or Picklist fields."
+    },
+    {
+      "title": "Concatenation is for text",
+      "trapDescription": "Concatenation joins field references and static text (in quotes) with '+' to build a string — it is a text expression, not numeric math.",
+      "bestPractice": "Use concatenation to assemble comments/labels; use math operators for numeric values."
+    },
+    {
+      "title": "Reuse a Dev Studio table = relevant record",
+      "trapDescription": "To reference a decision table built in Dev Studio from App Studio, you must mark it as a relevant record.",
+      "bestPractice": "Mark the Dev Studio decision table as a relevant record so Citizen Developers can use it in App Studio."
+    },
+    {
+      "title": "Custom App Studio tables need Constellation",
+      "trapDescription": "A question asks whether custom Decision Tables can be created and managed in App Studio for Traditional UI applications. Candidates say yes. App Studio's Decision Table management (custom tables) requires Constellation UI — Traditional UI applications must use Dev Studio for Decision Tables.",
+      "bestPractice": "On non-Constellation apps, build the table in Dev Studio (relevant record) and reference it."
+    },
+    {
+      "title": "Calculated fields are read-only and networked",
+      "trapDescription": "A calculated field is read-only and recalculates whenever an input changes; Pega's calculation network cascades updates to all dependent calculated fields.",
+      "bestPractice": "Don't expect users to edit a calculated field or to trigger a manual recalculate."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m26_q01",
+      "type": "single-select",
+      "scenario": "A Business Architect asks an SA to explain how Pega automatically computes field values that depend on other fields — for example, a total invoice amount derived from line items. What is a calculated field in Pega Platform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A field whose value is set automatically from one or more input fields and recalculates whenever an input changes"
+        },
+        {
+          "id": "B",
+          "text": "A free-text field the user types into and then locks manually"
+        },
+        {
+          "id": "C",
+          "text": "A field that stores the result of a Service-Level Agreement timer"
+        },
+        {
+          "id": "D",
+          "text": "A field used only to route assignments to a Work Queue"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Calculated fields derive their value from inputs and recalculate automatically on change.",
+      "rationale": "A calculation expresses a relationship between fields, setting a calculated field's value from input fields; it recalculates whenever an input updates and is read-only. B, C, and D do not describe a calculated field."
+    },
+    {
+      "questionId": "m26_q02",
+      "type": "single-select",
+      "scenario": "An SA is reviewing the options available for configuring Calculated Value fields in App Studio and a junior developer asks what types of calculation logic are supported. Which three calculation types does App Studio provide when configuring a Calculated Value field?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Functions, Expressions, and Decision tables"
+        },
+        {
+          "id": "B",
+          "text": "Expressions, Decision tables, and Decision trees"
+        },
+        {
+          "id": "C",
+          "text": "Functions, When conditions, and Decision trees"
+        },
+        {
+          "id": "D",
+          "text": "Data transforms, Activities, and Expressions"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Calculated fields are sourced from Functions, Expressions, or Decision tables in the Data Model.",
+      "rationale": "App Studio allows three calculation types: Functions, Expressions, and Decision tables. The other options mix in items (Decision trees, When conditions, Data transforms, Activities) that are not the App Studio calculation types."
+    },
+    {
+      "questionId": "m26_q03",
+      "type": "single-select",
+      "scenario": "What do Functions iterate over, and which field types do they support?",
+      "options": [
+        {
+          "id": "A",
+          "text": "They iterate over items in a data relationship (a list) and support Decimal, Currency, and Integer field types"
+        },
+        {
+          "id": "B",
+          "text": "They iterate over rows of a Decision table and support Text and Date types"
+        },
+        {
+          "id": "C",
+          "text": "They iterate over Stages in a Case and support any field type"
+        },
+        {
+          "id": "D",
+          "text": "They iterate over Access Roles and support Boolean fields only"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall what data structure Functions iterate over and which numeric field types they support.",
+      "rationale": "Functions iterate over items in a data relationship and are supported for Decimal, Currency, and Integer field types. The other options misstate both what they iterate over and the supported types."
+    },
+    {
+      "questionId": "m26_q04",
+      "type": "single-select",
+      "scenario": "An online retailer must keep a shopping-cart order total updated as customers add, remove, or change item quantities. Which function calculates the order total?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Sum of — adds all items in the specified property instances"
+        },
+        {
+          "id": "B",
+          "text": "Average of — calculates the average value of all instances"
+        },
+        {
+          "id": "C",
+          "text": "Maximum of — determines the largest value of all instances"
+        },
+        {
+          "id": "D",
+          "text": "Minimum of — determines the smallest value of all instances"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which calculation function adds all values in a list of property instances to produce a running total?",
+      "rationale": "Sum of adds all items in the specified property instances — exactly what an order total needs. Average of, Maximum of, and Minimum of compute the average, largest, and smallest values respectively."
+    },
+    {
+      "questionId": "m26_q05",
+      "type": "single-select",
+      "scenario": "A retailer lets a customer apply the single most valuable promotional discount from a list of submitted codes. Which function identifies it?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Maximum of — determines the largest value among the discounts"
+        },
+        {
+          "id": "B",
+          "text": "Minimum of — determines the smallest value among the discounts"
+        },
+        {
+          "id": "C",
+          "text": "Sum of — adds all the discounts together"
+        },
+        {
+          "id": "D",
+          "text": "Average of — averages the discounts"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which calculation function returns the single largest value from a list of property instances?",
+      "rationale": "Maximum of determines the largest value in the list, which is the most valuable discount. Minimum of would pick the smallest, Sum of adds them, and Average of averages them — none of which gives the single most valuable discount."
+    },
+    {
+      "questionId": "m26_q06",
+      "type": "single-select",
+      "scenario": "In an expression, how do you reference a field, and what does the symbol provide?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The dot operator ('.') references a field by name and lists the fields available in the current Case context"
+        },
+        {
+          "id": "B",
+          "text": "The at symbol ('@') references a field and lists all Access Roles"
+        },
+        {
+          "id": "C",
+          "text": "The hash symbol ('#') references a field and lists every Ruleset version"
+        },
+        {
+          "id": "D",
+          "text": "The slash ('/') references a field and lists the Case Stages"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall the symbol used to reference a field by name within a Pega expression.",
+      "rationale": "Expressions reference fields by name using the dot operator ('.'), which lists the fields available in the current Case context; for a data-relationship field you prefix it with the property/list name. The other symbols are not used this way."
+    },
+    {
+      "questionId": "m26_q07",
+      "type": "single-select",
+      "scenario": "A BA is setting up calculated fields in a Data Model and needs to know which field types do not support expressions. For which Simple field types can you NOT define an expression in Pega Platform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Email, Phone, and Picklist"
+        },
+        {
+          "id": "B",
+          "text": "Decimal, Currency, and Integer"
+        },
+        {
+          "id": "C",
+          "text": "Text, Date, and DateTime"
+        },
+        {
+          "id": "D",
+          "text": "Boolean, Text, and Currency"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Identify the three Simple field types that cannot have an expression calculation applied to them.",
+      "rationale": "Pega allows expressions on most Simple field types — including Text, Integer, Decimal, Currency, Date, DateTime, and Boolean. The three exceptions are Email, Phone, and Picklist fields, which cannot use calculated expressions. Remembering these three exceptions is a common exam topic because they are the only Simple types excluded from expression support."
+    },
+    {
+      "questionId": "m26_q08",
+      "type": "single-select",
+      "scenario": "An appraisal firm wants a comment like 'Appraiser 04795AD appraised Silver platter at a value of USD 350.' assembled from field values and static text. Which expression technique is this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Concatenation — combine field references with static text in quotation marks using '+'"
+        },
+        {
+          "id": "B",
+          "text": "A Sum of function over the text fields"
+        },
+        {
+          "id": "C",
+          "text": "A Decision table that returns the full sentence"
+        },
+        {
+          "id": "D",
+          "text": "A Boolean AND expression that joins the fields"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Joining text + fields with quotes and '+'.",
+      "rationale": "Concatenation assembles a text string by combining field references with static text (in quotation marks) joined with '+'; each reference is replaced with its current value at run time. A Sum function adds numbers, a Decision table returns a conditional result, and Boolean AND is a logical operation — none assembles the string."
+    },
+    {
+      "questionId": "m26_q09",
+      "type": "single-select",
+      "scenario": "Setting a loan's interest rate by evaluating the loan type against a set of logical tests is best implemented with which calculation type?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Decision table — it evaluates fields with logical tests to return an appropriate result"
+        },
+        {
+          "id": "B",
+          "text": "A Function — Sum of returns the interest rate from the loan type"
+        },
+        {
+          "id": "C",
+          "text": "An Expression — multiply the loan type by a coefficient"
+        },
+        {
+          "id": "D",
+          "text": "Concatenation — join the loan type and a default rate"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Returning a result based on conditions tested against property values = Decision table.",
+      "rationale": "A Decision table evaluates one or more fields with logical tests (conditions) to return an appropriate result, such as an interest rate from a loan type. Functions aggregate lists, expressions compute formulas, and concatenation builds text — none selects a result from conditions."
+    },
+    {
+      "questionId": "m26_q10",
+      "type": "single-select",
+      "scenario": "A System Architect built a decision table in Dev Studio. What must be done so a Citizen Developer can reference it in App Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Mark the decision table as a relevant record"
+        },
+        {
+          "id": "B",
+          "text": "Lock the Ruleset version that contains the table"
+        },
+        {
+          "id": "C",
+          "text": "Assign the table to an Access Role"
+        },
+        {
+          "id": "D",
+          "text": "Add the table to a Work Queue"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What must a developer do to a Dev Studio rule before citizen developers can reference it in App Studio?",
+      "rationale": "To reuse a Dev Studio decision table in App Studio, you must mark it as a relevant record. Locking a Ruleset, assigning an Access Role, or adding it to a Work Queue do not expose the table to App Studio."
+    },
+    {
+      "questionId": "m26_q11",
+      "type": "single-select",
+      "scenario": "Under what condition can a custom decision table be created directly in App Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Only when the application is based on Constellation"
+        },
+        {
+          "id": "B",
+          "text": "Always — App Studio supports custom decision tables in every application"
+        },
+        {
+          "id": "C",
+          "text": "Only when the user has a System Architect Access Role"
+        },
+        {
+          "id": "D",
+          "text": "Only when the Ruleset is unlocked in Dev Studio"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which UI architecture is required for creating custom decision tables directly in App Studio?",
+      "rationale": "Only applications based on Constellation support creating custom decision tables directly in App Studio. Otherwise the table is built in Dev Studio and marked as a relevant record."
+    },
+    {
+      "questionId": "m26_q12",
+      "type": "multi-select",
+      "scenario": "An SA is explaining the calculation network to a developer building a loan application where interest rate depends on credit score, and monthly payment depends on the interest rate. Which TWO statements correctly describe how the calculation network works in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A calculated field can serve as the input to another calculation, creating dependent calculations"
+        },
+        {
+          "id": "B",
+          "text": "When a value changes, Pega updates all relevant dependent calculated fields automatically"
+        },
+        {
+          "id": "C",
+          "text": "The user must manually recalculate each dependent field after changing an input"
+        },
+        {
+          "id": "D",
+          "text": "Calculated fields are stored only in Access Roles, not in the data model"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Consider whether a calculated field can serve as input to another calculation — what happens then?",
+      "rationale": "A calculated field can feed another calculation (A), and Pega's calculation network updates all relevant fields automatically when a value changes (B). C is wrong because the cascade is automatic, and D is wrong because calculated fields live in the Data model of a Case Type or data object, not in Access Roles.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m26_q13",
+      "type": "multi-select",
+      "scenario": "An SA is recommending a calculation approach for an insurance application where premium rate depends on age brackets and coverage type. Which TWO statements correctly describe when a Decision table is the appropriate calculation type?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Decision table is appropriate when the calculated value depends on evaluating discrete input ranges or categories that map to specific output values"
+        },
+        {
+          "id": "B",
+          "text": "Decision tables support multiple simultaneous input conditions that must all be evaluated to determine the returned value"
+        },
+        {
+          "id": "C",
+          "text": "A Decision table is the best choice when the calculation is a simple arithmetic formula such as price multiplied by quantity"
+        },
+        {
+          "id": "D",
+          "text": "Decision tables can only return numeric values and cannot be used to return text or date outputs"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Decision tables excel at condition-to-outcome mappings with multiple input columns — not simple formulas.",
+      "rationale": "Decision tables are designed for scenarios where discrete ranges or category combinations of inputs map to specific outputs — like age bracket plus coverage type mapping to a premium rate. They support multiple condition columns evaluated simultaneously. Simple arithmetic is better handled by an Expression, and Decision tables can return any data type including text."
+    },
+    {
+      "questionId": "m26_q14",
+      "type": "multi-select",
+      "scenario": "A developer is choosing between calculation types in App Studio for a set of derived fields in a loan application. Which TWO calculation types are directly available in App Studio for configuring a Calculated Value field?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Functions — built-in or custom mathematical or string operations applied to one or more input fields"
+        },
+        {
+          "id": "B",
+          "text": "Decision tables — condition-outcome mappings that return a value based on evaluated field inputs"
+        },
+        {
+          "id": "C",
+          "text": "Machine Learning model — a predictive model trained on historical Case data to forecast the field value"
+        },
+        {
+          "id": "D",
+          "text": "Direct SQL query — a raw database query executed against the Pega schema to compute the field value"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "App Studio offers three calculation types: Functions, Expressions, and Decision tables — no ML or SQL.",
+      "rationale": "App Studio provides three calculation types for Calculated Value fields: Functions (built-in operations like @Sum or @Abs), Expressions (formula-based arithmetic), and Decision tables (condition-outcome mappings). Machine Learning models and direct SQL queries are not available as Calculated Value types in App Studio."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Calculated field",
+      "value": "Value derived from input fields; read-only; recalculates whenever an input changes. Created in the Data model of a Case Type or data object."
+    },
+    {
+      "key": "Calculation network",
+      "value": "A calculated field can input another calculation; Pega cascades updates through all dependent calculated fields automatically."
+    },
+    {
+      "key": "Three types",
+      "value": "Functions · Expressions · Decision tables (the App Studio calculation types)."
+    },
+    {
+      "key": "Functions",
+      "value": "Iterate over a list: Sum / Average / Maximum / Minimum of. Decimal, Currency, Integer only."
+    },
+    {
+      "key": "Expressions",
+      "value": "Reference fields via dot operator; +, −, ×, ÷, parens, Boolean AND/OR. Any Simple field except Email, Phone, Picklist. Text via concatenation."
+    },
+    {
+      "key": "Decision tables",
+      "value": "Return a result from logical tests on fields (e.g. loan type → rate). Reuse a Dev Studio table by marking it a relevant record."
+    },
+    {
+      "key": "Constellation caveat",
+      "value": "Custom decision tables in App Studio require a Constellation-based app."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Decision tables",
+      "url": "https://academy.pega.com/topic/decision-tables/v5/in/96211/67251",
+      "duration": "20 min"
+    }
+  ]
+}

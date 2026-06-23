@@ -1,0 +1,588 @@
+{
+  "moduleId": "m32",
+  "moduleTitle": "Pausing and resuming Case processing",
+  "moduleUrl": "https://academy.pega.com/module/pausing-and-resuming-case-processing/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/pausing-and-resuming-case-processing/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Explain the role of dependencies in Case management",
+    "Differentiate between the Case Dependency and Timer wait types",
+    "Distinguish between a deliberate Wait Step and a delay caused by awaiting user action"
+  ],
+  "estTime": "15 min",
+  "topics": [
+    {
+      "title": "Case workflow dependency",
+      "url": "https://academy.pega.com/topic/case-workflow-dependency/v6/in/72681/66901/67076",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Wait Step — Overview",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Wait Step",
+          "description": "An automation shape that deliberately pauses Case processing and resumes it when defined conditions are met. Two Wait types: Case Dependency and Timer. Added to a Process in the Case Life Cycle like any other automation Step."
+        },
+        {
+          "type": "analogy",
+          "text": "Think of the Wait Step as a red traffic light in the middle of your workflow — it deliberately stops the car (Case) until the condition changes (light turns green). Sitting in traffic waiting for a slow pedestrian to cross is NOT the same — that's a user-action delay, not a red light (Wait Step)."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox='0 0 700 195' xmlns='http://www.w3.org/2000/svg' style='width:100%;font-family:system-ui,sans-serif'><text x='350' y='20' text-anchor='middle' style='fill:var(--pa-ink);font-size:13px;font-weight:700'>Wait Step — Two Types</text><rect x='8' y='32' width='332' height='155' rx='10' style='fill:var(--pa-surface-2);stroke:var(--pa-brand);stroke-width:1.5'/><text x='174' y='54' text-anchor='middle' style='fill:var(--pa-brand);font-size:12px;font-weight:700'>Case Dependency</text><line x1='8' y1='62' x2='340' y2='62' style='stroke:var(--pa-brand);stroke-width:0.5;opacity:0.4'/><rect x='20' y='75' width='88' height='30' rx='6' style='fill:var(--pa-surface-3);stroke:var(--pa-brand);stroke-width:1'/><text x='64' y='95' text-anchor='middle' style='fill:var(--pa-ink);font-size:10px;font-weight:600'>Parent Case</text><rect x='126' y='75' width='76' height='30' rx='6' style='fill:var(--pa-warn-bg);stroke:var(--pa-warn);stroke-width:1.5'/><text x='164' y='88' text-anchor='middle' style='fill:var(--pa-warn);font-size:10px;font-weight:700'>Wait Step</text><text x='164' y='100' text-anchor='middle' style='fill:var(--pa-warn);font-size:9px'>⏸ paused</text><rect x='222' y='75' width='106' height='30' rx='6' style='fill:var(--pa-ok-bg);stroke:var(--pa-ok);stroke-width:1'/><text x='275' y='88' text-anchor='middle' style='fill:var(--pa-ok);font-size:10px'>Child Case</text><text x='275' y='100' text-anchor='middle' style='fill:var(--pa-ok);font-size:10px'>resolves ✓</text><line x1='108' y1='90' x2='126' y2='90' style='stroke:var(--pa-muted);stroke-width:1.5'/><polygon points='124,86 132,90 124,94' style='fill:var(--pa-muted)'/><line x1='202' y1='90' x2='222' y2='90' style='stroke:var(--pa-ok);stroke-width:1.5;stroke-dasharray:4,3'/><polygon points='220,86 228,90 220,94' style='fill:var(--pa-ok)'/><text x='174' y='130' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Waits for child Case to reach</text><text x='174' y='145' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:10px;font-weight:600'>&apos;To be resolved&apos; or &apos;Resolved&apos;</text><text x='174' y='175' text-anchor='middle' style='fill:var(--pa-faint);font-size:9px'>Requires parent-child relationship</text><rect x='360' y='32' width='332' height='155' rx='10' style='fill:var(--pa-surface-2);stroke:var(--pa-brand-3);stroke-width:1.5'/><text x='526' y='54' text-anchor='middle' style='fill:var(--pa-brand-3);font-size:12px;font-weight:700'>Timer</text><line x1='360' y1='62' x2='692' y2='62' style='stroke:var(--pa-brand-3);stroke-width:0.5;opacity:0.4'/><rect x='374' y='75' width='76' height='30' rx='6' style='fill:var(--pa-warn-bg);stroke:var(--pa-warn);stroke-width:1.5'/><text x='412' y='88' text-anchor='middle' style='fill:var(--pa-warn);font-size:10px;font-weight:700'>Wait Step</text><text x='412' y='100' text-anchor='middle' style='fill:var(--pa-warn);font-size:9px'>⏸ paused</text><rect x='466' y='68' width='168' height='20' rx='4' style='fill:var(--pa-surface-3);stroke:var(--pa-brand-3);stroke-width:1'/><text x='550' y='82' text-anchor='middle' style='fill:var(--pa-brand-3);font-size:10px'>Set date/time interval (fixed hrs/min)</text><rect x='466' y='95' width='168' height='20' rx='4' style='fill:var(--pa-surface-3);stroke:var(--pa-brand-3);stroke-width:1'/><text x='550' y='109' text-anchor='middle' style='fill:var(--pa-brand-3);font-size:10px'>Reference date/time (field value)</text><line x1='450' y1='78' x2='466' y2='78' style='stroke:var(--pa-brand-3);stroke-width:1'/><line x1='450' y1='78' x2='450' y2='105' style='stroke:var(--pa-brand-3);stroke-width:1'/><line x1='450' y1='105' x2='466' y2='105' style='stroke:var(--pa-brand-3);stroke-width:1'/><text x='526' y='140' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Example: pause 24h for photo upload</text><text x='526' y='155' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>or until verification date is reached</text><text x='526' y='175' text-anchor='middle' style='fill:var(--pa-faint);font-size:9px'>No parent-child relationship needed</text></svg>",
+          "caption": "Case Dependency: parent Case waits for child Case status. Timer: Case waits for a time interval or specific date/time."
+        }
+      ],
+      "bulletPoints": [
+        "Wait Step = deliberate pause in Case processing. Two types: Case Dependency and Timer.",
+        "Added to a Process in the Case Life Cycle as an automation shape."
+      ]
+    },
+    {
+      "sectionTitle": "Case Dependency Wait Type",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Case Dependency — how it works",
+          "description": "Pauses a PARENT Case until a child Case dependency resolves. Add the Wait Step to the parent; when reached, it pauses until the child reaches the specified status. Requires a hierarchical parent-child Case relationship."
+        },
+        {
+          "type": "concept",
+          "term": "Child Case status triggers",
+          "description": "Two valid triggers: 'To be resolved' or 'Resolved'. Configure whether to check the child's status at the moment the parent reaches the Wait Step, or only track status changes that occur after that point."
+        },
+        {
+          "type": "concept",
+          "term": "Cancelling the wait",
+          "description": "You can allow users to cancel the wait conditions and continue processing the parent Case without waiting for the child to resolve."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m32-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">CASE DEPENDENCY WAIT — RULES &amp; STRUCTURE</text><rect x=\"10\" y=\"30\" width=\"700\" height=\"46\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Wait Step placed on PARENT case — waits until child reaches trigger status</text><text x=\"360\" y=\"68\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Requires formal parent-child relationship — cannot use between unrelated cases</text><rect x=\"10\" y=\"90\" width=\"340\" height=\"100\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"175\" y=\"112\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Trigger Status Options (exactly 2)</text><text x=\"175\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"600\">\"To be resolved\" — child still open</text><text x=\"175\" y=\"154\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"600\">\"Resolved\" — child closed</text><text x=\"175\" y=\"176\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"9\" font-weight=\"600\">No custom status values allowed</text><rect x=\"370\" y=\"90\" width=\"340\" height=\"100\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"540\" y=\"112\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Wait Types (exactly 2 total)</text><text x=\"540\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Timer — time-based (interval or date)</text><text x=\"540\" y=\"152\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Case Dependency — status-based</text><text x=\"540\" y=\"174\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"9\" font-weight=\"600\">No other Wait types exist</text></svg>",
+          "caption": "Case Dependency Wait Step on PARENT; 2 trigger statuses (To be resolved / Resolved); exactly 2 Wait types total (Timer + Case Dependency)."
+        }
+      ],
+      "bulletPoints": [
+        "Wait Step goes on the PARENT Case — not the child.",
+        "Trigger statuses: 'To be resolved' OR 'Resolved'.",
+        "Configurable: check child's CURRENT status OR watch for FUTURE status changes.",
+        "Prerequisite: parent-child Case relationship must exist.",
+        "Users can optionally be allowed to cancel the wait and continue."
+      ]
+    },
+    {
+      "sectionTitle": "Timer Wait Type",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Timer — two configurations",
+          "description": "Pauses a Case until a time condition is met. Two options: (1) Set date/time interval — pause for a fixed duration (e.g., 24 hours). (2) Reference date/time — pause until a specific date/time stored in a Case field is reached."
+        },
+        {
+          "type": "concept",
+          "term": "Timer use cases",
+          "description": "Example 1 (fixed interval): pause 24 hours for photo upload before review. Example 2 (reference date): pause until end-of-day for fund valuation. Example 3 (regulatory): pause exactly 72 hours before final review."
+        }
+      ],
+      "bulletPoints": [
+        "Timer option 1: fixed interval — specific hours/minutes.",
+        "Timer option 2: reference date/time — pause until a date/time field value is reached.",
+        "No parent-child relationship required.",
+        "Common use: waiting for time-based conditions (SLA windows, processing cutoffs, upload deadlines)."
+      ]
+    },
+    {
+      "sectionTitle": "Wait Step vs. User Action Delay",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Critical distinction",
+          "description": "A Wait Step is a DELIBERATELY configured automation that pauses Case processing. A user action delay is when Case processing stalls because a user has not completed an Assignment — NOT a Wait Step. These are completely different concepts."
+        },
+        {
+          "type": "concept",
+          "term": "User action delay examples",
+          "description": "A Case that appears paused because a user hasn't acted on an Assignment or submitted required data. NOT a configured Wait Step — just the natural flow of waiting for human action. Examples: awaiting manager approval, or uploading photos."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox='0 0 700 160' xmlns='http://www.w3.org/2000/svg' style='width:100%;font-family:system-ui,sans-serif'><text x='350' y='20' text-anchor='middle' style='fill:var(--pa-ink);font-size:13px;font-weight:700'>Wait Step vs. User Action Delay</text><rect x='8' y='30' width='332' height='122' rx='10' style='fill:var(--pa-ok-bg);stroke:var(--pa-ok);stroke-width:1.5'/><text x='174' y='52' text-anchor='middle' style='fill:var(--pa-ok);font-size:12px;font-weight:700'>Wait Step (deliberate)</text><line x1='8' y1='60' x2='340' y2='60' style='stroke:var(--pa-ok);stroke-width:0.5;opacity:0.5'/><text x='174' y='80' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:11px'>Configured in the Process flow</text><text x='174' y='98' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:11px'>Case Dependency or Timer</text><text x='174' y='116' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Ex: pause 24h for photo upload deadline</text><text x='174' y='134' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Ex: pause until child Case resolves</text><rect x='360' y='30' width='332' height='122' rx='10' style='fill:var(--pa-warn-bg);stroke:var(--pa-warn);stroke-width:1.5'/><text x='526' y='52' text-anchor='middle' style='fill:var(--pa-warn);font-size:12px;font-weight:700'>User Action Delay (incidental)</text><line x1='360' y1='60' x2='692' y2='60' style='stroke:var(--pa-warn);stroke-width:0.5;opacity:0.5'/><text x='526' y='80' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:11px'>Case waiting for user to complete</text><text x='526' y='98' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:11px'>an Assignment Step</text><text x='526' y='116' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Ex: manager hasn&apos;t approved expense report</text><text x='526' y='134' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Ex: user hasn&apos;t submitted accident photos</text></svg>",
+          "caption": "Wait Step = intentional process configuration. User action delay = Case waiting on a human — not the same thing."
+        }
+      ],
+      "bulletPoints": [
+        "Wait Step = deliberate. Configured by SA as an automation shape in the Process.",
+        "User action delay = incidental. Case is waiting for a human to complete their Assignment.",
+        "Manager not approving = user action delay (NOT Wait Step).",
+        "User not submitting photos = user action delay (NOT Wait Step)."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Case Dependency Wait Step goes on the PARENT — not the child",
+      "trapDescription": "Questions ask where the Case Dependency Wait Step is placed. Candidates say 'on the child case.' The Wait Step is placed on the PARENT case — it makes the parent wait until the child case reaches the specified status before continuing.",
+      "bestPractice": "The Wait Step is added to the PARENT Case. The parent pauses at the Wait Step and waits for the child Case to reach the specified status."
+    },
+    {
+      "title": "Case Dependency requires a parent-child relationship",
+      "trapDescription": "A question asks whether Case Dependency can be used between two unrelated cases. Candidates say yes. Case Dependency Wait Steps require a formal parent-child relationship — unrelated cases cannot use this mechanism.",
+      "bestPractice": "A hierarchical parent-child Case relationship MUST exist. Case Dependency cannot be used between unrelated Cases."
+    },
+    {
+      "title": "Child Case trigger statuses: ONLY 'To be resolved' or 'Resolved'",
+      "trapDescription": "Questions ask which child case status values can trigger a Case Dependency Wait Step to complete. Candidates name specific statuses like 'Closed-Resolved.' Only two options are valid: 'To be resolved' (any open status) or 'Resolved' (any resolved status) — no custom status values.",
+      "bestPractice": "Only 'To be resolved' or 'Resolved' are valid statuses that trigger the parent Case to resume."
+    },
+    {
+      "title": "Waiting for user action is NOT a Wait Step",
+      "trapDescription": "A question describes a case waiting for a user to complete an Assignment and asks which Wait type is used. Candidates say 'Wait for user action.' Waiting for user action is handled by an Assignment step, not a Wait Step — Wait Steps handle time delays and case dependencies.",
+      "bestPractice": "A user action delay (manager hasn't approved, user hasn't submitted photos) is NOT a Wait Step — it's a Case waiting for a user to complete an Assignment. A Wait Step is a deliberate, configured automation shape."
+    },
+    {
+      "title": "Timer has TWO configurations: interval OR reference date",
+      "trapDescription": "Questions ask how many ways a Timer Wait Step can be configured. Candidates say one (fixed interval). A Timer Wait can be set as a fixed interval (e.g., 3 days from now) OR relative to a date property on the clipboard — both configurations are available.",
+      "bestPractice": "Timer supports: (1) fixed interval (hours/minutes) and (2) reference date/time — pausing until a specific date/time field value is reached."
+    },
+    {
+      "title": "Case Dependency can check current OR future child status",
+      "trapDescription": "A question asks whether Case Dependency triggers only when the child reaches its final status. Candidates say yes. Case Dependency can monitor 'To be resolved' (which triggers while the child is still open) or 'Resolved' (triggers at closure) — both are valid trigger points.",
+      "bestPractice": "You can configure Case Dependency to check the child Case's current status at the moment the parent reaches the Wait Step, OR to watch only for status changes that occur afterward."
+    },
+    {
+      "title": "Exactly TWO Wait types — no others",
+      "trapDescription": "Questions ask how many Wait types are available. Candidates list three or more. There are exactly two Wait Step types in Pega: Timer (time-based) and Case Dependency (status-based) — no other Wait types exist.",
+      "bestPractice": "There are exactly two Wait types: Case Dependency and Timer. No others exist."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m32_q01",
+      "type": "single-select",
+      "scenario": "An auto insurance parent Case must pause until the 'Vehicle Damage' child Case is resolved. Which Wait type should the SA configure?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case Dependency — pauses the parent Case until the child Case reaches a specified status"
+        },
+        {
+          "id": "B",
+          "text": "Timer — sets a fixed interval for the parent to wait before resuming"
+        },
+        {
+          "id": "C",
+          "text": "Condition — pauses the parent Case until a property value changes"
+        },
+        {
+          "id": "D",
+          "text": "Assignment — routes the parent Case to a manager to confirm child completion"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Waiting for a child Case status = Case Dependency.",
+      "rationale": "Case Dependency pauses a parent Case until a child Case reaches a specified status. Timer is time-based, not status-based. Condition and Assignment are not Wait types."
+    },
+    {
+      "questionId": "m32_q02",
+      "type": "single-select",
+      "scenario": "An SA is configuring a Case Dependency Wait Step. Where should the Wait Step be added?",
+      "options": [
+        {
+          "id": "A",
+          "text": "To the parent Case — the parent pauses and waits for the child Case"
+        },
+        {
+          "id": "B",
+          "text": "To the child Case — the child signals the parent when it resolves"
+        },
+        {
+          "id": "C",
+          "text": "To both Cases — both must have matching Wait Steps"
+        },
+        {
+          "id": "D",
+          "text": "To a separate monitoring flow rule that watches both Cases"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The Wait Step pauses the Case it's added to — which Case needs to pause?",
+      "rationale": "The Wait Step is added to the PARENT Case — the parent pauses at the Wait Step until the child Case's status condition is met. The child has no Wait Step for this purpose."
+    },
+    {
+      "questionId": "m32_q03",
+      "type": "single-select",
+      "scenario": "A Case Dependency Wait Step is configured on a parent Case. Which child Case statuses can trigger the parent to resume?",
+      "options": [
+        {
+          "id": "A",
+          "text": "'To be resolved' or 'Resolved'"
+        },
+        {
+          "id": "B",
+          "text": "'Completed' or 'Closed'"
+        },
+        {
+          "id": "C",
+          "text": "'Approved' or 'Rejected'"
+        },
+        {
+          "id": "D",
+          "text": "Any status change on the child Case"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Only two specific child Case statuses are documented as valid Wait Step triggers.",
+      "rationale": "A Case Dependency Wait Step in Pega resumes the parent Case when the child or linked Case reaches one of two specific statuses: 'To be resolved' or 'Resolved.' Other intuitive-sounding statuses — such as 'Completed,' 'Closed,' 'Approved,' and 'Rejected' — are not valid triggers for Case Dependency and will not release the Wait Step."
+    },
+    {
+      "questionId": "m32_q04",
+      "type": "single-select",
+      "scenario": "An SA wants to use Case Dependency between two Cases that have no parent-child relationship. Is this possible?",
+      "options": [
+        {
+          "id": "A",
+          "text": "No — Case Dependency requires a hierarchical parent-child relationship"
+        },
+        {
+          "id": "B",
+          "text": "Yes — Case Dependency works between any two Cases in the application"
+        },
+        {
+          "id": "C",
+          "text": "Yes — but only if both Cases are the same Case Type"
+        },
+        {
+          "id": "D",
+          "text": "No — but Timer can be used as a workaround for unrelated Cases"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A hierarchical parent-child Case relationship must exist before the Wait Step can be configured.",
+      "rationale": "A parent-child hierarchical relationship MUST exist for Case Dependency. It cannot link unrelated Cases. D is an incorrect workaround — Timer waits for time, not another Case's status."
+    },
+    {
+      "questionId": "m32_q05",
+      "type": "single-select",
+      "scenario": "A regulatory compliance Case must pause for exactly 72 hours before final review. No other Cases are involved. Which Wait type is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Timer — with a fixed interval of 72 hours"
+        },
+        {
+          "id": "B",
+          "text": "Case Dependency — pause until a review child Case reaches 'Resolved'"
+        },
+        {
+          "id": "C",
+          "text": "Case Dependency — configured with a 72-hour timeout on the child Case"
+        },
+        {
+          "id": "D",
+          "text": "Timer — with a reference date/time set to 72 hours from now"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Fixed time interval, no other Cases involved = Timer with fixed interval.",
+      "rationale": "A 72-hour fixed pause with no child Case involved uses the Timer wait type with fixed interval. Case Dependency waits for child Case status, not a duration. D is less direct — reference date/time is for a specific date value in a field."
+    },
+    {
+      "questionId": "m32_q06",
+      "type": "single-select",
+      "scenario": "A loan application Case must pause until the applicant's employment verification date — stored in a Case field — is reached. Which configuration is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Timer — reference date/time pointing to the employment verification date field"
+        },
+        {
+          "id": "B",
+          "text": "Timer — fixed interval calculated manually to match the verification date"
+        },
+        {
+          "id": "C",
+          "text": "Case Dependency — wait for the verification child Case to reach 'Resolved'"
+        },
+        {
+          "id": "D",
+          "text": "Case Dependency — the verification date field automatically triggers resumption"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Pause until a specific date/time stored in a field = Timer reference date/time.",
+      "rationale": "When the resume trigger is a specific date/time stored in a Case field, use Timer with reference date/time. B calculates a fixed interval — this is less direct and error-prone. C and D incorrectly use Case Dependency for a time-based pause."
+    },
+    {
+      "questionId": "m32_q07",
+      "type": "single-select",
+      "scenario": "A manager has not yet approved an expense report. The Case is waiting. Which type of pause is this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A user action delay — the Case is waiting for a user to complete an Assignment, not a Wait Step"
+        },
+        {
+          "id": "B",
+          "text": "A Case Dependency Wait Step waiting for the approval child Case"
+        },
+        {
+          "id": "C",
+          "text": "A Timer Wait Step enforcing the approval deadline"
+        },
+        {
+          "id": "D",
+          "text": "Both a user action delay AND a Case Dependency Wait Step simultaneously"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Waiting for a manager to complete their Assignment ≠ Wait Step.",
+      "rationale": "The Case is waiting for a user to complete an Assignment (Approve/Reject Step). This is a normal user action delay, not a deliberately configured Wait Step. B, C, and D all misclassify this."
+    },
+    {
+      "questionId": "m32_q08",
+      "type": "single-select",
+      "scenario": "A user has not yet submitted accident photos in the Create Stage of an auto claims Case. The Case is on hold. What type of pause is this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A user action delay — the Case awaits completion of a 'Collect photos' Assignment Step"
+        },
+        {
+          "id": "B",
+          "text": "A Timer Wait Step pausing until the photo upload deadline"
+        },
+        {
+          "id": "C",
+          "text": "A Case Dependency Wait Step waiting for a photo review child Case"
+        },
+        {
+          "id": "D",
+          "text": "A guardrail violation — Cases cannot pause in the Create Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The user hasn't completed their Assignment — that's not a Wait Step.",
+      "rationale": "The Case is delayed because the user hasn't completed the 'Collect photos' Assignment — this is a user action delay. B, C, and D all incorrectly apply Wait Step logic."
+    },
+    {
+      "questionId": "m32_q09",
+      "type": "multi-select",
+      "scenario": "Which TWO are valid Wait types for the Pega Platform Wait Step?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case Dependency"
+        },
+        {
+          "id": "B",
+          "text": "Timer"
+        },
+        {
+          "id": "C",
+          "text": "User Action"
+        },
+        {
+          "id": "D",
+          "text": "Condition"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "selectCount": 2,
+      "hint": "Pega documents exactly two types of Wait Step configurations — recall both.",
+      "rationale": "Case Dependency and Timer are the only two Wait types. User Action and Condition are not Wait types — they describe other concepts in Pega."
+    },
+    {
+      "questionId": "m32_q10",
+      "type": "single-select",
+      "scenario": "A child Case was already 'Resolved' before the parent Case reached the Wait Step. How can the SA ensure the parent Case still resumes automatically?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Configure the Case Dependency Wait Step to consider the child Case's CURRENT status — not just future changes"
+        },
+        {
+          "id": "B",
+          "text": "This is not possible — Case Dependency only watches for future status changes after the parent reaches the Wait Step"
+        },
+        {
+          "id": "C",
+          "text": "Add a second Wait Step to the child Case to re-signal the parent"
+        },
+        {
+          "id": "D",
+          "text": "Switch to a Timer Wait Step — it always evaluates current conditions"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Case Dependency has a configuration option for current vs. future status.",
+      "rationale": "The Case Dependency Wait Step can be configured to check the child Case's current status at the moment the parent reaches it — covering the case where the child was already resolved. B is wrong. C and D are incorrect approaches."
+    },
+    {
+      "questionId": "m32_q11",
+      "type": "single-select",
+      "scenario": "What is the fundamental difference between a Wait Step and a user action delay?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Wait Step is a deliberate process configuration; a user action delay occurs when a user has not completed an Assignment"
+        },
+        {
+          "id": "B",
+          "text": "A Wait Step is configured in Dev Studio; user action delays are configured in App Studio"
+        },
+        {
+          "id": "C",
+          "text": "Wait Steps require SLA configuration; user action delays are handled by escalation rules"
+        },
+        {
+          "id": "D",
+          "text": "Wait Steps are temporary and auto-resolve; user action delays are permanent until manually cleared"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Deliberate vs. incidental — intention is the key.",
+      "rationale": "A Wait Step is deliberately added to a Process to pause Case processing. A user action delay is incidental — the Case stalls because a user hasn't completed their Assignment. B, C, and D state incorrect distinctions."
+    },
+    {
+      "questionId": "m32_q12",
+      "type": "single-select",
+      "scenario": "An SA needs a Case to pause for 30 minutes and then automatically resume. Which is the correct configuration?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Timer Wait Step with a fixed interval of 30 minutes"
+        },
+        {
+          "id": "B",
+          "text": "Case Dependency Wait Step configured to wait 30 minutes for child Case resolution"
+        },
+        {
+          "id": "C",
+          "text": "An SLA with a 30-minute goal that escalates and resumes the Case"
+        },
+        {
+          "id": "D",
+          "text": "A Condition Wait Step checking if 30 minutes have elapsed"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "30-minute fixed pause with no child Case = Timer with fixed interval.",
+      "rationale": "A fixed time pause uses the Timer Wait Step with a fixed interval. B misuses Case Dependency (no child Case or status trigger here). C uses SLA/escalation which enforces deadlines, not pauses. D invents a non-existent 'Condition' Wait type."
+    },
+    {
+      "questionId": "m32_q13",
+      "type": "multi-select",
+      "scenario": "A Pega developer asks about the Case Dependency Wait type. Which TWO statements correctly describe how a Case Dependency Wait works?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Case pauses and waits until a specified related Case reaches a defined status or resolution condition"
+        },
+        {
+          "id": "B",
+          "text": "Case Dependency can be used to pause a parent Case until a child Case is resolved or reaches a target status"
+        },
+        {
+          "id": "C",
+          "text": "The Case Dependency Wait type uses a calendar timer to pause for a fixed number of hours or business days"
+        },
+        {
+          "id": "D",
+          "text": "Case Dependency requires an Integration Designer connector to poll the status of the dependent Case"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Case Dependency waits for another Case's status — not a time duration. Timer is the time-based Wait type.",
+      "rationale": "The Case Dependency Wait type pauses processing until a specified related Case (typically a child Case) meets a defined status or resolution condition. This is distinct from the Timer Wait type, which pauses for a fixed calendar duration. Case Dependency does not use timers or require Integration Designer connectors — Pega monitors the related Case internally."
+    },
+    {
+      "questionId": "m32_q14",
+      "type": "multi-select",
+      "scenario": "An SA is designing a Claims workflow where the Case must wait 5 business days before advancing to the Settlement Stage. Which TWO elements must be configured to implement this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Wait Step placed in the process before the Settlement Stage"
+        },
+        {
+          "id": "B",
+          "text": "The Timer wait type configured with a duration of 5 business days on the Wait Step"
+        },
+        {
+          "id": "C",
+          "text": "A Case Dependency wait type targeting the status of a related external Case"
+        },
+        {
+          "id": "D",
+          "text": "An SLA rule with a 5-day deadline and an escalation action to automatically advance the Case"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "A time-based pause needs a Wait Step with the Timer type and the specific duration configured.",
+      "rationale": "To pause a Case for a fixed time duration, the SA adds a Wait Step to the process and configures the Timer wait type with the desired duration (5 business days). Case Dependency is for status-based waits on a related Case, not time-based pauses."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Wait Step",
+      "value": "Deliberate automation shape that pauses Case processing. Two types: Case Dependency and Timer."
+    },
+    {
+      "key": "Case Dependency",
+      "value": "Pauses PARENT Case until child Case reaches 'To be resolved' or 'Resolved'. Added to parent Case. Requires parent-child relationship. Configurable: check current status OR watch for future status changes."
+    },
+    {
+      "key": "Timer",
+      "value": "Pauses Case for: (1) fixed interval (hours/min), OR (2) until a reference date/time field value is reached."
+    },
+    {
+      "key": "Wait Step vs. User Action",
+      "value": "Wait Step = deliberate SA configuration. User action delay = Case waiting for user to complete an Assignment. These are DIFFERENT — manager not approving and user not submitting photos are NOT Wait Steps."
+    },
+    {
+      "key": "Case Dependency requirement",
+      "value": "Parent-child hierarchical Case relationship MUST exist. Cannot use between unrelated Cases."
+    },
+    {
+      "key": "Trigger statuses",
+      "value": "'To be resolved' or 'Resolved' — the only two statuses that trigger Case Dependency resumption."
+    },
+    {
+      "key": "Cancel wait option",
+      "value": "You can allow users to cancel the wait conditions and continue processing without waiting for the child Case."
+    }
+  ]
+}

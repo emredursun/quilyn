@@ -1,0 +1,562 @@
+{
+  "moduleId": "m12",
+  "moduleTitle": "Routing Assignments to users",
+  "moduleUrl": "https://academy.pega.com/module/routing-assignments-users/v8/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/routing-assignments-users/v8/quiz/in/96211",
+  "learningObjectives": [
+    "Explain the purpose of routing and how Assignments reach users",
+    "Distinguish between a Worklist (individual) and a Work Queue (team)",
+    "Select the correct routing option for a given business scenario"
+  ],
+  "estTime": "15 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Routing fundamentals",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Routing",
+          "description": "Routing assigns responsibility for completing a Task to one or more users. It increases business efficiency by ensuring the most appropriate users receive the right work at the right time, orchestrating the workflow across teams."
+        },
+        {
+          "type": "analogy",
+          "text": "Work routing in Pega is like a hospital triage system: instead of patients (assignments) queuing randomly, a triage nurse (routing rule) directs each patient to the right specialist (worklist) or general waiting area (workbasket) based on urgency, skill, and capacity. Skills-based routing ensures the cardiac patient never waits behind a sprained ankle — and no specialist sits idle while their patients pile up elsewhere."
+        },
+        {
+          "type": "concept",
+          "term": "Worklist vs. Work Queue",
+          "description": "A Worklist holds Assignments routed to a SPECIFIC user (operator) who owns the work. A Work Queue (work basket) is a SHARED queue for a team/Work Group from which any qualified member can pull and complete the work."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 290\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Routing Options in Pega</title>\n<desc>Three routing options: specific user worklist, work queue for teams, and business-logic routing</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">ROUTING OPTIONS</text>\n<!-- Assignment source -->\n<rect x=\"290\" y=\"48\" width=\"200\" height=\"56\" rx=\"10\" fill=\"var(--t)\" fill-opacity=\".08\" stroke=\"var(--t)\" stroke-width=\"1\" stroke-opacity=\".25\"/>\n<text x=\"390\" y=\"74\" font-size=\"13\" font-weight=\"700\" fill=\"var(--t)\" text-anchor=\"middle\">Assignment</text>\n<text x=\"390\" y=\"92\" font-size=\"11\" fill=\"var(--t)\" opacity=\".6\" text-anchor=\"middle\">(Case Step ready to be worked)</text>\n<!-- Arrows down to three options -->\n<line x1=\"310\" y1=\"104\" x2=\"130\" y2=\"148\" stroke=\"#6d8bff\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/>\n<line x1=\"390\" y1=\"104\" x2=\"390\" y2=\"148\" stroke=\"#6d8bff\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/>\n<line x1=\"470\" y1=\"104\" x2=\"650\" y2=\"148\" stroke=\"#6d8bff\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/>\n<!-- Route to current user -->\n<rect x=\"20\" y=\"148\" width=\"218\" height=\"120\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"182\" font-size=\"13\" font-weight=\"700\" fill=\"#0E3D28\">Specific User</text>\n<text x=\"40\" y=\"200\" font-size=\"11\" fill=\"#1E8A5B\">→ Current operator's</text>\n<text x=\"40\" y=\"216\" font-size=\"11\" fill=\"#1E8A5B\">  Worklist (personal)</text>\n<text x=\"40\" y=\"236\" font-size=\"10.5\" fill=\"#0E3D28\">Use when one named</text>\n<text x=\"40\" y=\"252\" font-size=\"10.5\" fill=\"#0E3D28\">person must do the work</text>\n<!-- Route to Work Queue -->\n<rect x=\"281\" y=\"148\" width=\"218\" height=\"120\" rx=\"14\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"2\"/>\n<text x=\"301\" y=\"182\" font-size=\"13\" font-weight=\"700\" fill=\"#2B2580\">Work Queue</text>\n<text x=\"301\" y=\"200\" font-size=\"11\" fill=\"#534AB7\">→ Shared team queue;</text>\n<text x=\"301\" y=\"216\" font-size=\"11\" fill=\"#534AB7\">  any member can pick</text>\n<text x=\"301\" y=\"236\" font-size=\"10.5\" fill=\"#2B2580\">Use when team shares</text>\n<text x=\"301\" y=\"252\" font-size=\"10.5\" fill=\"#2B2580\">responsibility (Work Group)</text>\n<!-- Route by business logic -->\n<rect x=\"542\" y=\"148\" width=\"218\" height=\"120\" rx=\"14\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"562\" y=\"182\" font-size=\"13\" font-weight=\"700\" fill=\"#5A3200\">Business Logic</text>\n<text x=\"562\" y=\"200\" font-size=\"11\" fill=\"#BA7517\">→ Skill, availability,</text>\n<text x=\"562\" y=\"216\" font-size=\"11\" fill=\"#BA7517\">  or decision rule</text>\n<text x=\"562\" y=\"236\" font-size=\"10.5\" fill=\"#5A3200\">Use when routing must</text>\n<text x=\"562\" y=\"252\" font-size=\"10.5\" fill=\"#5A3200\">follow dynamic criteria</text>\n</svg>",
+          "caption": "Three routing options: route to a specific user's Worklist, a shared Work Queue, or dynamically by business logic (skill, availability, or decision rule)."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Routing options",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Route to the current user",
+          "description": "Keep the Assignment with the user already working the Case — appropriate when the same person should continue."
+        },
+        {
+          "type": "concept",
+          "term": "Route to a specific user",
+          "description": "Send the Assignment to a named operator's Worklist when one accountable individual must own the Task."
+        },
+        {
+          "type": "concept",
+          "term": "Route to a Work Queue",
+          "description": "Send the Assignment to a shared Work Queue when any qualified member of a team can perform the work."
+        },
+        {
+          "type": "concept",
+          "term": "Route using business logic",
+          "description": "Determine the best-available user dynamically — for example by skill, availability, or other business rules — so work reaches the optimal person automatically."
+        },
+        {
+          "type": "interactive",
+          "title": "Routing Design Decisions",
+          "height": 420,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Accountability vs Availability\", \"scenario\": \"A financial audit Step must be completed by ONE specific named auditor (Emma Chen) who has personal accountability for the sign-off. Which routing configuration is correct?\", \"opts\": [\"Route to Emma Chen's Worklist \\u2014 the Worklist routes the Assignment to a specific operator's personal queue; accountability is enforced\", \"Route to the Audit Work Queue \\u2014 any available auditor can pick it up from the shared pool\", \"Route using business logic to find the auditor with the least assignments \\u2014 load balancing selects Emma probabilistically\", \"Route to the manager's Worklist and let the manager delegate to Emma manually\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. When personal accountability to a named individual is required, the Worklist is correct \\u2014 it routes directly to one specific Operator's queue.\", \"\\u2717 Incorrect. A Work Queue is shared \\u2014 ANY qualified auditor can pick it up, which eliminates named accountability.\", \"\\u2717 Incorrect. Load-balancing selects whichever auditor has the least work \\u2014 it may never select Emma and cannot enforce named accountability.\", \"\\u2717 Incorrect. Manager delegation adds unnecessary steps when Emma's name can be directly specified in the routing configuration.\"]}, {\"label\": \"Shared Pool\", \"scenario\": \"A 'Document Review' Assignment should be available to any of 30 available document specialists \\u2014 whoever is free picks it up. No single specialist is responsible. How should this be routed?\", \"opts\": [\"Route to the Document Review Work Queue shared by all 30 specialists \\u2014 any available specialist can pull the Assignment from the shared pool\", \"Route to all 30 specialists' Worklists simultaneously \\u2014 the first to open the Case 'wins' and Pega cancels the rest\", \"Route to the team lead's Worklist; the team lead redistributes manually to available specialists\", \"Route to the specific specialist who reviewed the PREVIOUS document in this Case to maintain consistency\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Work Queue = shared pool. One Assignment, 30 specialists who can all see and pick it up. The first to accept it removes it from the queue.\", \"\\u2717 Incorrect. Routing to 30 Worklists simultaneously creates 30 separate Assignments \\u2014 they all work the same document independently and submit conflicting outcomes.\", \"\\u2717 Incorrect. Manual redistribution by the team lead is an unnecessary bottleneck that defeats the purpose of automation.\", \"\\u2717 Incorrect. Consistency in specialist assignment is a business preference, not a reason to hard-code routing to a specific past operator \\u2014 that creates single-point-of-failure risk.\"]}, {\"label\": \"Business Logic Routing\", \"scenario\": \"A 'Premium Claims' Assignment should route to the agent with the highest seniority score who is currently available (online in the system). No fixed individual, no simple shared queue. How is this configured?\", \"opts\": [\"Route using business logic \\u2014 a routing rule evaluates operator properties (seniority score, availability) and dynamically selects the best qualified available operator\", \"Route to a general Work Queue and rely on agents to self-select based on their own judgment of complexity\", \"Route to the manager's Worklist and include a note in the Assignment about the seniority requirement\", \"Hard-code the top 3 most senior agents' Worklists with a priority rule \\u2014 the first available Worklist among the three receives the Assignment\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Business logic routing evaluates real-time operator properties (seniority score, online status) to make a dynamic, rule-driven assignment decision.\", \"\\u2717 Incorrect. A general queue lets any agent take the work \\u2014 there is no mechanism to enforce seniority routing in a basic Work Queue.\", \"\\u2717 Incorrect. Manager manual assignment requires human intervention for every Premium Claim \\u2014 not scalable and not automated.\", \"\\u2717 Incorrect. Hard-coding 3 names is brittle \\u2014 what happens when the senior agents change? Business logic routing evaluates dynamically at runtime.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 210\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">ROUTING OPTIONS — DESTINATIONS &amp; MECHANISMS</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"160\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Worklist (Personal)</text><text x=\"117\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Routes to named operator</text><text x=\"117\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">One owner per assignment</text><text x=\"117\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Get Next Work by Urgency</text><text x=\"117\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Use: known recipient</text><rect x=\"253\" y=\"30\" width=\"215\" height=\"160\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Workbasket (Queue)</text><text x=\"360\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">No specific owner</text><text x=\"360\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Any authorized operator</text><text x=\"360\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">in Work Group can claim</text><text x=\"360\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Work Group Mgr ≠ auto-assignee</text><text x=\"360\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Use: high-volume / unknown recipient</text><rect x=\"496\" y=\"30\" width=\"215\" height=\"160\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Advanced Routing</text><text x=\"603\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Business logic routing:</text><text x=\"603\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Data Page or expression</text><text x=\"603\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Skills-based: needs operator</text><text x=\"603\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">skill profiles configured</text><text x=\"603\" y=\"132\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Route to current user:</text><text x=\"603\" y=\"146\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">operator who triggered flow</text></svg>",
+          "caption": "Worklist = personal queue (named operator); Workbasket = shared queue (any Work Group member); advanced routing options and skills-based requirements."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Worklist vs. Work Queue",
+      "trapDescription": "Questions ask where an assignment goes when routed to a specific operator. Candidates say 'Work Queue.' An assignment routed to a named operator goes to that operator's Worklist — a Work Queue (Workbasket) holds assignments not assigned to any specific person.",
+      "bestPractice": "One accountable owner → Worklist (specific user); any qualified team member → Work Queue."
+    },
+    {
+      "title": "When to use business-logic routing",
+      "trapDescription": "A question describes a scenario where the approver should be determined by a business rule. Candidates describe hard-coding the operator name. Business-logic routing (using a Data Page or expression) is the correct approach when the assignee must be determined dynamically.",
+      "bestPractice": "Use business-logic routing (Data Page or expression) whenever the correct assignee must be resolved dynamically at runtime — do not hardcode operator names in routing configuration."
+    },
+    {
+      "title": "Route to current user",
+      "trapDescription": "Questions ask how to route an assignment back to the person who created the Case. Candidates look for a 'current user' option in routing. The 'Route to current user' option routes to the operator whose action triggered the current process — verify whether that matches 'Case creator' in the scenario.",
+      "bestPractice": "Same person continues → current user; otherwise pick specific user / queue / business logic."
+    },
+    {
+      "title": "Routing improves efficiency",
+      "trapDescription": "A question asks why Work Queues are preferred over individual routing in high-volume scenarios. Candidates say 'personal Worklists are slower.' Work Queues allow any available qualified operator to pick up work — this improves throughput and avoids bottlenecks when individuals are unavailable.",
+      "bestPractice": "Tie routing choices to who should accountably perform the Task."
+    },
+    {
+      "title": "Worklist vs. Workbasket — ownership model",
+      "trapDescription": "Questions ask the key difference between a Worklist and a Workbasket. Candidates say 'capacity.' A Worklist is owned by one operator; a Workbasket (Work Queue) has no single owner — any authorized operator in the associated Work Group can claim the assignment.",
+      "bestPractice": "A Worklist is a personal queue assigned to ONE specific operator — only that person sees and works it. A Workbasket is a shared queue any eligible team member can pull from. Use worklists for named-owner assignments; use workbaskets when any qualified person can process the item."
+    },
+    {
+      "title": "Routing to a workbasket does not assign the task to anyone",
+      "trapDescription": "A question asks what happens after routing to a Workbasket. Candidates say the Work Group Manager is automatically assigned. Routing to a Workbasket puts the assignment in a shared queue — no operator is assigned until one explicitly claims it.",
+      "bestPractice": "Routing to a workbasket places the assignment in a shared pool — NO individual is yet assigned. A team member must explicitly 'Get next work' or select the item from the workbasket. The assignment remains unowned until someone picks it up."
+    },
+    {
+      "title": "Skills-based routing requires operator skill profiles",
+      "trapDescription": "A scenario describes routing based on language skills. Candidates describe configuring a condition on the routing step. Skills-based routing requires that operator skill profiles are configured in the system — without them, the routing cannot evaluate skill criteria.",
+      "bestPractice": "For skills-based routing to work, each operator record must have the relevant skills and proficiency levels configured. If operator skill profiles are missing or incomplete, the routing rule cannot match assignments to skilled workers and falls back to the default routing."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m12_q01",
+      "type": "single-select",
+      "scenario": "A shared Claims Review Assignment must be visible to ALL 25 members of the claims team simultaneously so whichever agent is free can pick it up. A colleague suggests routing it to each agent's Worklist. What is the problem with this suggestion, and what is the correct approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Routing to individual Worklists would create 25 separate Assignments — one per agent — generating 25x work and assignment conflicts. Instead, route to a Work Queue shared by the claims team; one agent picks it up from the shared pool"
+        },
+        {
+          "id": "B",
+          "text": "Routing to individual Worklists is correct — each agent sees the same Assignment and the first to click 'Accept' locks it for themselves; Pega handles deduplication automatically"
+        },
+        {
+          "id": "C",
+          "text": "Route to the team manager's Worklist and let the manager manually reassign to a free agent — individual routing creates load-balancing problems"
+        },
+        {
+          "id": "D",
+          "text": "Use a Business Rule to broadcast the Assignment to all 25 Worklists simultaneously and let the SLA urgency determine who processes it first"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "If each agent gets their own Assignment, how many assignments are created and what conflict does that create?",
+      "rationale": "A Work Queue is the shared pool — one Assignment sits in the queue and any qualified agent claims it. Routing to 25 individual Worklists would create 25 separate Assignments — the opposite of a shared pool."
+    },
+    {
+      "questionId": "m12_q02",
+      "type": "single-select",
+      "scenario": "A new Case is created and must be routed to whoever is logged in and created it. The SA wants the assignment sent to that specific user automatically. Which routing option is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Current operator — routes the assignment to the user who is currently logged in and triggered the Case creation"
+        },
+        {
+          "id": "B",
+          "text": "Work queue — routes the assignment to a shared queue for any available user to claim"
+        },
+        {
+          "id": "C",
+          "text": "Reporting manager — routes the assignment to the manager of the user who created the Case"
+        },
+        {
+          "id": "D",
+          "text": "Specific operator — routes to a hard-coded user ID entered by the SA, not the logged-in user"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Whoever is logged in right now = Current operator.",
+      "rationale": "Current operator routes the assignment to whoever is currently logged in — the person creating the Case. Work queues are shared pools; specific operator routes to a hard-coded user."
+    },
+    {
+      "questionId": "m12_q03",
+      "type": "single-select",
+      "scenario": "A 'Contract Review' assignment must go to the manager of whichever user submitted the contract, without the SA needing to know who that person is in advance. Which routing option handles this dynamically?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Reporting manager — automatically routes to the manager of the user who performed the previous step"
+        },
+        {
+          "id": "B",
+          "text": "Current operator — routes to whoever is currently logged in, which might be the same person who submitted"
+        },
+        {
+          "id": "C",
+          "text": "Work queue — places the assignment in a shared queue accessible to all managers in the department"
+        },
+        {
+          "id": "D",
+          "text": "Specific operator — the SA hard-codes the manager's user ID to route the assignment"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Dynamic routing to the submitter's manager = Reporting manager.",
+      "rationale": "Reporting manager dynamically routes to the manager of the user who performed the prior step — no hard-coded IDs needed. Specific operator hard-codes a user and doesn't adapt to different submitters."
+    },
+    {
+      "questionId": "m12_q04",
+      "type": "single-select",
+      "scenario": "A compliance team implements a new 'KYC Verification' Step that must be completed by whichever KYC specialist has the fewest open assignments at the time the Case reaches that Step. How should the SA configure routing for this Step?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Route the Assignment to the KYC Work Queue using business logic (least-loaded specialist) — the Work Queue provides the shared pool and load-balancing logic determines which specialist picks it up"
+        },
+        {
+          "id": "B",
+          "text": "Route to a specific KYC specialist by Operator ID — this ensures the least-loaded specialist is assigned by pre-calculating workload at design time"
+        },
+        {
+          "id": "C",
+          "text": "Route to the current operator (the person who last worked the Case) — the current operator is assumed to have the least load since they just finished a Step"
+        },
+        {
+          "id": "D",
+          "text": "Do not configure routing — Pega automatically load-balances all Assignments across all users in the system without routing configuration"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "'Whichever specialist has the fewest open assignments' — does this suggest a named individual or a shared pool?",
+      "rationale": "A Work Queue with load-balancing business logic routes to the least-loaded available specialist dynamically at runtime B is wrong because pre-calculating workload at design time is impossible — workloads change constantly.."
+    },
+    {
+      "questionId": "m12_q05",
+      "type": "single-select",
+      "scenario": "A 'Claims Processing' step must be handled by any available claims processor rather than a specific person. The team is large and processors should self-assign from a shared pool. Which routing mechanism is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A work queue — assignments are placed in a shared queue and any eligible user with access to that queue can claim and work them"
+        },
+        {
+          "id": "B",
+          "text": "Current operator — the assignment is created under the name of whoever created the Case and any processor can then impersonate that operator"
+        },
+        {
+          "id": "C",
+          "text": "Specific operator — the SA enters each processor's ID into the routing so the system cycles through them"
+        },
+        {
+          "id": "D",
+          "text": "Reporting manager — the assignment goes to the team lead who then manually delegates to individual processors"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Shared pool where anyone can self-assign = work queue.",
+      "rationale": "A work queue is a shared assignment pool — any user with the correct access can claim and work available assignments without being directly targeted. Individual routing creates personal Worklist entries, not a shared pool."
+    },
+    {
+      "questionId": "m12_q06",
+      "type": "single-select",
+      "scenario": "An SA creates a work queue named 'Claims Processors Queue.' The SA must also define who can see and work assignments from that queue. What governs this access?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The work queue's worklist access configuration — the work queue is associated with Personas (roles) whose members can see and claim its assignments"
+        },
+        {
+          "id": "B",
+          "text": "The Case Life Cycle Stage — the Stage definition controls which user roles can access work queues during that Stage"
+        },
+        {
+          "id": "C",
+          "text": "The Data Page — the Data Page that sources the queue's assignment list includes access filters that restrict visibility"
+        },
+        {
+          "id": "D",
+          "text": "The Ruleset stack — only users whose active Rulesets include the work queue rule can see and claim its assignments"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Queue access = worklist access configuration tied to Personas/roles.",
+      "rationale": "A work queue is associated with Personas or roles — members of those roles can see and claim assignments from the queue. The queue itself isn't a role; roles are what determine who can access it."
+    },
+    {
+      "questionId": "m12_q07",
+      "type": "single-select",
+      "scenario": "A 'Loan Approval' Case has two steps: a credit check by an analyst and a final approval by a manager. The SA should ensure neither step is missed. Which Case design concept ensures both assignments are completed in sequence?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Case Life Cycle with two distinct Processes/Assignments in the correct Stage order — each assignment must be completed before the next is created"
+        },
+        {
+          "id": "B",
+          "text": "A single Automation with two parallel branches — each branch simultaneously creates both assignments so either can be done in any order"
+        },
+        {
+          "id": "C",
+          "text": "A work queue shared by both the analyst and the manager — both assignments appear in the same queue and whoever is available works next"
+        },
+        {
+          "id": "D",
+          "text": "A single assignment with two operators listed — Pega splits the work internally so each operator sees their portion"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Sequential required steps = distinct Processes/Assignments in ordered Stage/Process steps.",
+      "rationale": "Placing two Assignments in sequence within a Stage ensures the credit check completes before the approval Assignment is created. Parallel Processes would start both simultaneously, violating the dependency."
+    },
+    {
+      "questionId": "m12_q08",
+      "type": "single-select",
+      "scenario": "An SA wants to route a 'Document Verification' step to whichever user is on duty when the Case reaches that step, using a list maintained by the operations team. Which routing option supports this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A work queue — the operations team maintains membership of the queue; whoever is on duty and claims the assignment handles it"
+        },
+        {
+          "id": "B",
+          "text": "Current operator — routes to whoever created the Case, which may or may not be the on-duty agent"
+        },
+        {
+          "id": "C",
+          "text": "Specific operator — the SA enters a rotating list of user IDs in the routing rule that changes each shift"
+        },
+        {
+          "id": "D",
+          "text": "Reporting manager — escalates to a manager who then reassigns to the on-duty agent manually"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "On-duty whoever-is-available = work queue maintained by the ops team.",
+      "rationale": "A work queue is the right fit — the operations team manages queue membership and whichever on-duty agent claims the assignment handles it. Specific operator hard-codes one person, eliminating flexibility."
+    },
+    {
+      "questionId": "m12_q09",
+      "type": "single-select",
+      "scenario": "An SA explains the difference between a worklist and a work queue to a new team member. Which statement is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A worklist displays assignments routed directly to one specific user; a work queue displays assignments available for any eligible user to claim"
+        },
+        {
+          "id": "B",
+          "text": "A worklist is a shared pool for a team; a work queue is a personal to-do list for one user"
+        },
+        {
+          "id": "C",
+          "text": "A worklist displays Case history; a work queue displays pending assignments across all Case Types"
+        },
+        {
+          "id": "D",
+          "text": "A worklist and a work queue are interchangeable terms for the same Pega artifact"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Worklist = mine; work queue = team pool. Classic Pega distinction.",
+      "rationale": "A worklist shows assignments routed specifically to the logged-in user; a work queue is a shared pool from which any eligible user can claim. They are distinct routing mechanisms, not synonyms."
+    },
+    {
+      "questionId": "m12_q10",
+      "type": "single-select",
+      "scenario": "An SA must route a 'Manager Approval' step only to users who hold the 'Senior Manager' role. A routing rule should dynamically find the right person rather than naming any individual. Which configuration achieves this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Route to a work queue whose access is limited to the 'Senior Manager' Persona — only users with that role can claim the assignment"
+        },
+        {
+          "id": "B",
+          "text": "Route to Current operator with a condition that checks the operator's role before allowing them to work the assignment"
+        },
+        {
+          "id": "C",
+          "text": "Route to Reporting manager — all reporting managers inherently hold the Senior Manager role in Pega"
+        },
+        {
+          "id": "D",
+          "text": "Route to Specific operator and enter a wildcard role name — Pega resolves wildcards to all users with that role"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Role-based routing without naming individuals = work queue restricted to that Persona.",
+      "rationale": "A work queue restricted to the Senior Manager Persona means only users with that role can see and claim the assignment — dynamic and role-based. A specific operator hard-codes one person."
+    },
+    {
+      "questionId": "m12_q11",
+      "type": "single-select",
+      "scenario": "After deploying a new Case Type, an SA discovers that all assignments land on the developer's own worklist because the SA was logged in during Case creation testing. What routing option caused this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Current operator routing — the system routes every assignment to whoever was logged in when the Case was created"
+        },
+        {
+          "id": "B",
+          "text": "Work queue routing — the work queue was misconfigured and resolved to only the developer's personal queue"
+        },
+        {
+          "id": "C",
+          "text": "Reporting manager routing — all assignments went to the developer's manager who then forwarded them to the developer"
+        },
+        {
+          "id": "D",
+          "text": "Specific operator routing — the SA accidentally entered their own user ID in the Specific operator field during configuration"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "All assignments to the developer who was logged in = Current operator routing.",
+      "rationale": "Current operator routing sends the assignment to whoever is logged in at that moment. During testing that was the developer — so all assignments landed on the developer's Worklist. Switch to a work queue for production."
+    },
+    {
+      "questionId": "m12_q12",
+      "type": "single-select",
+      "scenario": "A BA asks: 'Which routing option would I use if I want the assignment always to go to the same person — the Head of Compliance, regardless of who submits or who is logged in?' What is the answer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Specific operator — routes to a named, hard-coded user ID regardless of context"
+        },
+        {
+          "id": "B",
+          "text": "Current operator — routes to the Head of Compliance if they happen to be logged in"
+        },
+        {
+          "id": "C",
+          "text": "Work queue — places the assignment in a queue that only the Head of Compliance can access"
+        },
+        {
+          "id": "D",
+          "text": "Reporting manager — routes to the manager of whoever submitted the Case, which may or may not be the Head of Compliance"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Always the same fixed person = Specific operator.",
+      "rationale": "Specific operator routes to a hard-coded user ID — always the same person regardless of who is logged in or who submitted. Use this only when the assignment genuinely must go to one named individual."
+    },
+    {
+      "questionId": "m12_q13",
+      "type": "multi-select",
+      "scenario": "A Pega System Architect is configuring routing for an Assignment Step. Which TWO routing options are available when configuring how work is distributed to users?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Route to a specific operator's Worklist for individual assignment"
+        },
+        {
+          "id": "B",
+          "text": "Route to a Work Queue for team-based access"
+        },
+        {
+          "id": "C",
+          "text": "Route to an external email inbox for off-platform processing"
+        },
+        {
+          "id": "D",
+          "text": "Route based on the user's geographic region using GPS coordinates"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Recall the two main routing destinations in Pega — individual and team-based.",
+      "rationale": "Pega supports routing Assignments to a specific operator's Worklist (individual assignment) or to a Work Queue (team-based, where any team member can claim the work). External email inboxes and GPS-based routing are not native Pega routing options."
+    },
+    {
+      "questionId": "m12_q14",
+      "type": "multi-select",
+      "scenario": "An SA is explaining Work Queues to a new Pega developer. Which TWO statements correctly describe how Work Queues function in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Any authorized team member can pick up work from a Work Queue"
+        },
+        {
+          "id": "B",
+          "text": "Work Queues support team-based routing for shared Assignments"
+        },
+        {
+          "id": "C",
+          "text": "Work in a Work Queue is visible only to the team manager, not team members"
+        },
+        {
+          "id": "D",
+          "text": "A Work Queue requires all team members to log in with the same credentials"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "A Work Queue is specifically designed for team visibility — recall who can access it and why.",
+      "rationale": "Work Queues are shared pools where any authorized team member can view and claim Assignments — this is the core purpose of team-based routing. Each team member uses their own credentials; the queue is not manager-exclusive."
+    },
+    {
+      "questionId": "m12_q15",
+      "type": "multi-select",
+      "scenario": "A Pega developer asks about individual Worklists. Which TWO statements are true about how Worklists work in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Worklist contains Assignments routed specifically to a single operator"
+        },
+        {
+          "id": "B",
+          "text": "Get Next Work retrieves the highest-urgency Assignment from the operator's Worklist"
+        },
+        {
+          "id": "C",
+          "text": "Multiple users can simultaneously claim the same Assignment from a single Worklist"
+        },
+        {
+          "id": "D",
+          "text": "Worklists are accessible only through legacy Pega portals, not Constellation applications"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "A Worklist belongs to one person — think about ownership and how urgency affects retrieval order.",
+      "rationale": "A Worklist is personal to a single operator — only that operator's Assignments appear in their Worklist. Get Next Work uses urgency to surface the most urgent Assignment first. A Worklist cannot be shared between multiple users, and Worklists function in both legacy portals and Constellation applications."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Routing",
+      "value": "Assigns a Task to the most appropriate user(s); increases efficiency by getting the right work to the right people."
+    },
+    {
+      "key": "Worklist vs Work Queue",
+      "value": "Worklist = specific user (owns it); Work Queue = shared team queue (pull-based)."
+    },
+    {
+      "key": "Routing options",
+      "value": "Current user, specific user, Work Queue, or business logic (best-available by skill/availability)."
+    },
+    {
+      "key": "Work Group",
+      "value": "Associates users and Work Queues so cross-functional teams share Assignments."
+    },
+    "Worklist = personal queue (one operator). Workbasket = shared pool (any eligible team member)."
+  ],
+  "topics": [
+    {
+      "title": "Routing work",
+      "url": "https://academy.pega.com/topic/routing-work/v7/in/96211/66656",
+      "duration": "20 min"
+    }
+  ]
+}

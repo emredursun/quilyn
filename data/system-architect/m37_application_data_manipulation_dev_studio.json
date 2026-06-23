@@ -1,0 +1,559 @@
+{
+  "moduleId": "m37",
+  "moduleTitle": "Application data manipulation in Dev Studio",
+  "moduleUrl": "https://academy.pega.com/module/application-data-manipulation-dev-studio/v2/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/application-data-manipulation-dev-studio/v2/quiz/in/96211",
+  "learningObjectives": [
+    "Call Data Transforms from a flow in Dev Studio and use expressions to set default property values.",
+    "Configure the superclass feature for Data Transforms to enable modular, hierarchical data initialization."
+  ],
+  "estTime": "~25 min · 2 topics",
+  "topics": [
+    {
+      "title": "Data Transforms and default values",
+      "url": "https://academy.pega.com/topic/data-transforms-and-default-values/v2/in/72681/67491/67516",
+      "duration": "10 min"
+    },
+    {
+      "title": "Superclass feature",
+      "url": "https://academy.pega.com/topic/superclass-feature/v5/in/96211/67516",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Data Transforms and Default Values in Dev Studio",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "A sorting machine on a factory line — it doesn't just move boxes from A to B. It can flip them, relabel them, or only pass through boxes over a certain weight. Data Transforms in Dev Studio work similarly: they initialize, manipulate, map, and transform data — including iterating over lists and applying conditional logic."
+        },
+        {
+          "type": "concept",
+          "term": "Calling a Data Transform from a flow",
+          "description": "Open a Process in Dev Studio → click the Connector between Steps → Connector properties window → Set properties section → select 'Apply Data Transform'. This fires the Data Transform at that specific transition point in the flow."
+        },
+        {
+          "type": "concept",
+          "term": "Iterating over a page list — auto repair example",
+          "description": "Data Transforms can iterate a page list with conditional logic. Example: iterate repair items and copy only entries where quantity > 0 to the parent Case for invoicing. Shows that Data Transforms can filter and iterate — not just copy/convert."
+        },
+        {
+          "type": "concept",
+          "term": "Expressions in Data Transforms — @CurrentDateTime()",
+          "description": "Use @CurrentDateTime() in pyDefault to set a date field to the moment the Case is created. Example: .DateOfTravel = @CurrentDateTime() → sets travel date to right now."
+        },
+        {
+          "type": "concept",
+          "term": "Expressions in Data Transforms — @addCalendar()",
+          "description": "Use @addCalendar() to calculate a date offset. Example: .DateOfReturn = @addCalendar(.DateOfTravel, '0','0','0','7','0','0','0') → sets return date to 7 days after travel date."
+        },
+        {
+          "type": "concept",
+          "term": "pyDefault and pySetFieldDefaults in App Explorer",
+          "description": "Both are accessible via the App Explorer in Dev Studio. Best practice: use the Data initialization page (Settings tab) for simple defaults — it updates pyDefault. For complex defaults, edit pyDefault directly. Never modify pySetFieldDefaults — system-managed."
+        },
+        {
+          "type": "concept",
+          "term": "Pages & Classes tab — required for Data Page references",
+          "description": "To reference a Data Page (e.g., OperatorID) in a Data Transform, add it to the Pages & Classes tab first. Example: .FirstName set to pyFirstName from OperatorID — OperatorID must be registered in Pages & Classes."
+        },
+        {
+          "type": "diagram",
+          "caption": "Calling a Data Transform from a Dev Studio flow — Connector approach",
+          "svg": "<svg viewBox=\"0 0 700 180\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m37-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ink-3)\"/></marker><marker id=\"m37-arr-b\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-brand)\"/></marker></defs><rect x=\"10\" y=\"60\" width=\"120\" height=\"44\" rx=\"8\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"70\" y=\"78\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"600\">Step A</text><text x=\"70\" y=\"94\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Process flow</text><line x1=\"130\" y1=\"82\" x2=\"290\" y2=\"82\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#m37-arr)\"/><rect x=\"175\" y=\"55\" width=\"115\" height=\"54\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"2\"/><text x=\"232\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"700\">Connector</text><text x=\"232\" y=\"89\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Set properties →</text><text x=\"232\" y=\"101\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Apply Data Transform</text><rect x=\"290\" y=\"60\" width=\"120\" height=\"44\" rx=\"8\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"350\" y=\"78\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"600\">Step B</text><text x=\"350\" y=\"94\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Process flow</text><line x1=\"232\" y1=\"109\" x2=\"232\" y2=\"145\" stroke=\"var(--pa-ok)\" stroke-width=\"2\" stroke-dasharray=\"4,3\" marker-end=\"url(#m37-arr-b)\"/><rect x=\"142\" y=\"145\" width=\"180\" height=\"30\" rx=\"6\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"232\" y=\"164\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"600\">Data Transform executes</text><text x=\"530\" y=\"70\" fill=\"var(--pa-ink-2)\" font-size=\"11\">Dev Studio only —</text><text x=\"530\" y=\"86\" fill=\"var(--pa-ink-2)\" font-size=\"11\">not available in</text><text x=\"530\" y=\"102\" fill=\"var(--pa-ink-2)\" font-size=\"11\">App Studio flows</text></svg>"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Superclass Feature for Data Transforms",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "A company org chart inheritance — the CEO sets company-wide policies, the VP adds division rules, the manager adds team rules. Each level adds its own defaults; they don't conflict because they cover different fields. The superclass feature works the same way across the class hierarchy."
+        },
+        {
+          "type": "concept",
+          "term": "Superclass feature — purpose",
+          "description": "Makes Data Transforms modular and maintainable by combining same-named Data Transforms at different class hierarchy levels. Each level sets defaults appropriate to its scope. Common defaults live high in the hierarchy; specific ones live low."
+        },
+        {
+          "type": "concept",
+          "term": "Superclass — runtime execution order",
+          "description": "At runtime, Pega walks UP the hierarchy to find the highest parent, then invokes Data Transforms TOP-DOWN (highest parent first → current class last). Example: Claim → Home → Rental: Claim SetDefault runs first, then Home, then Rental."
+        },
+        {
+          "type": "concept",
+          "term": "Subclass overrides parent for conflicting properties",
+          "description": "If the same property is set in both parent and subclass, the subclass value wins — it runs last and overwrites. Non-conflicting properties from all levels accumulate. So superclass is additive except where both levels set the same field."
+        },
+        {
+          "type": "concept",
+          "term": "Claim → Home → Rental example",
+          "description": "Claim SetDefault: sets Date of loss + Prefix (Case ID prefix). Home SetDefault: adds Address. Rental SetDefault: adds Name on lease. All three apply when a Rental Case is created — each level contributes its own fields."
+        },
+        {
+          "type": "concept",
+          "term": "Configuration — how to enable",
+          "description": "In Dev Studio: create a Data Transform with the SAME NAME at each class level → check 'Call superclass Data Transform' on each. Auto-enabled when App Studio creates default fields for a Case Type."
+        },
+        {
+          "type": "concept",
+          "term": "Work- pyDefault — what it sets",
+          "description": "Pega ships pyDefault in the Work- class. It sets work status, Urgency (default = 10), and operator organization info. All Case Types inherit it. Override in your Case Type class to change defaults."
+        },
+        {
+          "type": "diagram",
+          "caption": "Superclass execution — Claim → Home → Rental, top-down invocation",
+          "svg": "<svg viewBox=\"0 0 680 290\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m37-sc-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-brand)\"/></marker><marker id=\"m37-sc-arr2\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"340\" y=\"18\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\">Class hierarchy (top → bottom)</text><rect x=\"220\" y=\"28\" width=\"240\" height=\"52\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"340\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">Claim</text><text x=\"340\" y=\"68\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">SetDefault: Date of loss, Prefix</text><line x1=\"340\" y1=\"80\" x2=\"340\" y2=\"110\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#m37-sc-arr2)\"/><rect x=\"220\" y=\"110\" width=\"240\" height=\"52\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"340\" y=\"132\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">Home</text><text x=\"340\" y=\"150\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">SetDefault: Address</text><line x1=\"340\" y1=\"162\" x2=\"340\" y2=\"192\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#m37-sc-arr2)\"/><rect x=\"220\" y=\"192\" width=\"240\" height=\"52\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"340\" y=\"214\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">Rental</text><text x=\"340\" y=\"232\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">SetDefault: Name on lease</text><rect x=\"10\" y=\"28\" width=\"160\" height=\"216\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"90\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"700\">① Claim runs first</text><line x1=\"90\" y1=\"56\" x2=\"90\" y2=\"84\" stroke=\"var(--pa-ok)\" stroke-width=\"1.5\" marker-end=\"url(#m37-sc-arr)\"/><text x=\"90\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"700\">② Home runs second</text><line x1=\"90\" y1=\"106\" x2=\"90\" y2=\"134\" stroke=\"var(--pa-ok)\" stroke-width=\"1.5\" marker-end=\"url(#m37-sc-arr)\"/><text x=\"90\" y=\"150\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"700\">③ Rental runs last</text><line x1=\"90\" y1=\"156\" x2=\"90\" y2=\"184\" stroke=\"var(--pa-ok)\" stroke-width=\"1.5\" marker-end=\"url(#m37-sc-arr)\"/><text x=\"90\" y=\"200\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">All 3 levels apply</text><text x=\"90\" y=\"215\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">their defaults</text><text x=\"90\" y=\"230\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Subclass wins</text><text x=\"90\" y=\"245\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">on conflicts</text><text x=\"340\" y=\"262\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"10\">Same name 'SetDefault' at each level + 'Call superclass Data Transform' checked</text></svg>"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Flow Connector → Apply Data Transform — not a Step in the Case Life Cycle",
+      "trapDescription": "Questions ask how to run a Data Transform when a flow transitions between two steps. Candidates add an Automation Step inside the process. Data Transforms can be applied directly on a Flow Connector — this is the pattern for transformation during a transition, not a separate Automation Step.",
+      "bestPractice": "In Dev Studio flows, Data Transforms are called via Connector properties → Set properties → Apply Data Transform. This fires on the transition — different from adding a Run Data Transform Automation Step in the Case Life Cycle (App Studio approach)."
+    },
+    {
+      "title": "Superclass invocation is TOP-DOWN — highest parent first, current class last",
+      "trapDescription": "Exam questions list three class levels and ask which Data Transform runs first. Candidates assume the most-specific (current) class runs first, then calls parents upward — opposite of actual behavior.",
+      "bestPractice": "Pega walks UP the hierarchy to find the highest parent, then invokes TOP-DOWN: grandparent → parent → current class. The most specific class always runs last."
+    },
+    {
+      "title": "Superclass requires the SAME name at each class level",
+      "trapDescription": "Questions describe Data Transforms with different names at parent and child levels and ask why superclassing fails. Candidates don't realize the name AND the 'Call superclass' checkbox must both align at every level.",
+      "bestPractice": "Same name at every class level + 'Call superclass Data Transform' checked on each. Different names break the chain."
+    },
+    {
+      "title": "Subclass OVERRIDES parent for same property — not just additive",
+      "trapDescription": "A scenario shows the same property set in both a parent and subclass Data Transform. Candidates say both values apply additively. When a subclass Data Transform sets the same property as the parent, the subclass value OVERRIDES the parent — the last write wins, not a merge.",
+      "bestPractice": "If both parent and subclass set the same property, the subclass value wins (it runs last). Non-conflicting properties from all levels accumulate."
+    },
+    {
+      "title": "Work- pyDefault sets specific fields — know them",
+      "trapDescription": "Questions list fields and ask which ones Work- pyDefault sets. Candidates mark status only, missing Urgency (default 10) and operator organization info — all three are set by the base Work- pyDefault.",
+      "bestPractice": "Work- pyDefault sets: work status, work Urgency (default = 10), and operator organization information. You can override these in your Case Type's pyDefault — e.g., change Urgency from 10 to 20."
+    },
+    {
+      "title": "Superclass auto-enabled by App Studio default field creation",
+      "trapDescription": "A question asks when the superclass feature is automatically enabled. Candidates answer 'never — always manual' not knowing App Studio triggers it automatically when creating default Case Type fields.",
+      "bestPractice": "When App Studio creates default fields for a Case Type, the superclass feature is automatically enabled. Manual configuration (Dev Studio checkbox) is only needed when you set it up yourself."
+    },
+    {
+      "title": "Data Transforms can iterate over page lists — not just copy single values",
+      "trapDescription": "Scenarios describe filtering a list before copying it and ask which tool handles this. Candidates answer 'Activity' because they don't know Data Transforms can iterate over page lists and apply conditional logic.",
+      "bestPractice": "Data Transforms can iterate over a page list and apply conditional logic. Example: copy only items with quantity > 0 from a child Case's service list to the parent Case for invoicing."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m37_q01",
+      "type": "single-select",
+      "scenario": "In Dev Studio, how does an SA call a Data Transform at a specific transition point between two Steps in a flow?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Click the Connector between Steps → Connector properties → Set properties → Apply Data Transform"
+        },
+        {
+          "id": "B",
+          "text": "Add a Run Data Transform Automation Step immediately after the transition Step"
+        },
+        {
+          "id": "C",
+          "text": "Configure the Data Transform on the Stage properties panel in the Case Life Cycle"
+        },
+        {
+          "id": "D",
+          "text": "Add the Data Transform name to the Step's pre-processing tab in the flow viewer"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "In flows, Data Transforms are applied via the Connector — not a separate Step.",
+      "rationale": "In Dev Studio flows, Data Transforms are called via the Connector properties → Set properties → Apply Data Transform. B is an App Studio mechanism (Automation Step). C is incorrect — Stage properties don't configure Data Transforms this way. D describes pre-processing on a Step, a different mechanism."
+    },
+    {
+      "questionId": "m37_q02",
+      "type": "single-select",
+      "scenario": "An SA wants 'Date of Return' to default to 7 days after 'Date of Travel' when a Case is created. Which approach is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use @addCalendar(.DateOfTravel, '0','0','0','7','0','0','0') as an expression in pyDefault"
+        },
+        {
+          "id": "B",
+          "text": "Use a Declare Expression rule that triggers when Date of Travel changes"
+        },
+        {
+          "id": "C",
+          "text": "Configure a post-processing Data Transform on the first Step"
+        },
+        {
+          "id": "D",
+          "text": "Set a fixed +7 day offset directly in the Data initialization page"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "@addCalendar() computes a date offset inside a Data Transform expression.",
+      "rationale": "@addCalendar() is a Pega function usable in Data Transform expressions (in pyDefault) to calculate date offsets at Case creation. B recalculates when the field changes — not just at creation. C handles mid-Case processing. D — the Data initialization page does not support expression-based date arithmetic."
+    },
+    {
+      "questionId": "m37_q03",
+      "type": "single-select",
+      "scenario": "A SA is reviewing a Data Transform in Dev Studio and notices the superclass feature is enabled. What is the purpose of the superclass feature on a Data Transform in Pega Platform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Make Data Transforms modular by combining same-named transforms at different class levels"
+        },
+        {
+          "id": "B",
+          "text": "Allow Data Transforms to override all parent class rules without inheriting any defaults"
+        },
+        {
+          "id": "C",
+          "text": "Enable a Data Transform to run at higher priority than other Data Transforms"
+        },
+        {
+          "id": "D",
+          "text": "Allow App Studio to call Dev Studio Data Transforms across applications"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Superclass = modular, hierarchical Data Transform chaining across class levels.",
+      "rationale": "The superclass feature enables modularity by having same-named Data Transforms at each class level, each calling its parent. All levels contribute their defaults. B is wrong — superclass combines, not replaces. C and D mischaracterize the feature."
+    },
+    {
+      "questionId": "m37_q04",
+      "type": "single-select",
+      "scenario": "Class hierarchy: Claim → Home → Rental. Each has a 'SetDefault' Data Transform with 'Call superclass Data Transform' enabled. When a Rental Case is created, what is the execution order?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Claim SetDefault → Home SetDefault → Rental SetDefault (highest parent first)"
+        },
+        {
+          "id": "B",
+          "text": "Rental SetDefault → Home SetDefault → Claim SetDefault (current class first)"
+        },
+        {
+          "id": "C",
+          "text": "Only Rental SetDefault executes — parent Data Transforms are skipped"
+        },
+        {
+          "id": "D",
+          "text": "Home SetDefault → Rental SetDefault (only immediate parent and current class)"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Runtime order is top-down: highest parent class first, current Case class runs last.",
+      "rationale": "Pega walks up to the highest parent then executes top-down: Claim → Home → Rental. Each level's defaults are applied before the child's. B inverts the order. C is wrong — all levels run. D incorrectly skips Claim."
+    },
+    {
+      "questionId": "m37_q05",
+      "type": "single-select",
+      "scenario": "How does an SA configure the superclass feature for Data Transforms in Dev Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Create a Data Transform with the same name at each class level and check 'Call superclass Data Transform' on each"
+        },
+        {
+          "id": "B",
+          "text": "Create a single Data Transform in the top parent class that references all child class defaults"
+        },
+        {
+          "id": "C",
+          "text": "Enable a 'Superclass mode' toggle in App Studio Case Type settings"
+        },
+        {
+          "id": "D",
+          "text": "Set the Data Transform class to 'All' to automatically include all class levels"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Same name at each level + 'Call superclass Data Transform' checkbox.",
+      "rationale": "Requires: (1) same-named Data Transform at each class level, (2) 'Call superclass Data Transform' checked on each. B inverts control — children call parents, not the reverse. C is wrong — this is a Dev Studio feature. D does not exist."
+    },
+    {
+      "questionId": "m37_q06",
+      "type": "single-select",
+      "scenario": "In the Claim → Home → Rental superclass chain, Claim SetDefault sets Urgency = 10 and Rental SetDefault also sets Urgency = 20. What is the Urgency value after all three Data Transforms execute?",
+      "options": [
+        {
+          "id": "A",
+          "text": "20 — the Rental (subclass) value overwrites the Claim (parent) value"
+        },
+        {
+          "id": "B",
+          "text": "10 — the Claim (parent) value is set first and cannot be overwritten"
+        },
+        {
+          "id": "C",
+          "text": "30 — both values are summed together"
+        },
+        {
+          "id": "D",
+          "text": "An error is raised because the same property cannot be set at multiple levels"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Subclass runs last → its value wins for conflicting properties.",
+      "rationale": "Execution is top-down: Claim sets Urgency = 10, then Rental sets Urgency = 20 (overwriting). The subclass always runs last, so its value wins for any conflicting property. B, C, D are all incorrect."
+    },
+    {
+      "questionId": "m37_q07",
+      "type": "single-select",
+      "scenario": "When is the superclass feature for Data Transforms automatically enabled without manual Dev Studio configuration?",
+      "options": [
+        {
+          "id": "A",
+          "text": "When App Studio creates default fields for a Case Type automatically"
+        },
+        {
+          "id": "B",
+          "text": "When a Case Type has more than 3 levels in its class hierarchy"
+        },
+        {
+          "id": "C",
+          "text": "When the Data Transform name starts with 'py'"
+        },
+        {
+          "id": "D",
+          "text": "When the Data Transform is applied via a flow Connector"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "App Studio's automatic default field creation triggers superclass.",
+      "rationale": "Pega automatically enables the superclass feature on a Data Transform when App Studio generates the default pySetFieldDefaults transform for a Case Type. This enables the Data Transform to call its parent class's version of the same transform, ensuring that inherited default values are applied before any Case Type-specific overrides. It is not triggered manually by the developer."
+    },
+    {
+      "questionId": "m37_q08",
+      "type": "single-select",
+      "scenario": "An SA tries to reference OperatorID Data Page in pyDefault but gets a runtime error. What was missed?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Add the OperatorID Data Page to the Pages & Classes tab of the Data Transform"
+        },
+        {
+          "id": "B",
+          "text": "Load OperatorID using a 'Load Data Page' Automation Step before pyDefault runs"
+        },
+        {
+          "id": "C",
+          "text": "Enable OperatorID in the Case Type's Security settings"
+        },
+        {
+          "id": "D",
+          "text": "Reference OperatorID via a Declare Expression instead"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Data Pages in Data Transforms must be registered in Pages & Classes first.",
+      "rationale": "Any Data Page referenced in a Data Transform must be added to the Pages & Classes tab. Without registration, the runtime cannot resolve the page reference. B, C, and D are incorrect solutions."
+    },
+    {
+      "questionId": "m37_q09",
+      "type": "multi-select",
+      "scenario": "A SA is explaining Data Transform inheritance to a junior team member in Dev Studio. Which TWO statements correctly describe the superclass feature for Data Transforms in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The same Data Transform name must exist at each class level in the hierarchy"
+        },
+        {
+          "id": "B",
+          "text": "At runtime, the highest parent class Data Transform executes first"
+        },
+        {
+          "id": "C",
+          "text": "Different names at each class level are required for superclassing to work"
+        },
+        {
+          "id": "D",
+          "text": "The current class Data Transform runs before any parent class Data Transforms"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Same name at each level; top parent runs first.",
+      "rationale": "A is correct — same name required at each level. B is correct — execution is top-down (highest parent first). C is wrong — different names break the chain. D inverts the execution order.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m37_q10",
+      "type": "single-select",
+      "scenario": "What does @CurrentDateTime() return when used in a pyDefault Data Transform expression?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The current date and time at the moment the Case is created"
+        },
+        {
+          "id": "B",
+          "text": "The date and time of the most recent user action in the Case"
+        },
+        {
+          "id": "C",
+          "text": "The system installation date"
+        },
+        {
+          "id": "D",
+          "text": "The Case SLA deadline date"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "@CurrentDateTime() = now — captured when pyDefault runs at Case creation.",
+      "rationale": "@CurrentDateTime() returns the current date and time at the moment the expression evaluates. In pyDefault (which runs at Case creation), it captures the creation timestamp. B, C, and D describe other unrelated values."
+    },
+    {
+      "questionId": "m37_q11",
+      "type": "single-select",
+      "scenario": "What specific values does the Work- pyDefault Data Transform set out of the box?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Work status, work Urgency (default 10), and operator organization information"
+        },
+        {
+          "id": "B",
+          "text": "Case Type name, assigned operator, and SLA deadline"
+        },
+        {
+          "id": "C",
+          "text": "Only work Urgency — other values are set by the Case Type's own pyDefault"
+        },
+        {
+          "id": "D",
+          "text": "Work- pyDefault is empty by default — values are only set when customized"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Work- pyDefault sets status, Urgency (10), and operator org.",
+      "rationale": "The Work- pyDefault ships with values for work status, work Urgency (default = 10), and operator organization information. All Case Types inherit these. You can override them in your Case Type's pyDefault — e.g., change Urgency to 20."
+    },
+    {
+      "questionId": "m37_q12",
+      "type": "multi-select",
+      "scenario": "Which TWO are correct statements about pyDefault and pySetFieldDefaults in Dev Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "pyDefault invokes pySetFieldDefaults and is the parent Data Transform"
+        },
+        {
+          "id": "B",
+          "text": "Directly modifying pySetFieldDefaults is the recommended approach for adding defaults"
+        },
+        {
+          "id": "C",
+          "text": "Both are auto-created when the first View is created for a Case Type"
+        },
+        {
+          "id": "D",
+          "text": "pySetFieldDefaults is the parent that invokes pyDefault"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "C"
+      ],
+      "hint": "pyDefault calls pySetFieldDefaults; both auto-created on first View.",
+      "rationale": "A is correct — pyDefault is the parent that invokes pySetFieldDefaults. C is correct — both are automatically created on first View creation. B is wrong — modifying pySetFieldDefaults directly is explicitly cautioned against. D inverts the relationship.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m37_q13",
+      "type": "multi-select",
+      "scenario": "A developer is configuring a Data Transform that should reuse common initialization logic defined in a parent class. Which TWO statements correctly describe how the Superclass feature works for Data Transforms?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Superclass feature calls the Data Transform defined in the parent class, allowing shared initialization logic to be reused across subclasses"
+        },
+        {
+          "id": "B",
+          "text": "Configuring the Superclass feature enables a hierarchical Data Transform chain where the child class adds to or overrides the parent class logic"
+        },
+        {
+          "id": "C",
+          "text": "Enabling the Superclass feature on a child Data Transform eliminates the need to define any logic in the child class"
+        },
+        {
+          "id": "D",
+          "text": "The Superclass feature is only available for Activities and cannot be configured for Data Transforms"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Superclass calls the parent class's Data Transform first, enabling modular reuse with child-level overrides.",
+      "rationale": "The Superclass feature on a Data Transform instructs Pega to first execute the equivalent Data Transform defined in the parent class before applying the child class's logic. This creates a modular hierarchy where shared initialization is defined once in the parent. The child class can still define its own logic to extend or override the parent."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Flow Connector — Data Transform",
+      "value": "Dev Studio: click Connector → Set properties → Apply Data Transform. Fires on the transition."
+    },
+    {
+      "key": "Data Transform — can also iterate",
+      "value": "Not just copy/convert — can iterate over a page list and apply conditional logic (e.g., copy items where qty > 0)."
+    },
+    {
+      "key": "@CurrentDateTime()",
+      "value": "Returns current date/time. Used in pyDefault to set a date field to Case creation time."
+    },
+    {
+      "key": "@addCalendar()",
+      "value": "@addCalendar(.Field, '0','0','0','7','0','0','0') → adds 7 days to a date field."
+    },
+    {
+      "key": "Superclass feature",
+      "value": "Same-named Data Transform at each class level + 'Call superclass Data Transform' checked. Modular defaults across hierarchy."
+    },
+    {
+      "key": "Superclass runtime order",
+      "value": "Top-down: highest parent executes first, current class last. All levels contribute defaults."
+    },
+    {
+      "key": "Subclass overrides parent on conflict",
+      "value": "If same property set at multiple levels, the subclass (runs last) wins. Non-conflicting properties accumulate."
+    },
+    {
+      "key": "Work- pyDefault",
+      "value": "Sets work status, Urgency (default = 10), operator org. Override in your Case Type pyDefault to change these."
+    },
+    {
+      "key": "Superclass auto-enabled",
+      "value": "Automatically enabled when App Studio creates default fields for a Case Type."
+    }
+  ]
+}

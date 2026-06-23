@@ -1,0 +1,833 @@
+{
+  "moduleId": "BA-M05",
+  "moduleTitle": "Creating a Rule",
+  "moduleUrl": "https://academy.pega.com/module/creating-rule/v6/in/93701",
+  "moduleQuizUrl": "https://academy.pega.com/module/creating-rule/v6/quiz/in/93701",
+  "learningObjectives": [
+    "Explain how Pega Platform uses Rules and classes to support reusability in application design.",
+    "Discern which Rules are included in the Work, Data, and Integration classes.",
+    "Identify the role of Rulesets in managing Rules in a Pega Platform application.",
+    "Describe how the class hierarchy improves application quality and reduces development time."
+  ],
+  "estTime": "45 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Rules and Rule Types",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Rule",
+          "description": "The basic building block of a Pega application. Each Rule is an instance of a Rule Type (e.g., a Flow Rule models a Process). Rules define application behavior without custom coding."
+        },
+        {
+          "type": "concept",
+          "term": "Rule Type",
+          "description": "A template for creating a Rule that models a specific behavior — for example, a Flow Rule models a Process, while other Rule Types model UI, automated Decisions, and more."
+        },
+        {
+          "type": "concept",
+          "term": "Automated Rule creation in App Studio",
+          "description": "App Studio auto-creates Rules as you design: adding Processes creates Flow Rules, defining Steps creates Flow Action Rules, and configuring Views creates Section/Harness Rules."
+        },
+        {
+          "type": "analogy",
+          "text": "Rules are the rules of chess: agreed instructions that govern how each piece behaves (a pawn moves one or two spaces on its first move). A Rule Type is the rulebook chapter; a Rule is one specific instruction in it."
+        }
+      ],
+      "bulletPoints": [
+        "A Process configured visually in App Studio corresponds to a Flow Rule generated in the background (visible in the Dev Studio process modeler).",
+        "Pega provides many Rule Types as templates, each modeling a specific behavior."
+      ]
+    },
+    {
+      "sectionTitle": "Application Modularity with Rules",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Versioning",
+          "description": "Creating a new version of a Rule whenever Case behavior must change. Pega keeps a full change history, enabling rollback of a specific Rule without affecting others."
+        },
+        {
+          "type": "concept",
+          "term": "Delegation",
+          "description": "Exposing a specific Rule to business users so they can update Case behavior as conditions change, without filing an IT change request or touching other rules."
+        },
+        {
+          "type": "concept",
+          "term": "Reuse",
+          "description": "Developers reuse Rules whenever an application needs existing behavior, instead of reconfiguring it every time (e.g., reuse one policyholder-info UI form across auto, property, and marine claims)."
+        },
+        {
+          "type": "concept",
+          "term": "Parametrization",
+          "description": "To increase reusability, use parameters to drive a Rule's logic based on a passed value instead of hard-coded data — reducing code duplication and the time to implement Rule specializations."
+        },
+        {
+          "type": "analogy",
+          "text": "Modular Rules are like LEGO bricks: Versioning is swapping one brick for an improved one without rebuilding the model; Delegation hands a labeled brick to a business user to adjust; Reuse clicks the same brick into many models."
+        }
+      ],
+      "bulletPoints": [
+        "Modularity gives three benefits: Versioning, Delegation, and Reuse.",
+        "Delegated Rules let business users change behavior (like a threshold) without submitting an application change request."
+      ]
+    },
+    {
+      "sectionTitle": "Rulesets and Versioning",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Ruleset",
+          "description": "A group that identifies, stores, and manages the Rules defining an application or a significant portion of it. Rulesets enable versioning, access control, and portability."
+        },
+        {
+          "type": "concept",
+          "term": "Ruleset version",
+          "description": "An instance of a Ruleset collecting individual Rules. To update contents you create a NEW version (unlocked), add/change Rules, then lock it when complete."
+        },
+        {
+          "type": "concept",
+          "term": "Ruleset stack",
+          "description": "The sequence of Rulesets in an application determining the ORDER Pega searches to find a Rule at run time. The most-specific Ruleset is searched first."
+        },
+        {
+          "type": "analogy",
+          "text": "The Ruleset stack is a stack of transparency sheets: Pega looks down from the top sheet and uses the first matching Rule it finds — so the topmost (most specific) Ruleset wins."
+        }
+      ],
+      "bulletPoints": [
+        "Pega manages Ruleset/version assignment automatically for Rules created in App Studio.",
+        "Pega Infinity '23 product version = 23.1.1; the corresponding Ruleset semantic version = 08-23-02.",
+        "Naming best practices: meaningful business names; for org/division/shared Rulesets start with company+purpose (e.g., UPlusTelcoContracts not UPTC); do NOT use 'Pega'/'Pega-' prefixes; avoid spaces; max 32 characters; avoid special characters (- _ + \" \").",
+        "Saving/versioning best practices: develop only in the topmost Application Layer and keep built-on apps locked; increment versions frequently; new top-level class should inherit directly from @baseclass; create a major version when upgrading app/database server."
+      ]
+    },
+    {
+      "sectionTitle": "Rule Creation",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Two paths to a Rule",
+          "description": "In App Studio, Rules are created FOR you as you build the Case Life Cycle, Views, and data. In Dev Studio, you can directly create and manage how a Rule is created and reused to maintain Rule integrity and reusability."
+        },
+        {
+          "type": "concept",
+          "term": "Specialization by copy (Save As)",
+          "description": "You can copy an existing Rule into a different class or Ruleset to specialize its behavior, rather than building from scratch — preserving the original while creating a variant."
+        },
+        {
+          "type": "analogy",
+          "text": "App Studio is autopilot (Rules generated as you build); Dev Studio is manual flight (you decide exactly which class/Ruleset a Rule lives in and how it is reused)."
+        }
+      ],
+      "bulletPoints": [
+        "Creating in App Studio keeps you focused on business outcomes; Dev Studio gives precise control for integrity and reuse.",
+        "Prefer reuse/parametrization over creating many near-duplicate Rule versions."
+      ]
+    },
+    {
+      "sectionTitle": "Classes and Class Hierarchy",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Class",
+          "description": "A grouping of Rules according to their capacity for reuse: Work class (process Cases), Integration class (connect to systems), and Data class (describe data types)."
+        },
+        {
+          "type": "concept",
+          "term": "Parent and child classes",
+          "description": "A class can contain other classes. A parent class contains another class; a child class is contained by another. A child class can reuse/inherit any Rules defined for its parent class."
+        },
+        {
+          "type": "concept",
+          "term": "Class hierarchy",
+          "description": "Classes are layered from most-specific to least-specific. Pega starts at the most-specific class and expands the search upward until a matching Rule is found."
+        },
+        {
+          "type": "analogy",
+          "text": "The class hierarchy is a family tree read upward: a child inherits traits from parents and grandparents. Pega first asks the child for a Rule, then walks up the tree to ever-more-general ancestors."
+        }
+      ],
+      "bulletPoints": [
+        "Three class types: Work (process Cases), Integration (talk to other systems), Data (describe data types). App Studio identifies the correct class for you.",
+        "The Lead System Architect (LSA) and project leaders typically design the class hierarchy BEFORE building, to support reuse.",
+        "An application can use any Rule available through the class hierarchy and cannot use Rules it can't access."
+      ]
+    },
+    {
+      "sectionTitle": "Rule Reuse Through Inheritance",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Pattern inheritance",
+          "description": "Automatic inheritance using the existing class-name prefix structure to determine parent classes — no explicit configuration required. Promotes reuse by business suitability."
+        },
+        {
+          "type": "concept",
+          "term": "Directed inheritance",
+          "description": "Inheritance where the parent class is EXPLICITLY specified on the class form. It lets an application class inherit from standard Pega classes outside the naming hierarchy."
+        },
+        {
+          "type": "concept",
+          "term": "Resolution order & @baseclass",
+          "description": "Pega alternates pattern and directed searches up the class hierarchy. If no Rule is found by @baseclass, Pega returns a Rule-not-found error."
+        },
+        {
+          "type": "analogy",
+          "text": "Pattern inheritance is following your own family surname up the tree (automatic); directed inheritance is a formal adoption document on the class form that points to a different parent so you can inherit standard Pega rules too."
+        }
+      ],
+      "bulletPoints": [
+        "Pattern = automatic, by class-name prefix, business suitability. Directed = explicit on the class form, functional suitability, reaches standard Pega classes.",
+        "Example: Ticket Cases and Purchase Request Cases both inherit .pxCreateOpName via directed inheritance from the Work-Cover class.",
+        "Best practice: place Rules in a higher parent class if you anticipate reuse, and refactor with parameters instead of creating multiple versions."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Rule vs. Rule Type",
+      "trapDescription": "Candidates blur these. A Rule is an INSTANCE of a Rule Type; the Rule Type is the template that determines the behavior modeled.",
+      "bestPractice": "Remember a Flow Rule (type) models a Process; the specific flow you built is the Rule."
+    },
+    {
+      "title": "The three modularity benefits",
+      "trapDescription": "Versioning, Delegation, and Reuse are tested, often with Delegation (business users edit a delegated Rule) as the trick.",
+      "bestPractice": "Versioning = history/rollback; Delegation = hand a Rule to business users; Reuse = use existing behavior without rebuilding."
+    },
+    {
+      "title": "Ruleset version format",
+      "trapDescription": "Version is major-minor-patch, each two digits (01–99), starting 01-01-01 — not a single number.",
+      "bestPractice": "Read e.g. 01-02-03 as major 01, minor 02, patch 03. New version to edit; lock older versions."
+    },
+    {
+      "title": "Ruleset naming rules",
+      "trapDescription": "Tests target forbidden patterns: 'Pega'/'Pega-' prefix, spaces, special characters, and the 32-character limit.",
+      "bestPractice": "Use meaningful names; no Pega prefix; no spaces; ≤32 chars; avoid - _ + and quotes."
+    },
+    {
+      "title": "The three class types",
+      "trapDescription": "Work, Integration, and Data classes get confused. Work = process Cases; Integration = talk to other systems; Data = describe data types.",
+      "bestPractice": "If it's about processing a Case → Work; connecting externally → Integration; defining a data type → Data."
+    },
+    {
+      "title": "Class hierarchy search direction",
+      "trapDescription": "Resolution goes most-specific → least-specific; the hyphenated name encodes parent/child (TGB-IT-Work is a child of TGB-IT).",
+      "bestPractice": "Pega starts at the most-specific class and walks UP to more general classes."
+    },
+    {
+      "title": "Pattern vs. Directed inheritance",
+      "trapDescription": "The classic trap: pattern is AUTOMATIC (by class-name prefix, business suitability); directed is EXPLICIT on the class form (functional suitability) and is what lets you inherit standard Pega classes like Work-/Data-.",
+      "bestPractice": "Automatic + prefix = pattern; explicitly specified parent + reaches standard Pega classes = directed."
+    },
+    {
+      "title": "@baseclass and resolution failure",
+      "trapDescription": "Resolution alternates pattern then directed searches up to the ultimate base class, @baseclass; not finding the Rule there returns an error.",
+      "bestPractice": "Order: pattern → directed (then pattern again) → … → @baseclass → error if still not found."
+    },
+    {
+      "title": "Who designs the class hierarchy",
+      "trapDescription": "The LSA and project leaders design the class hierarchy BEFORE building — not ad hoc during development.",
+      "bestPractice": "Class hierarchy is planned up front by the LSA to support reuse."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A BA configures a Process in the App Studio Case Life Cycle. What is generated in the background to model that Process?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Flow Rule"
+        },
+        {
+          "id": "B",
+          "text": "A Ruleset version"
+        },
+        {
+          "id": "C",
+          "text": "An Access Role"
+        },
+        {
+          "id": "D",
+          "text": "A Data class"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think about which Rule Type specifically models the shape-and-connector flow diagram of a Process.",
+      "rationale": "A Process is modeled by a Flow Rule, generated in the background as you build in App Studio. The others are not the Rule Type that models a Process."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "Accounting wants to raise the auto-approval threshold for expense reports from USD 25 to USD 50 themselves, without an application change request. Which modularity benefit enables this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Delegation"
+        },
+        {
+          "id": "B",
+          "text": "Versioning"
+        },
+        {
+          "id": "C",
+          "text": "Reuse"
+        },
+        {
+          "id": "D",
+          "text": "Parametrization"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A Rule is handed to business users to maintain.",
+      "rationale": "Delegation lets business users update a delegated Rule (the threshold) while the rest of the app is unchanged. Versioning is history/rollback, Reuse is using existing behavior, and parametrization is a reuse technique."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A developer removed a critical field from a UI form and must restore the prior behavior without touching other Rules. Which benefit makes this possible?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Versioning — review history and revert the form Rule"
+        },
+        {
+          "id": "B",
+          "text": "Delegation"
+        },
+        {
+          "id": "C",
+          "text": "Directed inheritance"
+        },
+        {
+          "id": "D",
+          "text": "Parametrization"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Versioning preserves history so you can roll back a specific Rule without impacting others.",
+      "rationale": "Versioning maintains a change history so you can revert a specific Rule to an earlier form without affecting other Rules. Rulesets package Rules, delegation exposes them to business users, and parametrization drives logic with passed values."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A System Architect is reviewing a Ruleset named Expense:01-02-03 in Dev Studio and a junior team member asks what the version numbers mean. How should this version number be correctly interpreted?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Major 01, minor 02, patch 03 of the Expense Ruleset"
+        },
+        {
+          "id": "B",
+          "text": "Version 1023 of the Expense application"
+        },
+        {
+          "id": "C",
+          "text": "Three separate Rulesets named 01, 02, and 03"
+        },
+        {
+          "id": "D",
+          "text": "A date stamp"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Ruleset version numbers have three two-digit segments: major, minor, and patch.",
+      "rationale": "Ruleset versions follow a major-minor-patch format, with each segment consisting of exactly two digits. So version 01-02-03 means major 01, minor 02, patch 03 of the Expense Ruleset."
+    },
+    {
+      "questionId": "Q5",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "A new System Architect is creating Rulesets for a new insurance application and wants to follow governance best practices. Which TWO of the following are valid Ruleset naming best practices?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use meaningful names and keep them to 32 characters or fewer"
+        },
+        {
+          "id": "B",
+          "text": "Avoid the 'Pega' / 'Pega-' prefix (reserved for internal use)"
+        },
+        {
+          "id": "C",
+          "text": "Use spaces and dashes freely to improve readability"
+        },
+        {
+          "id": "D",
+          "text": "Prefer cryptic acronyms like UPTC over descriptive names"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Two options describe valid Ruleset practices; two are explicitly identified as poor practices to avoid.",
+      "rationale": "Use meaningful names ≤32 chars and avoid the reserved 'Pega'/'Pega-' prefix. Spaces and special characters are discouraged, and descriptive names (UPlusTelcoContracts) beat acronyms (UPTC). No partial credit."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "A BA is trying to understand why Pega applies one version of a Rule over another during runtime processing. What does the Ruleset stack determine?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The order in which Pega searches Rulesets to find the Rule in use"
+        },
+        {
+          "id": "B",
+          "text": "The physical database tablespace for Rules"
+        },
+        {
+          "id": "C",
+          "text": "Which operators can log in"
+        },
+        {
+          "id": "D",
+          "text": "The color theme of the application"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The Ruleset stack defines the search order Pega follows to locate the applicable Rule at run time.",
+      "rationale": "The Ruleset stack is the ordered sequence of Rulesets that determines how Pega searches for the applicable Rule at run time. Each application version has its own unique stack configuration."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "An application needs Rules that connect it to an external customer database and a third-party web service. Which class type contains these Rules?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Integration class"
+        },
+        {
+          "id": "B",
+          "text": "Work class"
+        },
+        {
+          "id": "C",
+          "text": "Data class"
+        },
+        {
+          "id": "D",
+          "text": "Access class"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think about which class type connects a Pega application to OTHER external systems.",
+      "rationale": "The Integration class contains Rules describing how the application interacts with other systems. Work processes Cases; Data describes data types; there is no 'Access class' here."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "Which class type contains the Rules that describe how to PROCESS Cases — Processes, data elements, and user interfaces?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Work class"
+        },
+        {
+          "id": "B",
+          "text": "Integration class"
+        },
+        {
+          "id": "C",
+          "text": "Data class"
+        },
+        {
+          "id": "D",
+          "text": "Rule class"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The Work class contains the Rules that handle how Cases are created and processed.",
+      "rationale": "The Work class holds Rules that process Cases — Processes, data elements, and UIs. The Integration class connects to other systems via connectors, and the Data class describes data types and properties."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "A System Architect is reviewing the class hierarchy for a TGB project and encounters the class TGB-IT-Work. Which statement about this class hierarchy is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "TGB-IT-Work is a child of TGB-IT, which is a child of TGB"
+        },
+        {
+          "id": "B",
+          "text": "TGB-IT-Work is the parent of TGB"
+        },
+        {
+          "id": "C",
+          "text": "The hyphens are decorative and carry no meaning"
+        },
+        {
+          "id": "D",
+          "text": "TGB is the most-specific class"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "In a class name like TGB-IT-Work, each hyphen separates one level of the class hierarchy.",
+      "rationale": "Hyphens encode the hierarchy: TGB-IT-Work is a child of TGB-IT, itself a child of TGB. TGB is the most general (least specific), not the most specific."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "At run time, in what order does Pega search the class hierarchy for a Rule?",
+      "options": [
+        {
+          "id": "A",
+          "text": "From the most-specific class, expanding to more general classes"
+        },
+        {
+          "id": "B",
+          "text": "From the most-general class down to the most specific"
+        },
+        {
+          "id": "C",
+          "text": "Randomly across all classes"
+        },
+        {
+          "id": "D",
+          "text": "Only in the class where the Case was created"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Pega always starts Rule resolution at the most-specific class and expands outward.",
+      "rationale": "Pega begins Rule resolution at the most-specific (most concrete) class and progressively expands the search to more general parent classes until a matching Rule is found or @baseclass is reached."
+    },
+    {
+      "questionId": "Q11",
+      "type": "single-select",
+      "scenario": "Which inheritance type is AUTOMATIC and uses the shared class-name prefix to determine reuse, promoting reuse based on business suitability?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Pattern inheritance"
+        },
+        {
+          "id": "B",
+          "text": "Directed inheritance"
+        },
+        {
+          "id": "C",
+          "text": "Multiple inheritance"
+        },
+        {
+          "id": "D",
+          "text": "Manual inheritance"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Pattern inheritance is automatic and determined solely by the class-name prefix structure.",
+      "rationale": "Pattern inheritance is automatic, based on the class-name prefix, and requires no explicit configuration. Directed inheritance, by contrast, is explicitly specified on the class form and can reach classes outside the naming hierarchy."
+    },
+    {
+      "questionId": "Q12",
+      "type": "single-select",
+      "scenario": "An application class must inherit standard Pega Rules from the Work- class, which is outside its business class hierarchy. Which inheritance type makes this possible?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Directed inheritance, specified on the class Rule form"
+        },
+        {
+          "id": "B",
+          "text": "Pattern inheritance, which is automatic"
+        },
+        {
+          "id": "C",
+          "text": "Ruleset inheritance"
+        },
+        {
+          "id": "D",
+          "text": "Delegation"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Explicitly specify a parent outside the business hierarchy.",
+      "rationale": "Directed inheritance explicitly specifies a parent class (e.g., Work-/Data-) on the class form, allowing inheritance of standard Pega Rules outside the business hierarchy. Pattern inheritance only follows the class-name prefix."
+    },
+    {
+      "questionId": "Q13",
+      "type": "single-select",
+      "scenario": "During Rule resolution, what is the last class Pega searches before returning an error if the Rule is not found?",
+      "options": [
+        {
+          "id": "A",
+          "text": "@baseclass (the ultimate base class)"
+        },
+        {
+          "id": "B",
+          "text": "The Work-Cover class"
+        },
+        {
+          "id": "C",
+          "text": "The Integration class"
+        },
+        {
+          "id": "D",
+          "text": "The topmost Ruleset"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "If no Rule is found anywhere in the hierarchy, Pega searches @baseclass as the final fallback.",
+      "rationale": "Pega alternates pattern and directed searches up the class hierarchy. If the Rule is not found by @baseclass, Pega returns a Rule-not-found error. @baseclass is the universal ancestor for all classes."
+    },
+    {
+      "questionId": "Q14",
+      "type": "single-select",
+      "scenario": "Ticket Cases (IT app) and Purchase Request Cases (Accounting app) both record the creating operator in .pxCreateOpName, defined once in the Work-Cover class. Which mechanism lets both inherit it?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Directed inheritance from the Work-Cover class"
+        },
+        {
+          "id": "B",
+          "text": "Delegation to business users"
+        },
+        {
+          "id": "C",
+          "text": "A shared Ruleset version number"
+        },
+        {
+          "id": "D",
+          "text": "A simulated data source"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Inheriting a standard property from a standard class.",
+      "rationale": "Both Case Types inherit .pxCreateOpName from the standard Work-Cover class via directed inheritance, which lets a business class reach standard Pega classes outside the business-naming prefix hierarchy."
+    },
+    {
+      "questionId": "Q15",
+      "type": "single-select",
+      "scenario": "A developer needs a variant of an existing Rule for a more specific class without losing the original. What is the recommended approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Copy (Save As) the Rule into the appropriate class/Ruleset to specialize it"
+        },
+        {
+          "id": "B",
+          "text": "Delete the original and rewrite it"
+        },
+        {
+          "id": "C",
+          "text": "Rename the Ruleset"
+        },
+        {
+          "id": "D",
+          "text": "Convert it to an Access Role"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Specialization means copying a Rule into another class or Ruleset to create a context-specific version.",
+      "rationale": "Copying (Save As) a Rule into the appropriate class/Ruleset specializes behavior while preserving the original. Deleting/rewriting loses history; renaming a Ruleset and Access Roles are unrelated."
+    },
+    {
+      "questionId": "Q16",
+      "type": "single-select",
+      "scenario": "To increase a Rule's reusability and avoid creating many near-duplicate versions, what technique should you use?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Parametrization — drive logic by a passed parameter instead of hard-coded data"
+        },
+        {
+          "id": "B",
+          "text": "Locking all Rulesets"
+        },
+        {
+          "id": "C",
+          "text": "Adding more patch versions"
+        },
+        {
+          "id": "D",
+          "text": "Moving the Rule to the Integration class"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Parametrization passes a value into a Rule to vary its logic rather than hard-coding each scenario.",
+      "rationale": "Parametrization drives a Rule's logic with passed parameters, reducing duplication and the effort needed to create multiple near-identical specializations. The other options — delegation, versioning, specialization — address different reuse challenges."
+    },
+    {
+      "questionId": "Q18",
+      "type": "single-select",
+      "scenario": "A project team is starting a new Pega implementation and a junior BA asks who is responsible for designing the class hierarchy and when it should be done. Who typically designs the class hierarchy, and when?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Lead System Architect and project leaders, before building the application"
+        },
+        {
+          "id": "B",
+          "text": "Business users, after go-live"
+        },
+        {
+          "id": "C",
+          "text": "The Scrum Master, during retrospectives"
+        },
+        {
+          "id": "D",
+          "text": "It is generated randomly at runtime"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Planned up front by the most senior architect.",
+      "rationale": "The LSA and project leaders collaborate to design the class hierarchy before any build begins, ensuring the structure supports the organization's planned reuse needs. This decision shapes the entire application's inheritance and resolution behavior."
+    },
+    {
+      "questionId": "Q19",
+      "type": "single-select",
+      "scenario": "Which analogy correctly captures the relationship between a Rule and a Ruleset?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Rule is like a song; a Ruleset is like an entire album"
+        },
+        {
+          "id": "B",
+          "text": "A Rule is like an album; a Ruleset is like a single song"
+        },
+        {
+          "id": "C",
+          "text": "A Rule and a Ruleset are identical"
+        },
+        {
+          "id": "D",
+          "text": "A Ruleset is a single property value"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think of a Rule as one song and its Ruleset as the complete album that packages many songs.",
+      "rationale": "A Rule is like an individual song and a Ruleset is like the album that groups many songs for packaging and distribution. A Ruleset version is a specific release of that album, collecting a set of Rules at a point in time."
+    },
+    {
+      "questionId": "Q20",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "A System Architect is establishing Ruleset governance policies for a large enterprise Pega program. Which TWO of the following are valid Ruleset saving and versioning best practices?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Develop only in the topmost Application Layer and keep built-on applications locked"
+        },
+        {
+          "id": "B",
+          "text": "Create a new Ruleset whose top-level class inherits directly from @baseclass"
+        },
+        {
+          "id": "C",
+          "text": "Edit Rules directly in locked, lower built-on applications"
+        },
+        {
+          "id": "D",
+          "text": "Never increment versions so history stays simple"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Top layer for dev; new top-level class from @baseclass.",
+      "rationale": "Best practices: develop in the topmost Application Layer (keep built-on apps locked) and have a new Ruleset's top-level class inherit directly from @baseclass. Editing locked lower apps and never versioning are anti-patterns. No partial credit."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Rule / Rule Type",
+      "value": "A Rule is the basic building block and an instance of a Rule Type; the type determines behavior (e.g., Flow Rule = Process). App Studio auto-creates Rules."
+    },
+    {
+      "key": "Modularity benefits",
+      "value": "Versioning (history/rollback), Delegation (business users edit a Rule), Reuse (use existing behavior). Parametrization boosts reuse."
+    },
+    {
+      "key": "Ruleset",
+      "value": "Groups/identifies/manages Rules (song vs. album); shareable. New version to edit; lock older versions. Format major-minor-patch (two digits, from 01-01-01)."
+    },
+    {
+      "key": "Ruleset stack",
+      "value": "Sequence that sets the search order for finding the Rule in use; unique per application version."
+    },
+    {
+      "key": "Naming rules",
+      "value": "Meaningful names; no 'Pega' prefix; no spaces; ≤32 chars; avoid special characters."
+    },
+    {
+      "key": "Three class types",
+      "value": "Work (process Cases), Integration (talk to other systems), Data (describe data types). App Studio picks the class."
+    },
+    {
+      "key": "Class hierarchy",
+      "value": "Most-specific → least-specific; hyphens encode levels (TGB-IT-Work child of TGB-IT child of TGB); LSA designs it up front."
+    },
+    {
+      "key": "Inheritance",
+      "value": "Pattern = automatic, prefix-based, business suitability. Directed = explicit on class form, reaches standard Pega classes, functional suitability. Resolution ends at @baseclass (else error)."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Rules and Rule Types",
+      "url": "https://academy.pega.com/topic/rules-and-rule-types/v6/in/72701",
+      "duration": "10 min"
+    },
+    {
+      "title": "Rulesets",
+      "url": "https://academy.pega.com/topic/rulesets/v7/in/72701",
+      "duration": "5 min"
+    },
+    {
+      "title": "Rule creation",
+      "url": "https://academy.pega.com/topic/rule-creation/v7/in/72701",
+      "duration": "5 min"
+    },
+    {
+      "title": "Classes and class hierarchy",
+      "url": "https://academy.pega.com/topic/classes-and-class-hierarchy/v7/in/72701",
+      "duration": "10 min"
+    },
+    {
+      "title": "Rule reuse through inheritance",
+      "url": "https://academy.pega.com/topic/rule-reuse-through-inheritance/v7/in/72701",
+      "duration": "10 min"
+    }
+  ]
+}

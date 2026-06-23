@@ -1,0 +1,586 @@
+{
+  "moduleId": "m41",
+  "moduleTitle": "Managing application access",
+  "moduleUrl": "https://academy.pega.com/module/managing-application-access/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/managing-application-access/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Explain how Personas, Access Roles, and Access Groups control user access in Pega applications.",
+    "Describe how ARO and Access Deny records manage Case Type permissions and how production levels affect access control."
+  ],
+  "estTime": "~25 min · 2 topics",
+  "topics": [
+    {
+      "title": "Application access",
+      "url": "https://academy.pega.com/topic/application-access/v6/in/72681/73731",
+      "duration": "10 min"
+    },
+    {
+      "title": "Access control",
+      "url": "https://academy.pega.com/topic/access-control/v5/in/72681/73731",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Personas, Access Roles, and Access Groups",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "Think of access control like a hotel. The Persona is the guest type (business traveler vs. tourist — different business outcomes). The Role is the floor/wing they're placed on. The Access Group is the room key type (standard vs. premium). The ARO is the list of which specific doors that key can open. Access Deny is a padlock that blocks entry even if the key matches."
+        },
+        {
+          "type": "concept",
+          "term": "Persona",
+          "description": "Defines how users align with an application by BUSINESS OUTCOMES. Example: 'Loan Applicant' and 'Loan Officer' have different goals in the process. Creating a Persona in App Studio auto-creates a corresponding Access Group in Dev Studio."
+        },
+        {
+          "type": "concept",
+          "term": "Role",
+          "description": "Defines how users INTERACT with the application. Example: Manager, User. Each Role has a default Channel interface — this determines which screen users see upon login."
+        },
+        {
+          "type": "concept",
+          "term": "Access Role",
+          "description": "Categorizes users by job function. For each Access Role, you configure permissions to control Actions on instances of a specific class. Example: 'Manager' and 'User' can be separate Access Roles with different permissions."
+        },
+        {
+          "type": "concept",
+          "term": "Access Group",
+          "description": "Represents a group of privileges. Each Access Group references one or more Access Roles. Multiple Access Groups can reference the same application for different access levels and align with roles assignable to users in App Studio."
+        },
+        {
+          "type": "concept",
+          "term": "Access Group — conflicting permissions rule",
+          "description": "When an Access Group references multiple Access Roles with conflicting permissions, the MOST PERMISSIVE permission applies. Pega favors access in conflict scenarios."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 600 220\" xmlns=\"http://www.w3.org/2000/svg\"><defs><marker id=\"m41-arr\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-2)\"/></marker></defs><rect x=\"10\" y=\"10\" width=\"580\" height=\"200\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"300\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Access Control Hierarchy</text><rect x=\"240\" y=\"48\" width=\"120\" height=\"38\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok)\" stroke-width=\"1.5\"/><text x=\"300\" y=\"72\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-ok)\">Persona</text><line x1=\"300\" y1=\"87\" x2=\"300\" y2=\"105\" stroke=\"var(--pa-ink-2)\" stroke-width=\"1.5\" marker-end=\"url(#m41-arr)\"/><rect x=\"200\" y=\"106\" width=\"200\" height=\"38\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"300\" y=\"130\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-brand)\">Access Group</text><line x1=\"300\" y1=\"145\" x2=\"300\" y2=\"163\" stroke=\"var(--pa-ink-2)\" stroke-width=\"1.5\" marker-end=\"url(#m41-arr)\"/><rect x=\"110\" y=\"164\" width=\"170\" height=\"38\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"195\" y=\"188\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-brand)\">Access Role (RBAC)</text><rect x=\"310\" y=\"164\" width=\"170\" height=\"38\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-err)\" stroke-width=\"1.5\"/><text x=\"395\" y=\"180\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-err)\">ARO / Access Deny</text><text x=\"395\" y=\"196\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-2)\">Grants / Overrides</text><text x=\"30\" y=\"100\" font-size=\"10\" fill=\"var(--pa-ink-3)\">App Studio → Dev Studio</text><text x=\"30\" y=\"115\" font-size=\"10\" fill=\"var(--pa-ink-3)\">(auto-creates Access Group)</text></svg>",
+          "caption": "Persona auto-creates an Access Group. Access Group references Access Roles. ARO grants permissions; Access Deny overrides them."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Access Control Records and Tools",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "ARO — Access of Role to Object",
+          "description": "Specifies permissions for instances of a specific CLASS for members of a specific ACCESS ROLE. This is how RBAC permissions are granted in Pega. The name describes its function: Access of Role to Object."
+        },
+        {
+          "type": "concept",
+          "term": "Access Deny",
+          "description": "OVERRIDES AROs to explicitly DENY access when regulations or policy require it. An Access Deny record takes precedence over any ARO that would otherwise allow access. Denial can also depend on the production level value (1 to 5)."
+        },
+        {
+          "type": "concept",
+          "term": "Best practice: use management tools, not direct record edits",
+          "description": "App Studio: Users → User management (Persona access landing page). Dev Studio: Configure → Org & Security → Access Manager. Both tools allow setting permissions for Access Roles. Avoid directly editing ARO or Access Deny records."
+        },
+        {
+          "type": "concept",
+          "term": "Production levels (on-premises)",
+          "description": "Scale 1–5: 1 = Production (most restrictive), 2 = Staging, 3 = Quality Assurance, 4 = Development, 5 = Sandbox (most permissive). Lower number = more production-like. Access Deny denial can depend on the production level."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 270\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">ACCESS CONTROL RECORDS, TOOLS &amp; PRODUCTION LEVELS</text><rect x=\"10\" y=\"28\" width=\"215\" height=\"90\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">ARO</text><text x=\"117\" y=\"64\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Access of Role to Object</text><text x=\"117\" y=\"78\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Grants permissions for a class</text><text x=\"117\" y=\"92\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">to members of a Role</text><text x=\"117\" y=\"108\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Grants access ✓</text><rect x=\"253\" y=\"28\" width=\"215\" height=\"90\" rx=\"10\" fill=\"rgba(231,76,60,0.1)\" stroke=\"var(--pa-err)\" stroke-width=\"2\"/><text x=\"360\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"12\" font-weight=\"700\">Access Deny</text><text x=\"360\" y=\"64\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Explicitly DENIES access</text><text x=\"360\" y=\"78\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Overrides any matching ARO</text><text x=\"360\" y=\"92\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Use for regulatory requirements</text><text x=\"360\" y=\"108\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">ALWAYS overrides ARO ✗</text><rect x=\"496\" y=\"28\" width=\"215\" height=\"90\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Management Tools</text><text x=\"603\" y=\"64\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">App Studio: Users → User mgmt</text><text x=\"603\" y=\"78\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Dev Studio: Configure → Org &amp;</text><text x=\"603\" y=\"92\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Security → Access Manager</text><text x=\"603\" y=\"108\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">⚠ Don't edit AROs directly</text><rect x=\"10\" y=\"140\" width=\"700\" height=\"112\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"160\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">Production Levels (on-premises) — Lower = More Restrictive</text><rect x=\"30\" y=\"172\" width=\"90\" height=\"64\" rx=\"6\" fill=\"var(--pa-err)\" opacity=\"0.8\"/><text x=\"75\" y=\"192\" text-anchor=\"middle\" fill=\"#fff\" font-size=\"14\" font-weight=\"800\">1</text><text x=\"75\" y=\"210\" text-anchor=\"middle\" fill=\"#fff\" font-size=\"10\">Production</text><text x=\"75\" y=\"224\" text-anchor=\"middle\" fill=\"#fff\" font-size=\"9\">Most strict</text><rect x=\"140\" y=\"172\" width=\"90\" height=\"64\" rx=\"6\" fill=\"rgba(231,76,60,0.5)\"/><text x=\"185\" y=\"192\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"14\" font-weight=\"800\">2</text><text x=\"185\" y=\"210\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"10\">Staging</text><rect x=\"250\" y=\"172\" width=\"90\" height=\"64\" rx=\"6\" fill=\"rgba(251,190,0,0.5)\"/><text x=\"295\" y=\"192\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"14\" font-weight=\"800\">3</text><text x=\"295\" y=\"210\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"10\">QA</text><rect x=\"360\" y=\"172\" width=\"90\" height=\"64\" rx=\"6\" fill=\"rgba(109,139,255,0.3)\"/><text x=\"405\" y=\"192\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"14\" font-weight=\"800\">4</text><text x=\"405\" y=\"210\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"10\">Development</text><rect x=\"470\" y=\"172\" width=\"90\" height=\"64\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1\"/><text x=\"515\" y=\"192\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"14\" font-weight=\"800\">5</text><text x=\"515\" y=\"210\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\">Sandbox</text><text x=\"515\" y=\"224\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"9\">Least strict</text><text x=\"630\" y=\"204\" fill=\"var(--pa-ink-3)\" font-size=\"10\">Lower #</text><text x=\"630\" y=\"218\" fill=\"var(--pa-ink-3)\" font-size=\"10\">= stricter</text></svg>",
+          "caption": "ARO vs Access Deny, management tools best practice, and production level scale."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Persona ≠ Role — different purposes",
+      "trapDescription": "Questions describe a user needing Case access and ask what grants it. Candidates select Role, not realizing Persona (which bundles Access Group + Roles + Channel) is the business-facing construct that provides complete access.",
+      "bestPractice": "Persona = business outcomes alignment. Role = interaction pattern with the app. Each Role has a default Channel interface that determines the login screen."
+    },
+    {
+      "title": "Conflicting permissions → MOST PERMISSIVE wins",
+      "trapDescription": "A question describes a user with two Access Roles that grant conflicting permissions. Candidates say the more restrictive role takes precedence. When permissions conflict across multiple Access Roles, Pega applies the MOST PERMISSIVE — if any role grants access, the user has access.",
+      "bestPractice": "When an Access Group has conflicting permissions from multiple roles, the MOST PERMISSIVE permission applies. Pega favors access in conflict scenarios."
+    },
+    {
+      "title": "ARO grants; Access Deny overrides",
+      "trapDescription": "A question lists ARO and Access Deny and asks which wins when they conflict. Candidates guess ARO wins because it explicitly grants access. Access Deny always overrides — it exists to force denial regardless of grants.",
+      "bestPractice": "ARO (Access of Role to Object) = grants permissions per class per role. Access Deny = overrides AROs to explicitly deny access when required by regulations or policy."
+    },
+    {
+      "title": "Best practice: avoid direct ARO editing",
+      "trapDescription": "A question asks the best way to update user permissions. Candidates select 'edit the ARO record directly' for maximum control. Pega recommends App Studio User management or Dev Studio Access Manager — not direct ARO edits.",
+      "bestPractice": "Use the Persona access landing page (App Studio: Users → User management) or Access Manager (Dev Studio: Configure → Org & Security → Access Manager). Avoid editing ARO or Access Deny records directly."
+    },
+    {
+      "title": "Production level scale: 1 = Production, 5 = Sandbox",
+      "trapDescription": "Questions give a production level number and ask what environment it represents. Candidates reverse the scale, assuming level 5 is the strictest (like a 5-star rating) — level 1 is the most restrictive.",
+      "bestPractice": "Production level 1 = Production (most restrictive); level 5 = Sandbox (most permissive). Lower number = closer to production."
+    },
+    {
+      "title": "Persona → Access Group: not all Access Groups have a Persona",
+      "trapDescription": "Questions ask whether every Access Group must have a corresponding Persona. Candidates say yes. A Persona maps to an Access Group, but an Access Group can exist without any Persona — system-level groups (admins, developers) typically have no Persona.",
+      "bestPractice": "Creating a Persona in App Studio auto-creates a corresponding Access Group in Dev Studio. However, not all Access Groups in Dev Studio have a corresponding Persona in App Studio."
+    },
+    {
+      "title": "Access Manager path in Dev Studio",
+      "trapDescription": "An exam question asks where to find Access Manager in Dev Studio. Candidates describe App Studio's Users section or navigate to Configure → Application instead of the correct Configure → Org & Security → Authentication path.",
+      "bestPractice": "Dev Studio Access Manager: Configure → Org & Security → Access Manager. App Studio: Users → User management (Persona access landing page)."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m41_q01",
+      "type": "single-select",
+      "scenario": "A Pega System Architect is explaining the access control model to a business stakeholder for a Claims application that serves three distinct user populations: Adjusters, Supervisors, and Administrators. In this context, what does a Persona define in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "How users align with an application in terms of business outcomes"
+        },
+        {
+          "id": "B",
+          "text": "How users interact with the application interface"
+        },
+        {
+          "id": "C",
+          "text": "The permissions assigned to each user role"
+        },
+        {
+          "id": "D",
+          "text": "The default channel interface for each user at login"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Persona maps to business outcomes and the application; Role maps to interaction type.",
+      "rationale": "A Persona defines how users align with the application in terms of business outcomes. A Role defines how users interact with the application. D describes the Channel interface associated with a Role."
+    },
+    {
+      "questionId": "m41_q02",
+      "type": "single-select",
+      "scenario": "An Access Group references two Access Roles. One grants Create permission on a Case class; the other denies it. How does Pega resolve this conflict?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The most permissive permission (Grant) applies"
+        },
+        {
+          "id": "B",
+          "text": "The most restrictive permission (Deny) applies"
+        },
+        {
+          "id": "C",
+          "text": "The first Access Role listed takes priority"
+        },
+        {
+          "id": "D",
+          "text": "An error is raised requiring manual configuration"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "When access rules conflict in Pega, the system favors granting rather than denying access.",
+      "rationale": "When an operator belongs to an Access Group that contains multiple Access Roles with conflicting permissions on the same object, Pega resolves the conflict by applying the most permissive permission. This means if one role grants Read-Write and another grants Read-only on the same class, the operator receives Read-Write access — Pega always favors granting over restricting."
+    },
+    {
+      "questionId": "m41_q03",
+      "type": "single-select",
+      "scenario": "A SA is configuring access controls for a regulated financial application and needs to explain ARO records to a compliance officer. What does an Access of Role to Object (ARO) record specify?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Permissions for instances of a specific class for members of a specific Access Role"
+        },
+        {
+          "id": "B",
+          "text": "Explicit denial of access to override other permissions"
+        },
+        {
+          "id": "C",
+          "text": "The production level at which a role can take an action"
+        },
+        {
+          "id": "D",
+          "text": "The channel interface assigned to each Persona"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "ARO = Access of Role to Object — the name describes it.",
+      "rationale": "An Access of Role to Object (ARO) record defines the permissions (Read, Write, Delete, etc.) that a specific Access Role has over instances of a particular class. AROs grant access — they do not deny it. To explicitly block access that would otherwise be granted through an ARO, a separate Access Deny record must be configured in addition to the ARO."
+    },
+    {
+      "questionId": "m41_q04",
+      "type": "single-select",
+      "scenario": "Regulations require a specific Access Role cannot access a particular class, even though an ARO would normally allow it. Which record type enforces this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Access Deny"
+        },
+        {
+          "id": "B",
+          "text": "ARO (Access of Role to Object)"
+        },
+        {
+          "id": "C",
+          "text": "Access Group"
+        },
+        {
+          "id": "D",
+          "text": "Operator record"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which access control record type overrides ARO grants to block access to a specific class?",
+      "rationale": "Access Deny records are used to explicitly prevent access to specific class instances, overriding any permissions granted by ARO records. This is essential in regulated environments where certain operators must be prevented from viewing or editing specific records — such as blocking adjusters from accessing competitor claims — regardless of their general role permissions."
+    },
+    {
+      "questionId": "m41_q05",
+      "type": "single-select",
+      "scenario": "What is the recommended best practice for managing Case Type access permissions?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use the Persona access landing page or Access Manager instead of directly editing ARO or Access Deny records"
+        },
+        {
+          "id": "B",
+          "text": "Directly edit ARO records in Dev Studio for precise control"
+        },
+        {
+          "id": "C",
+          "text": "Modify Access Deny records for all production environment changes"
+        },
+        {
+          "id": "D",
+          "text": "Use the Security Checklist to manage all role permissions"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Pega best practice avoids direct editing of shared operator records in the system.",
+      "rationale": "Use the Persona access landing page (App Studio: Users → User management) or Access Manager (Dev Studio: Configure → Org & Security → Access Manager) — not direct ARO or Access Deny edits."
+    },
+    {
+      "questionId": "m41_q06",
+      "type": "single-select",
+      "scenario": "A Pega System Architect needs to review and configure Access Roles and permissions for a Claims application and wants to use the dedicated access management tool in Dev Studio rather than navigating through the Rule Explorer. Where is the Access Manager located in Dev Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Configure → Org & Security → Access Manager"
+        },
+        {
+          "id": "B",
+          "text": "Configure → Security → RBAC → Access Manager"
+        },
+        {
+          "id": "C",
+          "text": "App Explorer → Access Manager"
+        },
+        {
+          "id": "D",
+          "text": "Records → Security → Access Manager"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "It's under Org & Security in Dev Studio.",
+      "rationale": "Access Manager in Dev Studio is found at: Configure → Org & Security → Access Manager. Options B, C, and D are incorrect navigation paths that do not lead to the Access Manager configuration page."
+    },
+    {
+      "questionId": "m41_q07",
+      "type": "single-select",
+      "scenario": "In an on-premises Pega system, production level 3 corresponds to which environment type?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Quality Assurance"
+        },
+        {
+          "id": "B",
+          "text": "Production"
+        },
+        {
+          "id": "C",
+          "text": "Development"
+        },
+        {
+          "id": "D",
+          "text": "Staging"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall the scale: 1=Production, 2=Staging, 3=QA/Test, 4=Development, 5=Sandbox.",
+      "rationale": "Production levels run 1–5: level 1 is Production (most restrictive), 5 is Sandbox (least restrictive). The scale is counterintuitive — lower number = more locked down. Level 3 = Quality Assurance."
+    },
+    {
+      "questionId": "m41_q08",
+      "type": "single-select",
+      "scenario": "What determines which screen a user sees immediately after logging into a Pega application?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The default Channel interface associated with their Role"
+        },
+        {
+          "id": "B",
+          "text": "The Access Group assigned to their Operator record"
+        },
+        {
+          "id": "C",
+          "text": "The Persona access landing page configuration"
+        },
+        {
+          "id": "D",
+          "text": "The ARO record for their class"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Each Access Role has a default Channel interface that determines the user portal.",
+      "rationale": "Each Role has a default Channel interface that determines which screen users see upon login. B, C, and D control permissions and alignment — not the login landing screen."
+    },
+    {
+      "questionId": "m41_q09",
+      "type": "single-select",
+      "scenario": "Two groups of managers need different levels of access to the same Pega application. How should this be configured?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Create multiple Access Groups that reference the same application with different Access Roles"
+        },
+        {
+          "id": "B",
+          "text": "Create multiple applications — one per access level"
+        },
+        {
+          "id": "C",
+          "text": "Assign multiple Personas to each manager"
+        },
+        {
+          "id": "D",
+          "text": "Use Access Deny records to restrict individual manager permissions"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Multiple Access Groups can reference the same application.",
+      "rationale": "Creating a Persona in App Studio automatically generates a corresponding Access Group in Dev Studio. This linkage is automatic — no manual Dev Studio step is required."
+    },
+    {
+      "questionId": "m41_q10",
+      "type": "single-select",
+      "scenario": "How do Access Groups in Dev Studio relate to role assignments in App Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Access Groups in Dev Studio align with the roles that can be assigned to users in App Studio"
+        },
+        {
+          "id": "B",
+          "text": "Access Groups in Dev Studio are completely separate from App Studio roles"
+        },
+        {
+          "id": "C",
+          "text": "App Studio roles must always be created before Dev Studio Access Groups"
+        },
+        {
+          "id": "D",
+          "text": "Dev Studio Access Groups replace App Studio role assignments entirely"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "They represent the same underlying concept in different studios.",
+      "rationale": "Access Groups in Dev Studio align with the roles that developers can assign to users in App Studio — they represent the same underlying concept, accessible from different studios."
+    },
+    {
+      "questionId": "m41_q11",
+      "type": "single-select",
+      "scenario": "A BA wants to configure which portal pages each Persona can access but is unsure where to find the Persona access settings. Where is the Persona access landing page found in App Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Users → User management"
+        },
+        {
+          "id": "B",
+          "text": "Configure → Org & Security → Access Manager"
+        },
+        {
+          "id": "C",
+          "text": "Settings → Security → Personas"
+        },
+        {
+          "id": "D",
+          "text": "App Explorer → Personas → Access"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "It's in the Users section of App Studio.",
+      "rationale": "To manage Persona access and channel configurations, navigate to App Studio → Users → User management, then select the relevant Persona. This App Studio path is designed for BAs configuring which portals and pages a Persona can access. Dev Studio's Access Manager is a separate, more technical interface intended for SAs managing fine-grained AROs and access records."
+    },
+    {
+      "questionId": "m41_q12",
+      "type": "single-select",
+      "scenario": "A new Persona is created in App Studio. What automatically happens in Dev Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A corresponding Access Group is automatically created in Dev Studio"
+        },
+        {
+          "id": "B",
+          "text": "A corresponding ARO record is created for all classes"
+        },
+        {
+          "id": "C",
+          "text": "A corresponding Access Deny record is created"
+        },
+        {
+          "id": "D",
+          "text": "Nothing — Dev Studio and App Studio are independent"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Persona creation in App Studio triggers something in Dev Studio.",
+      "rationale": "Creating a Persona in App Studio automatically creates a corresponding Access Group in Dev Studio. However, not all Access Groups in Dev Studio have corresponding Personas in App Studio."
+    },
+    {
+      "questionId": "m41_q13",
+      "type": "multi-select",
+      "scenario": "A Pega System Architect is explaining access control to a junior developer. Which TWO elements work together to control what actions a user can perform on a Case?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Access Role — defines the permitted actions (create, read, update, delete) for a role"
+        },
+        {
+          "id": "B",
+          "text": "Access Group — associates users with one or more Access Roles and a default portal"
+        },
+        {
+          "id": "C",
+          "text": "Data Page — determines what data the user can load from external systems"
+        },
+        {
+          "id": "D",
+          "text": "Field Group — restricts which fields are visible per Assignment step"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Recall the two Pega constructs that define permissions and then assign those permissions to users.",
+      "rationale": "Access Roles define the permitted operations (create, read, update, delete) on Cases and Rules. Access Groups link users to those Access Roles and to a default application portal. Data Pages and Field Groups serve data and UI purposes respectively, not permission control."
+    },
+    {
+      "questionId": "m41_q14",
+      "type": "multi-select",
+      "scenario": "An SA is configuring fine-grained Case access in a Pega application. Which TWO statements correctly describe Access Role Objects (AROs) and their relationship to Access Deny rules?",
+      "options": [
+        {
+          "id": "A",
+          "text": "AROs grant or restrict access to specific Case Types at the record level for a given role"
+        },
+        {
+          "id": "B",
+          "text": "Access Deny rules can be used alongside AROs to explicitly block access even when a role would otherwise permit it"
+        },
+        {
+          "id": "C",
+          "text": "AROs are applied at the individual operator level, not at the role level"
+        },
+        {
+          "id": "D",
+          "text": "AROs automatically propagate permissions to all child Cases without additional configuration"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "AROs operate at the role level for Case Type access, and Deny rules can override grants.",
+      "rationale": "AROs (Access Role Objects) define what a role can do on a specific Case Type at the record level — granting or restricting CRUD operations. Access Deny rules provide an override layer that explicitly blocks access even when an ARO would otherwise grant it. AROs apply to roles, not individual operators, and do not auto-propagate to child Cases."
+    },
+    {
+      "questionId": "m41_q15",
+      "type": "multi-select",
+      "scenario": "A Pega application requires three distinct user populations — Agents, Supervisors, and Administrators — each with different access levels. Which TWO Pega constructs are required to grant each group different levels of application access?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Separate Personas aligned to each user type to define their role in the application"
+        },
+        {
+          "id": "B",
+          "text": "Access Roles defining the specific permissions granted to each Persona"
+        },
+        {
+          "id": "C",
+          "text": "Separate Application Rulesets per user type to isolate their configuration rules"
+        },
+        {
+          "id": "D",
+          "text": "Custom Declare Expressions to evaluate user type and grant access at runtime"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Pega uses Personas to model user types and Access Roles to assign what those types can do.",
+      "rationale": "Personas represent the distinct user types in an application and align users to an application role. Access Roles define the actual permissions for each Persona. Separate Application Rulesets per user type and Declare Expressions are not the correct mechanism for access control in Pega."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Persona vs Role",
+      "value": "Persona = business outcomes. Role = how users interact. Each Role has a default Channel interface (login screen)."
+    },
+    {
+      "key": "Access Role",
+      "value": "Categorizes users by job function. Permissions control Actions on instances of specific classes."
+    },
+    {
+      "key": "Access Group",
+      "value": "Group of privileges referencing one or more Access Roles. Conflicting permissions → MOST PERMISSIVE wins."
+    },
+    {
+      "key": "ARO vs Access Deny",
+      "value": "ARO = grants permissions per class per role. Access Deny = overrides AROs to explicitly deny access."
+    },
+    {
+      "key": "Best practice for permissions",
+      "value": "App Studio: Users → User management. Dev Studio: Configure → Org & Security → Access Manager. Avoid direct ARO edits."
+    },
+    {
+      "key": "Production levels",
+      "value": "1=Production, 2=Staging, 3=QA, 4=Development, 5=Sandbox. Lower = more production-like."
+    },
+    {
+      "key": "Persona → Access Group",
+      "value": "Creating Persona in App Studio auto-creates Access Group in Dev Studio. Not all Access Groups have a Persona."
+    }
+  ]
+}

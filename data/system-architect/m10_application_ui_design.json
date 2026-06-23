@@ -1,0 +1,887 @@
+{
+  "moduleId": "m10",
+  "moduleTitle": "Application user interface design",
+  "moduleUrl": "https://academy.pega.com/module/application-user-interface-design/v1/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/application-user-interface-design/v1/quiz/in/96211",
+  "learningObjectives": [
+    "Describe the two top-level View types in Constellation: Full Page and Partial",
+    "Configure a View for a Case Type Step in App Studio",
+    "Explain how Model-driven UI selects controls automatically from Field Types",
+    "Distinguish between Form Views and List Views and their editing behavior",
+    "Describe how Primary Fields on a data object propagate into Case Type Views"
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Views in Constellation",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "View",
+          "description": "A reusable configuration of UI elements used to capture or display data for a Case. Constellation applications are built on a View-based UI architecture (the Constellation Ruleset), and Views are reusable across Case Types."
+        },
+        {
+          "type": "analogy",
+          "text": "Configuring a Pega Constellation UI is like furnishing a modular apartment: Views are the room layouts, Fields are the furniture pieces, and model-driven controls are the building code that says 'all outlets must be at 18 inches.' Change one layout template and every room using it updates automatically — the model drives the furniture arrangement without repainting each room by hand."
+        },
+        {
+          "type": "concept",
+          "term": "Prescribed design system",
+          "description": "Constellation provides a prescribed but configurable design system — a builder kit of UI elements, styles, UX patterns, themes, and guidelines — with out-of-the-box accessibility. BAs, Citizen Developers, and System Architects configure Views in App Studio."
+        },
+        {
+          "type": "concept",
+          "term": "The four View types",
+          "description": "Full Page View (read-only; one per Case/data object), Partial (read-only), List (data-source-backed; table/timeline/tile; read-only by default), and Form (gathers data; editable)."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 290\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Constellation UI View Hierarchy</title>\n<desc>Full Page View contains Partial Views; Partial Views contain Form or List Views with fields</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">CONSTELLATION VIEW HIERARCHY</text>\n<!-- Full Page outer -->\n<rect x=\"20\" y=\"44\" width=\"740\" height=\"230\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"74\" font-size=\"14\" font-weight=\"700\" fill=\"#0E3D28\">Full Page View</text>\n<text x=\"40\" y=\"92\" font-size=\"11\" fill=\"#1E8A5B\">Entire portal screen · contains Partial Views as regions</text>\n<!-- Partial A -->\n<rect x=\"40\" y=\"104\" width=\"330\" height=\"150\" rx=\"10\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/>\n<text x=\"58\" y=\"128\" font-size=\"12\" font-weight=\"700\" fill=\"#2B2580\">Partial View (Header)</text>\n<!-- Form inside Partial A -->\n<rect x=\"58\" y=\"138\" width=\"294\" height=\"100\" rx=\"7\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"1\"/>\n<text x=\"74\" y=\"162\" font-size=\"11\" font-weight=\"700\" fill=\"#0D3560\">Form View</text>\n<text x=\"74\" y=\"178\" font-size=\"10.5\" fill=\"#185FA5\">First Name [Text input]</text>\n<text x=\"74\" y=\"194\" font-size=\"10.5\" fill=\"#185FA5\">Policy # [Text input]</text>\n<text x=\"74\" y=\"210\" font-size=\"10.5\" fill=\"#185FA5\">Status [Dropdown]</text>\n<!-- Partial B -->\n<rect x=\"390\" y=\"104\" width=\"350\" height=\"150\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/>\n<text x=\"408\" y=\"128\" font-size=\"12\" font-weight=\"700\" fill=\"#5A3200\">Partial View (Body)</text>\n<!-- List inside Partial B -->\n<rect x=\"408\" y=\"138\" width=\"314\" height=\"100\" rx=\"7\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"1\"/>\n<text x=\"424\" y=\"162\" font-size=\"11\" font-weight=\"700\" fill=\"#0D3560\">List View (read-only by default)</text>\n<text x=\"424\" y=\"178\" font-size=\"10.5\" fill=\"#185FA5\">Row 1 · Row 2 · Row 3 …</text>\n<text x=\"424\" y=\"196\" font-size=\"10.5\" fill=\"#185FA5\">Controls: sort, filter, paginate</text>\n<text x=\"424\" y=\"214\" font-size=\"10.5\" fill=\"#BA7517\">Enable editing explicitly</text>\n</svg>",
+          "caption": "Constellation's View hierarchy: a Full Page View holds Partial Views as regions; Partial Views contain Form Views (editable) or List Views (read-only by default)."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "UI Configuration in App Studio",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Separation of Concerns",
+          "description": "The UI layer follows the Separation of Concerns principle — the application is divided into distinct parts, each addressing one concern — so front-end components connect cleanly to back-end APIs."
+        },
+        {
+          "type": "concept",
+          "term": "Templates",
+          "description": "Auto-generated Views are built from Templates that handle layout and responsiveness (breakpoints, white-space, wrapping) and ensure out-of-the-box accessibility. Each View type uses a different template."
+        },
+        {
+          "type": "concept",
+          "term": "Full Page View",
+          "description": "Auto-added per new Case Type/data object; the three-pane visual framework representing a single Case. Edited on the UX tab. While authoring, the Preview shows only placeholder text — run a Case instance to preview with real data."
+        },
+        {
+          "type": "concept",
+          "term": "Summary panel & Promoted Action",
+          "description": "The Summary panel sits upper-left and by default includes the Details View (showing Primary Fields) and Pulse View. A Promoted Action gives header access to a frequent Case-wide Action (e.g., Change Stage) — one per Case Type."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">UI CONFIGURATION — KEY RULES</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">View Editability</text><text x=\"117\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Set at VIEW level</text><text x=\"117\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Read-only View → ALL fields</text><text x=\"117\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">inside are read-only</text><text x=\"117\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">1 Promoted Action per</text><text x=\"117\" y=\"132\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Case Type maximum</text><rect x=\"253\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Model-driven Controls</text><text x=\"360\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Property data type →</text><text x=\"360\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">auto-selected UI control</text><text x=\"360\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Date → DatePicker</text><text x=\"360\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Text → TextInput</text><text x=\"360\" y=\"130\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Overrideable per field</text><rect x=\"496\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Primary Fields</text><text x=\"603\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Defaults from Data Model</text><text x=\"603\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">(key properties)</text><text x=\"603\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Child Case Types inherit</text><text x=\"603\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">&amp; can extend</text><text x=\"603\" y=\"132\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">NOT empty by default</text></svg>",
+          "caption": "View editability is set at the View level; 1 Promoted Action max per Case Type; model-driven controls auto-selected from property type; Primary Fields defaults from Data Model."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Form Views",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Creating a Form View",
+          "description": "Two ways: on the Workflow tab (configuring a Step's View auto-creates a Form View) or on the UX tab's Other Views pane. Form Views use the Default template; Step-associated Views can also use the Hierarchical template."
+        },
+        {
+          "type": "concept",
+          "term": "Layout",
+          "description": "Set 1–3 columns; two-column is best practice. Narrow inputs (Text single line, Currency) take one column; wider/any-height inputs (Rich Text Editor, Text area, Radio group, Checkbox, Booleans, Attachments) span two columns, keeping tabbing left-to-right."
+        },
+        {
+          "type": "concept",
+          "term": "Field groups & multi-step vs hierarchical",
+          "description": "A field group clusters related fields under one header, specific to that View (not reusable). Multi-step Forms split an Assignment across multiple Views; Hierarchical Forms split across tabs within a single Form View; UX-tab-only forms cannot be hierarchical."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 170\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">FORM VIEW LAYOUT</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"126\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Creation</text><text x=\"117\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Created from a template</text><text x=\"117\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Default: single-column layout</text><text x=\"117\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">NOT blank canvas</text><text x=\"117\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Template can be changed</text><rect x=\"253\" y=\"30\" width=\"215\" height=\"126\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Two-Column Layout</text><text x=\"360\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Individual inputs can span</text><text x=\"360\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">BOTH columns (full width)</text><text x=\"360\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Spanning = supported ✓</text><rect x=\"496\" y=\"30\" width=\"215\" height=\"126\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Field Groups</text><text x=\"603\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Hierarchical nesting supported</text><text x=\"603\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">but has DEPTH LIMIT</text><text x=\"603\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Too deep = render error</text></svg>",
+          "caption": "Form Views created from template (default single-column); two-column inputs can span; field groups have a depth limit."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Exploring Fields",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Field settings",
+          "description": "Each field has a name and a Field Type that determines its format/validation and the control shown. You configure field settings (label, required, visibility, etc.) to tailor capture and presentation."
+        },
+        {
+          "type": "concept",
+          "term": "Primary Fields",
+          "description": "The critical fields displayed whenever interacting with a Case type; automatically shown on the default Create, Edit, and Details Views. A reference field inherits the referenced data object's Primary Fields into the Case Type's Views."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Model-driven UI Controls",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Model-driven UI",
+          "description": "In Constellation, the UI is generated from the Data Model: the control type is selected AUTOMATICALLY based on field type. Date → date picker; Boolean → checkbox; Picklist → dropdown. No manual wiring needed."
+        },
+        {
+          "type": "concept",
+          "term": "Patterns and consistency",
+          "description": "Because controls derive from the model via reusable patterns, the UI stays consistent and responsive across devices/channels, and adapts automatically when rules change. You can still customize a control's presentation where needed."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 240\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Model-driven UI: Field Type to Control Mapping</title>\n<desc>Pega auto-selects the UI control based on the Field Type at render time</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">MODEL-DRIVEN UI — AUTOMATIC CONTROL SELECTION</text>\n<!-- Arrow flow label -->\n<text x=\"240\" y=\"60\" font-size=\"11\" fill=\"var(--t)\" opacity=\".5\" text-anchor=\"middle\">Field Type</text>\n<line x1=\"320\" y1=\"56\" x2=\"380\" y2=\"56\" stroke=\"#6d8bff\" stroke-width=\"2\"/>\n<polygon points=\"380,50 392,56 380,62\" fill=\"#6d8bff\"/>\n<text x=\"520\" y=\"60\" font-size=\"11\" fill=\"var(--t)\" opacity=\".5\" text-anchor=\"middle\">UI Control (auto)</text>\n<!-- Rows -->\n<rect x=\"20\" y=\"72\" width=\"280\" height=\"34\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"36\" y=\"94\" font-size=\"12\" fill=\"#0E3D28\">Text (single line)</text>\n<rect x=\"500\" y=\"72\" width=\"260\" height=\"34\" rx=\"7\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"1.5\"/>\n<text x=\"516\" y=\"94\" font-size=\"12\" fill=\"#0D3560\">Single-line text input</text>\n\n<rect x=\"20\" y=\"114\" width=\"280\" height=\"34\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"36\" y=\"136\" font-size=\"12\" fill=\"#0E3D28\">Boolean</text>\n<rect x=\"500\" y=\"114\" width=\"260\" height=\"34\" rx=\"7\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"1.5\"/>\n<text x=\"516\" y=\"136\" font-size=\"12\" fill=\"#0D3560\">Checkbox or toggle</text>\n\n<rect x=\"20\" y=\"156\" width=\"280\" height=\"34\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"36\" y=\"178\" font-size=\"12\" fill=\"#0E3D28\">Picklist</text>\n<rect x=\"500\" y=\"156\" width=\"260\" height=\"34\" rx=\"7\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"1.5\"/>\n<text x=\"516\" y=\"178\" font-size=\"12\" fill=\"#0D3560\">Dropdown or radio group</text>\n\n<rect x=\"20\" y=\"198\" width=\"280\" height=\"34\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"36\" y=\"220\" font-size=\"12\" fill=\"#0E3D28\">Date only</text>\n<rect x=\"500\" y=\"198\" width=\"260\" height=\"34\" rx=\"7\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"1.5\"/>\n<text x=\"516\" y=\"220\" font-size=\"12\" fill=\"#0D3560\">Date picker calendar</text>\n</svg>",
+          "caption": "Model-driven UI: Pega automatically selects the UI control at render time based on the Field Type — no manual wiring required."
+        },
+        {
+          "type": "interactive",
+          "title": "UI Design: Spot the Flaw",
+          "height": 460,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Field Group vs View\", \"scenario\": \"An SA creates a new 'Shipping Details' Form View and adds Address, City, State, and ZIP code to it. They then configure the same group of fields again on two other Form Views for Billing and Returns. When Address format changes (adding a Suite field), they must update all three Views manually. What design flaw caused this maintenance burden?\", \"opts\": [\"The SA should have used a single reusable 'Address' View (Partial or Form) and referenced it from all three contexts \\u2014 changing the Address View once would propagate to all three\", \"The SA should have used field groups within each View to organize the fields \\u2014 field groups enable reuse across Views\", \"The issue is with Data Model design \\u2014 the Address fields should be in a separate data object with a relationship so each View automatically gets updates\", \"The SA should have used Sections (Traditional UI) instead of Views \\u2014 Sections support cross-View reuse unlike Constellation Views\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Views are designed for reuse. A single Address View referenced from Shipping, Billing, and Returns means one update propagates everywhere.\", \"\\u2717 Incorrect. Field groups organize fields within a single View but are specific to that View \\u2014 they do not enable reuse across different Views.\", \"\\u2717 Incorrect. While a separate Address data object improves data reuse, it does not automatically update Views. The UI View still needs to be referenced consistently.\", \"\\u2717 Incorrect. Sections are Traditional UI architecture (Theme Cosmos). In Constellation, Views provide the same cross-Case-Type reuse capability.\"]}, {\"label\": \"Model-Driven Control\", \"scenario\": \"An SA manually overrides the Date field control in a Constellation View to render as a text input (single line) because 'the date picker sometimes confuses users.' A team member warns this is wrong. Who is right?\", \"opts\": [\"The team member is right \\u2014 overriding the model-driven control breaks Constellation's separation of concerns; the date picker is the correct model-driven control for a Date field type\", \"The SA is right \\u2014 UI overrides are supported and encouraged in Constellation when the default control does not match user experience requirements\", \"The SA's approach is acceptable for a Date field but would be wrong for Boolean, Currency, or Picklist fields where the model-driven control enforces data integrity\", \"Both are wrong \\u2014 you cannot override controls in Constellation at all; the model-driven control is fixed and non-configurable\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Overriding the date picker with a text input breaks model-driven UI \\u2014 users could type arbitrary text instead of valid dates, removing the control's data-integrity benefits.\", \"\\u2717 Incorrect. While minor styling overrides are possible, changing the control TYPE (date picker \\u2192 text input) defeats the purpose of model-driven UI and removes built-in date validation.\", \"\\u2717 Incorrect. The data-integrity concern applies equally to Date fields \\u2014 a text input allows 'banana' as a date value.\", \"\\u2717 Incorrect. Some styling and configuration overrides ARE available in Constellation, but the fundamental control type is driven by the field type.\"]}, {\"label\": \"Promoted Action Limit\", \"scenario\": \"A Case Type has 5 frequent Actions that users access regularly: 'Change Address', 'Add Note', 'Escalate', 'Request Callback', and 'Update Priority'. An SA tries to configure all 5 as promoted Actions (accessible from the Case header). Is this possible?\", \"opts\": [\"No \\u2014 only ONE promoted Action is allowed per Case Type; the other frequent Actions should be accessible via the Actions menu, optional Actions, or Stages\", \"Yes \\u2014 up to 5 promoted Actions can be configured per Case Type; the limit is 5 to prevent header clutter\", \"Yes \\u2014 there is no limit on promoted Actions per Case Type; add as many as needed for user convenience\", \"No \\u2014 promoted Actions are only for optional Actions; required Steps cannot be promoted regardless of frequency\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Exactly one promoted Action per Case Type is the Pega design constraint. Additional frequent Actions belong in the standard Actions menu or as Stage/Case-wide optional Actions.\", \"\\u2717 Incorrect. The limit is ONE, not five. Configuring more than one is not supported by the platform.\", \"\\u2717 Incorrect. There IS a limit \\u2014 one per Case Type. Unlimited promoted Actions would clutter the Case header and defeat the purpose of 'promoted' (the single most important action).\", \"\\u2717 Incorrect. The one-per-Case-Type limit applies to the configuration itself \\u2014 the restriction is not about Action type (optional vs. required).\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "View editability",
+      "trapDescription": "Questions ask how to make a View read-only for a specific Persona. Candidates set individual field permissions. Editability is a View-level property — setting the View to read-only locks all fields inside it regardless of individual field configurations.",
+      "bestPractice": "Memorize: Full Page + Partial = read-only; List = read-only by default; Form = editable. Partial fields always read-only."
+    },
+    {
+      "title": "Full Page View preview",
+      "trapDescription": "Authoring shows only placeholder text; run a Case to see real data. It is edited on the UX tab and is three-pane.",
+      "bestPractice": "Placeholders at design time; run a Case instance for live data."
+    },
+    {
+      "title": "One promoted Action per Case Type",
+      "trapDescription": "A question asks how many Actions can be promoted as the primary button on a Case page. Candidates say 'unlimited.' Only ONE Action per Case Type can be promoted — it appears as the primary button on the Case page header.",
+      "bestPractice": "Exactly one promoted Action per Case Type; first Case-wide Action; no button component."
+    },
+    {
+      "title": "Form View creation + default template",
+      "trapDescription": "Questions ask how a Form View is created and what its default layout is. Candidates describe creating it from scratch with a blank canvas. Form Views are created from a template — the default is a single-column layout that can be modified.",
+      "bestPractice": "Workflow tab + Step → Form View. Other templates come from creating other View types on the UX tab."
+    },
+    {
+      "title": "Two-column layout and spanning inputs",
+      "trapDescription": "A question asks how to make one input field span the full width of a two-column Form View. Candidates say it is not possible. In a two-column layout, individual inputs can be configured to span both columns — this is a standard layout option.",
+      "bestPractice": "One column: Text(single line), Currency. Span two: Rich Text Editor, Text area, Radio group, Checkbox, Booleans, Attachments."
+    },
+    {
+      "title": "Model-driven control selection",
+      "trapDescription": "Questions ask why Pega automatically selects a Date control for a Date property. Candidates say the developer must manually assign control types. Pega uses model-driven UI — the property data type determines the default UI control automatically.",
+      "bestPractice": "Set the right Field Type and the correct control renders automatically (date picker, checkbox, dropdown)."
+    },
+    {
+      "title": "Primary Fields defaults & inheritance",
+      "trapDescription": "A question asks which fields appear in the Primary Fields section by default. Candidates say it is empty. Primary Fields defaults to the key properties defined in the Data Model — child Case Types inherit and can extend these defaults.",
+      "bestPractice": "Primary Fields auto-appear on Create/Edit/Details; reference fields bring in the referenced object's Primary Fields."
+    },
+    {
+      "title": "Field groups & hierarchical limits",
+      "trapDescription": "Questions ask how many levels of nested field groups are supported. Candidates say 'unlimited.' Field groups have a hierarchical depth limit — deeply nested field groups exceed this limit and cause rendering errors.",
+      "bestPractice": "Field group = local to its View; hierarchical layout needs a Step-associated View."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m10_q01",
+      "type": "single-select",
+      "scenario": "A Pega application must serve both a mobile sales team and desktop-based approvers. An SA explains that defining a separate UI view per channel prevents channel-specific changes from breaking other channels. Which Pega feature enables this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Channels — each channel (mobile, web, voice, etc.) maps to its own UI configuration so changes to one channel do not impact others"
+        },
+        {
+          "id": "B",
+          "text": "Themes — a single theme definition automatically adapts the same view to any screen size without separate channel configuration"
+        },
+        {
+          "id": "C",
+          "text": "Case Life Cycle stages — each stage renders its own channel-appropriate UI automatically based on the user's device"
+        },
+        {
+          "id": "D",
+          "text": "Data Pages — a separate Data Page per channel fetches and formats device-specific data independently"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Channels isolate channel-specific UI so one channel's changes don't cascade.",
+      "rationale": "Channels in Pega let each channel (mobile web, desktop browser, voice) have its own UI configuration — changes to mobile do not affect desktop. A single theme would apply the same layout to all channels."
+    },
+    {
+      "questionId": "m10_q02",
+      "type": "single-select",
+      "scenario": "An SA needs to add a custom navigation tab labeled 'My Tasks' to the portal so all users see it immediately upon login. Where is this configuration made?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Portal — the portal configuration controls navigation, global layout, and what users see immediately when they log in"
+        },
+        {
+          "id": "B",
+          "text": "Theme — the application theme controls the color and font of navigation tabs, not their content or visibility"
+        },
+        {
+          "id": "C",
+          "text": "View — a View defines the fields and layout of a specific form, not the global portal navigation structure"
+        },
+        {
+          "id": "D",
+          "text": "Channel — the channel selection determines the device type, not individual navigation tab labels"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Portal = navigation + global layout the user sees upon login.",
+      "rationale": "The Portal is where navigation tabs, landing pages, and the global layout are configured. Themes control visual styling (colors, typography); neither Views nor the Data Model manage navigation."
+    },
+    {
+      "questionId": "m10_q03",
+      "type": "single-select",
+      "scenario": "An SA must ensure that when a customer submits a 'Lost Card' Case on mobile, the form layout is optimized for a small screen without changing the desktop layout. Which construct should contain the mobile-specific View?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The mobile Channel — the mobile channel holds mobile-specific Views so desktop Views are unaffected"
+        },
+        {
+          "id": "B",
+          "text": "The Case Type's Stage — a separate Stage in the Case Life Cycle is created for mobile users with a mobile-optimized layout"
+        },
+        {
+          "id": "C",
+          "text": "A new Case Type — a separate Case Type for mobile users encapsulates the mobile-specific form layout"
+        },
+        {
+          "id": "D",
+          "text": "The Data Page — the mobile Data Page formats data for a smaller screen, which controls how the View renders"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Each channel holds its own Views — mobile channel → mobile Views; desktop channel → desktop Views.",
+      "rationale": "The mobile Channel holds mobile-specific Views, keeping them separate from the desktop channel's Views B is wrong because a Stage defines workflow steps, not device-specific layouts — the same Stage serves all."
+    },
+    {
+      "questionId": "m10_q04",
+      "type": "single-select",
+      "scenario": "A BA asks: 'What is the fundamental purpose of a View in Pega?' Which answer is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A View defines the visual layout and the fields presented to a user within a UI screen or form"
+        },
+        {
+          "id": "B",
+          "text": "A View stores the business logic (validation, assignments) triggered when a user interacts with a field"
+        },
+        {
+          "id": "C",
+          "text": "A View is a Pega security artifact that controls which fields a user role can read or modify"
+        },
+        {
+          "id": "D",
+          "text": "A View caches the data displayed on a form so the screen loads without re-querying the data source"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A View = layout + fields shown to the user. Not logic, not security, not caching.",
+      "rationale": "A View defines the visual layout and which fields appear on a UI screen or form B is wrong because business logic (validation, assignments, decisions) is captured in Automations, not in a View.."
+    },
+    {
+      "questionId": "m10_q05",
+      "type": "single-select",
+      "scenario": "A Constellation form has a two-column grid. The grid contains: a single-line text field, a currency field, a rich text editor for comments, and a date picker. The designer asks: 'Which control breaks out of the two-column constraint and spans the full width?' Which is correct and why?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Rich Text Editor spans both columns because it requires more vertical/horizontal space and is in the 'wider input' category that Constellation treats as full-width"
+        },
+        {
+          "id": "B",
+          "text": "The Currency field spans both columns because monetary values need wider formatting to display correctly in all locales"
+        },
+        {
+          "id": "C",
+          "text": "The Date picker spans both columns because it renders a calendar overlay that requires full-width positioning to display without clipping"
+        },
+        {
+          "id": "D",
+          "text": "All four fields follow the same two-column rule — none automatically spans both columns; width is configured manually for each field"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which field type is in the 'any height, wider' category that makes it full-width?",
+      "rationale": "Rich Text Editor (RTE) is in the 'any height / wider' category along with text areas, radio groups, checkboxes, attachments — these span both columns automatically in Constellation's two-column layout."
+    },
+    {
+      "questionId": "m10_q06",
+      "type": "single-select",
+      "scenario": "An SA is reviewing the default Views generated for a 'Loan Application' Case Type. A colleague asks: 'Which View is shown when a manager opens the Case to review it without editing any fields?' What is the answer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Review View (also called the Case Summary View) — a read-only display of all key Case data for non-editing stakeholders"
+        },
+        {
+          "id": "B",
+          "text": "The Perform View — the same editing View shown to workers, but with all fields pre-populated for the manager"
+        },
+        {
+          "id": "C",
+          "text": "The Confirm View — shown after any data-entry step to confirm changes before the manager can move the Case forward"
+        },
+        {
+          "id": "D",
+          "text": "The Portal View — the portal's default landing page that loads the Case list for all managers upon login"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Read-only Case review without editing = Review/Summary View.",
+      "rationale": "The Review View (Case Summary View) is the read-only display used when stakeholders open a Case to inspect it without performing an assignment. The Perform View is for active assignments where users must enter data."
+    },
+    {
+      "questionId": "m10_q07",
+      "type": "single-select",
+      "scenario": "An SA adds a 'Submit' button to a form and observes that it triggers the next Case step and advances the workflow. What kind of element is this button within a View?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An Action — interactive controls such as Submit or Save that trigger business logic or workflow transitions"
+        },
+        {
+          "id": "B",
+          "text": "A Data element — the button stores a Boolean flag value that the Case engine reads to advance the workflow"
+        },
+        {
+          "id": "C",
+          "text": "A Section — a container grouping related fields; the Submit button is a specialized section boundary"
+        },
+        {
+          "id": "D",
+          "text": "A Channel — the Submit button is the channel-level trigger that signals the device to send the Case to the server"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Buttons that trigger logic = Actions in Pega's View anatomy.",
+      "rationale": "A Submit button is an Action — an interactive control that triggers business logic or advances the workflow B is wrong because Data elements (properties) store field values — a button is not a data storage."
+    },
+    {
+      "questionId": "m10_q08",
+      "type": "single-select",
+      "scenario": "An SA wants to display a warning message directly on the form when a customer enters an annual income below $10,000 during data entry — without navigating away from the form. Which View element provides inline validation feedback?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Validation element — inline validation checks that field values meet defined rules and displays error messages on the form"
+        },
+        {
+          "id": "B",
+          "text": "A Section — a new Section is dynamically added to the form containing the warning text when the threshold is crossed"
+        },
+        {
+          "id": "C",
+          "text": "A Data Page — the Data Page is refreshed with an error code that the form renders as a warning text automatically"
+        },
+        {
+          "id": "D",
+          "text": "A Channel — the channel detects the input and routes the warning message to the user's notification center"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Inline error messages on a form = Validation elements.",
+      "rationale": "Validation elements check field values and display error messages inline on the form without leaving the screen. A Section groups fields; a Confirm dialog interrupts flow — neither performs inline validation."
+    },
+    {
+      "questionId": "m10_q09",
+      "type": "single-select",
+      "scenario": "An SA opens a Case Type's Data Model in App Studio. She notices that 'Label' and 'Description' have a star/badge marking them as Primary. A junior BA asks: 'What does Primary mean here, and what happens automatically because of that designation?' What is the correct explanation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Primary Fields are automatically included on the Create, Edit, and Details Views without any manual View configuration — marking a field Primary ensures it appears on standard Views without explicit placement"
+        },
+        {
+          "id": "B",
+          "text": "Primary Fields are mandatory (required) fields — marking a field Primary adds a required validation that prevents the Case from advancing if the field is empty"
+        },
+        {
+          "id": "C",
+          "text": "Primary Fields are displayed in the sidebar summary panel only — they appear as a quick-view list of key Case attributes without being on any editable form"
+        },
+        {
+          "id": "D",
+          "text": "Primary Fields are indexed in the Pega database for faster search — the designation improves query performance for Cases with many field properties"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Primary designation controls which Views auto-include the field without manual configuration.",
+      "rationale": "Primary Fields auto-appear on the Create, Edit, and Details Views — the key benefit is that those Views update automatically when you designate a field as Primary, without manual configuration."
+    },
+    {
+      "questionId": "m10_q10",
+      "type": "single-select",
+      "scenario": "A Pega application was recently updated but a tester is still seeing old UI styles in the browser. An SA proposes updating a version parameter appended to the stylesheet link in index.html. What technique is this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Cache busting — appending or updating a version query string (e.g., ?v=20260616) forces the browser to download the latest stylesheet instead of using a cached version"
+        },
+        {
+          "id": "B",
+          "text": "CDN purging — the SA submits a purge request to the Content Delivery Network to remove cached assets from edge nodes"
+        },
+        {
+          "id": "C",
+          "text": "Theme versioning — Pega's built-in theme versioning increments the internal version number and automatically invalidates browser cache"
+        },
+        {
+          "id": "D",
+          "text": "Service worker reset — clearing the service worker's cache manifest forces all assets to be re-fetched"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "?v=... in the link href = cache busting via version query string.",
+      "rationale": "Cache busting appends (or updates) a version query string to the stylesheet URL so the browser treats it as a new file and bypasses its cache. Hard refreshes are a temporary client-side workaround, not a permanent fix."
+    },
+    {
+      "questionId": "m10_q11",
+      "type": "single-select",
+      "scenario": "During a design review an SA explains that Views should only define layout and field presentation, not business logic. A developer disagrees, saying the Submit button's action flow should be embedded in the View itself. Who is correct and why?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The SA — Views define layout and presentation; Automations (action flows) contain the business logic that buttons trigger"
+        },
+        {
+          "id": "B",
+          "text": "The developer — embedding action flows in the View collocates the trigger and the logic, reducing configuration steps"
+        },
+        {
+          "id": "C",
+          "text": "Both — Pega allows business logic to be defined either in the View or in a separate Automation depending on complexity"
+        },
+        {
+          "id": "D",
+          "text": "Neither — business logic in Pega must always be defined in the Case Life Cycle Stage, not in Views or Automations"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Views = layout; Automations = business logic. Separation of concerns is a Pega SA principle.",
+      "rationale": "Views handle layout and field presentation; Automations hold business logic. Mixing logic into Views breaks Pega's separation of concerns and makes the application harder to maintain and reuse."
+    },
+    {
+      "questionId": "m10_q12",
+      "type": "single-select",
+      "scenario": "A BA wants to verify how a View will look to a user at runtime. She opens the View in App Studio and only sees placeholder boxes instead of real data. A junior SA says 'enable editing mode to preview.' The lead SA corrects them. What is the right way to see the View with real data?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Run a Case instance — Views show placeholders in the authoring environment; real data only renders when a Case is actively running"
+        },
+        {
+          "id": "B",
+          "text": "Switch to Dev Studio and open the View's Preview tab — Dev Studio's Preview renders a full data-driven View by accessing the last saved Case"
+        },
+        {
+          "id": "C",
+          "text": "Enable 'editing mode' on the View in App Studio — this toggles the View from placeholder display to a live data-driven preview"
+        },
+        {
+          "id": "D",
+          "text": "Use the Application Layers Widget to preview Views with their Primary Fields populated from the Data Model"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Where does real Case data come from that fills in a View's placeholders?",
+      "rationale": "Authoring Views always shows placeholders — real data requires running an actual Case instance, which populates the View with live property values B is wrong because Dev Studio's Preview also shows a configuration view, not live Case data.."
+    },
+    {
+      "questionId": "m10_q13",
+      "type": "single-select",
+      "scenario": "An SA reviews the Views auto-generated when a Case Type is created. Which statement correctly describes the purpose of the Perform View?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Perform View is the assignment-editing UI shown to a user when they need to complete a task or enter data to advance the Case"
+        },
+        {
+          "id": "B",
+          "text": "The Perform View is the read-only summary display shown to stakeholders who open the Case to inspect its current status"
+        },
+        {
+          "id": "C",
+          "text": "The Perform View is the confirmation dialog shown after a user submits data, asking them to approve the submission before it is saved"
+        },
+        {
+          "id": "D",
+          "text": "The Perform View is the portal-level navigation page that lists all active Cases assigned to the current user"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Perform View = user's task-editing screen. Review = read-only. Confirm = post-submit review.",
+      "rationale": "The Perform View is the editing UI shown when a user must complete an assignment — enter data, make choices, and advance the Case. The Review View is read-only; the Create View is for initial Case submission."
+    },
+    {
+      "questionId": "m10_q14",
+      "type": "single-select",
+      "scenario": "An SA must configure a 'Document Upload' feature that appears only when a user checks 'Attach supporting documents.' Which View construct shows or hides a group of fields based on a condition?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Section configured with a visibility condition — groups related fields and can be shown or hidden based on a field value or expression"
+        },
+        {
+          "id": "B",
+          "text": "A Channel — the channel routing logic detects the checked state and routes to a different channel with the upload fields"
+        },
+        {
+          "id": "C",
+          "text": "An Action — the Action rule evaluates the checkbox and adds upload fields to the View dynamically at submit time"
+        },
+        {
+          "id": "D",
+          "text": "A Data Page — the Data Page is parameterized by the checkbox value and returns an augmented field set containing the upload fields"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Conditional show/hide of a field group = a Section with a visibility condition.",
+      "rationale": "A Section groups related fields and accepts a visibility condition — when the checkbox is unchecked, the Section (and its upload fields) is hidden. A Tab is a page-level navigation element, not a conditional UI block."
+    },
+    {
+      "questionId": "m10_q15",
+      "type": "single-select",
+      "scenario": "An SA explains to a developer that Sections within a View can be nested and reused across multiple Views. Why is Section reuse architecturally significant?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Reusing a Section ensures consistent layout and field presentation across all Views that include it — a change to the Section propagates everywhere it is used"
+        },
+        {
+          "id": "B",
+          "text": "Section reuse is only a visual convenience — it has no architectural impact because each View maintains its own independent copy of the section's fields"
+        },
+        {
+          "id": "C",
+          "text": "Sections can only be reused within the same Case Type; they cannot be shared across different Case Types in the application"
+        },
+        {
+          "id": "D",
+          "text": "A reused Section automatically merges its data validation rules with the hosting View's rules, doubling the number of active validation checks"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Single Section definition → shared by many Views → one change propagates everywhere.",
+      "rationale": "Reusing a Section means a single definition serves multiple Views — update the Section once and all Views using it reflect the change. Copying creates independent copies that diverge over time."
+    },
+    {
+      "questionId": "m10_q16",
+      "type": "single-select",
+      "scenario": "A UX designer asks an SA: 'How does Pega automatically adapt the same Pega-designed form to different screen sizes without requiring separate Views for each breakpoint?' What feature does the SA describe?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Cosmos React — Pega's UI framework that renders Views using responsive design so they automatically adapt to different screen sizes"
+        },
+        {
+          "id": "B",
+          "text": "The Channel configuration — channel configuration manually maps each screen size to a pre-designed View"
+        },
+        {
+          "id": "C",
+          "text": "The Data Page — the Data Page returns differently sized data payloads depending on screen resolution"
+        },
+        {
+          "id": "D",
+          "text": "The Ruleset stack — the Ruleset layer closest to the user's device is applied so higher layers handle larger screens"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Cosmos React = Pega's responsive UI framework that auto-adapts layouts.",
+      "rationale": "Cosmos React is Pega's UI framework — it uses responsive design so Views automatically reflow to fit different screen sizes. Channels control per-channel configuration, not automatic responsive rendering."
+    },
+    {
+      "questionId": "m10_q17",
+      "type": "single-select",
+      "scenario": "An SA must implement a field on a form that autocompletes product names by fetching matching records from an external catalog as the user types. Which approach uses a Data Page within a View?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Configure the field to source its autocomplete options from a List Data Page parameterized by the user's typed input"
+        },
+        {
+          "id": "B",
+          "text": "Store all product names in the View's embedded JSON array so autocomplete works offline without an external Data Page"
+        },
+        {
+          "id": "C",
+          "text": "Configure a Channel to intercept keystrokes and route each character to an Action that returns a product name list"
+        },
+        {
+          "id": "D",
+          "text": "Use an Embedded Data Field Type to store the full product catalog inside the Case and filter it client-side"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Autocomplete from external = list Data Page parameterized by typed input.",
+      "rationale": "Autocomplete is implemented by pointing the field's options source to a List Data Page — the typed input is passed as a parameter and the Data Page returns matching records dynamically."
+    },
+    {
+      "questionId": "m10_q18",
+      "type": "single-select",
+      "scenario": "An SA's mentor reviews UI work and notes: 'You've placed assignment-advancing business logic inside a View. What should you do instead?' What is the correct approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Move the business logic into Automations — Views handle layout and presentation; Automations contain logic that triggers when Actions are invoked"
+        },
+        {
+          "id": "B",
+          "text": "Keep it in the View but add a comment explaining why it is there, so future developers know it is intentional"
+        },
+        {
+          "id": "C",
+          "text": "Move it into the Data Page — Data Pages are the correct container for any logic that fires when a user submits a form"
+        },
+        {
+          "id": "D",
+          "text": "Duplicate it into both the View and an Automation so the logic runs regardless of which path the user takes"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Logic in a View → move to Automations. Views = presentation; Automations = logic.",
+      "rationale": "Business logic belongs in Automations — Views handle layout and presentation only. Placing assignment or decision logic in Views couples UI to behavior, making both harder to maintain."
+    },
+    {
+      "questionId": "m10_q19",
+      "type": "multi-select",
+      "scenario": "A Pega System Architect is explaining Constellation View types to a junior developer. Which TWO statements correctly describe Full Page and Partial views?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Full Page views are top-level containers that can be assigned directly to a Case Type step"
+        },
+        {
+          "id": "B",
+          "text": "Partial views are embedded inside Full Page views and cannot be used as a step's top-level view"
+        },
+        {
+          "id": "C",
+          "text": "Full Page and Partial views share identical configuration options with no structural difference"
+        },
+        {
+          "id": "D",
+          "text": "Partial views can be assigned as the primary view for an Assignment step without a parent Full Page view"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Recall which view type is assigned to a step versus embedded within another view.",
+      "rationale": "Full Page views are the top-level containers for a Constellation step and are directly assigned to Case Type steps in App Studio. Partial views are reusable sub-views embedded inside Full Page views — they cannot independently serve as a step's top-level view."
+    },
+    {
+      "questionId": "m10_q20",
+      "type": "multi-select",
+      "scenario": "An SA is configuring UI controls for a new Case Type in App Studio. Which TWO statements are true about Model-driven UI in Pega Constellation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Constellation selects the appropriate UI control automatically based on the field's data type"
+        },
+        {
+          "id": "B",
+          "text": "A Date field automatically renders as a date-picker control without manual configuration"
+        },
+        {
+          "id": "C",
+          "text": "Developers must manually assign a UI control to every field regardless of field type"
+        },
+        {
+          "id": "D",
+          "text": "Model-driven UI applies only to List Views and has no effect on Form Views"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Think about what drives automatic control selection — field metadata, not manual configuration.",
+      "rationale": "Model-driven UI in Constellation reads each field's data type and metadata to automatically select the correct control — a Date field becomes a date-picker, a Boolean becomes a checkbox. Developers do not need to manually assign controls, and the behavior applies to both Form and List Views."
+    },
+    {
+      "questionId": "m10_q21",
+      "type": "multi-select",
+      "scenario": "A business analyst asks how Form Views differ from List Views in a Pega Constellation application. Which TWO statements are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Form Views allow users to enter and edit field data for a single record"
+        },
+        {
+          "id": "B",
+          "text": "List Views display multiple records in a tabular or grid format"
+        },
+        {
+          "id": "C",
+          "text": "Form Views display multiple records side-by-side for comparison"
+        },
+        {
+          "id": "D",
+          "text": "List Views support full inline editing by default in Constellation"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Recall which view type is for single-record editing versus displaying a collection of records.",
+      "rationale": "Form Views are designed for entering and editing data for a single record — they present fields for user input during an Assignment. List Views display a collection of records in rows and columns. List Views in Constellation are read-only by default and require explicit inline-edit configuration."
+    },
+    {
+      "questionId": "m10_q22",
+      "type": "multi-select",
+      "scenario": "An SA is configuring Primary Fields on a Vehicle data object. Which TWO statements correctly describe how Primary Fields behave in Pega App Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Primary Fields represent the most important identifying fields on a data object, such as name or ID"
+        },
+        {
+          "id": "B",
+          "text": "When creating a Case Type View in App Studio, Primary Fields from associated data objects are automatically suggested for inclusion"
+        },
+        {
+          "id": "C",
+          "text": "Primary Fields are mandatory and must appear in every Case Type View regardless of step context"
+        },
+        {
+          "id": "D",
+          "text": "Setting a field as Primary removes it from the data object and places it directly on the Case Type"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Primary Fields mark the most important data object fields and are auto-suggested when building Views.",
+      "rationale": "Primary Fields identify the most important descriptive fields on a data object (e.g., Vehicle Make, Model, VIN). When an SA creates a Case Type View in App Studio, Primary Fields are automatically suggested as initial fields to include, saving configuration time. They are not mandatory in every View, and they remain part of the data object."
+    },
+    {
+      "questionId": "m10_q23",
+      "type": "multi-select",
+      "scenario": "A developer is building a form in App Studio using Pega's Model-driven UI. Which TWO statements correctly describe how Model-driven UI selects controls automatically?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Constellation reads each field's data type and metadata to automatically select the appropriate UI control"
+        },
+        {
+          "id": "B",
+          "text": "A Boolean field automatically renders as a checkbox control without any manual control configuration"
+        },
+        {
+          "id": "C",
+          "text": "Model-driven UI requires the developer to manually map every field to a specific control in the View"
+        },
+        {
+          "id": "D",
+          "text": "Model-driven UI applies only to Data Page fields and does not apply to Case properties"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Model-driven UI reads field metadata to auto-assign controls — Boolean becomes checkbox, Date becomes date-picker.",
+      "rationale": "Model-driven UI in Constellation uses each field's data type and metadata to automatically assign the correct control — a Boolean field becomes a checkbox, a Date field becomes a date-picker, a Text field becomes a text input. No manual control mapping is required, and Model-driven UI applies to both Data Page fields and Case properties."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Views",
+      "value": "Reusable UI configs; Constellation is View-based. Full Page + Partial = read-only; List = read-only by default; Form = editable."
+    },
+    {
+      "key": "Full Page View",
+      "value": "Auto per Case/data object; three-pane; UX tab; Preview = placeholders, run a Case for real data."
+    },
+    {
+      "key": "Summary panel / Promoted Action",
+      "value": "Upper-left; Details (Primary Fields) + Pulse. Promoted Action: one per Case Type, first Case-wide Action, header button, no component."
+    },
+    {
+      "key": "Form Views",
+      "value": "Auto-created on the Workflow tab (Default form). Two-column best practice; RTE/Text area/Radio/Checkbox/Boolean/Attachment span two columns; field groups not reusable."
+    },
+    {
+      "key": "Primary Fields",
+      "value": "Auto on Create/Edit/Details; Label & Description default Primary on Case Types; reference fields inherit referenced object's Primary Fields."
+    },
+    {
+      "key": "Model-driven controls",
+      "value": "The control renders automatically from the field's Field Type (Date→date picker, Boolean→checkbox, Picklist→dropdown); consistent, responsive, adapts to rule changes."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Views (Constellation)",
+      "url": "https://academy.pega.com/topic/views-constellation/v2/in/96211/102646",
+      "duration": "10 min"
+    },
+    {
+      "title": "UI configuration in App Studio",
+      "url": "https://academy.pega.com/topic/ui-configuration-app-studio/v5/in/96211/102646",
+      "duration": "10 min"
+    },
+    {
+      "title": "Form views",
+      "url": "https://academy.pega.com/topic/form-views/v3/in/96211/102646",
+      "duration": "10 min"
+    },
+    {
+      "title": "Exploring fields",
+      "url": "https://academy.pega.com/topic/exploring-fields/v1/in/96211/102646",
+      "duration": "10 min"
+    },
+    {
+      "title": "Model-driven UI controls",
+      "url": "https://academy.pega.com/topic/model-driven-ui-controls/v2/in/96211/102646",
+      "duration": "10 min"
+    }
+  ]
+}

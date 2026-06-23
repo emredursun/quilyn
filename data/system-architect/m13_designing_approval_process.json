@@ -1,0 +1,567 @@
+{
+  "moduleId": "m13",
+  "moduleTitle": "Designing an approval Process",
+  "moduleUrl": "https://academy.pega.com/module/designing-approval-process/v8/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/designing-approval-process/v8/quiz/in/96211",
+  "learningObjectives": [
+    "Explain what an Approval Step does and when to use it",
+    "Describe how Approve and Reject outcomes route the Case to different paths",
+    "Configure a single approval with routing and outcome paths"
+  ],
+  "estTime": "15 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "The Approval Step",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Approval Step",
+          "description": "An approval routes a Case to a user (the approver) to either APPROVE or REJECT the work. It enhances business reliability and accountability by requiring sign-off within the Process before the Case proceeds."
+        },
+        {
+          "type": "analogy",
+          "text": "An approval process in Pega is like a document traveling through an office for wet-ink signatures: each approver sees only their signature page, signs or rejects it, and passes it on automatically. The difference from paper: Pega routes the document to the next approver instantly, logs who signed when with a timestamp, and escalates via SLA if someone leaves the form sitting in their inbox too long."
+        },
+        {
+          "type": "concept",
+          "term": "Approve vs. reject routing",
+          "description": "The approver's outcome drives the path: APPROVED typically continues the primary path, while REJECTED branches to rework, a rejection Stage, or another defined path. You configure what happens for each outcome."
+        },
+        {
+          "type": "concept",
+          "term": "Three approval actions",
+          "description": "At an Approval Assignment, the approver can: APPROVE (work meets requirements — continue), REJECT (does not meet requirements — follow rejection path), or SEND BACK (return to submitter for clarification, then re-route for decision). 'Send Back' is most often missed."
+        },
+        {
+          "type": "concept",
+          "term": "No response → add an SLA",
+          "description": "If an approver may not respond in time, attach a Service-Level Agreement (SLA) to the approval Assignment. The SLA timer can escalate, reassign, or even auto-approve/auto-advance the Case after the deadline, so work does not stall waiting on one approver."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 300\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Single Approval Step Flow</title>\n<desc>An Approval Step routes to an approver whose decision branches the case to approve or reject paths</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">SINGLE APPROVAL FLOW</text>\n<!-- Case arrives -->\n<rect x=\"20\" y=\"50\" width=\"140\" height=\"48\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"90\" y=\"79\" font-size=\"12\" font-weight=\"700\" fill=\"#0E3D28\" text-anchor=\"middle\">Case in progress</text>\n<line x1=\"162\" y1=\"74\" x2=\"202\" y2=\"74\" stroke=\"#6d8bff\" stroke-width=\"2\"/>\n<polygon points=\"202,68 214,74 202,80\" fill=\"#6d8bff\"/>\n<!-- Approval Step box -->\n<rect x=\"216\" y=\"50\" width=\"160\" height=\"48\" rx=\"10\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"2\"/>\n<text x=\"296\" y=\"79\" font-size=\"12\" font-weight=\"700\" fill=\"#2B2580\" text-anchor=\"middle\">Approval Step</text>\n<!-- Arrow to approver -->\n<line x1=\"296\" y1=\"100\" x2=\"296\" y2=\"132\" stroke=\"#6d8bff\" stroke-width=\"2\"/>\n<polygon points=\"290,132 296,144 302,132\" fill=\"#6d8bff\"/>\n<!-- Approver -->\n<rect x=\"196\" y=\"144\" width=\"200\" height=\"44\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/>\n<text x=\"296\" y=\"170\" font-size=\"12\" font-weight=\"700\" fill=\"#5A3200\" text-anchor=\"middle\">Approver (routed)</text>\n<!-- Decision diamond -->\n<polygon points=\"296,210 350,240 296,270 242,240\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"296\" y=\"244\" font-size=\"11\" font-weight=\"700\" fill=\"#0D3560\" text-anchor=\"middle\">Decision?</text>\n<line x1=\"296\" y1=\"188\" x2=\"296\" y2=\"210\" stroke=\"#6d8bff\" stroke-width=\"2\"/>\n<!-- Approve path -->\n<line x1=\"350\" y1=\"240\" x2=\"530\" y2=\"240\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<polygon points=\"530,234 542,240 530,246\" fill=\"#1E8A5B\"/>\n<rect x=\"544\" y=\"216\" width=\"216\" height=\"48\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/>\n<text x=\"652\" y=\"240\" font-size=\"12\" font-weight=\"700\" fill=\"#0E3D28\" text-anchor=\"middle\">Continue primary path</text>\n<text x=\"412\" y=\"230\" font-size=\"11\" fill=\"#1E8A5B\">Approve</text>\n<!-- Reject path -->\n<line x1=\"242\" y1=\"240\" x2=\"100\" y2=\"240\" stroke=\"#DC2626\" stroke-width=\"2\"/>\n<polygon points=\"100,234 88,240 100,246\" fill=\"#DC2626\"/>\n<rect x=\"20\" y=\"216\" width=\"66\" height=\"48\" rx=\"10\" fill=\"#FEE2E2\" stroke=\"#DC2626\" stroke-width=\"1.5\"/>\n<text x=\"53\" y=\"244\" font-size=\"11\" font-weight=\"700\" fill=\"#7F1D1D\" text-anchor=\"middle\">Reject/</text>\n<text x=\"53\" y=\"257\" font-size=\"11\" font-weight=\"700\" fill=\"#7F1D1D\" text-anchor=\"middle\">Rework</text>\n<text x=\"148\" y=\"230\" font-size=\"11\" fill=\"#DC2626\">Reject</text>\n</svg>",
+          "caption": "A single Approval Step routes the assignment to a configured approver. Approve continues the primary path; Reject branches to a rework or rejection path."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Configuring a single approval",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Single approval",
+          "description": "A single approval requires ONE approver. You specify who approves (e.g., a specific user, the manager of the current operator, or a user determined by business logic) and the routing for approve/reject outcomes."
+        },
+        {
+          "type": "concept",
+          "term": "Choosing the approver",
+          "description": "The approver can be routed like any Assignment — to a specific user, a manager (reporting relationship), a Work Queue, or by business logic — so the right person signs off."
+        },
+        {
+          "type": "concept",
+          "term": "Single vs. Sequential vs. Cascading",
+          "description": "Approvals scale three ways: SINGLE = one approver; SEQUENTIAL = a fixed chain (each must act before the next); CASCADING = derived from an authority matrix, where the number of levels depends on threshold rules."
+        },
+        {
+          "type": "interactive",
+          "title": "Approval Process Design Decisions",
+          "height": 420,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Approval vs Wait\", \"scenario\": \"A travel request Case must pause until the submitter's manager reviews and either approves or rejects it. The SA debates between an 'approval Step' and a 'Wait Step.' Which is correct?\", \"opts\": [\"An approval Step \\u2014 it creates an Assignment for the approver with Approve and Reject outcomes that determine the Case's next path; a Wait Step pauses for time or events, not human decisions\", \"A Wait Step configured for 'wait for manager response' \\u2014 Wait Steps can pause for human approval and branch on the outcome\", \"Either \\u2014 both create an Assignment for the approver; the only difference is whether the manager sees 'Approve/Reject' or a standard 'Submit' button\", \"A Data Transform that writes an 'ApprovalStatus' field, then a When condition that routes based on the value \\u2014 this avoids an additional Step\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Approval Steps are specifically designed for human decisions with Approve/Reject outcomes. Wait Steps pause for time (timer) or Case events (child Case resolution), not human decisions.\", \"\\u2717 Incorrect. Wait Steps are not designed for human decision routing. They pause for time or event conditions, not for 'someone makes a decision.'\", \"\\u2717 Incorrect. The two are fundamentally different. An approval Step creates a routable Assignment with predefined Approve/Reject actions. A Wait Step has no Assignment or decision outcome mechanism.\", \"\\u2717 Incorrect. A Data Transform + When condition creates hidden workflow logic disconnected from the Case Life Cycle model. Approval Steps make the approval gate visible and auditable in the lifecycle.\"]}, {\"label\": \"Rejection Handling\", \"scenario\": \"An expense report approval is rejected by the manager. The SA says 'the Case is automatically deleted when rejected.' A BA disagrees. Who is right and what actually happens?\", \"opts\": [\"The BA is right \\u2014 rejection typically routes the Case to an Alternate Stage (e.g., 'Revision Required') where the submitter can correct and resubmit; the Case is NOT deleted\", \"The SA is right \\u2014 Pega automatically deletes Cases when an approval Step receives a Reject outcome, since the work is no longer needed\", \"Both are wrong \\u2014 rejection always routes to the Resolution Stage immediately with a 'Resolved-Rejected' status, ending the Case without revision\", \"Rejection sends a notification to the submitter and the Case remains in the Pending-Approval status until the submitter cancels it manually\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Rejection typically routes to an Alternate Stage (Revision/Rework) so the submitter can fix and resubmit. The SA controls what the rejection path does \\u2014 it does not auto-delete.\", \"\\u2717 Incorrect. Pega NEVER automatically deletes a Case upon rejection. Deletion is a drastic, irreversible action that would destroy the audit trail.\", \"\\u2717 Incorrect. Routing directly to Resolution (Resolved-Rejected) is one valid design for cases that cannot be revised, but it is not the only or automatic behavior \\u2014 the SA configures the rejection path.\", \"\\u2717 Incorrect. Cases do not passively wait in Pending-Approval after rejection \\u2014 the rejection triggers whatever path the SA configured, typically an Alternate Stage for revision.\"]}, {\"label\": \"Approver Selection\", \"scenario\": \"A project budget approval must go to the project's assigned Finance Controller \\u2014 a specific operator stored in the 'FinanceController' property on the Case. How does the SA route this approval?\", \"opts\": [\"Route using business logic that reads the FinanceController property value \\u2014 at runtime, the routing rule resolves this to the specific operator for that project\", \"Route to the Finance Department Work Queue and include a note saying 'please route to the Finance Controller' \\u2014 the first available finance user handles it\", \"Hard-code the Finance Director's Operator ID \\u2014 the Finance Director oversees all Finance Controllers so this ensures appropriate oversight\", \"Route to all Finance Controllers simultaneously; whichever one responds first is the valid approval\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Business logic routing reads a Case property (FinanceController) to dynamically identify and route to the correct specific operator at runtime.\", \"\\u2717 Incorrect. A Work Queue makes it available to ALL Finance users \\u2014 the specific Finance Controller may not even see it or may see it after someone else already acted on it.\", \"\\u2717 Incorrect. The Finance Director is one level above the required approver. Hard-coding to the Director bypasses the designated Finance Controller and alters the business process.\", \"\\u2717 Incorrect. Routing to all Finance Controllers simultaneously would create multiple competing approval Assignments \\u2014 only one decision is needed.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 180\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m13-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ink-3)\"/></marker><marker id=\"m13-err\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-err)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">SINGLE APPROVAL — FLOW &amp; ROUTING</text><rect x=\"10\" y=\"36\" width=\"130\" height=\"50\" rx=\"8\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"75\" y=\"58\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Case Pauses</text><text x=\"75\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Assignment created</text><line x1=\"140\" y1=\"61\" x2=\"188\" y2=\"61\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#m13-arr)\"/><rect x=\"190\" y=\"36\" width=\"130\" height=\"50\" rx=\"8\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"255\" y=\"58\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Approver Acts</text><text x=\"255\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Routed to their Worklist</text><line x1=\"320\" y1=\"55\" x2=\"368\" y2=\"36\" stroke=\"var(--pa-ok-line)\" stroke-width=\"2\" marker-end=\"url(#m13-arr)\"/><line x1=\"320\" y1=\"67\" x2=\"368\" y2=\"86\" stroke=\"var(--pa-err)\" stroke-width=\"2\" marker-end=\"url(#m13-err)\"/><rect x=\"370\" y=\"20\" width=\"160\" height=\"36\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"450\" y=\"40\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"700\">APPROVE → Continue</text><text x=\"450\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">Case proceeds forward</text><rect x=\"370\" y=\"70\" width=\"160\" height=\"36\" rx=\"8\" fill=\"rgba(231,76,60,0.1)\" stroke=\"var(--pa-err)\" stroke-width=\"1.5\"/><text x=\"450\" y=\"90\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"11\" font-weight=\"700\">REJECT → Configured path</text><text x=\"450\" y=\"104\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">Stage, prior process, or alternate</text><rect x=\"10\" y=\"114\" width=\"700\" height=\"56\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">Key Rules</text><text x=\"360\" y=\"154\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Approve and Reject route DIFFERENTLY | Rejection destination is CONFIGURABLE | Purpose = decision gate</text></svg>",
+          "caption": "Single approval pauses Case; Approve continues forward; Reject routes to a configurable destination (Stage, process, or alternate path)."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Three approval actions (don't forget Send back)",
+      "trapDescription": "Approve and Reject are obvious; the third action — Send back / Request more information — returns the Assignment to the submitter for clarification and is frequently the tested answer.",
+      "bestPractice": "Approval actions = Approve · Reject · Send back (request more information)."
+    },
+    {
+      "title": "Approve vs. reject route differently",
+      "trapDescription": "A question asks where a Case goes after an approver clicks Reject. Candidates say it follows the same path as Approve but with a flag. Approve and Reject route to different next steps in the flow — Reject typically routes to a resolution or rework Stage.",
+      "bestPractice": "Approved → continue (primary path); Rejected → rework/rejection path. Configure both."
+    },
+    {
+      "title": "Single vs. cascading approval",
+      "trapDescription": "Questions ask the difference between single and cascading approval flows. Candidates say cascading just adds more approvers in sequence. Cascading approval uses a reporting structure — each approver in the chain is determined by the reports-to relationship, not a manually configured list.",
+      "bestPractice": "One approver → single approval; multiple levels → cascading approvals."
+    },
+    {
+      "title": "Approver is routed",
+      "trapDescription": "A question asks what happens after an approval step is configured. Candidates say the Case moves forward immediately. Configuring an approval step creates an Assignment — the Case pauses and waits for the designated approver to act before proceeding.",
+      "bestPractice": "Route the approval to the correct approver just like any Assignment."
+    },
+    {
+      "title": "Purpose of approvals",
+      "trapDescription": "Questions ask why approval steps exist in a Case life cycle. Candidates say 'to capture a signature.' Approvals enforce a human decision gate — they ensure a qualified person reviews and authorizes the Case before it continues.",
+      "bestPractice": "Use an approval where sign-off must gate the Case before it proceeds."
+    },
+    {
+      "title": "Reject sends the case back — to where exactly?",
+      "trapDescription": "A question asks where the Case goes after rejection. Candidates say 'back to the submitter.' The destination after rejection is configurable — it can go to a specific Stage, a prior process, or trigger an alternate path depending on how the reject route is configured.",
+      "bestPractice": "Where the case goes on rejection depends on how the approval process is configured. The default is to return to the previous assignment or a designated step — not necessarily the start of the case. Review the 'When rejected go to' setting in the Approve/Reject shape to confirm the target."
+    },
+    {
+      "title": "Cascading approvals are not the same as a single approval with multiple approvers",
+      "trapDescription": "Questions describe a chain of four approvers and ask whether this is cascading. Candidates say yes as long as multiple people approve. Cascading approval is specifically driven by the reports-to operator hierarchy — manually listing multiple approvers in sequence is not the same pattern.",
+      "bestPractice": "Cascading approval derives its chain from an authority matrix — e.g., manager → director → VP — based on business rules. A single approval with multiple approvers routes to all of them simultaneously."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m13_q01",
+      "type": "single-select",
+      "scenario": "An SA must implement a 'Loan Approval' step that is sent simultaneously to three regional managers, and the loan is approved as soon as ANY ONE of them approves. Which approval pattern is this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Cascading approval — the same approval is sent to multiple approvers simultaneously and is resolved when a threshold (in this case, one) responds"
+        },
+        {
+          "id": "B",
+          "text": "Sequential approval — the approval is sent to one approver at a time; only if they reject does it go to the next"
+        },
+        {
+          "id": "C",
+          "text": "Self-approval — the user who submitted the loan automatically becomes the approver"
+        },
+        {
+          "id": "D",
+          "text": "Automatic approval — a decision rule automatically approves the loan with no human approver involved"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Sent to multiple simultaneously + resolved on first response = Cascading (parallel) approval.",
+      "rationale": "Cascading approval sends the request to multiple approvers in parallel and resolves based on the first qualifying response — one approval suffices. Sequential approval routes to one approver at a time in a fixed order."
+    },
+    {
+      "questionId": "m13_q02",
+      "type": "single-select",
+      "scenario": "An SA must implement a policy where a purchase request is first approved by the department head, and only if approved does it then go to the CFO. Which approval pattern implements this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Sequential approval — the request is routed to the department head first; if approved, it then routes to the CFO"
+        },
+        {
+          "id": "B",
+          "text": "Cascading approval — the request is sent to both the department head and the CFO simultaneously"
+        },
+        {
+          "id": "C",
+          "text": "Self-approval — the request submitter approves their own request, then the CFO receives a copy"
+        },
+        {
+          "id": "D",
+          "text": "Automatic approval — a decision rule checks the department head flag and routes to the CFO without a human approval step"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Department head first, then CFO only if approved = sequential approval chain.",
+      "rationale": "Sequential approval routes to one approver at a time in a defined order — department head first, then CFO. Cascading sends to all simultaneously and resolves on the first qualifying response."
+    },
+    {
+      "questionId": "m13_q03",
+      "type": "single-select",
+      "scenario": "A travel expense claim must be reviewed and signed off before reimbursement. The company requires exactly ONE approver (the submitter's direct manager). A BA configures a two-Step approval process with a 'Review' Step and a separate 'Confirm' Step, both assigned to the manager. What is the simplest correct design?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A single approval Step routed to the submitter's manager — one approver with an Approve/Reject outcome; the two-Step design duplicates work with no added value"
+        },
+        {
+          "id": "B",
+          "text": "The two-Step design is correct — Pega approval Steps always require a Review Step to evaluate the claim and a Confirm Step to finalize the decision; they cannot be combined"
+        },
+        {
+          "id": "C",
+          "text": "A cascading approval with one level — cascading approvals are required for any manager-based approval because the routing must traverse the reporting structure"
+        },
+        {
+          "id": "D",
+          "text": "An optional Action for the manager to approve — optional Actions allow the manager to approve at any point without interrupting the main workflow"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "One approver + one outcome (Approve/Reject) = which approval type?",
+      "rationale": "A single approval Step handles one approver making an Approve/Reject decision. Two Steps for one approver is unnecessary duplication; the single Step already captures the decision."
+    },
+    {
+      "questionId": "m13_q04",
+      "type": "single-select",
+      "scenario": "A purchase order approval must go to the submitter's direct manager, not a fixed named approver. Different submitters have different managers. How does the SA configure the approver identification?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Route the approval using business logic that reads the submitter's 'Reports To' property — this dynamically identifies the correct manager at runtime for any submitter"
+        },
+        {
+          "id": "B",
+          "text": "Hard-code the CFO's Operator ID as the approver for all purchase orders — this ensures consistent approval regardless of who submitted"
+        },
+        {
+          "id": "C",
+          "text": "Route to a shared Approval Work Queue and let any manager pick it up — purchase orders don't require a specific hierarchical relationship"
+        },
+        {
+          "id": "D",
+          "text": "Use a Decision Table that maps submitter names to manager names — the table is updated whenever organizational structure changes"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The approver is 'the submitter's manager' — this is a dynamic relationship, not a fixed name.",
+      "rationale": "Business logic routing reads the submitter's reporting structure at runtime to find the correct manager dynamically. Hard-coding a manager ID breaks the process for every other submitter."
+    },
+    {
+      "questionId": "m13_q05",
+      "type": "single-select",
+      "scenario": "During an approval step, an approver realizes they need more information before deciding. Which approval action allows them to send the Case back to the submitter to provide additional details?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Send back (Return for more information) — sends the assignment back to the previous operator/submitter for clarification or additional input"
+        },
+        {
+          "id": "B",
+          "text": "Reject — permanently rejects the request so the submitter must create a brand-new Case to try again"
+        },
+        {
+          "id": "C",
+          "text": "Withdraw — the approver withdraws from the process and the approval is automatically escalated to a senior approver"
+        },
+        {
+          "id": "D",
+          "text": "Escalate — routes the Case to a higher authority rather than returning it to the submitter"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Need more info → send back to submitter = Send back / Return for more information.",
+      "rationale": "Send back (Return for more information) returns the Case to the submitter for additional input without rejecting it — preserving the Case and allowing re-review once the submitter responds."
+    },
+    {
+      "questionId": "m13_q06",
+      "type": "single-select",
+      "scenario": "An SA must configure an approval step so that if the approver takes no action within 48 hours, the Case automatically moves to the next step. Which feature implements this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Service-Level Agreement (SLA) with an auto-approval or auto-advance action — the SLA timer fires after 48 hours and advances the Case"
+        },
+        {
+          "id": "B",
+          "text": "A Cascading approval with a timeout — cascading approval automatically selects the next approver after 48 hours"
+        },
+        {
+          "id": "C",
+          "text": "A Reporting manager escalation — the system routes the Case to the reporting manager after 48 hours of inactivity"
+        },
+        {
+          "id": "D",
+          "text": "A work queue expiry — the assignment expires in the work queue after 48 hours and is deleted from the system"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "No action in X hours → auto-advance = SLA with auto-advance action.",
+      "rationale": "An SLA defines timing thresholds with escalation or auto-advance actions — a 48-hour SLA fires and automatically advances the Case if the approver doesn't act. Timer shapes pause and resume; they don't advance on timeout."
+    },
+    {
+      "questionId": "m13_q07",
+      "type": "single-select",
+      "scenario": "An SA reviews the available approval actions in Pega. Which set correctly lists all standard approval resolution actions an approver can take?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Approve, Reject, and Send back (return for more information)"
+        },
+        {
+          "id": "B",
+          "text": "Submit, Cancel, and Escalate"
+        },
+        {
+          "id": "C",
+          "text": "Approve, Withdraw, and Escalate"
+        },
+        {
+          "id": "D",
+          "text": "Accept, Decline, and Forward"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Standard approver actions = Approve, Reject, Send back.",
+      "rationale": "The three standard approval resolution actions are Approve, Reject, and Send back. 'Submit' and 'Complete' are not approval-specific actions and do not appear in the approval Step configuration."
+    },
+    {
+      "questionId": "m13_q08",
+      "type": "single-select",
+      "scenario": "An approver clicks 'Reject' on a vendor contract approval. What is the typical next-state outcome for the Case?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Case moves to a rejection handling step or is resolved as Rejected — the Case status changes and the workflow follows the configured rejection path"
+        },
+        {
+          "id": "B",
+          "text": "The Case is immediately deleted from the system — rejected Cases are automatically purged to save storage"
+        },
+        {
+          "id": "C",
+          "text": "The Case is sent back to the previous step for the approver to reconsider — Reject and Send back are synonymous in Pega"
+        },
+        {
+          "id": "D",
+          "text": "The Case is escalated to the CEO for a final decision — Reject always triggers executive escalation by default"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Reject → Case follows configured rejection path / resolved as Rejected.",
+      "rationale": "Reject moves the Case to the configured rejection handling step or resolves the Case as Rejected — the exact outcome depends on the workflow connectors. The Case does not auto-close or return for revision on Reject."
+    },
+    {
+      "questionId": "m13_q09",
+      "type": "single-select",
+      "scenario": "An SA is designing a vacation request approval. A user submits a request; if the manager approves, the SA wants the system to automatically mark the Case as 'Approved' and notify HR. What should come after the Approval step?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Automation steps in the Case Life Cycle — a notification Automation and a status-update Automation are placed after the Approval step to fire automatically when approved"
+        },
+        {
+          "id": "B",
+          "text": "Another Approval step for HR — HR must also formally approve before the system notifies itself"
+        },
+        {
+          "id": "C",
+          "text": "A new Case Type — a separate 'HR Notification' Case Type is spawned after approval to handle the notification independently"
+        },
+        {
+          "id": "D",
+          "text": "The approver must manually trigger the HR notification and status change from within the approval form"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Auto-notify + auto-update after Approval = Automation steps placed after the Approval step.",
+      "rationale": "After the Approval step resolves, subsequent Automation steps (send notification, update status) fire automatically based on the outcome. Automations execute without human intervention — no Assignment needed."
+    },
+    {
+      "questionId": "m13_q10",
+      "type": "single-select",
+      "scenario": "A Pega approval process is configured so that, after a senior manager approves, the case automatically moves to the legal team for a compliance check. The legal team's review step is NOT an Approve/Reject shape — it is a standard assignment. Which design element connects the senior-manager approval outcome to the legal assignment?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The flow router after the Approve/Reject shape evaluates the approved outcome and routes the case to the legal assignment step"
+        },
+        {
+          "id": "B",
+          "text": "The Approve/Reject shape has a built-in second-approver field where the legal team can be listed directly"
+        },
+        {
+          "id": "C",
+          "text": "The SLA on the approval shape automatically escalates to the legal team after approval"
+        },
+        {
+          "id": "D",
+          "text": "The legal assignment is triggered by a declarative rule that detects when the Approval status property changes to Approved"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What controls case flow after an approval decision?",
+      "rationale": "The flow connector after the Approve/Reject shape determines what happens on each outcome. Routing to legal on approval is configured as the post-Approve connector in the workflow."
+    },
+    {
+      "questionId": "m13_q11",
+      "type": "single-select",
+      "scenario": "A manager working in the end-user portal approves a purchase order. Immediately after clicking Approve, the case status still shows 'Pending-Approval.' The next approver (CFO) has not yet received their assignment. Which is the most likely explanation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The case is now at the second stage of a cascading approval — the CFO assignment is the next step and will appear in the CFO workbasket once the current step resolves"
+        },
+        {
+          "id": "B",
+          "text": "The approval routing rule is misconfigured and has lost the approval decision"
+        },
+        {
+          "id": "C",
+          "text": "The manager did not have the correct Access Role to approve, so the system accepted the click but did not process it"
+        },
+        {
+          "id": "D",
+          "text": "The SLA deadline has not been reached yet, so the case is paused until it escalates"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "In a cascade, what happens immediately after one approver approves?",
+      "rationale": "In a sequential approval, each level resolves into the next. After the manager approves, the Case transitions to the CFO approval assignment — the CFO sees a NEW pending approval, not the manager's already-approved one."
+    },
+    {
+      "questionId": "m13_q12",
+      "type": "single-select",
+      "scenario": "Which shape in a Pega case life cycle enables a user to choose between Approve, Reject, or Revise actions while working on an assignment?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Approve/Reject shape — provides the standard Approve, Reject, and optional More Info/Revise actions on an assignment"
+        },
+        {
+          "id": "B",
+          "text": "Decision shape — evaluates conditions and branches the flow; the operator cannot interact with it directly"
+        },
+        {
+          "id": "C",
+          "text": "Utility shape — performs automatic processing and can be configured with a custom action button"
+        },
+        {
+          "id": "D",
+          "text": "Automation shape — runs background actions without any user interaction required"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which shape presents Approve/Reject choices to a human user?",
+      "rationale": "The Approve/Reject shape creates a user-facing assignment where the operator selects Approve, Reject, or (optionally) More Info/Revise B is wrong because a Decision shape is an automated branch — no user clicks it; it evaluates."
+    },
+    {
+      "questionId": "m13_q13",
+      "type": "multi-select",
+      "scenario": "A Pega System Architect is configuring an Approval Step for a loan application process. Which TWO statements correctly describe how Approve and Reject outcomes can be configured?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Approve outcome can route the Case to a specified next step or stage"
+        },
+        {
+          "id": "B",
+          "text": "The Reject outcome can send the Case back to a previous stage or step"
+        },
+        {
+          "id": "C",
+          "text": "Approval steps always terminate the Case when the Approve outcome is selected"
+        },
+        {
+          "id": "D",
+          "text": "Only a single Reject path can be configured per Approval Step"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Both Approve and Reject outcomes define routing paths — neither is fixed to a predetermined destination.",
+      "rationale": "Both the Approve and Reject outcomes on a Pega Approval Step are configurable. Approve can route forward to any next step or stage; Reject can send the Case backward or to a resolution path. Neither outcome is hardcoded — the SA defines the routing for each outcome."
+    },
+    {
+      "questionId": "m13_q14",
+      "type": "multi-select",
+      "scenario": "An SA needs to implement a contract approval process where three regional managers must each approve the contract before it proceeds to the next stage. Which TWO Pega approaches correctly implement this requirement?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use Cascading Approval to chain the three approvers sequentially, one after another"
+        },
+        {
+          "id": "B",
+          "text": "Configure three separate sequential Approval Steps, one per manager, in the same process"
+        },
+        {
+          "id": "C",
+          "text": "Create a single Approval Step with a single approver and set the SLA urgency to alert all three managers"
+        },
+        {
+          "id": "D",
+          "text": "Use a Decision Table to select one approver from the three based on a random rule"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Multiple sequential approvers require either a cascading pattern or chained individual steps.",
+      "rationale": "Cascading Approval chains approvers in sequence — each approver reviews and approves before it moves to the next. Alternatively, three explicit sequential Approval Steps each assigned to one manager achieve the same result. SLA urgency and Decision Tables do not add approvers."
+    },
+    {
+      "questionId": "m13_q15",
+      "type": "multi-select",
+      "scenario": "A developer is reviewing approval configuration in Pega App Studio. Which TWO capabilities are available when configuring an Approval Step?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Route the Approval to a specific operator or to the submitter's reporting manager"
+        },
+        {
+          "id": "B",
+          "text": "Configure separate outcome paths for both Approve and Reject responses"
+        },
+        {
+          "id": "C",
+          "text": "Automatically create a child Case for the approver to process separately"
+        },
+        {
+          "id": "D",
+          "text": "Restrict the Approval Step so that only the Approve outcome is configurable"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Recall what routing targets and outcome paths are available on an Approval Step in App Studio.",
+      "rationale": "Pega Approval Steps allow routing to a specific user or to the reporting manager (authority-based routing). Both Approve and Reject outcomes are configurable with separate routing paths. Approval Steps do not automatically create child Cases, and the Reject outcome cannot be removed."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Approval Step",
+      "value": "Routes the Case to an approver to approve or reject; gates progression and adds accountability."
+    },
+    {
+      "key": "Outcomes",
+      "value": "Approved → continue (primary path); Rejected → rework/rejection path. Configure both."
+    },
+    {
+      "key": "Single approval",
+      "value": "One approver; route to a specific user, manager, Work Queue, or by business logic."
+    },
+    {
+      "key": "Single vs cascading",
+      "value": "One approver → single approval; multiple sequential approvers → cascading approvals."
+    },
+    "Approve/Reject shape = user-facing; Decision shape = automated branching — never confuse them."
+  ],
+  "topics": [
+    {
+      "title": "Work approval",
+      "url": "https://academy.pega.com/topic/work-approval/v7/in/72681/66426/66676",
+      "duration": "10 min"
+    }
+  ]
+}

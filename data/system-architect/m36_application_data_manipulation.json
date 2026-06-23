@@ -1,0 +1,569 @@
+{
+  "moduleId": "m36",
+  "moduleTitle": "Application data manipulation",
+  "moduleUrl": "https://academy.pega.com/module/application-data-manipulation/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/application-data-manipulation/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Apply Data Transforms to copy, convert, and drive data using Run Data Transform automation or pre/post-processing actions.",
+    "Set default property values using the Data initialization page and understand the role of pyDefault and pySetFieldDefaults."
+  ],
+  "estTime": "~25 min · 2 topics",
+  "topics": [
+    {
+      "title": "Data Transforms",
+      "url": "https://academy.pega.com/topic/data-transforms/v6/in/96211/67116",
+      "duration": "10 min"
+    },
+    {
+      "title": "Default property values",
+      "url": "https://academy.pega.com/topic/default-property-values/v6/in/72681/66901/67116",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Data Transforms — Concept and Operations",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "Porter vs. translator — A porter carries a suitcase as-is (copy). A translator converts the message into another language (convert). A Data Transform does both: moves a value to a different field, or changes its data type entirely."
+        },
+        {
+          "type": "concept",
+          "term": "Data Transform — what it does",
+          "description": "Manipulates data in an application: copy, convert, or drive. It does NOT perform validation or calculation — it moves or transforms data."
+        },
+        {
+          "type": "concept",
+          "term": "Copy — move a value",
+          "description": "Copies a field value into another field. Example: copy customer details from the checkout form into the shipping address fields."
+        },
+        {
+          "type": "concept",
+          "term": "Convert — change data type",
+          "description": "Changes the data type of a value. Example: convert the string 'December 4, 2021' to the date value 12/04/2021. Data Transforms don't just copy — they convert too."
+        },
+        {
+          "type": "concept",
+          "term": "Parent-child tip — reference over copy",
+          "description": "In parent-child Case relationships, REFERENCE data instead of copying it via Data Transform. Referencing keeps the child Case synchronized if data changes in the parent."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Data Transforms — Execution Methods",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Method 1 — Run Data Transform Automation",
+          "description": "Added as an Automation Step in the Case Life Cycle. Runs automatically at runtime — no user interaction required. A new Data Transform can be defined inline (e.g., 'Convert string to date')."
+        },
+        {
+          "type": "concept",
+          "term": "Method 2 — Pre-processing",
+          "description": "Configured on a Step's Pre/Post Processing tab. The Data Transform runs BEFORE the Step executes. Use case: populate fields before the form is displayed to the user."
+        },
+        {
+          "type": "concept",
+          "term": "Method 3 — Post-processing",
+          "description": "The Data Transform runs AFTER the Step completes. Use case: clean up or convert data after the user submits a form."
+        },
+        {
+          "type": "diagram",
+          "caption": "3 Data Transform application methods — where each fits in the Case Life Cycle",
+          "svg": "<svg viewBox=\"0 0 720 270\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m36-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ink-3)\"/></marker><marker id=\"m36-arr-b\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-brand)\"/></marker></defs><rect x=\"10\" y=\"20\" width=\"700\" height=\"55\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"42\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\">Case Life Cycle</text><rect x=\"30\" y=\"35\" width=\"90\" height=\"30\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"75\" y=\"55\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"11\" font-weight=\"600\">Stage 1</text><rect x=\"200\" y=\"35\" width=\"100\" height=\"30\" rx=\"6\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"250\" y=\"55\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"600\">Step A</text><rect x=\"400\" y=\"35\" width=\"130\" height=\"30\" rx=\"6\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"465\" y=\"55\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"600\">Automation Step</text><rect x=\"620\" y=\"35\" width=\"80\" height=\"30\" rx=\"6\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"660\" y=\"55\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"600\">Step B</text><line x1=\"120\" y1=\"50\" x2=\"200\" y2=\"50\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#m36-arr)\"/><line x1=\"300\" y1=\"50\" x2=\"400\" y2=\"50\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#m36-arr)\"/><line x1=\"530\" y1=\"50\" x2=\"620\" y2=\"50\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#m36-arr)\"/><line x1=\"465\" y1=\"65\" x2=\"465\" y2=\"110\" stroke=\"var(--pa-brand)\" stroke-width=\"2\" stroke-dasharray=\"4,3\" marker-end=\"url(#m36-arr-b)\"/><rect x=\"370\" y=\"110\" width=\"190\" height=\"42\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"465\" y=\"127\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">① Run DT Automation</text><text x=\"465\" y=\"143\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Standalone Automation Step</text><line x1=\"250\" y1=\"65\" x2=\"200\" y2=\"155\" stroke=\"var(--pa-ok)\" stroke-width=\"2\" stroke-dasharray=\"4,3\" marker-end=\"url(#m36-arr-b)\"/><rect x=\"30\" y=\"155\" width=\"170\" height=\"42\" rx=\"8\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"2\"/><text x=\"115\" y=\"172\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"12\" font-weight=\"700\">② Pre-processing</text><text x=\"115\" y=\"188\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Runs BEFORE Step A</text><line x1=\"660\" y1=\"65\" x2=\"610\" y2=\"155\" stroke=\"var(--pa-err)\" stroke-width=\"2\" stroke-dasharray=\"4,3\" marker-end=\"url(#m36-arr-b)\"/><rect x=\"510\" y=\"155\" width=\"190\" height=\"42\" rx=\"8\" fill=\"rgba(255,80,80,0.08)\" stroke=\"var(--pa-err)\" stroke-width=\"2\"/><text x=\"605\" y=\"172\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"12\" font-weight=\"700\">③ Post-processing</text><text x=\"605\" y=\"188\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Runs AFTER Step B</text><text x=\"115\" y=\"228\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"10\">Step → Pre/Post Processing tab</text><text x=\"605\" y=\"228\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"10\">Step → Pre/Post Processing tab</text><text x=\"465\" y=\"228\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"10\">Added to Case Life Cycle</text></svg>"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Default Property Values",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "Pre-filled form at the doctor's office — when you arrive, the form already has your name, date of birth, and insurance details filled in. The Data initialization page works the same way: when a Case is created, fields arrive pre-populated with known values."
+        },
+        {
+          "type": "concept",
+          "term": "Data initialization page — where to find it",
+          "description": "App Studio → Case Type → Settings tab → Data initialization. This is where you configure default property values assigned when a Case is created."
+        },
+        {
+          "type": "concept",
+          "term": "Example use cases",
+          "description": "① Pre-populate user's First Name and Last Name from the OperatorID clipboard page. ② Set a date field to today's date. ③ Speed up iterative testing in development by pre-filling required fields."
+        },
+        {
+          "type": "concept",
+          "term": "pyDefault and pySetFieldDefaults — when are they created?",
+          "description": "Pega automatically creates BOTH Data Transforms when the first View is created for a Case Type. They are always created together — not separately triggered."
+        },
+        {
+          "type": "concept",
+          "term": "pyDefault vs pySetFieldDefaults — different trigger times",
+          "description": "pyDefault → invoked when the Case is CREATED. pySetFieldDefaults → runs each time a View is LOADED. pyDefault invokes pySetFieldDefaults as part of its chain at Case creation."
+        },
+        {
+          "type": "concept",
+          "term": "Best practice — Data init page for simple, pyDefault for complex",
+          "description": "Simple defaults → use the Data initialization page (it updates pyDefault). Complex default logic → edit pyDefault directly. Either way, never touch pySetFieldDefaults — it is system-managed and manual edits can be overwritten."
+        },
+        {
+          "type": "diagram",
+          "caption": "pyDefault → pySetFieldDefaults invocation chain",
+          "svg": "<svg viewBox=\"0 0 700 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"m36-dt-arr\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-brand)\"/></marker><marker id=\"m36-dt-arr2\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"6\" markerHeight=\"6\" orient=\"auto-start-reverse\"><path d=\"M 0 0 L 10 5 L 0 10 z\" fill=\"var(--pa-ok)\"/></marker></defs><rect x=\"10\" y=\"75\" width=\"130\" height=\"50\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><text x=\"75\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"12\" font-weight=\"600\">Case</text><text x=\"75\" y=\"113\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Created</text><line x1=\"140\" y1=\"100\" x2=\"185\" y2=\"100\" stroke=\"var(--pa-brand)\" stroke-width=\"2\" marker-end=\"url(#m36-dt-arr)\"/><rect x=\"185\" y=\"62\" width=\"175\" height=\"76\" rx=\"10\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"272\" y=\"90\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">pyDefault</text><text x=\"272\" y=\"108\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Updated via Data init page</text><text x=\"272\" y=\"124\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\">✓ Edit here for complex logic</text><line x1=\"360\" y1=\"100\" x2=\"405\" y2=\"100\" stroke=\"var(--pa-brand)\" stroke-width=\"2\" marker-end=\"url(#m36-dt-arr)\"/><text x=\"382\" y=\"90\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"10\">invokes</text><rect x=\"405\" y=\"62\" width=\"205\" height=\"76\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><text x=\"507\" y=\"90\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"13\" font-weight=\"700\">pySetFieldDefaults</text><text x=\"507\" y=\"108\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Also runs on every View load</text><text x=\"507\" y=\"124\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\">⚠ System-managed — do NOT edit</text><line x1=\"610\" y1=\"100\" x2=\"655\" y2=\"100\" stroke=\"var(--pa-ok)\" stroke-width=\"2\" marker-end=\"url(#m36-dt-arr2)\"/><rect x=\"655\" y=\"80\" width=\"36\" height=\"38\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"673\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"9\" font-weight=\"700\">Fields</text><text x=\"673\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"9\">set</text><rect x=\"165\" y=\"158\" width=\"215\" height=\"22\" rx=\"5\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1\"/><text x=\"272\" y=\"173\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\">Settings tab → Data initialization page</text><text x=\"507\" y=\"158\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\">✗ Do not modify directly</text></svg>"
+        },
+        {
+          "type": "concept",
+          "term": "Pages & Classes tab — required for Data Page references",
+          "description": "To reference a Data Page (e.g., OperatorID) inside a Data Transform, you must first add it to the Pages & Classes tab. Without this registration, the Data Transform cannot resolve the page reference at runtime."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Pre-processing vs. post-processing — order confusion",
+      "trapDescription": "A question asks which Data Transform runs before an Assignment is presented vs. after it is submitted. Candidates reverse the order. Pre-processing Data Transforms run BEFORE the form is shown to the user; post-processing Data Transforms run AFTER the user submits.",
+      "bestPractice": "Pre: runs BEFORE the Step executes. Post: runs AFTER the Step completes. 'Pre = before' is the mnemonic."
+    },
+    {
+      "title": "Editing pySetFieldDefaults directly — system will overwrite it",
+      "trapDescription": "Questions ask how to customize default field values set by the system. Candidates say 'edit pySetFieldDefaults.' Directly editing pySetFieldDefaults is a guardrail violation — the system regenerates it on save. Use a custom Data Transform that calls the system one.",
+      "bestPractice": "Simple defaults → use Data initialization page (updates pyDefault). Complex defaults → edit pyDefault directly. Never touch pySetFieldDefaults — it is system-managed and manual changes can be overwritten."
+    },
+    {
+      "title": "Data initialization page is on the Settings tab — not the Data tab",
+      "trapDescription": "A question asks where to configure the Data Transform that initializes a Case Type's default field values. Candidates navigate to the Data tab. This configuration is on the Case Type's Settings tab — not the Data tab.",
+      "bestPractice": "Location: App Studio → Case Type → Settings tab → Data initialization. 'Settings' is the key word."
+    },
+    {
+      "title": "pyDefault vs pySetFieldDefaults — who runs when?",
+      "trapDescription": "Questions ask when pyDefault runs vs. pySetFieldDefaults. Candidates say they are interchangeable. pyDefault runs when a new Case is created and sets general system defaults; pySetFieldDefaults runs when the Case Type's create form loads and sets field-specific default values.",
+      "bestPractice": "pyDefault runs when the Case is CREATED and invokes pySetFieldDefaults. pySetFieldDefaults runs every time a View is LOADED. Hierarchy: pyDefault (parent) → pySetFieldDefaults (child)."
+    },
+    {
+      "title": "Run Data Transform = Automation Step, not a user Step",
+      "trapDescription": "A question asks how to run a Data Transform as part of the Case flow. Candidates describe adding a user Step. Data Transforms are executed via the 'Run Data Transform' Automation Step — they are not user-facing Steps and do not create Assignments.",
+      "bestPractice": "Run Data Transform is an AUTOMATION Step — it executes automatically when the Case reaches that Step, with no user interaction."
+    },
+    {
+      "title": "Data Transforms convert data types — not just copy",
+      "trapDescription": "Questions ask what Data Transforms can do. Candidates say 'copy data between pages only.' Data Transforms can also convert data types (e.g., Text to Integer), apply conditions, iterate over page lists, and call other Data Transforms.",
+      "bestPractice": "Data Transforms copy, convert, AND drive. Example: convert the string 'December 4, 2021' to a Date data type."
+    },
+    {
+      "title": "Pages & Classes tab is required before referencing a Data Page",
+      "trapDescription": "A question asks what must be configured before a Data Transform can write to a Data Page. Candidates say 'just the step parameter.' The Pages & Classes tab in the Data Transform must declare the Data Page and its class before it can be referenced in steps.",
+      "bestPractice": "Before referencing any Data Page in a Data Transform, add it to the Pages & Classes tab. Without this step, the Data Transform fails at runtime."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m36_q01",
+      "type": "single-select",
+      "scenario": "An SA needs to copy the shipping address from a previous Step into a summary field before the next form is displayed to the user. Which method is appropriate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Pre-processing — runs the Data Transform before the Step executes"
+        },
+        {
+          "id": "B",
+          "text": "Post-processing — runs the Data Transform after the Step completes"
+        },
+        {
+          "id": "C",
+          "text": "Run Data Transform Automation — add as a standalone Automation Step in the Case Life Cycle"
+        },
+        {
+          "id": "D",
+          "text": "Data initialization page — populates the summary field when the Case is created"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Must run BEFORE the form is displayed → pre-processing.",
+      "rationale": "Pre-processing runs the Data Transform BEFORE the Step executes — fields are populated before the user sees the form. B runs after the Step. C is a standalone step not tied to a specific Step's lifecycle. D only fires at Case creation."
+    },
+    {
+      "questionId": "m36_q02",
+      "type": "single-select",
+      "scenario": "After a user submits a form, an SA needs to convert the string 'December 4, 2021' to a Date type. Which approach is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Add a Run Data Transform Automation Step after the form Step in the Case Life Cycle"
+        },
+        {
+          "id": "B",
+          "text": "Configure post-processing on the form Step to run a Data Transform that converts the value"
+        },
+        {
+          "id": "C",
+          "text": "Either A or B — both can execute a Data Transform that converts data"
+        },
+        {
+          "id": "D",
+          "text": "Data initialization page — configure the conversion at Case creation"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Both Run DT Automation and post-processing can execute a converting Data Transform.",
+      "rationale": "Both Run Data Transform Automation (standalone step) and post-processing (runs after the Step) can execute a Data Transform that converts a data type. D only fires at Case creation, not mid-Case."
+    },
+    {
+      "questionId": "m36_q03",
+      "type": "single-select",
+      "scenario": "Where does an SA configure default property values for a Case Type in App Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Settings tab → Data initialization"
+        },
+        {
+          "id": "B",
+          "text": "Data tab → Default values section"
+        },
+        {
+          "id": "C",
+          "text": "Workflow tab → Case initialization settings"
+        },
+        {
+          "id": "D",
+          "text": "Dev Studio → pyDefault Data Transform"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Data initialization page lives on the Settings tab.",
+      "rationale": "Default property values are configured on the Data initialization page under the Settings tab of the Case Type in App Studio. B, C, and D are incorrect locations."
+    },
+    {
+      "questionId": "m36_q04",
+      "type": "single-select",
+      "scenario": "When the first View is created for a Case Type, what does Pega automatically create?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Both pyDefault and pySetFieldDefaults Data Transforms"
+        },
+        {
+          "id": "B",
+          "text": "Only pyDefault — pySetFieldDefaults is created when the first default value is added"
+        },
+        {
+          "id": "C",
+          "text": "Only pySetFieldDefaults — pyDefault is created when a Run Data Transform Step is added"
+        },
+        {
+          "id": "D",
+          "text": "A single pyDataInit Data Transform that handles all default value logic"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Both are auto-created together on first View creation.",
+      "rationale": "When an SA creates the first View for a Case Type, Pega Platform automatically generates two Data Transforms: pyDefault (which runs when the Case is created) and pySetFieldDefaults (which runs when the View is loaded). Both are created simultaneously — not one at a time, and not in response to separate actions by the developer. Options B, C, and D describe incorrect behavior."
+    },
+    {
+      "questionId": "m36_q05",
+      "type": "single-select",
+      "scenario": "An SA opens pySetFieldDefaults in Dev Studio and edits it directly to add a default value. What is wrong with this approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "pySetFieldDefaults is system-managed — manual edits can be overwritten; use the Data initialization page or edit pyDefault instead"
+        },
+        {
+          "id": "B",
+          "text": "pySetFieldDefaults is read-only and cannot be opened in Dev Studio"
+        },
+        {
+          "id": "C",
+          "text": "Default values must be set in the Data tab of App Studio, not through Data Transforms"
+        },
+        {
+          "id": "D",
+          "text": "pySetFieldDefaults only supports numeric defaults, not text or date fields"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "pySetFieldDefaults is system-managed — editing it directly is risky.",
+      "rationale": "pySetFieldDefaults is managed by the system and manual edits risk being overwritten. For simple defaults use the Data initialization page; for complex defaults edit pyDefault directly. B, C, and D are incorrect statements."
+    },
+    {
+      "questionId": "m36_q06",
+      "type": "single-select",
+      "scenario": "A developer is configuring default property values for a new Case Type and wants to understand the execution order and purpose of pyDefault and pySetFieldDefaults. Which statement correctly describes the relationship between pyDefault and pySetFieldDefaults in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "pyDefault runs when the Case is created; pySetFieldDefaults runs on every View load and is invoked by pyDefault"
+        },
+        {
+          "id": "B",
+          "text": "pySetFieldDefaults runs when the Case is created and invokes pyDefault"
+        },
+        {
+          "id": "C",
+          "text": "Both run simultaneously only at Case creation"
+        },
+        {
+          "id": "D",
+          "text": "pyDefault is only created when a Run Data Transform Automation Step is added"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "pyDefault = Case creation; pySetFieldDefaults = View load + invoked by pyDefault.",
+      "rationale": "A is correct: pyDefault is invoked at Case creation and invokes pySetFieldDefaults; pySetFieldDefaults also runs independently on every View load. B reverses the relationship. C incorrectly ties both to the same trigger. D is wrong — both are auto-created on first View creation."
+    },
+    {
+      "questionId": "m36_q07",
+      "type": "single-select",
+      "scenario": "An SA wants a new travel request Case to auto-populate the logged-in user's First Name and Last Name at creation. What is the best approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Data initialization page — configure First Name and Last Name to pull from the OperatorID clipboard page"
+        },
+        {
+          "id": "B",
+          "text": "Case Life Cycle — add a Run Data Transform Automation Step as the first Step in Stage 1"
+        },
+        {
+          "id": "C",
+          "text": "App Studio View — set static text values for the First Name and Last Name fields"
+        },
+        {
+          "id": "D",
+          "text": "pySetFieldDefaults — add First Name and Last Name entries directly"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Simple default from operator record → Data initialization page.",
+      "rationale": "The Data initialization page is the best practice for simple Case creation defaults, including values pulled from the OperatorID clipboard page. D is wrong — never manually edit pySetFieldDefaults. B adds unnecessary complexity for a simple default. C sets a static value, not a dynamic operator record lookup."
+    },
+    {
+      "questionId": "m36_q08",
+      "type": "single-select",
+      "scenario": "A Data Transform references the OperatorID Data Page to pull the user's name, but fails at runtime. What step was most likely missed?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The OperatorID Data Page was not added to the Pages & Classes tab of the Data Transform"
+        },
+        {
+          "id": "B",
+          "text": "The OperatorID Data Page must be loaded in Dev Studio before it can be referenced"
+        },
+        {
+          "id": "C",
+          "text": "Data Pages cannot be referenced in Data Transforms — use a Declare Expression instead"
+        },
+        {
+          "id": "D",
+          "text": "The OperatorID page requires an API key configured in Application settings"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Data Page reference in a Data Transform requires Pages & Classes registration.",
+      "rationale": "To reference a Data Page in a Data Transform, it must first be added to the Pages & Classes tab. Without this, the Data Transform cannot resolve the page at runtime. B, C, and D are incorrect."
+    },
+    {
+      "questionId": "m36_q09",
+      "type": "multi-select",
+      "scenario": "A Pega System Architect is explaining Data Transform capabilities and invocation patterns to a junior developer implementing data manipulation logic in a Claims application. Which TWO statements correctly describe how Data Transforms work in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Data Transforms can convert data types (e.g., string to date)"
+        },
+        {
+          "id": "B",
+          "text": "Data Transforms can only copy values — they cannot change data types"
+        },
+        {
+          "id": "C",
+          "text": "Run Data Transform is an Automation Step in the Case Life Cycle"
+        },
+        {
+          "id": "D",
+          "text": "Data Transforms require a Declare Expression to trigger automatically"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "C"
+      ],
+      "hint": "Data Transforms copy AND convert. Run DT is an Automation Step.",
+      "rationale": "A is correct — Data Transforms support type conversion (e.g., string to date). C is correct — Run Data Transform is an Automation Step. B is wrong — type conversion is explicitly supported. D is wrong — Declare Expressions are a separate rule type.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m36_q10",
+      "type": "single-select",
+      "scenario": "A child Case needs the customer address from its parent Case. What does Pega Academy recommend over copying it via a Data Transform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Reference the data — keeps the child Case synchronized with the parent"
+        },
+        {
+          "id": "B",
+          "text": "Copy using pyDefault — creates a clean snapshot for the child Case"
+        },
+        {
+          "id": "C",
+          "text": "Use a Declare Expression to pull the parent address automatically"
+        },
+        {
+          "id": "D",
+          "text": "Use a Decision Table to determine when to copy vs. reference"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What does Pega Academy recommend when a child Case needs access to data from its parent Case?",
+      "rationale": "Pega Academy explicitly recommends REFERENCING data in parent-child Case relationships — it avoids synchronization issues if parent data changes. B creates a frozen snapshot. C and D are not the documented approach for this scenario."
+    },
+    {
+      "questionId": "m36_q11",
+      "type": "single-select",
+      "scenario": "Post-processing is configured on a Step. When does the Data Transform execute?",
+      "options": [
+        {
+          "id": "A",
+          "text": "After the Step completes (e.g., after the user submits the form)"
+        },
+        {
+          "id": "B",
+          "text": "Before the Step executes (e.g., before the form is shown to the user)"
+        },
+        {
+          "id": "C",
+          "text": "When the Case enters the Stage containing that Step"
+        },
+        {
+          "id": "D",
+          "text": "When the Case is resolved"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Post-processing runs after the Step completes; Pre-processing runs before it starts.",
+      "rationale": "Post-processing runs AFTER the Step completes; Pre-processing runs BEFORE the Step starts. C and D describe incorrect trigger points that do not correspond to any documented pre/post-processing behavior in Pega."
+    },
+    {
+      "questionId": "m36_q12",
+      "type": "multi-select",
+      "scenario": "A BA is explaining when to use the Data initialization page in App Studio to a new team member. Which TWO are valid use cases for the Data initialization page in Pega Platform?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Pre-populate the logged-in user's name from the operator record when a Case is created"
+        },
+        {
+          "id": "B",
+          "text": "Pre-fill test values during development to speed up iterative testing"
+        },
+        {
+          "id": "C",
+          "text": "Convert a string field to a date type after the user submits a form"
+        },
+        {
+          "id": "D",
+          "text": "Copy data from a parent Case to a child Case at runtime"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Data initialization page only fires at Case creation — not mid-Case.",
+      "rationale": "A (pre-populate from operator record) and B (speed up dev testing) are documented uses of the Data initialization page. C is a mid-Case conversion done by a Data Transform Automation Step or post-processing. D is handled by Case creation/parent-child configuration.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m36_q13",
+      "type": "multi-select",
+      "scenario": "An SA is explaining how Data Transforms are used for data manipulation in a Pega Case. Which TWO statements correctly describe Data Transform behavior?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Data Transform can copy data from one property to another, apply functions, and set calculated values on Case properties"
+        },
+        {
+          "id": "B",
+          "text": "A Data Transform can be invoked as a pre- or post-processing action on an Assignment or other automation step"
+        },
+        {
+          "id": "C",
+          "text": "A Data Transform executes automatically every time the Case page is loaded without any explicit invocation configured"
+        },
+        {
+          "id": "D",
+          "text": "A Data Transform can only set static default values and cannot read from external Data Pages or reference other properties"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Data Transforms copy and compute property values and are explicitly invoked — they do not run on page load.",
+      "rationale": "Data Transforms can perform operations like copying property values, applying functions, and computing derived values. They are invoked explicitly — as a Run Data Transform automation step, or as a pre/post-processing action on an Assignment. They do not execute automatically on page load, and they can read from Data Pages and reference other properties."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Data Transform",
+      "value": "Copies, converts, or drives data. Does NOT validate or calculate."
+    },
+    {
+      "key": "Run DT Automation",
+      "value": "Automation Step in the Case Life Cycle — runs automatically, no user interaction."
+    },
+    {
+      "key": "Pre-processing",
+      "value": "Data Transform runs BEFORE the Step executes."
+    },
+    {
+      "key": "Post-processing",
+      "value": "Data Transform runs AFTER the Step completes."
+    },
+    {
+      "key": "Parent-child tip",
+      "value": "REFERENCE data instead of copying it — keeps child Case in sync with parent."
+    },
+    {
+      "key": "Data initialization page",
+      "value": "App Studio → Case Type → Settings tab. Sets default property values at Case creation."
+    },
+    {
+      "key": "pyDefault",
+      "value": "Runs at Case CREATION. Simple defaults → Data init page. Complex defaults → edit pyDefault directly."
+    },
+    {
+      "key": "pySetFieldDefaults",
+      "value": "Runs on every View LOAD. System-managed — never edit directly."
+    },
+    {
+      "key": "Pages & Classes tab",
+      "value": "Must register any Data Page here before referencing it inside a Data Transform."
+    }
+  ]
+}

@@ -1,0 +1,542 @@
+{
+  "moduleId": "m18",
+  "moduleTitle": "Creating and managing teams of users",
+  "moduleUrl": "https://academy.pega.com/module/creating-and-managing-teams-users/v7/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/creating-and-managing-teams-users/v7/quiz/in/96211",
+  "learningObjectives": [
+    "Explain how a Work Group organizes a cross-functional team around one Work Queue",
+    "Distinguish a Work Queue (shared) from a Worklist (individual) and how Assignments move between them",
+    "Describe Work Group managers and Authorized Managers, including their limits"
+  ],
+  "estTime": "15 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Work Groups and Work Queues",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Work Group",
+          "description": "A CROSS-FUNCTIONAL team — a manager plus a Work Queue — whose members share work regardless of their business unit. Note: an 'Operator' in Dev Studio is a 'User' in App Studio."
+        },
+        {
+          "type": "analogy",
+          "text": "Work Groups in Pega are like departments in a company org chart: each department (Work Group) has a manager (Work Group Manager), members (operators), and a shared inbox (workbasket). When an assignment needs Legal Review, it goes to the Legal workbasket — any available Legal team member can pick it up, just as any attorney can handle incoming departmental mail."
+        },
+        {
+          "type": "concept",
+          "term": "One Work Queue per Work Group (mutual requirement)",
+          "description": "Each Work Group contains exactly ONE Work Queue. A Work Queue REQUIRES a Work Group and vice versa — they go together. When setting up your first Work Group, you can reuse the default@pega.com Work Queue."
+        },
+        {
+          "type": "concept",
+          "term": "Work Queue vs. Worklist",
+          "description": "A WORK QUEUE is a SHARED list for all operators in a Work Group; a WORKLIST holds only the work assigned to ONE specific operator. An Assignment moves from the Work Queue to a Worklist when ready to be worked."
+        },
+        {
+          "type": "concept",
+          "term": "Operators and Work Groups",
+          "description": "An operator must belong to AT LEAST ONE Work Group and can belong to MORE THAN ONE. Work Group membership controls work sharing without changing the organizational hierarchy. Configure users in App Studio; Dev Studio offers advanced options."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 290\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Work Group Structure</title>\n<desc>Work Group contains a manager, users, and one or more Work Queues; users have personal Worklists</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">WORK GROUP STRUCTURE</text>\n<!-- Work Group outer -->\n<rect x=\"20\" y=\"44\" width=\"740\" height=\"226\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"76\" font-size=\"14\" font-weight=\"700\" fill=\"#0E3D28\">Work Group</text>\n<!-- Manager -->\n<rect x=\"40\" y=\"90\" width=\"160\" height=\"52\" rx=\"10\" fill=\"#1E8A5B\"/>\n<text x=\"120\" y=\"114\" font-size=\"12\" font-weight=\"700\" fill=\"#ffffff\" text-anchor=\"middle\">Manager</text>\n<text x=\"120\" y=\"130\" font-size=\"10.5\" fill=\"#A7F3D0\" text-anchor=\"middle\">Oversees group</text>\n<!-- Users row -->\n<rect x=\"40\" y=\"158\" width=\"108\" height=\"94\" rx=\"10\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/>\n<text x=\"94\" y=\"194\" font-size=\"11.5\" font-weight=\"700\" fill=\"#2B2580\" text-anchor=\"middle\">User A</text>\n<text x=\"94\" y=\"210\" font-size=\"10\" fill=\"#534AB7\" text-anchor=\"middle\">Personal</text>\n<text x=\"94\" y=\"224\" font-size=\"10\" fill=\"#534AB7\" text-anchor=\"middle\">Worklist</text>\n<rect x=\"160\" y=\"158\" width=\"108\" height=\"94\" rx=\"10\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/>\n<text x=\"214\" y=\"194\" font-size=\"11.5\" font-weight=\"700\" fill=\"#2B2580\" text-anchor=\"middle\">User B</text>\n<text x=\"214\" y=\"210\" font-size=\"10\" fill=\"#534AB7\" text-anchor=\"middle\">Personal</text>\n<text x=\"214\" y=\"224\" font-size=\"10\" fill=\"#534AB7\" text-anchor=\"middle\">Worklist</text>\n<rect x=\"280\" y=\"158\" width=\"108\" height=\"94\" rx=\"10\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/>\n<text x=\"334\" y=\"194\" font-size=\"11.5\" font-weight=\"700\" fill=\"#2B2580\" text-anchor=\"middle\">User C</text>\n<text x=\"334\" y=\"210\" font-size=\"10\" fill=\"#534AB7\" text-anchor=\"middle\">Personal</text>\n<text x=\"334\" y=\"224\" font-size=\"10\" fill=\"#534AB7\" text-anchor=\"middle\">Worklist</text>\n<!-- Work Queue -->\n<rect x=\"430\" y=\"90\" width=\"308\" height=\"162\" rx=\"12\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"584\" y=\"124\" font-size=\"14\" font-weight=\"700\" fill=\"#5A3200\" text-anchor=\"middle\">Work Queue</text>\n<text x=\"584\" y=\"144\" font-size=\"11\" fill=\"#BA7517\" text-anchor=\"middle\">Shared pool of Assignments</text>\n<text x=\"584\" y=\"162\" font-size=\"11\" fill=\"#5A3200\" text-anchor=\"middle\">Any qualified member</text>\n<text x=\"584\" y=\"178\" font-size=\"11\" fill=\"#5A3200\" text-anchor=\"middle\">can pull and work</text>\n<text x=\"584\" y=\"200\" font-size=\"10.5\" fill=\"#BA7517\" text-anchor=\"middle\">No single owner</text>\n<text x=\"584\" y=\"220\" font-size=\"10.5\" fill=\"#BA7517\" text-anchor=\"middle\">Prevents bottlenecks</text>\n<!-- Arrow users → queue -->\n<line x1=\"390\" y1=\"205\" x2=\"428\" y2=\"205\" stroke=\"#6d8bff\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/>\n<polygon points=\"428,199 440,205 428,211\" fill=\"#6d8bff\"/>\n</svg>",
+          "caption": "A Work Group bundles a manager, users (each with a personal Worklist), and one or more shared Work Queues. Any qualified group member can pull from the shared queue."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Managers and Authorized Managers",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Work Group manager",
+          "description": "A Work Group names ONE operator as its PRIMARY manager. The system uses manager information for NOTIFICATION Tasks, APPROVAL Tasks, ROUTING Tasks, and ESCALATION. Managers assign, monitor, and report on the group's work using the Web Portal."
+        },
+        {
+          "type": "concept",
+          "term": "Authorized Managers (and their limits)",
+          "description": "Work Group can have AUTHORIZED MANAGERS to help TRANSFER Assignments. Limits: need NOT be Work Group members, CANNOT perform approvals, and if from OUTSIDE the Work Group cannot complete Work Queue Assignments."
+        },
+        {
+          "type": "interactive",
+          "title": "Worklist vs Work Queue Decisions",
+          "height": 420,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Named vs Pool\", \"scenario\": \"A procurement manager personally signs off on all contracts. No one else can approve in their absence \\u2014 only they can complete the Contract Approval Assignment. Where should this Assignment be routed?\", \"opts\": [\"Manager's Worklist \\u2014 route directly to the specific named operator's personal queue when individual accountability is required\", \"Contract Approval Work Queue \\u2014 any authorized approver can claim it from the pool\", \"Broadcast to all approvers' Worklists simultaneously \\u2014 the first to respond is the valid approval\", \"Business logic routing to find the approver with the fewest assignments \\u2014 ensures load balancing across named individuals\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. When a specific named individual must complete the work (personal accountability), route to their Worklist.\", \"\\u2717 Incorrect. A Work Queue means any member of the group can claim it \\u2014 the scenario requires ONE specific person.\", \"\\u2717 Incorrect. Broadcasting to multiple Worklists creates multiple Assignments and potential duplicate completions.\", \"\\u2717 Incorrect. Load balancing chooses dynamically \\u2014 it cannot guarantee the specific named manager receives every contract.\"]}, {\"label\": \"Shared Pool\", \"scenario\": \"A document verification team of 12 analysts must process verification requests. All 12 should see the same incoming requests. Whoever is free picks it up. Which routing applies?\", \"opts\": [\"Document Verification Work Queue \\u2014 one Assignment visible to all 12; first to claim removes it from the pool for others\", \"Each analyst's individual Worklist \\u2014 broadcast to all 12 simultaneously\", \"Round-robin across the 12 Worklists \\u2014 one at a time, rotating\", \"Route to the team lead's Worklist; team lead delegates to available analysts\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Work Queue = shared pool. One Assignment, 12 can see it, first to claim processes it. No duplicates.\", \"\\u2717 Incorrect. Broadcasting to 12 Worklists creates 12 separate Assignments \\u2014 all 12 could submit the same verification, creating conflicts.\", \"\\u2717 Incorrect. Round-robin sends to one analyst at a time, removing visibility from the other 11 who may also be available.\", \"\\u2717 Incorrect. Manager delegation is a manual bottleneck \\u2014 defeats the purpose of automated shared-pool routing.\"]}, {\"label\": \"Queue vs List Behavior\", \"scenario\": \"A CSR claims a customer complaint Assignment from the Work Queue. 30 minutes later, they are pulled into an urgent meeting. What happens to the Assignment they claimed?\", \"opts\": [\"The Assignment is in their Worklist and stays there \\u2014 it's their responsibility. They (or a manager) must reassign it back to the queue or to another CSR if they cannot complete it\", \"The Assignment automatically returns to the Work Queue after 30 minutes of inactivity\", \"The Assignment is shared with their team automatically when they become inactive \\u2014 any team member can complete it\", \"The Assignment is escalated to the manager by the SLA, who then manually reassigns it\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Once claimed, the Assignment moves to the CSR's Worklist and is their exclusive responsibility. It does not auto-return unless a manager manually reassigns it (or an SLA escalation triggers reassignment).\", \"\\u2717 Incorrect. Assignments do not auto-return to a queue based on inactivity time. The SLA escalation timeout can trigger reassignment, but that requires explicit SLA configuration.\", \"\\u2717 Incorrect. Claimed Assignments are not automatically shared \\u2014 they are exclusively in the claiming CSR's Worklist until completed or explicitly reassigned.\", \"\\u2717 Incorrect. Automatic SLA escalation to the manager requires explicit SLA configuration with a 'Reassign' action. It does not happen by default and requires a manager to manually act on the escalation.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Operator = User / people",
+      "trapDescription": "Questions use 'Operator' and 'User' interchangeably and ask which term Pega uses. Candidates default to 'User.' In Pega, the correct term is Operator — an Operator record holds authentication credentials, profile data, and access group assignments.",
+      "bestPractice": "Treat Operator and User as the same record across studios."
+    },
+    {
+      "title": "One Work Queue per Work Group",
+      "trapDescription": "Each Work Group has exactly one Work Queue, and the two require each other; the first group can reuse default@pega.com.",
+      "bestPractice": "Don't expect many queues per group — it is 1:1."
+    },
+    {
+      "title": "Work Queue vs. Worklist",
+      "trapDescription": "A question asks where assignments go when routed to an individual operator. Candidates say Work Queue. A Worklist belongs to one operator (personal queue); a Work Queue (Workbasket) is shared — routing to a named operator targets the Worklist.",
+      "bestPractice": "Route to a Work Queue (Workbasket) for shared team pickup where any member can claim the work; route to a named operator for their personal Worklist only."
+    },
+    {
+      "title": "At least one, possibly many",
+      "trapDescription": "An operator must belong to at least one Work Group and may belong to more than one; this does not change the org hierarchy.",
+      "bestPractice": "Assign operators to Work Groups to enable shared work routing — an operator can belong to more than one Work Group simultaneously without organizational restructuring."
+    },
+    {
+      "title": "Authorized Manager limits",
+      "trapDescription": "Authorized Managers transfer Assignments but CANNOT approve; if they are outside the Work Group they cannot complete Assignments from the Work Queue.",
+      "bestPractice": "Use Authorized Managers only for assignment transfer and backup coverage — they cannot approve Cases and must not be substituted for the approving manager in approval flows."
+    },
+    {
+      "title": "App Studio vs Dev Studio",
+      "trapDescription": "Questions ask where to create or manage operator records in bulk. Candidates select App Studio. Individual operator records are managed in App Studio; bulk operator management and advanced configuration (like skill profiles) require Dev Studio.",
+      "bestPractice": "Default to App Studio; use Dev Studio for advanced Operator/Work Group settings."
+    },
+    {
+      "title": "Work Group vs. Access Group — different purposes",
+      "trapDescription": "Questions ask how Work Groups and Access Groups differ. Candidates say they are the same. A Work Group organizes operators for routing and reporting; an Access Group grants access rights (Roles, Portals, Rulesets) — they serve completely different purposes.",
+      "bestPractice": "Work Group = team for work routing (which workbasket, who is the manager). Access Group = security container (roles, portals, rulesets). An operator belongs to one Work Group but may belong to multiple Access Groups."
+    },
+    {
+      "title": "Work Group Manager is not an automatic approver",
+      "trapDescription": "A question asks whether the Work Group Manager automatically becomes the approver for cases in that group. Candidates say yes. The Work Group Manager is an administrative role for the group — it does not automatically make that person an approver in any Case flow.",
+      "bestPractice": "The WGM is the designated supervisor for escalation, not an automatic approver. Approval routing must be explicitly configured in the approval process using the 'Route to Work Group Manager' option."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m18_q01",
+      "type": "single-select",
+      "scenario": "A finance analyst, a marketing manager, and a staff writer in DIFFERENT business units all maintain the company website and must share a pool of work. What should the SA create?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Work Group — a cross-functional team (with one Work Queue) whose members share work regardless of business unit"
+        },
+        {
+          "id": "B",
+          "text": "A new business unit that contains all three"
+        },
+        {
+          "id": "C",
+          "text": "Three separate Worklists that sync with each other"
+        },
+        {
+          "id": "D",
+          "text": "An Access Role shared by the three"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Cross-functional teams that share work assignments use a Work Group structure.",
+      "rationale": "A Work Group is a cross-functional team that shares work via one Work Queue regardless of business unit. B is wrong because it would alter the org hierarchy unnecessarily. C is wrong because Worklists are per-operator and not shared. D is wrong because Access Roles grant permissions, not shared work."
+    },
+    {
+      "questionId": "m18_q02",
+      "type": "single-select",
+      "scenario": "How many Work Queues does a Work Group contain, and what is the relationship between the two?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Exactly one — and a Work Queue requires a Work Group while a Work Group requires a Work Queue"
+        },
+        {
+          "id": "B",
+          "text": "Many Work Queues, one per operator in the group"
+        },
+        {
+          "id": "C",
+          "text": "Zero — Work Queues are configured separately from Work Groups"
+        },
+        {
+          "id": "D",
+          "text": "One, but a Work Group can exist without any Work Queue"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think about the cardinality: how many Work Queues exist per Work Group, and is the relationship mutual?",
+      "rationale": "Each Work Group has exactly one Work Queue, and the two require each other. B is wrong because there is one queue per group, not per operator. C and D are wrong because a Work Group cannot exist without a Work Queue."
+    },
+    {
+      "questionId": "m18_q03",
+      "type": "single-select",
+      "scenario": "A BA is explaining assignment routing to a client stakeholder who is designing team workflows. What is the key difference between a Work Queue and a Worklist in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Work Queue is shared by all operators in a Work Group; a Worklist holds only one operator's work. Assignments move from the Queue to a Worklist when ready"
+        },
+        {
+          "id": "B",
+          "text": "They are identical; the names are interchangeable"
+        },
+        {
+          "id": "C",
+          "text": "A Worklist is shared; a Work Queue is personal"
+        },
+        {
+          "id": "D",
+          "text": "A Work Queue stores rules; a Worklist stores data"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Work Queue is a shared team list; Worklist belongs to one specific operator.",
+      "rationale": "A Work Queue is shared across the Work Group; a Worklist is one operator's. Assignments transfer Queue → Worklist when ready. B is wrong because they differ. C reverses them. D is wrong because both hold Assignments, not rules/data."
+    },
+    {
+      "questionId": "m18_q04",
+      "type": "single-select",
+      "scenario": "An SA is onboarding a team of Claims Adjusters who handle both residential and commercial claims across two different departments, each with its own Work Queue. The SA must determine how many Work Groups a single operator can belong to in Pega.",
+      "options": [
+        {
+          "id": "A",
+          "text": "At least one, and the operator may belong to more than one"
+        },
+        {
+          "id": "B",
+          "text": "Exactly one — operators cannot belong to multiple Work Groups"
+        },
+        {
+          "id": "C",
+          "text": "Zero or more — Work Group membership is optional"
+        },
+        {
+          "id": "D",
+          "text": "Exactly two — a primary and a backup"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Consider the minimum and maximum number of Work Groups an operator can belong to.",
+      "rationale": "An operator must belong to at least one Work Group and can belong to more than one. B is wrong because multiple memberships are allowed. C is wrong because membership is required (at least one). D is wrong because there is no two-group rule."
+    },
+    {
+      "questionId": "m18_q05",
+      "type": "single-select",
+      "scenario": "A BA is setting up a Work Group for a loan processing team and is asked why the manager field is required. For what purpose does Pega use the Work Group manager's information?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Notification Tasks, approval Tasks, routing Tasks, and escalation — managers also monitor/report via the Web Portal"
+        },
+        {
+          "id": "B",
+          "text": "Only for sending marketing emails"
+        },
+        {
+          "id": "C",
+          "text": "To store the Ruleset version of the application"
+        },
+        {
+          "id": "D",
+          "text": "To authenticate operators at login"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Which four workflow functions rely on the Work Group manager's information in Pega?",
+      "rationale": "Manager info drives notification, approval, routing, and escalation Tasks, and managers monitor/report via the Web Portal. B, C, D are unrelated to the manager role on a Work Group."
+    },
+    {
+      "questionId": "m18_q06",
+      "type": "multi-select",
+      "scenario": "A Pega System Architect is explaining Authorized Manager capabilities to a BA who wants to understand how supervisors outside a Work Group can assist when the primary manager is unavailable. Which TWO statements about an Authorized Manager are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "They help transfer Assignments and can cover when the primary manager is unavailable"
+        },
+        {
+          "id": "B",
+          "text": "They cannot perform approvals"
+        },
+        {
+          "id": "C",
+          "text": "They must be a member of the Work Group"
+        },
+        {
+          "id": "D",
+          "text": "From outside the Work Group, they can still complete Assignments from the Work Queue"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "selectCount": 2,
+      "hint": "Focus on what an Authorized Manager can do — coverage and transfer — and what they cannot do.",
+      "rationale": "Authorized Managers help transfer Assignments and cover for the primary, but cannot perform approvals. C is wrong because they are NOT required to be in the Work Group. D is wrong because an outside Authorized Manager cannot complete Assignments from the Work Queue."
+    },
+    {
+      "questionId": "m18_q07",
+      "type": "single-select",
+      "scenario": "An SA refers to an 'Operator' in Dev Studio. What is the equivalent term in App Studio?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A User (also called 'people') — the same record, different studio label"
+        },
+        {
+          "id": "B",
+          "text": "A Persona"
+        },
+        {
+          "id": "C",
+          "text": "A Work Queue"
+        },
+        {
+          "id": "D",
+          "text": "An Access Group"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Recall the Dev Studio vs. App Studio terminology mapping for the same person record.",
+      "rationale": "An Operator (Dev Studio) is a User/people (App Studio). B is wrong because a Persona is a role category, not the individual record. C and D are different artifacts."
+    },
+    {
+      "questionId": "m18_q08",
+      "type": "single-select",
+      "scenario": "An SA is setting up the very first Work Group and has not created a dedicated Work Queue yet. What can they use?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The default@pega.com Work Queue"
+        },
+        {
+          "id": "B",
+          "text": "No Work Queue — the first Work Group does not need one"
+        },
+        {
+          "id": "C",
+          "text": "A Worklist instead of a Work Queue"
+        },
+        {
+          "id": "D",
+          "text": "A temporary Data Page as the queue"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Hint: Pega provides a built-in default Work Queue you can reuse.",
+      "rationale": "The first Work Group can reuse the default@pega.com Work Queue. B is wrong because every Work Group requires a Work Queue. C is wrong because a Worklist is per-operator. D is wrong because Data Pages are not Work Queues."
+    },
+    {
+      "questionId": "m18_q09",
+      "type": "single-select",
+      "scenario": "An SA configures a work group named Claims-Processing with 12 operators. All 12 should be able to process claims from the shared queue. Which routing target should the Send Work step use?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Claims-Processing workbasket — routes to the shared queue where any of the 12 can pull work"
+        },
+        {
+          "id": "B",
+          "text": "The Work Group Manager worklist — the manager redistributes to team members"
+        },
+        {
+          "id": "C",
+          "text": "Round-robin assignment to each of the 12 operator worklists"
+        },
+        {
+          "id": "D",
+          "text": "Skill-match query returning the first available member across the 12"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "For a shared team queue, route to workbasket or individual worklist?",
+      "rationale": "Workbasket = shared pool, any member can pull. B routes to one person and creates a bottleneck. C pre-assigns work and removes flexibility. D skill-match returns one operator, not a shared pool."
+    },
+    {
+      "questionId": "m18_q10",
+      "type": "single-select",
+      "scenario": "A developer needs assignments to automatically route to the Work Group Manager's backup when the manager is absent. Where is the backup configured?",
+      "options": [
+        {
+          "id": "A",
+          "text": "In the Work Group record — the Deputy Work Group Manager field designates the backup"
+        },
+        {
+          "id": "B",
+          "text": "In each operator record — the Substitute Operator field covers manager absences"
+        },
+        {
+          "id": "C",
+          "text": "In the Access Group record — the secondary approver field"
+        },
+        {
+          "id": "D",
+          "text": "In the SLA rule — the escalation action reassigns to a hardcoded backup operator ID"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Where is the deputy manager for a Work Group configured?",
+      "rationale": "Work Group record has a Deputy WGM field. B covers individual operator absence, not Work Group management. C manages security roles, not team management. D fires only on SLA breach, not on manager absence."
+    },
+    {
+      "questionId": "m18_q11",
+      "type": "single-select",
+      "scenario": "Routing is set to Work Group Manager. Three requests arrive simultaneously. What happens to all three assignments?",
+      "options": [
+        {
+          "id": "A",
+          "text": "All three appear in the WGM personal worklist simultaneously — the manager processes or redistributes them"
+        },
+        {
+          "id": "B",
+          "text": "All three route to the Work Group workbasket, accessible by any member"
+        },
+        {
+          "id": "C",
+          "text": "Pega rejects the second and third because the WGM worklist holds only one active assignment"
+        },
+        {
+          "id": "D",
+          "text": "The routing rule auto-escalates to the Deputy WGM when more than one assignment is pending"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What happens when multiple assignments route to one operator worklist?",
+      "rationale": "Routing to the WGM sends to their PERSONAL worklist — all accumulate there. B is wrong because WGM routing goes to the worklist, not the group workbasket. C is wrong because worklists have no hard limit. D is wrong because auto-escalation requires explicit SLA configuration."
+    },
+    {
+      "questionId": "m18_q12",
+      "type": "single-select",
+      "scenario": "An operator in the Claims-Processing Work Group cannot see the Approve button on an assignment. What is the most likely cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The operator's Access Role does not include the Approve action"
+        },
+        {
+          "id": "B",
+          "text": "Only the Work Group Manager can access workbasket assignments"
+        },
+        {
+          "id": "C",
+          "text": "The operator must be removed and re-added to the Work Group"
+        },
+        {
+          "id": "D",
+          "text": "Work Group membership automatically grants all workbasket actions — this is a UI rendering bug"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "What controls button/action visibility in a Pega UI?",
+      "rationale": "Access Role controls action permissions. Work Group controls routing. B is wrong because all members can access the workbasket. C is wrong because Work Group membership does not affect Access Role permissions. D is wrong because Work Group membership does not grant actions."
+    },
+    {
+      "questionId": "m18_q13",
+      "type": "multi-select",
+      "scenario": "An SA is explaining how to structure a cross-functional team in a Pega application. Which TWO statements correctly describe a Work Group?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Work Group organizes a cross-functional team and associates that team with a single shared Work Queue"
+        },
+        {
+          "id": "B",
+          "text": "A Work Group has a designated manager who has supervisory access to the team's Case workload"
+        },
+        {
+          "id": "C",
+          "text": "A Work Group stores individual Worklist assignments for each team member privately, separate from the shared queue"
+        },
+        {
+          "id": "D",
+          "text": "A Work Group must be associated with exactly one Persona or it cannot be created in App Studio"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "A Work Group = team + shared Work Queue + manager — recall what it organizes and who manages it.",
+      "rationale": "A Work Group bundles a cross-functional team with a shared Work Queue, so all team members can access and claim the same pool of Assignments. Each Work Group has a designated manager with supervisory capabilities. Work Groups do not store individual private Worklists, and no Persona requirement exists for Work Group creation."
+    },
+    {
+      "questionId": "m18_q14",
+      "type": "multi-select",
+      "scenario": "A business stakeholder asks about the difference between a Work Group Manager and an Authorized Manager in Pega. Which TWO statements about Authorized Managers are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An Authorized Manager can perform managerial actions on a Case even when it is not routed to their own Work Queue"
+        },
+        {
+          "id": "B",
+          "text": "Authorized Manager access is configured per Case Type to control which Case Types a manager can act upon"
+        },
+        {
+          "id": "C",
+          "text": "An Authorized Manager can create new Personas and assign them to operators in the same application"
+        },
+        {
+          "id": "D",
+          "text": "Authorized Managers have the same system-level permissions as the Pega System Administrator"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Authorized Managers extend supervisory access beyond the manager's own Work Queue, scoped per Case Type.",
+      "rationale": "Authorized Managers are granted the ability to manage Cases outside their own Work Queue — useful for supervisors overseeing multiple teams. This access is scoped per Case Type so it does not grant unlimited application-wide control. Authorized Managers cannot create Personas or grant System Administrator permissions."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Work Group",
+      "value": "Cross-functional team = a manager + one Work Queue; shares work across business units. (Operator = User/people in App Studio.)"
+    },
+    {
+      "key": "Work Group ↔ Work Queue",
+      "value": "Exactly one Work Queue per group; each requires the other; first group can use default@pega.com."
+    },
+    {
+      "key": "Queue vs Worklist",
+      "value": "Work Queue = shared team list; Worklist = one operator. Assignments move Queue → Worklist when ready."
+    },
+    {
+      "key": "Operator membership",
+      "value": "At least one Work Group; may belong to more than one; does not change the org hierarchy."
+    },
+    {
+      "key": "Manager",
+      "value": "One primary manager; drives notification/approval/routing/escalation; monitors via Web Portal."
+    },
+    {
+      "key": "Authorized Manager",
+      "value": "Transfers Assignments / covers the primary; NOT required in the group; CANNOT approve; if outside, cannot complete Queue Assignments."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Teams of users",
+      "url": "https://academy.pega.com/topic/teams-users/v6/in/96211/73601",
+      "duration": "20 min"
+    }
+  ]
+}

@@ -1,0 +1,850 @@
+{
+  "moduleId": "BA-M10",
+  "moduleTitle": "Displaying data with App Studio for Business Architects",
+  "moduleUrl": "https://academy.pega.com/module/displaying-data-app-studio-business-architects/v3/in/93701",
+  "moduleQuizUrl": "https://academy.pega.com/module/displaying-data-app-studio-business-architects/v3/quiz/in/93701",
+  "learningObjectives": [
+    "Configure a View with different Field Types to capture and display various types of Case data.",
+    "Create Views that deliver a consistent user experience.",
+    "Explain the significance of Primary Fields within a Case structure."
+  ],
+  "estTime": "65 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "UI Configuration in App Studio",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Separation of Concerns",
+          "description": "The software design principle the Pega UI layer applies: divide the application into distinct parts, each with a single responsibility, so front-end components are decoupled from back-end APIs."
+        },
+        {
+          "type": "concept",
+          "term": "UI elements: Views, templates, widgets",
+          "description": "You author applications with Views, templates, and widgets. For new apps, Pega auto-generates a set of Views (built from Templates) so you can start configuring UI immediately."
+        },
+        {
+          "type": "concept",
+          "term": "Templates",
+          "description": "Handle layout and responsiveness of a View — including breakpoints, white-space management, and wrapping — to ensure out-of-the-box accessibility. Each View type uses a different template; available templates vary by the type and location of the View."
+        },
+        {
+          "type": "concept",
+          "term": "Full Page View",
+          "description": "Automatically added when a new Case Type or data object is created. Provides the three-pane framework — navigation, summary panel, and detail area — representing the overall workspace for a Case."
+        },
+        {
+          "type": "concept",
+          "term": "Summary panel",
+          "description": "Displays the most critical Case information in the upper-left pane. Its content is configured by the architect and typically includes the Case's Primary Fields for quick-glance status."
+        },
+        {
+          "type": "concept",
+          "term": "Promoted Action",
+          "description": "Gives quick access to a frequently used Action (e.g., Change Stage) as a button on the Case header — a default pattern requiring no button component. Each Case Type supports ONE promoted Action, and it is the first Case-wide Action."
+        },
+        {
+          "type": "analogy",
+          "text": "Separation of Concerns is a well-run restaurant: the dining room (UI), the waitstaff (logic), and the kitchen (back-end APIs) each do one job and stay decoupled, so you can redecorate the dining room without touching the kitchen."
+        }
+      ],
+      "bulletPoints": [
+        "Full Page View and Summary panel are edited in the UX tab; Preview = placeholders, run a Case for live data.",
+        "One promoted Action per Case Type; it is the first Case-wide Action and needs no button component."
+      ]
+    },
+    {
+      "sectionTitle": "Data Capture in Views",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "View",
+          "description": "A UI component that gathers data from a user OR displays data to the user, showing the fields and instructions for the current Task/Assignment. Views are reusable across applications with multiple Case Types."
+        },
+        {
+          "type": "concept",
+          "term": "Prescribed design system",
+          "description": "A systemized collection of design rules, patterns, and UI component standards (Cosmos React) that ensures consistent look, feel, and accessibility across all Pega applications."
+        },
+        {
+          "type": "concept",
+          "term": "The four View types & editability",
+          "description": "Full Page View (read-only), Partial (read-only), List (read-only by default; can enable editing), and Form (editable). View type determines whether users can enter data."
+        },
+        {
+          "type": "analogy",
+          "text": "Views are like form letters in a template library: write one 'Customer details' View and reuse it across every Case Type that needs customer info — change it once, and every letter updates."
+        }
+      ],
+      "bulletPoints": [
+        "Pega stores the name and value of each UI element in local storage or an external SOR, making information reusable; settings make data editable or read-only.",
+        "Data-entry Views are also called forms.",
+        "Out-of-the-box accessibility includes screen-reader support and localization."
+      ]
+    },
+    {
+      "sectionTitle": "Forms in Pega Platform",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "View vs. Form",
+          "description": "A View is a reusable configuration of UI elements attached to a data source. A Form is an interface specifically for collecting data, with navigation buttons (Cancel/Next/Previous/Submit)."
+        },
+        {
+          "type": "concept",
+          "term": "Where Form Views are configured",
+          "description": "Two entry points: the Workflow tab (clicking Configure View on a Step auto-creates a Form View using the Default template), or the UX tab (manual creation, not auto-generated)."
+        },
+        {
+          "type": "concept",
+          "term": "Layout",
+          "description": "1–3 columns; two-column is best practice. Narrow inputs (Text single line, Currency) take one column; wider/any-height inputs (Rich Text Editor, Text area, Radio group, Checkbox, Booleans, Attachments) span two columns. This keeps tabbing left-to-right."
+        },
+        {
+          "type": "concept",
+          "term": "Field groups",
+          "description": "A cluster of related fields under a single header (collapsible); fields can come from the Case Type Data Model or various data objects. Field groups are specific to that View only — NOT reusable in other Views."
+        },
+        {
+          "type": "concept",
+          "term": "Multi-step vs. Hierarchical Forms",
+          "description": "Multi-step Form: one Assignment across MULTIPLE Views (linear, default for the Create Stage). Hierarchical Form: a single View with expandable sub-Views linked to a Step hierarchy."
+        }
+      ],
+      "bulletPoints": [
+        "All fields in Partial Views are read-only.",
+        "Best practice: Multi-step when users must fill out sequentially; Hierarchical when they can fill out in any order.",
+        "A form View shows Step instructions by default; you can override them with custom text or hide them.",
+        "In a non-submitted Multi-step Form with no required fields, users can navigate back and forth."
+      ]
+    },
+    {
+      "sectionTitle": "Adding Data Through a UI View",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Add fields from a View",
+          "description": "You can create portions of the Data Model while creating a View — adding new fields to the Case Type Data Model from the Configure/Edit View screen (e.g., adding an Account number field while configuring the Collect customer information View)."
+        },
+        {
+          "type": "analogy",
+          "text": "Adding a field from a View is like jotting a new line on a form mid-meeting: convenient, but the master template (Data Model) should really be designed first so the addition fits the bigger picture."
+        }
+      ],
+      "bulletPoints": [
+        "Best practice: build the Data Model first using the Data tab in App Studio, keeping reuse and inheritance in mind — 'add from View' is the exception, not the rule."
+      ]
+    },
+    {
+      "sectionTitle": "Designate Primary Fields",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Primary Fields",
+          "description": "Fields marked as Primary on the Data Model tab that appear automatically on the Create, Edit, and Details Views without additional configuration. Label and Description are Primary by default."
+        },
+        {
+          "type": "concept",
+          "term": "Default Primary Fields on Case Types",
+          "description": "The Case Type Data Model automatically designates the Label and Description fields as Primary by default; removing the Primary designation removes them from the Details, Create, and Edit Views."
+        },
+        {
+          "type": "concept",
+          "term": "Primary Fields & Reference Fields (inheritance)",
+          "description": "Adding a reference field to a Case Type inherits the referenced object's Primary Fields into the Case Type's Views automatically, without manual field-by-field mapping."
+        },
+        {
+          "type": "analogy",
+          "text": "Primary Fields are the 'pinned' columns of a spreadsheet — the few you always want visible. Mark them once on the data object, and any Case that references it inherits those pinned columns automatically."
+        }
+      ],
+      "bulletPoints": [
+        "Configure Primary Fields once at the data object level → referenced objects auto-add their Primary Fields → no Case-Type-level config needed for inherited Primary Fields to appear."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "View editability",
+      "trapDescription": "Full Page View and Partial are ALWAYS read-only; List is read-only by DEFAULT (enable editing); Form is editable.",
+      "bestPractice": "Memorize: Full Page + Partial = read-only; List = read-only by default; Form = editable. Partial fields are always read-only."
+    },
+    {
+      "title": "One promoted Action per Case Type",
+      "trapDescription": "Tests whether you think multiple promoted Actions or a button component are needed.",
+      "bestPractice": "Exactly one promoted Action per Case Type; it is the first Case-wide Action; no button component required."
+    },
+    {
+      "title": "Full Page View preview shows placeholders",
+      "trapDescription": "Authoring shows only placeholder text; you must run a Case to see real data.",
+      "bestPractice": "Placeholders at design time; run a Case instance for live data. Edited in the UX tab; three-pane layout."
+    },
+    {
+      "title": "Form View creation point",
+      "trapDescription": "A Form View is auto-created when you Configure View for a Step on the Workflow tab; default template is the Default form.",
+      "bestPractice": "Workflow tab + Step → Form View (Default form). Other templates come from creating different View types on the UX tab."
+    },
+    {
+      "title": "Two-column layout and which inputs span",
+      "trapDescription": "Two-column is best practice; certain inputs span both columns.",
+      "bestPractice": "One column: Text(single line), Currency. Span two: Rich Text Editor, Text area, Radio group, Checkbox, Booleans, Attachments."
+    },
+    {
+      "title": "Field groups are not reusable",
+      "trapDescription": "Field groups are specific to their View.",
+      "bestPractice": "Field group = local to its View. (Hierarchical Form groups are likewise not independent or reusable.)"
+    },
+    {
+      "title": "Multi-step vs. Hierarchical Forms",
+      "trapDescription": "Multi-step = multiple Views; Hierarchical = multiple tabs in one View; UX-tab-only forms cannot be hierarchical; default Create Process is Multi-step.",
+      "bestPractice": "Many Views (sequential) = Multi-step. Many tabs in one View (any order) = Hierarchical. Needs Step association to be hierarchical."
+    },
+    {
+      "title": "Add-from-View vs. Data tab first",
+      "trapDescription": "You CAN add fields from a View, but it is not the preferred starting point.",
+      "bestPractice": "Build the Data Model first in the Data tab (reuse + inheritance); add-from-View is the exception."
+    },
+    {
+      "title": "Primary Fields defaults and inheritance",
+      "trapDescription": "Label and Description are Primary by default on Case Types; a reference field inherits the referenced object's Primary Fields.",
+      "bestPractice": "Primary Fields auto-appear on Create/Edit/Details; referenced objects' Primary Fields inherit automatically into the Case Type's Views."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A BA creates a brand-new Case Type. What does Pega automatically add to represent the single Case visually, and where is it edited?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Full Page View, edited in the UX tab"
+        },
+        {
+          "id": "B",
+          "text": "A Partial View, edited in the Data tab"
+        },
+        {
+          "id": "C",
+          "text": "A Multi-step Form, edited in Dev Studio"
+        },
+        {
+          "id": "D",
+          "text": "A Pulse View, edited on the Workflow tab"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Pega auto-adds a three-pane framework View for each new Case Type, configured in the UX tab.",
+      "rationale": "Pega automatically adds a Full Page View — the three-pane framework — for each new Case Type and data object, which is then edited in the UX tab. The other options describe different artifacts or locations."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "While authoring a Full Page View in App Studio, the Preview shows only placeholder text. How do you preview the UI with actual data?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Run a Case instance"
+        },
+        {
+          "id": "B",
+          "text": "Enable editing on the View"
+        },
+        {
+          "id": "C",
+          "text": "Switch to Dev Studio"
+        },
+        {
+          "id": "D",
+          "text": "Add it to the Summary panel"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Placeholders at design time; data at run time.",
+      "rationale": "The UX Preview shows placeholder data, not real run-time values. Running an actual Case instance is needed to render the UI with real data. Changing editability or switching studios does not produce live Case data."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A BA wants one-click access to 'Change Stage' from the Case header. What is configured, and what is the limit?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A promoted Action; one per Case Type; it is the first Case-wide Action and needs no button component"
+        },
+        {
+          "id": "B",
+          "text": "A widget; unlimited per Case Type"
+        },
+        {
+          "id": "C",
+          "text": "A custom button component; two per Case Type"
+        },
+        {
+          "id": "D",
+          "text": "A Pulse post; one per Stage"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "'Promoted' = one, on the header, no build.",
+      "rationale": "A promoted Action provides header access to a frequent Action; each Case Type supports exactly one, it is the first Case-wide Action, and no button component is required."
+    },
+    {
+      "questionId": "Q4",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "A BA is reviewing the View types available in App Studio and needs to determine which are inherently read-only. Which TWO View types are ALWAYS read-only?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Full Page View"
+        },
+        {
+          "id": "B",
+          "text": "Partial"
+        },
+        {
+          "id": "C",
+          "text": "List"
+        },
+        {
+          "id": "D",
+          "text": "Form"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "List is read-only by default (can be enabled); Form is editable.",
+      "rationale": "Full Page View and Partial are always read-only. List is read-only by DEFAULT but editing can be enabled, and Form is editable. No partial credit."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A BA adds a List View but users can only read it. Why?",
+      "options": [
+        {
+          "id": "A",
+          "text": "List Views are read-only by default; editing must be enabled"
+        },
+        {
+          "id": "B",
+          "text": "List Views can never be edited"
+        },
+        {
+          "id": "C",
+          "text": "The data source is external"
+        },
+        {
+          "id": "D",
+          "text": "Partial Views override List Views"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "List Views are read-only by default; to allow data entry you must enable a specific setting.",
+      "rationale": "List Views are read-only by default; to allow create, edit, or delete operations you must explicitly enable editing on the List View configuration. The data source location does not affect whether editing is permitted."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "A BA clicks Configure View on a Step in the Workflow tab to define what data the user will see and capture. When does Pega automatically create a Form View?",
+      "options": [
+        {
+          "id": "A",
+          "text": "When you click Configure View for a Step on the Workflow tab"
+        },
+        {
+          "id": "B",
+          "text": "When you open the Summary panel"
+        },
+        {
+          "id": "C",
+          "text": "When you run a Case instance"
+        },
+        {
+          "id": "D",
+          "text": "When you designate Primary Fields"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Configuring a Step's View on the Workflow tab triggers automatic Form View creation.",
+      "rationale": "Clicking Configure View for a Step on the Workflow tab auto-creates a Form View using the Default form template. Forms created manually on the UX tab are not auto-generated and require the architect to set them up from scratch."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "A stakeholder asks a BA to clarify the structural difference between a View and a Form in Pega App Studio. How does a View differ from a Form?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Form collects data/processes work and can contain one or more Views; a View is not always a Form"
+        },
+        {
+          "id": "B",
+          "text": "They are identical"
+        },
+        {
+          "id": "C",
+          "text": "A View always contains multiple Forms"
+        },
+        {
+          "id": "D",
+          "text": "A Form can only contain a single field"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The Form is the container with the buttons.",
+      "rationale": "A Form is the data-collection interface that includes navigation buttons (Cancel, Next, Previous, Submit) and may contain one or more Views. A View is the reusable UI configuration; not every View is a Form."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "A BA is designing a two-column form layout in App Studio and following Pega's recommended layout guidelines for field placement. Which type of input should span BOTH columns?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Rich Text Editor"
+        },
+        {
+          "id": "B",
+          "text": "Text (single line)"
+        },
+        {
+          "id": "C",
+          "text": "Currency"
+        },
+        {
+          "id": "D",
+          "text": "A single-line phone field"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Wider inputs like Rich Text Editor and Checkbox span two columns; compact inputs like Text fields span one.",
+      "rationale": "Wider or any-height inputs — Rich Text Editor, Text area, Radio group, Checkbox, Boolean, Attachments — span two columns. Compact inputs such as Text (single line), Currency, and Phone fields occupy one column."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "A BA groups related fields under one header in a View and wants to reuse that exact group in another View. What is true?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Field groups are specific to that View only and are not reusable"
+        },
+        {
+          "id": "B",
+          "text": "Field groups are reusable across all Views"
+        },
+        {
+          "id": "C",
+          "text": "Field groups become Partial Views automatically"
+        },
+        {
+          "id": "D",
+          "text": "Field groups can only contain fields from one data object"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Field groups are local to the View they are created in and cannot be reused in other Views.",
+      "rationale": "Field groups are specific to the View in which they are defined and are not reusable across other Views. Their fields can come from the Case Type Data Model or from various data objects, but the grouping itself is View-local."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "A BA needs to choose between Multi-step and Hierarchical Forms for a complex multi-screen data-capture assignment. Which statement correctly distinguishes the two form types?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Multi-step splits info across multiple Form Views; Hierarchical splits across multiple tabs in a single Form View"
+        },
+        {
+          "id": "B",
+          "text": "Multi-step uses tabs in one View; Hierarchical uses multiple Views"
+        },
+        {
+          "id": "C",
+          "text": "Both split info across multiple independent, reusable Views"
+        },
+        {
+          "id": "D",
+          "text": "Neither can be associated with a Step"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Many Views vs. many tabs in one View.",
+      "rationale": "Multi-step = multiple Form Views; Hierarchical = multiple tabs (Form groups) in a single Form View. Hierarchical Form groups are not independent/reusable, and only Step-associated Views can be hierarchical."
+    },
+    {
+      "questionId": "Q11",
+      "type": "single-select",
+      "scenario": "A BA creates a new Case Type in App Studio and notices a process has already been added automatically to the Create Stage. Which type of Create Process does Pega add by default?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Multi-step Form"
+        },
+        {
+          "id": "B",
+          "text": "A Hierarchical Form"
+        },
+        {
+          "id": "C",
+          "text": "A Partial View"
+        },
+        {
+          "id": "D",
+          "text": "A List View"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The default Create Process in the Create Stage is a Multi-step Form — linear and step-by-step.",
+      "rationale": "The default Create Process added to the Create Stage when a new Case Type is created is a Multi-step Form. It is linear and splits the creation flow across multiple Views, one Step at a time."
+    },
+    {
+      "questionId": "Q12",
+      "type": "single-select",
+      "scenario": "A BA built a form directly on the UX tab and now wants to convert it to a hierarchical layout. What happens?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It cannot become hierarchical because UX-tab forms are not associated with a Step"
+        },
+        {
+          "id": "B",
+          "text": "It converts instantly"
+        },
+        {
+          "id": "C",
+          "text": "Only after enabling editing"
+        },
+        {
+          "id": "D",
+          "text": "Only in Dev Studio"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Hierarchical layout requires the View to be associated with a Step; UX-tab-only forms cannot become hierarchical.",
+      "rationale": "Hierarchical layout requires a Step-associated View created via the Workflow tab. Forms created directly on the UX tab are not Step-associated and therefore cannot use hierarchical layout."
+    },
+    {
+      "questionId": "Q13",
+      "type": "single-select",
+      "scenario": "A new requirement adds an Account number field; a BA adds it directly from the Edit View screen. What is the best-practice guidance?",
+      "options": [
+        {
+          "id": "A",
+          "text": "You can add fields from a View, but build the Data Model first via the Data tab (reuse + inheritance)"
+        },
+        {
+          "id": "B",
+          "text": "Always add fields from Views; never use the Data tab"
+        },
+        {
+          "id": "C",
+          "text": "Fields can only be added in Dev Studio"
+        },
+        {
+          "id": "D",
+          "text": "Adding fields from a View is not possible"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Adding a field from a View is possible but creates a non-preferred, View-specific field rather than a reusable one.",
+      "rationale": "Adding fields from a View is possible, but the best practice is to design the Data Model first in the Data tab with reuse/inheritance in mind."
+    },
+    {
+      "questionId": "Q14",
+      "type": "single-select",
+      "scenario": "A BA designates several key fields as Primary on the Data Model tab. Where will those Primary Fields automatically appear in the running application?",
+      "options": [
+        {
+          "id": "A",
+          "text": "On the default Create, Edit, and Details Views"
+        },
+        {
+          "id": "B",
+          "text": "Only on the Pulse View"
+        },
+        {
+          "id": "C",
+          "text": "Only in Dev Studio"
+        },
+        {
+          "id": "D",
+          "text": "On the List View only"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Primary Fields appear automatically on three default Views when marked on the Data Model tab.",
+      "rationale": "Primary Fields are automatically displayed on the Create, Edit, and Details Views once designated on the Data Model tab. This requires no per-View configuration and applies consistently across the Case Type."
+    },
+    {
+      "questionId": "Q15",
+      "type": "single-select",
+      "scenario": "On a Case Type's Data Model, which fields are designated as Primary by DEFAULT?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Label and Description"
+        },
+        {
+          "id": "B",
+          "text": "Create date and Operator"
+        },
+        {
+          "id": "C",
+          "text": "pyGUID and Status"
+        },
+        {
+          "id": "D",
+          "text": "First name and Last name"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Removing Primary status drops those fields from all three default Views (Details, Create, Edit).",
+      "rationale": "Case Type Data Models designate Label and Description as Primary Fields by default. Removing the Primary designation removes those fields from the Details, Create, and Edit Views automatically."
+    },
+    {
+      "questionId": "Q16",
+      "type": "single-select",
+      "scenario": "An Assistance Request Case Type has a reference field to the Service Address data object (City, State, Street marked Primary). What appears in the Case Type's Views WITHOUT extra configuration?",
+      "options": [
+        {
+          "id": "A",
+          "text": "City, State, and Street inherit automatically into the Case Type's Data Model and Views"
+        },
+        {
+          "id": "B",
+          "text": "Nothing — Primary Fields don't inherit"
+        },
+        {
+          "id": "C",
+          "text": "Only Label and Description"
+        },
+        {
+          "id": "D",
+          "text": "All Service Address fields, Primary or not"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Reference field → referenced object's Primary Fields flow through.",
+      "rationale": "A reference field automatically brings the referenced object's Primary Fields (City/State/Street) into the Case Type's Data Model and Views. Only the Primary Fields inherit — not all fields."
+    },
+    {
+      "questionId": "Q17",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "A BA is designing the Case page layout and wants to confirm the default behavior and contents of the Summary panel. Which TWO statements about the Summary panel are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It sits in the upper-left and collapses to responsive mode"
+        },
+        {
+          "id": "B",
+          "text": "By default it includes the Details View (showing Primary Fields) and the Pulse View"
+        },
+        {
+          "id": "C",
+          "text": "It is always editable and stores Primary Fields permanently"
+        },
+        {
+          "id": "D",
+          "text": "It can only be rendered on mobile devices"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "The Summary panel's position (upper-left) and default contents (Primary Fields) define its role.",
+      "rationale": "The Summary panel is upper-left, mobile-shaped, and collapses to responsive mode; by default it contains the Details View (Primary Fields) and Pulse View. It is not 'always editable,' and it renders on all devices. No partial credit."
+    },
+    {
+      "questionId": "Q18",
+      "type": "multi-select",
+      "selectCount": 2,
+      "scenario": "Which TWO statements about the prescribed design system and who configures Views are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It is a builder kit of UI elements, styles, UX patterns, themes, and guidelines"
+        },
+        {
+          "id": "B",
+          "text": "BAs, Citizen Developers, and System Architects configure Views entirely in App Studio"
+        },
+        {
+          "id": "C",
+          "text": "Only System Architects may configure Views, and only in Dev Studio"
+        },
+        {
+          "id": "D",
+          "text": "The core front-end experience cannot be configured at all"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "A prescribed design system defines the component kit, style rules, and who configures vs. who creates custom styles.",
+      "rationale": "The design system is a builder kit (UI elements, styles, UX patterns, themes, guidelines), and BAs/Citizen Developers/SAs configure Views entirely in App Studio. The core experience is prescribed but configurable. No partial credit."
+    },
+    {
+      "questionId": "Q19",
+      "type": "single-select",
+      "scenario": "A loan officer must see submitted applicant data but not change it, while entering an approve/reject decision. How should the View be designed?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Display customer data as read-only and provide editable fields for the decision"
+        },
+        {
+          "id": "B",
+          "text": "Make all fields editable"
+        },
+        {
+          "id": "C",
+          "text": "Use a List View with bulk actions"
+        },
+        {
+          "id": "D",
+          "text": "Hide the customer data entirely"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This View design presents customer data read-only alongside editable decision fields for the officer.",
+      "rationale": "The officer should see the submitted data read-only and have editable fields for the approval/rejection decision — exactly how View editability settings are intended to be used."
+    },
+    {
+      "questionId": "Q20",
+      "type": "single-select",
+      "scenario": "Which View type relies on a data source and can be displayed as a table, timeline, or tile-based gallery?",
+      "options": [
+        {
+          "id": "A",
+          "text": "List View"
+        },
+        {
+          "id": "B",
+          "text": "Form View"
+        },
+        {
+          "id": "C",
+          "text": "Partial View"
+        },
+        {
+          "id": "D",
+          "text": "Full Page View"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "List Views support column configuration, filtering, sorting, and optional bulk action capabilities.",
+      "rationale": "The List View relies on a data source and can render as a table, timeline, or tile-based gallery, with column selection, filter/sort/group, and bulk actions."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Separation of Concerns",
+      "value": "UI layer is modular; each part one concern; connects front-end to back-end APIs."
+    },
+    {
+      "key": "View editability",
+      "value": "Full Page + Partial = read-only. List = read-only by default. Form = editable. Partial fields always read-only."
+    },
+    {
+      "key": "Full Page View",
+      "value": "Auto per Case/data object; three-pane; edited in UX tab; preview = placeholders, run a Case for live data."
+    },
+    {
+      "key": "Summary panel",
+      "value": "Upper-left, mobile-shaped, collapses to responsive; Details (Primary Fields) + Pulse by default."
+    },
+    {
+      "key": "Promoted Action",
+      "value": "One per Case Type; first Case-wide Action; header button; no component build."
+    },
+    {
+      "key": "Form vs View",
+      "value": "Form collects data + has Cancel/Next/Previous/Submit and holds 1+ Views. A View is not always a Form."
+    },
+    {
+      "key": "Layout",
+      "value": "Two-column best practice. One col: Text(single)/Currency. Span two: RTE, Text area, Radio group, Checkbox, Booleans, Attachments."
+    },
+    {
+      "key": "Multi-step vs Hierarchical",
+      "value": "Multi-step = many Views (sequential; default Create Process). Hierarchical = many tabs in one View (any order; needs Step association; groups not reusable)."
+    },
+    {
+      "key": "Field groups",
+      "value": "Single header, collapsible; fields from model/data objects; NOT reusable across Views."
+    },
+    {
+      "key": "Primary Fields",
+      "value": "Auto on Create/Edit/Details. Label & Description default Primary on Case Types. Reference fields inherit the referenced object's Primary Fields."
+    }
+  ],
+  "topics": [
+    {
+      "title": "UI configuration in App Studio",
+      "url": "https://academy.pega.com/topic/ui-configuration-app-studio/v4/in/94776",
+      "duration": "20 min"
+    },
+    {
+      "title": "Data capture in Views",
+      "url": "https://academy.pega.com/topic/data-capture-views/v3/in/94776",
+      "duration": "15 min"
+    },
+    {
+      "title": "Forms in Pega Platform",
+      "url": "https://academy.pega.com/topic/forms-pega-platform/v3/in/94776",
+      "duration": "10 min"
+    },
+    {
+      "title": "Adding data through a UI View",
+      "url": "https://academy.pega.com/topic/adding-data-through-ui-view/v2/in/80626",
+      "duration": "5 min"
+    },
+    {
+      "title": "Designate Primary Fields",
+      "url": "https://academy.pega.com/topic/designate-primary-fields/v2/in/80626",
+      "duration": "5 min"
+    }
+  ]
+}

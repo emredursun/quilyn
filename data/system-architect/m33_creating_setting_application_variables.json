@@ -1,0 +1,611 @@
+{
+  "moduleId": "m33",
+  "moduleTitle": "Creating and setting application variables",
+  "moduleUrl": "https://academy.pega.com/module/creating-and-setting-application-variables/v5/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/creating-and-setting-application-variables/v5/quiz/in/96211",
+  "learningObjectives": [
+    "Create and set customizable Application Settings using Configuration Sets",
+    "Organize Configuration Sets that associate Configuration settings with a common element",
+    "Reference Configuration settings using the Condition Builder"
+  ],
+  "estTime": "10 min",
+  "topics": [
+    {
+      "title": "Configuration Sets",
+      "url": "https://academy.pega.com/topic/configuration-sets/v4/in/96211/67666",
+      "duration": "10 min"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Configuration Settings and Configuration Sets",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Configuration settings",
+          "description": "A unified, low-code framework for customizing application behavior parameters without Rule overrides. Configuration settings minimize the need for custom Rule changes, making applications easier to maintain, upgrade, and deploy — shortening time-to-market and reducing bugs."
+        },
+        {
+          "type": "concept",
+          "term": "Configuration Set",
+          "description": "A named group of Configuration settings for a specific feature or Case Type, created in App Studio. Rules (classes, Data Pages, properties) are auto-generated in Dev Studio. Name stored as pyLabel of a class Rule (max 64 chars)."
+        },
+        {
+          "type": "analogy",
+          "text": "Think of a Configuration Set as a settings panel on your phone — you can change ringtone, brightness, and font size (Configuration settings) without opening the phone's codebase. Managers and users adjust behavior at runtime without touching any design-time rules."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox='0 0 700 185' xmlns='http://www.w3.org/2000/svg' style='width:100%;font-family:system-ui,sans-serif'><text x='350' y='20' text-anchor='middle' style='fill:var(--pa-ink);font-size:13px;font-weight:700'>Configuration Set Structure</text><rect x='200' y='30' width='300' height='36' rx='8' style='fill:var(--pa-brand);opacity:0.15;stroke:var(--pa-brand);stroke-width:1.5'/><text x='350' y='49' text-anchor='middle' style='fill:var(--pa-brand);font-size:12px;font-weight:700'>Configuration Set (App Studio)</text><text x='350' y='63' text-anchor='middle' style='fill:var(--pa-muted);font-size:10px'>Groups settings by feature or Case Type · max 64 chars</text><line x1='240' y1='66' x2='190' y2='95' style='stroke:var(--pa-muted);stroke-width:1'/><line x1='300' y1='66' x2='300' y2='95' style='stroke:var(--pa-muted);stroke-width:1'/><line x1='400' y1='66' x2='400' y2='95' style='stroke:var(--pa-muted);stroke-width:1'/><line x1='460' y1='66' x2='510' y2='95' style='stroke:var(--pa-muted);stroke-width:1'/><rect x='110' y='95' width='140' height='36' rx='6' style='fill:var(--pa-surface-2);stroke:var(--pa-brand-3);stroke-width:1'/><text x='180' y='114' text-anchor='middle' style='fill:var(--pa-brand-3);font-size:10px;font-weight:600'>Setting A</text><text x='180' y='126' text-anchor='middle' style='fill:var(--pa-muted);font-size:9px'>e.g. Show instructions: true</text><rect x='265' y='95' width='140' height='36' rx='6' style='fill:var(--pa-surface-2);stroke:var(--pa-brand-3);stroke-width:1'/><text x='335' y='114' text-anchor='middle' style='fill:var(--pa-brand-3);font-size:10px;font-weight:600'>Setting B</text><text x='335' y='126' text-anchor='middle' style='fill:var(--pa-muted);font-size:9px'>e.g. Max attachments: 5</text><rect x='420' y='95' width='140' height='36' rx='6' style='fill:var(--pa-surface-2);stroke:var(--pa-brand-3);stroke-width:1'/><text x='490' y='114' text-anchor='middle' style='fill:var(--pa-brand-3);font-size:10px;font-weight:600'>Setting C</text><text x='490' y='126' text-anchor='middle' style='fill:var(--pa-muted);font-size:9px'>e.g. Approval limit: 10000</text><text x='350' y='155' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:11px'>Referenced via Condition Builder throughout the application</text><text x='350' y='172' text-anchor='middle' style='fill:var(--pa-faint);font-size:10px'>Data instances of Data-Configuration-Setting class · included in deployment file</text></svg>",
+          "caption": "A Configuration Set groups related settings tied to a feature or Case Type. Settings are referenced via the Condition Builder."
+        },
+        {
+          "type": "concept",
+          "term": "DSS → Configuration settings (key migration note)",
+          "description": "In previous Pega Platform releases, Dynamic System Settings (DSS) provided dynamic behavior functionality. Configuration settings REPLACE DSS — they provide enhanced functionality and simpler maintenance."
+        }
+      ],
+      "bulletPoints": [
+        "Configuration settings = low-code, no Rule overrides. Easier maintenance, faster upgrades.",
+        "Configuration Set = named group of settings tied to a feature or Case Type.",
+        "Name stored as pyLabel of a class Rule — max 64 characters.",
+        "Settings are data instances of the Data-Configuration-Setting class.",
+        "Created in App Studio → underlying rules visible in Dev Studio.",
+        "Replace DSS (Dynamic System Settings) in newer Pega releases."
+      ]
+    },
+    {
+      "sectionTitle": "Navigation, Access, and Deployment",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Where to access",
+          "description": "App Studio → Settings tab → Configurations landing page. Configuration Sets allow runtime customization by users without switching to a design-time environment (App Studio or Dev Studio)."
+        },
+        {
+          "type": "concept",
+          "term": "Role-based access",
+          "description": "Administrators (PegaRULES:SysAdm4): Read/Write/Delete on both Configuration Sets and settings. Managers (PegaRULES:WorkMgr4): Read/Write/Delete on Sets, Read-only on individual settings. Users (PegaRULES:User4): Read-only on both. Administrators can grant additional write/delete access to users and managers."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox='0 0 700 162' xmlns='http://www.w3.org/2000/svg' style='width:100%;font-family:system-ui,sans-serif'><text x='350' y='18' text-anchor='middle' style='fill:var(--pa-ink);font-size:13px;font-weight:700'>Default Access: Configuration Sets vs. Settings</text><rect x='8' y='28' width='684' height='28' rx='0' style='fill:var(--pa-surface-3)'/><text x='175' y='47' text-anchor='middle' style='fill:var(--pa-muted);font-size:11px;font-weight:700'>Role</text><text x='400' y='47' text-anchor='middle' style='fill:var(--pa-muted);font-size:11px;font-weight:700'>Configuration Sets</text><text x='580' y='47' text-anchor='middle' style='fill:var(--pa-muted);font-size:11px;font-weight:700'>Configuration Settings</text><line x1='8' y1='56' x2='692' y2='56' style='stroke:var(--pa-line-2);stroke-width:1'/><rect x='8' y='56' width='684' height='28' rx='0' style='fill:var(--pa-surface-2)'/><text x='175' y='75' text-anchor='middle' style='fill:var(--pa-ok);font-size:10px;font-weight:600'>Administrators (SysAdm4)</text><text x='400' y='75' text-anchor='middle' style='fill:var(--pa-ok);font-size:10px'>Read / Write / Delete</text><text x='580' y='75' text-anchor='middle' style='fill:var(--pa-ok);font-size:10px'>Read / Write / Delete</text><line x1='8' y1='84' x2='692' y2='84' style='stroke:var(--pa-line-2);stroke-width:1'/><rect x='8' y='84' width='684' height='28' rx='0' style='fill:var(--pa-surface-3)'/><text x='175' y='103' text-anchor='middle' style='fill:var(--pa-brand);font-size:10px;font-weight:600'>Managers (WorkMgr4)</text><text x='400' y='103' text-anchor='middle' style='fill:var(--pa-brand);font-size:10px'>Read / Write / Delete</text><text x='580' y='103' text-anchor='middle' style='fill:var(--pa-warn);font-size:10px'>Read only</text><line x1='8' y1='112' x2='692' y2='112' style='stroke:var(--pa-line-2);stroke-width:1'/><rect x='8' y='112' width='684' height='28' rx='0' style='fill:var(--pa-surface-2)'/><text x='175' y='131' text-anchor='middle' style='fill:var(--pa-ink-soft);font-size:10px;font-weight:600'>Users (User4)</text><text x='400' y='131' text-anchor='middle' style='fill:var(--pa-warn);font-size:10px'>Read only</text><text x='580' y='131' text-anchor='middle' style='fill:var(--pa-warn);font-size:10px'>Read only</text><text x='350' y='152' text-anchor='middle' style='fill:var(--pa-faint);font-size:9px'>Administrators can grant additional write/delete access to users and managers</text></svg>",
+          "caption": "Admins: full control. Managers: edit Sets, read-only on individual settings. Users: read-only on everything."
+        },
+        {
+          "type": "concept",
+          "term": "Deployment",
+          "description": "Configuration Sets are defined in the Pega-Configuration class structure and included in the deployment file generated by product Rules. Configuration settings are included only when the 'Include associated data' checkbox is selected during product file creation."
+        }
+      ],
+      "bulletPoints": [
+        "Navigate: App Studio → Settings tab → Configurations.",
+        "Admins: full Read/Write/Delete on Sets AND individual settings.",
+        "Managers: Read/Write/Delete on Sets; Read-only on individual settings.",
+        "Users: Read-only on both Sets and settings.",
+        "Deployment: must select 'Include associated data' during product file creation.",
+        "Runtime customization — no design-time environment needed."
+      ]
+    },
+    {
+      "sectionTitle": "Referencing Configuration Settings",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Condition Builder reference",
+          "description": "Reference Configuration settings throughout the application using the Condition Builder. The Condition Builder provides a menu to select a Configuration Set, then the specific setting within it. Allows business logic to react dynamically to setting values without hardcoding."
+        },
+        {
+          "type": "concept",
+          "term": "Runtime customization example",
+          "description": "Show additional guidance text to new users via a Configuration setting (value = true). Once experienced, update the setting to false — guidance text is hidden. No Rule change, no redeployment required."
+        }
+      ],
+      "bulletPoints": [
+        "Reference via Condition Builder: select Set → select setting.",
+        "No hardcoded values — behavior driven dynamically by setting values.",
+        "Updating a setting value changes app behavior instantly, no rule deployment."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Configuration settings REPLACE DSS — they are not the same",
+      "trapDescription": "Questions ask whether Dynamic System Settings (DSS) and Configuration Settings are the same artifact. Candidates say yes. Configuration Settings are the modern replacement for DSS in Pega 8.5+ — they provide a UI-based management layer that DSS lacked.",
+      "bestPractice": "Configuration settings replace DSS in newer Pega releases with enhanced functionality and simpler maintenance. DSS is the legacy approach."
+    },
+    {
+      "title": "Configuration Set name max = 64 characters",
+      "trapDescription": "A question asks the maximum length for a Configuration Set name. Candidates say 'unlimited' or '255 characters.' Configuration Set names are capped at 64 characters — exceeding this limit causes a validation error.",
+      "bestPractice": "The Configuration Set name is stored as the pyLabel of a class Rule and has a maximum length of 64 characters."
+    },
+    {
+      "title": "Managers can edit Sets but only READ individual settings (by default)",
+      "trapDescription": "Questions ask what access level Managers have for Configuration Settings. Candidates say 'full read/write.' By default, Managers can create and edit Configuration Sets but can only read individual setting values — editing individual values requires elevated permissions.",
+      "bestPractice": "Managers (WorkMgr4) have Read/Write/Delete on Configuration Sets by default, but only Read access on individual Configuration settings. Admins can grant additional access."
+    },
+    {
+      "title": "Users are Read-only — not runtime editors",
+      "trapDescription": "A question asks whether end users can change Configuration Setting values at runtime. Candidates say yes if the Set is published. End users have read-only access to Configuration Settings — only operators with appropriate access can modify values.",
+      "bestPractice": "Users (User4) have Read-only access to both Sets and settings by default. Runtime customization means Admins/Managers change values — not end users. Admins can extend access if needed."
+    },
+    {
+      "title": "'Include associated data' must be selected for deployment",
+      "trapDescription": "Questions ask how to deploy Configuration Settings to another environment. Candidates describe exporting rules only. When packaging for deployment, the 'Include associated data' option must be selected — otherwise the Configuration Setting values are not included in the package.",
+      "bestPractice": "Configuration settings are only included in the deployment file when 'Include associated data' is explicitly selected during product file creation."
+    },
+    {
+      "title": "Create Configuration Sets in App Studio — not Dev Studio",
+      "trapDescription": "A question asks where to create Configuration Sets. Candidates navigate to Dev Studio. Configuration Sets are created in App Studio under the Settings section — they are an App Studio citizen-developer-facing feature.",
+      "bestPractice": "Configuration Sets are created and maintained in App Studio. Dev Studio shows the generated rules but is not the authoring surface."
+    },
+    {
+      "title": "Reference via Condition Builder — not a direct property reference",
+      "trapDescription": "Questions ask how to reference a Configuration Setting value in a rule expression. Candidates write a direct property path. Configuration Settings are referenced using the Condition Builder function — not by a direct property path notation.",
+      "bestPractice": "Configuration settings are referenced using the Condition Builder, which provides a menu to select the Configuration Set and specific setting within it."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m33_q01",
+      "type": "single-select",
+      "scenario": "A System Architect needs to let application behavior be customized without Rule overrides or redeployment. Which Pega feature provides this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Configuration settings organized in Configuration Sets"
+        },
+        {
+          "id": "B",
+          "text": "Dynamic System Settings (DSS) in the Pega Rules Engine"
+        },
+        {
+          "id": "C",
+          "text": "Decision Tables configured in Dev Studio"
+        },
+        {
+          "id": "D",
+          "text": "Application Rulesets with environment-specific overlays"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think: unified low-code framework for exposing customizable, runtime-configurable application behavior settings.",
+      "rationale": "Configuration settings in Configuration Sets provide a unified low-code framework for customizing behavior without Rule overrides. B is the legacy approach now replaced. C and D are unrelated."
+    },
+    {
+      "questionId": "m33_q02",
+      "type": "single-select",
+      "scenario": "A Pega System Architect needs to create a new Configuration Set to group related application settings — such as API endpoints and feature toggles — for a new insurance application. The SA is looking for the correct location in the Pega studios. Where are Configuration Sets created and maintained in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "App Studio → Settings tab → Configurations"
+        },
+        {
+          "id": "B",
+          "text": "Dev Studio → Records → Data → Configuration Sets"
+        },
+        {
+          "id": "C",
+          "text": "Admin Studio → System → Configuration Manager"
+        },
+        {
+          "id": "D",
+          "text": "Dev Studio → App → Data Model → Variables"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Configuration Sets are created in the low-code authoring environment.",
+      "rationale": "Configuration Sets are authored and maintained entirely in App Studio under Settings → Configurations — the primary design surface for BAs and SAs. Although the underlying Rules (class, Data Page, properties) are visible in Dev Studio, they are generated by the platform and should not be edited there directly, as App Studio manages their lifecycle."
+    },
+    {
+      "questionId": "m33_q03",
+      "type": "single-select",
+      "scenario": "A BA is establishing naming conventions for Configuration Sets in a new Pega application and needs to know platform constraints. What is the maximum character length for a Configuration Set name?",
+      "options": [
+        {
+          "id": "A",
+          "text": "64 characters"
+        },
+        {
+          "id": "B",
+          "text": "128 characters"
+        },
+        {
+          "id": "C",
+          "text": "256 characters"
+        },
+        {
+          "id": "D",
+          "text": "No documented limit"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The name is stored as pyLabel of a class Rule.",
+      "rationale": "In Pega, a Configuration Set name is stored as the pyLabel of the generated class Rule. The platform enforces a maximum length of 64 characters for the name field. Exceeding this limit will prevent the Configuration Set from saving, so teams should plan naming conventions with this constraint in mind before building out their configuration structure."
+    },
+    {
+      "questionId": "m33_q04",
+      "type": "single-select",
+      "scenario": "A Manager (PegaRULES:WorkMgr4) can update Configuration Sets but cannot modify individual Configuration settings. Is this expected?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Yes — Managers have Read/Write/Delete on Sets but only Read access on individual settings by default"
+        },
+        {
+          "id": "B",
+          "text": "No — Managers have full access to both Sets and individual settings"
+        },
+        {
+          "id": "C",
+          "text": "Yes — Managers have no access to Configuration Sets or settings by default"
+        },
+        {
+          "id": "D",
+          "text": "No — this is a misconfiguration that should be reported"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Managers get different default access for Sets vs. individual settings.",
+      "rationale": "Pega's default Configuration Set permissions are intentionally split: Managers can Read, Write, and Delete the Configuration Set container but have Read-only access to the individual settings within it. Administrators can grant broader permissions when needed. This separation prevents accidental modification of production settings by non-administrator roles."
+    },
+    {
+      "questionId": "m33_q05",
+      "type": "single-select",
+      "scenario": "What is the default access level for a User role (PegaRULES:User4) on Configuration settings?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Read-only on both Configuration Sets and settings"
+        },
+        {
+          "id": "B",
+          "text": "Read/Write on settings but Read-only on Sets"
+        },
+        {
+          "id": "C",
+          "text": "No access at all — must be explicitly granted by an Administrator"
+        },
+        {
+          "id": "D",
+          "text": "Read/Write/Delete on both Sets and settings"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "By default, users receive the most restricted level of access in the system.",
+      "rationale": "Users (User4 role) have Read-only access to Configuration Sets and individual settings by default. Administrators can grant additional create or modify access. Read-only is the most restricted default access level."
+    },
+    {
+      "questionId": "m33_q06",
+      "type": "single-select",
+      "scenario": "An SA is packaging the application for deployment. What must be done to include Configuration settings in the product file?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Select the 'Include associated data' checkbox during product file creation"
+        },
+        {
+          "id": "B",
+          "text": "Configuration settings are automatically included in all deployment files"
+        },
+        {
+          "id": "C",
+          "text": "Export Configuration Sets separately via Admin Studio"
+        },
+        {
+          "id": "D",
+          "text": "Enable a 'Configuration deployment' flag in the Ruleset stack"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A specific checkbox during product file creation is required.",
+      "rationale": "Configuration Set data is not bundled into a deployment package by default. To include the settings values in a product file, the developer must explicitly select 'Include associated data' during product file creation. Forgetting this step is a common source of environment-specific configuration failures after deployment to a new environment."
+    },
+    {
+      "questionId": "m33_q07",
+      "type": "single-select",
+      "scenario": "An application team uses Dynamic System Settings (DSS) for runtime customization. What is the modern Pega recommendation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Replace DSS with Configuration settings — they offer enhanced functionality and simpler maintenance"
+        },
+        {
+          "id": "B",
+          "text": "Continue using DSS — it is still the recommended approach in Pega Platform '24"
+        },
+        {
+          "id": "C",
+          "text": "Migrate DSS to Decision Tables in App Studio"
+        },
+        {
+          "id": "D",
+          "text": "Use Application Rulesets with overlays to replace DSS functionality"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "A newer App Studio feature is designed to explicitly replace Dynamic System Settings.",
+      "rationale": "Configuration Sets are the modern replacement for Dynamic System Settings (DSS). They offer enhanced functionality and simpler App Studio-based maintenance. DSS remains available but is the legacy approach in new implementations."
+    },
+    {
+      "questionId": "m33_q08",
+      "type": "single-select",
+      "scenario": "A SA is implementing business rules that need to read a Configuration Set value at runtime. How should a developer correctly reference a Configuration setting within application logic?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use the Condition Builder — select the Configuration Set, then the specific setting"
+        },
+        {
+          "id": "B",
+          "text": "Use a direct property reference from the Data-Configuration-Setting class"
+        },
+        {
+          "id": "C",
+          "text": "Use a When rule to query the Configuration Set at runtime"
+        },
+        {
+          "id": "D",
+          "text": "Use a Data Transform to copy the setting value into a Case property first"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The Condition Builder has a dedicated menu for Configuration settings.",
+      "rationale": "Configuration Sets are the newer replacement for Dynamic System Settings (DSS). They provide a unified, App Studio-based framework for configuring and customizing application behavior at runtime."
+    },
+    {
+      "questionId": "m33_q09",
+      "type": "single-select",
+      "scenario": "A junior BA asks a senior SA what conceptual element a Configuration Set is grouped around when designing the settings structure. A Configuration Set is associated with which type of application element?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A common element such as an application feature or specific Case Type"
+        },
+        {
+          "id": "B",
+          "text": "A specific Operator (user) who needs the customized settings"
+        },
+        {
+          "id": "C",
+          "text": "A specific Ruleset version for environment-based configuration"
+        },
+        {
+          "id": "D",
+          "text": "A specific Stage in the Case Life Cycle"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Sets are organized around functional areas — features or Case Types.",
+      "rationale": "A Configuration Set is designed to group related settings that belong to a shared application concept — for example, all email notification parameters for a specific Case Type, or all timeout thresholds for a feature module. They are not organized by individual users, Rulesets, or Stages, but by a common application feature or Case Type."
+    },
+    {
+      "questionId": "m33_q10",
+      "type": "single-select",
+      "scenario": "When a developer creates a Configuration Set in App Studio, where are the generated underlying rules (classes, Data Pages, properties) visible?",
+      "options": [
+        {
+          "id": "A",
+          "text": "In Dev Studio — the generated rules are visible there"
+        },
+        {
+          "id": "B",
+          "text": "They are not visible anywhere — Configuration Sets are self-contained"
+        },
+        {
+          "id": "C",
+          "text": "In Admin Studio — under the System rules section"
+        },
+        {
+          "id": "D",
+          "text": "Only in the deployment file — not in any studio"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Generated rules appear in the advanced authoring environment.",
+      "rationale": "When a BA or SA creates a Configuration Set in App Studio, Pega automatically generates supporting Rules in the background — including class definitions, Data Pages, and properties. These generated Rules are visible in Dev Studio for inspection, but they should not be manually edited there since App Studio manages their lifecycle and any manual changes may be overwritten."
+    },
+    {
+      "questionId": "m33_q11",
+      "type": "single-select",
+      "scenario": "An app initially shows guidance text for new users. Once trained, the team wants to hide it without a Rule change or redeployment. What is the correct approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use a Configuration setting to control the guidance text visibility — update the value at runtime when users are trained"
+        },
+        {
+          "id": "B",
+          "text": "Delete the guidance text Rule and redeploy the application"
+        },
+        {
+          "id": "C",
+          "text": "Use a Decision Table that evaluates user hire date to decide visibility"
+        },
+        {
+          "id": "D",
+          "text": "Create a Condition on the Case Life Cycle Stage that checks user experience"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Runtime control of behavior without Rule changes = Configuration settings.",
+      "rationale": "A Configuration setting controlling guidance text visibility can be updated at runtime — no Rule change or redeployment required. This is the exact use case Configuration settings are designed for."
+    },
+    {
+      "questionId": "m33_q12",
+      "type": "single-select",
+      "scenario": "A Pega developer is reviewing the underlying class structure of Configuration settings in Dev Studio to understand how they are stored and referenced at the data layer. Configuration settings are data instances of which Pega class?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Data-Configuration-Setting"
+        },
+        {
+          "id": "B",
+          "text": "Rule-Configuration-Setting"
+        },
+        {
+          "id": "C",
+          "text": "Pega-Configuration-Data"
+        },
+        {
+          "id": "D",
+          "text": "Data-AppSettings-Variable"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "It is a Data class, not a Rule class.",
+      "rationale": "Configuration settings are data instances of the Data-Configuration-Setting class within the Pega-Configuration class structure. This is why they appear in Dev Studio as class instances, not as standalone Rules."
+    },
+    {
+      "questionId": "m33_q13",
+      "type": "multi-select",
+      "scenario": "A Pega System Architect is implementing Configuration Sets for a new application. Which TWO statements correctly describe what Configuration Sets and settings provide?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Configuration Sets group related Configuration settings under a common logical label"
+        },
+        {
+          "id": "B",
+          "text": "Configuration settings can be referenced in Condition Builder to drive conditional logic"
+        },
+        {
+          "id": "C",
+          "text": "Configuration Sets replace all Data Pages and eliminate the need for data layer rules"
+        },
+        {
+          "id": "D",
+          "text": "Configuration settings are locked after deployment and require a Rule import to change"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Focus on what Configuration Sets organize and where their values can be used in the application.",
+      "rationale": "Configuration Sets organize related Configuration settings under a shared label for easier management. Those settings can be read directly in Condition Builder expressions to drive logic. Configuration Sets do not replace Data Pages, and settings can be updated without a full Rule deployment."
+    },
+    {
+      "questionId": "m33_q14",
+      "type": "multi-select",
+      "scenario": "An SA is designing a Pega application that must behave differently in Development, Test, and Production environments — for example, using different API endpoints and feature toggles. Which TWO capabilities of Configuration Sets support this requirement?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Configuration settings can store different values depending on the deployment environment"
+        },
+        {
+          "id": "B",
+          "text": "Configuration Sets allow environment-specific overrides without modifying Rules"
+        },
+        {
+          "id": "C",
+          "text": "Configuration Sets automatically synchronize values to all Pega nodes with no setup"
+        },
+        {
+          "id": "D",
+          "text": "Configuration Sets replace Access Groups to separate environment-level permissions"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Think about what makes Configuration settings valuable for multi-environment deployments.",
+      "rationale": "Configuration settings are designed for environment-specific values — the same setting key can hold a different value in Dev vs. Production without any Rule changes. This makes them ideal for API endpoints and feature toggles. They do not auto-sync across nodes automatically, and they are unrelated to Access Group management."
+    },
+    {
+      "questionId": "m33_q15",
+      "type": "multi-select",
+      "scenario": "A developer is reviewing when to use Configuration settings versus hardcoded Rule values in a Pega application. Which TWO are valid reasons to use Configuration settings?",
+      "options": [
+        {
+          "id": "A",
+          "text": "To allow application behavior to be customized per environment without modifying Rules"
+        },
+        {
+          "id": "B",
+          "text": "To expose configurable values that can be read via Condition Builder without Rule changes"
+        },
+        {
+          "id": "C",
+          "text": "To replace Declare Expressions and compute derived property values automatically"
+        },
+        {
+          "id": "D",
+          "text": "To eliminate the need for Application Rulesets in multi-version applications"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Configuration settings are for externalized, environment-adaptable values — not computation or versioning.",
+      "rationale": "Configuration settings externalize values that vary by environment or need to change without a Rule deployment, and they integrate with Condition Builder for dynamic logic. They do not replace Declare Expressions (which compute properties) or eliminate the need for Application Rulesets (which manage Rule versioning)."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Configuration settings",
+      "value": "Low-code framework for customizing app behavior without Rule overrides. Easier maintenance, faster upgrades, shorter time-to-market."
+    },
+    {
+      "key": "Configuration Set",
+      "value": "Named group of related settings tied to a feature or Case Type. Max 64-char name (stored as pyLabel of a class Rule). Created in App Studio."
+    },
+    {
+      "key": "Replaces DSS",
+      "value": "Configuration settings replace Dynamic System Settings (DSS). Enhanced functionality, simpler maintenance."
+    },
+    {
+      "key": "Access — Admins",
+      "value": "Read/Write/Delete on both Configuration Sets AND individual settings."
+    },
+    {
+      "key": "Access — Managers",
+      "value": "Read/Write/Delete on Configuration Sets; Read-only on individual settings."
+    },
+    {
+      "key": "Access — Users",
+      "value": "Read-only on both Configuration Sets and settings."
+    },
+    {
+      "key": "Navigate",
+      "value": "App Studio → Settings tab → Configurations landing page."
+    },
+    {
+      "key": "Reference",
+      "value": "Condition Builder → select Configuration Set → select specific setting."
+    },
+    {
+      "key": "Deployment",
+      "value": "Select 'Include associated data' during product file creation — not automatic."
+    }
+  ]
+}

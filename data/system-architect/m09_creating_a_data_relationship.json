@@ -1,0 +1,704 @@
+{
+  "moduleId": "m09",
+  "moduleTitle": "Creating a data relationship",
+  "moduleUrl": "https://academy.pega.com/module/creating-data-relationship/v6/in/96211",
+  "moduleQuizUrl": "https://academy.pega.com/module/creating-data-relationship/v6/quiz/in/96211",
+  "learningObjectives": [
+    "Explain the role of Data Objects in grouping related fields",
+    "Describe the four Data Relationship types: Embedded Data, Data reference, Case reference, and Query",
+    "Select the correct relationship type and cardinality for a given scenario"
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Data Objects",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Data object",
+          "description": "A structure that groups related fields to model a single entity and establish common context (e.g., a Customer grouping First name, Last name, Email, Phone). Data objects are reusable across an application's Case Types."
+        },
+        {
+          "type": "analogy",
+          "text": "Data relationships in Pega are like a library catalog: each book (data object) has its own record, and the catalog links books to topics, authors, and borrowers. An Embedded data relationship is like a book with a built-in bookmark ribbon — the data only makes sense inside that specific book. A Page List is like a card catalog drawer — one card per item, all managed together."
+        },
+        {
+          "type": "concept",
+          "term": "Extending a data object",
+          "description": "You can extend a data object by referencing another data object; the referenced object's fields become part of the referencing object. Any object can be referenced once or many times."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Data Relationships",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Data relationship",
+          "description": "A container that associates related fields. Unlike a data object or field, it does NOT store data — it relates data-storing elements to the elements that need that data to resolve a Case (object↔Case, object↔object, or Case↔Case)."
+        },
+        {
+          "type": "concept",
+          "term": "Single record vs. list of records",
+          "description": "Regardless of Field Type, a data relationship references either a SINGLE record (one set of fields/values, e.g., one Customer) or a LIST of records (many grouped sets, e.g., multiple ordered items)."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 780 310\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Data Relationship Types</title>\n<desc>Four relationship types with storage location and cardinality options</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">DATA RELATIONSHIP TYPES</text>\n<!-- Embedded Data -->\n<rect x=\"20\" y=\"44\" width=\"172\" height=\"246\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"80\" font-size=\"13\" font-weight=\"700\" fill=\"#0E3D28\">Embedded</text>\n<text x=\"40\" y=\"96\" font-size=\"13\" font-weight=\"700\" fill=\"#0E3D28\">Data</text>\n<text x=\"40\" y=\"118\" font-size=\"10.5\" fill=\"#1E8A5B\">Stored inside</text>\n<text x=\"40\" y=\"134\" font-size=\"10.5\" fill=\"#1E8A5B\">the Case</text>\n<text x=\"40\" y=\"154\" font-size=\"10.5\" fill=\"#0E3D28\">Single record</text>\n<text x=\"40\" y=\"170\" font-size=\"10.5\" fill=\"#0E3D28\">or List of records</text>\n<text x=\"40\" y=\"192\" font-size=\"10.5\" fill=\"#1E8A5B\">e.g. line items</text>\n<text x=\"40\" y=\"208\" font-size=\"10.5\" fill=\"#1E8A5B\">on an order</text>\n<rect x=\"32\" y=\"228\" width=\"148\" height=\"42\" rx=\"7\" fill=\"#1E8A5B\" fill-opacity=\".12\"/>\n<text x=\"42\" y=\"248\" font-size=\"10\" fill=\"#0E3D28\" font-weight=\"600\">Unique to Case</text>\n<text x=\"42\" y=\"262\" font-size=\"10\" fill=\"#0E3D28\">No external source</text>\n<!-- Data reference -->\n<rect x=\"206\" y=\"44\" width=\"172\" height=\"246\" rx=\"14\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"2\"/>\n<text x=\"226\" y=\"80\" font-size=\"13\" font-weight=\"700\" fill=\"#2B2580\">Data</text>\n<text x=\"226\" y=\"96\" font-size=\"13\" font-weight=\"700\" fill=\"#2B2580\">reference</text>\n<text x=\"226\" y=\"118\" font-size=\"10.5\" fill=\"#534AB7\">Stored in external</text>\n<text x=\"226\" y=\"134\" font-size=\"10.5\" fill=\"#534AB7\">SOR or Pega DB</text>\n<text x=\"226\" y=\"154\" font-size=\"10.5\" fill=\"#2B2580\">Single record</text>\n<text x=\"226\" y=\"170\" font-size=\"10.5\" fill=\"#2B2580\">or List of records</text>\n<text x=\"226\" y=\"192\" font-size=\"10.5\" fill=\"#534AB7\">e.g. customer</text>\n<text x=\"226\" y=\"208\" font-size=\"10.5\" fill=\"#534AB7\">profile lookup</text>\n<rect x=\"218\" y=\"228\" width=\"148\" height=\"42\" rx=\"7\" fill=\"#534AB7\" fill-opacity=\".12\"/>\n<text x=\"228\" y=\"248\" font-size=\"10\" fill=\"#2B2580\" font-weight=\"600\">Shared data object</text>\n<text x=\"228\" y=\"262\" font-size=\"10\" fill=\"#2B2580\">Sourced externally</text>\n<!-- Case reference -->\n<rect x=\"392\" y=\"44\" width=\"172\" height=\"246\" rx=\"14\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"412\" y=\"80\" font-size=\"13\" font-weight=\"700\" fill=\"#5A3200\">Case</text>\n<text x=\"412\" y=\"96\" font-size=\"13\" font-weight=\"700\" fill=\"#5A3200\">reference</text>\n<text x=\"412\" y=\"118\" font-size=\"10.5\" fill=\"#BA7517\">Links to another</text>\n<text x=\"412\" y=\"134\" font-size=\"10.5\" fill=\"#BA7517\">Case instance</text>\n<text x=\"412\" y=\"154\" font-size=\"10.5\" fill=\"#5A3200\">Single record only</text>\n<text x=\"412\" y=\"174\" font-size=\"10.5\" fill=\"#BA7517\">e.g. related</text>\n<text x=\"412\" y=\"190\" font-size=\"10.5\" fill=\"#BA7517\">claim or parent</text>\n<text x=\"412\" y=\"206\" font-size=\"10.5\" fill=\"#BA7517\">case link</text>\n<rect x=\"404\" y=\"228\" width=\"148\" height=\"42\" rx=\"7\" fill=\"#BA7517\" fill-opacity=\".12\"/>\n<text x=\"414\" y=\"248\" font-size=\"10\" fill=\"#5A3200\" font-weight=\"600\">Points to a Case</text>\n<text x=\"414\" y=\"262\" font-size=\"10\" fill=\"#5A3200\">by pyID/reference</text>\n<!-- Query -->\n<rect x=\"578\" y=\"44\" width=\"182\" height=\"246\" rx=\"14\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"598\" y=\"80\" font-size=\"13\" font-weight=\"700\" fill=\"#0D3560\">Query</text>\n<text x=\"598\" y=\"118\" font-size=\"10.5\" fill=\"#185FA5\">Read-only access</text>\n<text x=\"598\" y=\"134\" font-size=\"10.5\" fill=\"#185FA5\">to external data</text>\n<text x=\"598\" y=\"154\" font-size=\"10.5\" fill=\"#0D3560\">Single or List</text>\n<text x=\"598\" y=\"170\" font-size=\"10.5\" fill=\"#0D3560\">Supports parameters</text>\n<text x=\"598\" y=\"190\" font-size=\"10.5\" fill=\"#185FA5\">e.g. search for</text>\n<text x=\"598\" y=\"206\" font-size=\"10.5\" fill=\"#185FA5\">products by code</text>\n<rect x=\"590\" y=\"228\" width=\"158\" height=\"42\" rx=\"7\" fill=\"#185FA5\" fill-opacity=\".12\"/>\n<text x=\"600\" y=\"248\" font-size=\"10\" fill=\"#0D3560\" font-weight=\"600\">Always read-only</text>\n<text x=\"600\" y=\"262\" font-size=\"10\" fill=\"#0D3560\">Parameterized query</text>\n</svg>",
+          "caption": "The four Data Relationship types differ by where data is stored (Case vs external) and whether it can hold one or many records."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Data Relationship Field Types",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Embedded Data",
+          "description": "Use when information is collected from user input directly inside the Case. Data is stored WITH that Case instance (not shared from an external source), enforcing a common format (e.g., a patient's emergency contact entered in the Case)."
+        },
+        {
+          "type": "concept",
+          "term": "Data reference",
+          "description": "Use when you need to REUSE another data object from OUTSIDE the Case — data sourced from locally-stored Data Records or an external system of record (e.g., reference the facility where a medical appointment is booked)."
+        },
+        {
+          "type": "concept",
+          "term": "Case reference",
+          "description": "Use when you want to REUSE data from another CASE (e.g., a user selects from a list of Service Cases from the Service Case Type)."
+        },
+        {
+          "type": "concept",
+          "term": "Query",
+          "description": "Use for READ-ONLY access to information that is external to the Case; the Query Field Type allows PARAMETERS to query for specific data (e.g., return a medical professional's next appointment, or all appointments in a given time frame)."
+        },
+        {
+          "type": "interactive",
+          "title": "Data Relationship Type Selector",
+          "height": 440,
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Direct User Entry\", \"scenario\": \"A health insurance claim form requires the claimant to enter details about the medical procedure directly on the claim: procedure code, date performed, and provider name. This data is unique to each claim and not reused elsewhere. Which relationship type applies?\", \"opts\": [\"Embedded Data \\u2014 the user enters data directly in the Case; it is stored with the specific Case instance and is not shared\", \"Data reference \\u2014 the procedure details are sourced from an external medical procedure catalog and referenced, not entered manually\", \"Case reference \\u2014 the procedure details are captured in a separate Case Type (e.g., Procedure Case) and referenced from the claim\", \"Query \\u2014 the provider and procedure data is read from an external database, with the procedure code as the filter parameter\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. User enters procedure details directly in the claim form, stored with that specific Case \\u2014 this is classic Embedded Data: user-entered, Case-specific, not shared.\", \"\\u2717 Incorrect. Data reference is for when the data ALREADY EXISTS in an external system and is being referenced. Here, the user is entering new data; it doesn't exist until they type it.\", \"\\u2717 Incorrect. Case reference is for when the data lives in another Pega Case. Here, there is no separate Case for procedures \\u2014 the data is entered directly on the claim.\", \"\\u2717 Incorrect. Query is read-only access to external data with parameter filtering. The scenario says the claimant ENTERS these details \\u2014 it is not a pre-existing lookup.\"]}, {\"label\": \"Reuse External Object\", \"scenario\": \"A loan application references the applying Customer's profile. The Customer data (name, address, credit score) is maintained in a CRM system \\u2014 not entered on the loan form. One Customer may have many loan applications over time. Which relationship type applies?\", \"opts\": [\"Data reference, Single record \\u2014 the Customer is an external data object reused across many Cases; one Customer per loan application\", \"Embedded Data, Single record \\u2014 the customer details are needed on the form, so the user enters them directly each time a new loan is applied for\", \"Case reference \\u2014 the Customer is managed as a separate Pega Case Type (Customer Case); the loan application references that Case\", \"Query \\u2014 the CRM is a read-only external database; the loan app retrieves customer data by passing the customer ID as a parameter\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. The Customer exists in an external system (CRM), is reused across many loan applications (not entered each time), and one customer per loan = Data reference, Single record.\", \"\\u2717 Incorrect. If the user entered customer details each time, you'd get a different copy of the customer on every loan \\u2014 data quality nightmare. External reusable data = Data reference.\", \"\\u2717 Incorrect. The scenario says the customer is in a CRM system, not managed as a Pega Case Type. Case reference is for other Pega Cases, not external CRM records.\", \"\\u2717 Incorrect. Query is for read-only parameter-driven access where you cannot create or update records. Data reference is correct when the external data object is reused (not just read) and can be associated with Cases.\"]}, {\"label\": \"Another Case's Data\", \"scenario\": \"A 'Complaint' Case must display and link to the original 'Service Request' Case that triggered the complaint. The Service Request was created separately and already has a Case ID. Which relationship type applies?\", \"opts\": [\"Case reference \\u2014 the Service Request is another Pega Case; Case reference lets the Complaint reference and display its data using the Case ID\", \"Data reference \\u2014 the Service Request is an existing record in the system; reference it the same way you would reference a Customer from a CRM\", \"Embedded Data \\u2014 copy the relevant Service Request fields into the Complaint form so the agent has them without needing to navigate away\", \"Query \\u2014 retrieve the Service Request data by passing the Case ID as a parameter to a read-only external data source\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. The Service Request is another Pega Case \\u2014 Case reference is specifically designed to link and surface data from another Case by its Case ID.\", \"\\u2717 Incorrect. Data reference is for external data objects (from external systems or Pega's data layer). A Pega Case is not a data object \\u2014 it is a Case Type instance.\", \"\\u2717 Incorrect. Copying fields with Embedded Data creates a static snapshot that won't update if the Service Request changes. Case reference maintains a live link.\", \"\\u2717 Incorrect. Query is for read-only access to external (non-Pega) data sources with parameter filtering. The Service Request is a Pega Case, not an external data source.\"]}, {\"label\": \"Read-Only Lookup with Filter\", \"scenario\": \"A form must display the list of medical facilities near the patient's ZIP code, fetched from an external government registry. The SA cannot write back to this registry, and the ZIP code from the Case is used as the filter. Which type applies?\", \"opts\": [\"Query \\u2014 read-only access to external data with the ZIP code passed as a parameter to filter the relevant facilities\", \"Data reference \\u2014 the facility registry is an external data object; reference it by the facility ID after the user selects one\", \"Embedded Data, List of records \\u2014 the facilities are entered by the user on the form for this specific Case\", \"Case reference \\u2014 the facilities are managed as a Pega Case Type (Facility Case); reference them by Case ID\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Query: external source \\u2713, read-only \\u2713, parameter-driven (ZIP code) \\u2713, returns a list of matching records \\u2713.\", \"\\u2717 Incorrect. Data reference retrieves a specific record by key for reuse \\u2014 it does not support parameter-driven filtering of a subset from a large external dataset.\", \"\\u2717 Incorrect. The user is not entering facility data \\u2014 it already exists in a government registry. Embedded Data is for user-entered, Case-specific data.\", \"\\u2717 Incorrect. The facilities are in a government registry, not managed as Pega Cases. Case reference is for Pega Case instances.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 210\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">DATA RELATIONSHIP TYPES — EMBEDDED vs. SOURCED</text><rect x=\"10\" y=\"30\" width=\"340\" height=\"160\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"180\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Embedded Data</text><text x=\"180\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Stored WITH the Case</text><text x=\"180\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Persists as long as Case exists</text><text x=\"180\" y=\"104\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">No external system call</text><text x=\"180\" y=\"122\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Page (single) → one record</text><text x=\"180\" y=\"136\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Page List (ordered) → many records</text><text x=\"180\" y=\"150\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Page Group (keyed) → unordered map</text><text x=\"180\" y=\"168\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Use when data travels with Case</text><rect x=\"370\" y=\"30\" width=\"340\" height=\"160\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"540\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Sourced (Related) Data</text><text x=\"540\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Pointer to external source</text><text x=\"540\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Stores reference keys — not data</text><text x=\"540\" y=\"104\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Data comes from Data Page</text><text x=\"540\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">or external system at runtime</text><text x=\"540\" y=\"138\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Single Record → Page</text><text x=\"540\" y=\"152\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">List of Records → Page List</text><text x=\"540\" y=\"168\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Use when data lives in another system</text></svg>",
+          "caption": "Embedded data stores with the Case (Page/Page List/Page Group); Sourced data is a pointer to an external Data Page or system."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "A data relationship stores no data",
+      "trapDescription": "Questions ask where the data for a related object is stored when a data relationship is created. Candidates say 'inside the Case.' A data relationship is a pointer — it stores a reference (key values), not the actual data of the related object.",
+      "bestPractice": "Pick the option stating the relationship 'does not store data'; data objects/fields store it."
+    },
+    {
+      "title": "Choose Field Type by source",
+      "trapDescription": "A question presents a scenario and asks which field type (embedded vs. related) to use. Candidates choose based on complexity. The decision is based on data source: embedded data travels WITH the Case; related (sourced) data comes from an external system or Data Page.",
+      "bestPractice": "In-case input → Embedded; external object reuse → Data reference; another Case → Case reference; parameterized read-only lookup → Query."
+    },
+    {
+      "title": "Query vs. Data reference",
+      "trapDescription": "Both pull external data, but Query is READ-ONLY and PARAMETERIZED for specific results, while Data reference reuses a whole data object.",
+      "bestPractice": "Need a parameter-driven, read-only result set → Query; need to reuse an external object's fields → Data reference."
+    },
+    {
+      "title": "Embedded data is stored with the Case",
+      "trapDescription": "Questions ask whether embedded data survives after the Case closes. Candidates say 'it is lost when the Case closes.' Embedded data is stored inside the Case work object — it persists as long as the Case exists in the database.",
+      "bestPractice": "Use Embedded data for user-entered, case-specific information that should travel with and persist inside the Case work object for its entire lifecycle."
+    },
+    {
+      "title": "Single vs. list cardinality",
+      "trapDescription": "A question describes a field that holds multiple related items and asks which page type to use. Candidates say 'Page' (single). A single related object = Page; multiple related objects = Page List — cardinality determines the page type.",
+      "bestPractice": "Match cardinality to page type: one related object = Page (Single Record); multiple ordered objects = Page List (List of Records); keyed unordered set = Page Group."
+    },
+    {
+      "title": "Object-to-object relationships",
+      "trapDescription": "Questions ask how to link two Data Types together. Candidates describe adding a property with a matching name. Object-to-object relationships are configured by adding a field of type 'Single Record' or 'List of Records' pointing to the target Data Type.",
+      "bestPractice": "Nest objects via relationships; e.g., Product (Data reference) inside Product line, then Product line (Embedded, List) in the order."
+    },
+    {
+      "title": "Embedded vs. referenced data — mutability",
+      "trapDescription": "Candidates assume embedded data objects can be freely shared across cases; embedded data is local to the case and has no independent lifecycle.",
+      "bestPractice": "Use Embedded Data for user-entered, Case-specific data. Use Data reference for externally managed, reusable objects. Never embed data that needs to be updated by its owner system."
+    },
+    {
+      "title": "Page vs. Page List vs. Page Group",
+      "trapDescription": "A question asks which clipboard structure to use when storing an ordered collection of related items. Candidates select Page Group. Page Group uses keys (unordered, key-value); Page List is an ordered indexed collection — use Page List for ordered items.",
+      "bestPractice": "Page = single embedded or referenced object. Page List = ordered list (integer-indexed) of multiple objects of the same type. Page Group = keyed map of objects. Use Page List when order matters; use Page Group when you need named-key lookups."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "m09_q01",
+      "type": "single-select",
+      "scenario": "A BA describes two properties of a data relationship: 'It links two data-storing elements together, and it does NOT store the actual values itself.' A team member confuses this with a 'Data reference' relationship type. What is the correct distinction?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A data relationship is the CATEGORY (the concept) describing how fields are associated; Embedded Data, Data reference, Case reference, and Query are the TYPES of data relationship — specific implementations of that concept"
+        },
+        {
+          "id": "B",
+          "text": "A data relationship and a Data reference are synonymous in Pega — the term 'data relationship' was renamed to 'Data reference' in Pega Infinity"
+        },
+        {
+          "id": "C",
+          "text": "A data relationship stores the actual field values; a Data reference only stores a pointer (key) to the external system where values live"
+        },
+        {
+          "id": "D",
+          "text": "A data relationship is a Dev Studio concept; Data reference is the App Studio term for the same thing — the distinction is studio, not concept"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Is 'data relationship' the category or one specific type?",
+      "rationale": "A data relationship is the overarching concept — any association between data elements that stores no data itself. The four types (Embedded Data, Data reference, Case reference, Query) are specific implementations of that concept."
+    },
+    {
+      "questionId": "m09_q02",
+      "type": "single-select",
+      "scenario": "An order Case must capture credit card details (number, expiry, CVV) typed in by the user. Each order has exactly one payment card. Which Field Type and cardinality are correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Embedded Data, Single record — user-entered, Case-specific data with a one-per-order constraint"
+        },
+        {
+          "id": "B",
+          "text": "Data reference, List of records — the card details are sourced from an external payment vault and multiple cards may apply"
+        },
+        {
+          "id": "C",
+          "text": "Case reference, Single record — the payment card is itself a separate Case that must be referenced"
+        },
+        {
+          "id": "D",
+          "text": "Query, List of records — card details are fetched read-only from a payment gateway based on the user's profile"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "User types it in → Embedded; one card → Single record.",
+      "rationale": "Credit card details entered directly into the order are Case-specific (Embedded Data), and one card per order means Single record. Data reference is for externally maintained, reusable objects — not user-entered Case data."
+    },
+    {
+      "questionId": "m09_q03",
+      "type": "single-select",
+      "scenario": "An order Case must associate a Customer whose record is maintained in an external CRM. Each order has exactly one customer. The customer data must not be duplicated inside the order. Which Field Type and cardinality?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Data reference, Single record — reuses the externally maintained Customer object; one per order"
+        },
+        {
+          "id": "B",
+          "text": "Embedded Data, Single record — the customer details are entered freshly by the user for each order"
+        },
+        {
+          "id": "C",
+          "text": "Query, Single record — fetches the customer read-only with parameters from the CRM"
+        },
+        {
+          "id": "D",
+          "text": "Case reference, Single record — references a separate Customer Case in Pega"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Reusing a data object from outside the Case = Data reference; one customer = Single record.",
+      "rationale": "A Customer maintained externally is a reusable data object — Data reference is correct. Single record because each order has one customer. Embedded Data would copy the customer into each Case, creating stale data."
+    },
+    {
+      "questionId": "m09_q04",
+      "type": "single-select",
+      "scenario": "A 'Billing Dispute' Case must reference the original 'Service Request' Case to access its data. The user selects the relevant Case from a list. Which Field Type models this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Case reference — used when one Case must reference and reuse data from another Pega Case"
+        },
+        {
+          "id": "B",
+          "text": "Embedded Data — the Service Request data is entered freshly into the Billing Dispute by the user"
+        },
+        {
+          "id": "C",
+          "text": "Data reference — the Service Request is treated as an external data object maintained outside Pega"
+        },
+        {
+          "id": "D",
+          "text": "Query — fetches the Service Request details read-only using the Case ID as a parameter"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Reusing data FROM another Pega Case = Case reference.",
+      "rationale": "Case reference is the Field Type for connecting one Case to another in the same Pega application. Embedded Data and Data reference are for non-Case data; Query retrieves read-only lists from external systems."
+    },
+    {
+      "questionId": "m09_q05",
+      "type": "single-select",
+      "scenario": "A 'Medical Appointment' Case must show a physician's available time slots filtered by physician ID and a 2-week date range. The slots are read-only. Which Field Type supports this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Query — provides read-only, parameter-driven access to external data (physician ID + date range as parameters)"
+        },
+        {
+          "id": "B",
+          "text": "Embedded Data — the available slots are entered manually by the user into the Case"
+        },
+        {
+          "id": "C",
+          "text": "Case reference — the appointment slots are sourced from a separate Pega 'Schedule' Case"
+        },
+        {
+          "id": "D",
+          "text": "Data reference — reuses the physician's data object from an external source without parameter filtering"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Read-only + parameter-driven filter of external data = Query Field Type.",
+      "rationale": "Query provides read-only, parameter-driven access to external data — physician ID and date range are the parameters that filter the returned slots. Data reference retrieves a single record, not a parameterized list."
+    },
+    {
+      "questionId": "m09_q06",
+      "type": "single-select",
+      "scenario": "An SA must choose a Field Type for a data relationship. The design brief says: 'The data is sourced from OUTSIDE the Case; we need to READ it but never write back to it; and we need to pass parameters to filter the results.' Which type matches ALL three constraints?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Query — provides read-only access to external data and supports passing parameters to filter/retrieve a specific subset of records"
+        },
+        {
+          "id": "B",
+          "text": "Data reference — retrieves a single external record by key; supports parameters for filtering but allows write-back through a Savable Data Page"
+        },
+        {
+          "id": "C",
+          "text": "Embedded Data — captures user-entered data directly in the Case; parameters can be set as default values on the embedded fields"
+        },
+        {
+          "id": "D",
+          "text": "Case reference — references another Case's data; supports parameters to select which Case fields to expose as read-only"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Three constraints: external source + read-only + parameter-driven filtering. Which type matches all three?",
+      "rationale": "Query: external source ✓, read-only ✓, parameter-driven ✓. Data reference (B) is wrong because it retrieves a reusable data object — while it IS external, it does not natively support free-form parameter filtering; that's Query's defining feature."
+    },
+    {
+      "questionId": "m09_q07",
+      "type": "single-select",
+      "scenario": "An order Case lets a customer add multiple products to a cart. For each product the user enters a quantity directly in the Case. Which Field Type and cardinality model the product list?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Embedded Data, List of records — user-entered, Case-specific data with multiple items per order"
+        },
+        {
+          "id": "B",
+          "text": "Data reference, Single record — each product is sourced from an external catalog and only one can be selected"
+        },
+        {
+          "id": "C",
+          "text": "Query, List of records — the product list is fetched read-only from an external catalog with no user entry"
+        },
+        {
+          "id": "D",
+          "text": "Case reference, Single record — each product line item references a separate Pega Product Case"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "User enters quantities directly in the Case for many items → Embedded Data, List.",
+      "rationale": "Each product line item is entered directly by the user (Embedded Data) and there can be many items per order (List of records). Single record would allow only one product; Data reference would point to an external object, not user-entered cart items."
+    },
+    {
+      "questionId": "m09_q08",
+      "type": "single-select",
+      "scenario": "Within a 'Product line' Embedded Data object, each line item must reference one specific Product from an external catalog. Which Field Type and cardinality?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Data reference, Single record — the Product is sourced from an external catalog (reused) and one applies per line item"
+        },
+        {
+          "id": "B",
+          "text": "Embedded Data, Single record — each Product's details are entered fresh by the user for that line item"
+        },
+        {
+          "id": "C",
+          "text": "Query, List of records — the Product is fetched read-only from the catalog; multiple products apply per line"
+        },
+        {
+          "id": "D",
+          "text": "Case reference, Single record — each Product line item references a separate Product Case in Pega"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Externally sourced and reused = Data reference; one product per line = Single record.",
+      "rationale": "The Product exists in an external catalog (Data reference) and one applies per line item (Single record) B is wrong because Embedded Data is for user-entered, Case-specific data; the Product is maintained externally.."
+    },
+    {
+      "questionId": "m09_q09",
+      "type": "single-select",
+      "scenario": "An SA reviews where credit card details captured via Embedded Data are stored. Can any other Case access this payment information?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Embedded Data is stored with the specific Case instance and is unique to that Case — it cannot be accessed by other Cases"
+        },
+        {
+          "id": "B",
+          "text": "Embedded Data is stored in an external system of record and can be shared across any Case that references that system"
+        },
+        {
+          "id": "C",
+          "text": "Embedded Data is stored in a separate Case Type and can be referenced by any Case in the application"
+        },
+        {
+          "id": "D",
+          "text": "Embedded Data is not persisted anywhere — it exists only in session memory and is lost when the Case is closed"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Embedded = belongs to this Case only, stored with it, not shared.",
+      "rationale": "Embedded Data is stored as part of the specific Case instance — unique to that Case and not accessible by other Cases. It does not sync back to an external system; each Case owns its embedded data independently."
+    },
+    {
+      "questionId": "m09_q10",
+      "type": "multi-select",
+      "scenario": "A BA asks an SA to clarify the difference between Query and Data reference Field Types. Which TWO statements correctly distinguish them?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Query provides read-only access to data external to the Case"
+        },
+        {
+          "id": "B",
+          "text": "Query supports parameters to return specific, filtered data from the external source"
+        },
+        {
+          "id": "C",
+          "text": "Query stores data inside the Case like Embedded Data but in a separate read-only field"
+        },
+        {
+          "id": "D",
+          "text": "Data reference is always read-only and parameter-driven, making it interchangeable with Query"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Query = read-only + parameter-driven external access. Data reference = reuse a whole external object.",
+      "rationale": "Query provides read-only, parameter-driven access to external data — you pass parameters to get specific filtered results C is wrong because Query does not store data inside the Case; it retrieves external data for display.",
+      "selectCount": 2
+    },
+    {
+      "questionId": "m09_q11",
+      "type": "single-select",
+      "scenario": "An SA explains why 'Customer' is defined as a data object instead of scattering individual fields across Case Types. What benefit does grouping fields in a data object provide?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A data object groups related fields that model a single real-world entity, providing a common, reusable context across all Case Types that need Customer data"
+        },
+        {
+          "id": "B",
+          "text": "A data object stores the application's Rulesets so related rules are kept together with the data they apply to"
+        },
+        {
+          "id": "C",
+          "text": "A data object authenticates users by grouping the fields needed for identity verification in one place"
+        },
+        {
+          "id": "D",
+          "text": "A data object caches its grouped fields in memory during Case processing to improve performance"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Grouping related fields under one entity = common context = reusability.",
+      "rationale": "A data object groups related fields modeling one entity (Customer) and provides a reusable, common context — any Case Type can reference the same Customer object. Standalone fields have no shared context for grouping or reuse."
+    },
+    {
+      "questionId": "m09_q12",
+      "type": "single-select",
+      "scenario": "A Customer object has a Billing Address embedded inside it. The Billing Address in turn references a Country (sourced from a lookup table). An SA asks: 'Can a data relationship exist inside another data object?' What is the answer and what does this pattern demonstrate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Yes — a data relationship can exist inside another data object (e.g., Country as a Data reference inside the Address data object, which is embedded in Customer); this demonstrates nested data modeling"
+        },
+        {
+          "id": "B",
+          "text": "No — data relationships can only connect top-level data objects to Case Types; relationships inside other objects create circular references that Pega rejects"
+        },
+        {
+          "id": "C",
+          "text": "Yes, but only for Embedded Data — you can nest Embedded Data inside another data object, but Query, Data reference, and Case reference cannot be nested"
+        },
+        {
+          "id": "D",
+          "text": "No — data objects can only contain flat properties; if you need nested structure, you must use a separate Case Type with a child Case relationship"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Can a data object that is itself referenced by another object also contain relationships?",
+      "rationale": "Nested data modeling is fully supported — Customer embeds Address, and Address has a Data reference to Country. This creates a clean, layered data structure with no flat-list limitations."
+    },
+    {
+      "questionId": "m09_q13",
+      "type": "single-select",
+      "scenario": "An SA is designing data relationships. A BA asks: 'What are the four Field Types available for creating data relationships?' What is the correct answer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Embedded Data, Data reference, Case reference, and Query"
+        },
+        {
+          "id": "B",
+          "text": "Text, Integer, Decimal, and Boolean — the four primitive field types"
+        },
+        {
+          "id": "C",
+          "text": "Single, List, Read-only, and Read-write — the four cardinality/access modes"
+        },
+        {
+          "id": "D",
+          "text": "Work, Data, Integration, and Query — the four class types in Pega's hierarchy"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "For user-entered, external objects, other Cases, and read-only filtered external data.",
+      "rationale": "The four data relationship Field Types are Embedded Data, Data reference, Case reference, and Query B is wrong because Text, Integer, Decimal, and Boolean are primitive value field types, not relationship types.."
+    },
+    {
+      "questionId": "m09_q14",
+      "type": "single-select",
+      "scenario": "A 'Patient Registration' Case requires collecting an emergency contact name and phone entered by the registering nurse at the point of care. The contact belongs specifically to this registration. Which Field Type is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Embedded Data — user-entered, Case-specific data that lives with this registration Case instance"
+        },
+        {
+          "id": "B",
+          "text": "Data reference — the emergency contact is sourced from an external contact registry and reused across patient Cases"
+        },
+        {
+          "id": "C",
+          "text": "Case reference — the emergency contact is a separate Pega Case referenced from the registration"
+        },
+        {
+          "id": "D",
+          "text": "Query — the emergency contact data is fetched read-only from an HR system using the patient's ID as a parameter"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "User enters it at registration + belongs only to this Case = Embedded Data.",
+      "rationale": "Emergency contact details entered directly into the registration Case are user-entered and Case-specific — Embedded Data. External contacts maintained in a separate system would use Data reference instead."
+    },
+    {
+      "questionId": "m09_q15",
+      "type": "single-select",
+      "scenario": "A 'Booking' Case must identify which medical facility the appointment is at. Facility records are maintained in a Facilities data object sourced from an external hospital management system. Which Field Type connects the Booking to the Facility?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Data reference — the Facility is a reusable data object maintained externally and referenced by the Booking Case"
+        },
+        {
+          "id": "B",
+          "text": "Embedded Data — facility details are entered by the user for each booking"
+        },
+        {
+          "id": "C",
+          "text": "Case reference — the Facility is a separate Pega Case referenced by the Booking Case"
+        },
+        {
+          "id": "D",
+          "text": "Query — facility data is fetched read-only from the hospital system with parameterized filters"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "External data object reused in the Case = Data reference.",
+      "rationale": "A Facility maintained externally is a reusable data object — Data reference is correct for an externally-maintained object. Embedded Data would copy facility details into each Case, creating stale data if the facility changes."
+    },
+    {
+      "questionId": "m09_q16",
+      "type": "single-select",
+      "scenario": "An SA is modeling a 'Product line' data object that contains a reference to a 'Product' from an external catalog. A colleague asks: 'Can a data relationship reference one data object inside another?' What is the answer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Yes — data relationships can reference one data object inside another, enabling nested data models such as Product inside Product line"
+        },
+        {
+          "id": "B",
+          "text": "No — data relationships can only connect data objects directly to Case Types, not to other data objects"
+        },
+        {
+          "id": "C",
+          "text": "Only for Query fields — Query is the only relationship type that supports nesting inside another data object"
+        },
+        {
+          "id": "D",
+          "text": "Only in Dev Studio — nested data object relationships cannot be configured in App Studio and require direct Ruleset editing"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Data relationships can be nested — a data object inside another data object is standard modeling.",
+      "rationale": "Data relationships can reference one data object inside another — a Product line Embedded Data object can contain a Product Data reference. Relationships are not limited to top-level Case fields."
+    },
+    {
+      "questionId": "m09_q17",
+      "type": "multi-select",
+      "scenario": "A Pega developer is reviewing the four Data Relationship types available when designing a data model. Which TWO are valid Data Relationship types in Pega?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Embedded Data — related data is stored directly inside the parent Case without a separate reusable record"
+        },
+        {
+          "id": "B",
+          "text": "Case reference — the Case stores a reference to one or more other Cases by their Case ID"
+        },
+        {
+          "id": "C",
+          "text": "Linked record — a mirrored copy of the data is created in a separate database table automatically"
+        },
+        {
+          "id": "D",
+          "text": "Dynamic reference — a Decision Table determines which related record to load at runtime"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Recall the four Pega relationship types: Embedded Data, Data reference, Case reference, and Query.",
+      "rationale": "Embedded Data stores related field data directly inside the parent Case — the data has no independent existence. Case reference stores the ID of one or more related Cases, linking them without copying their data. Linked record and Dynamic reference are not standard Pega Data Relationship types."
+    },
+    {
+      "questionId": "m09_q18",
+      "type": "multi-select",
+      "scenario": "An SA is designing a customer record where address details (street, city, postal code) are nested within the customer Case and do not exist as standalone reusable records. Which TWO statements correctly describe this scenario?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Embedded Data is the correct relationship type — the address fields are stored inside the parent Case"
+        },
+        {
+          "id": "B",
+          "text": "The address Data Object is embedded with a cardinality of Single, since each customer has one primary address"
+        },
+        {
+          "id": "C",
+          "text": "A Data reference should be used because the address data is displayed within the same Case form"
+        },
+        {
+          "id": "D",
+          "text": "A Query relationship is required because address data must be retrieved from an external system at runtime"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "When data exists only inside the parent and is not reused elsewhere, Embedded Data with a cardinality is the pattern.",
+      "rationale": "Embedded Data is used when related data exists only in the context of the parent Case and is not reused across other records. A cardinality of Single means the Case contains exactly one embedded address group. A Data reference is for reusable shared records, and a Query relationship requires an external data source."
+    },
+    {
+      "questionId": "m09_q19",
+      "type": "multi-select",
+      "scenario": "A Pega application models a Customer Case where each customer can have multiple Insurance Policies, and each Policy belongs to exactly one Customer. Which TWO statements correctly describe how to model this relationship?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The relationship type is Data reference — the Policy records exist independently and are referenced from the Customer Case by ID"
+        },
+        {
+          "id": "B",
+          "text": "The cardinality of the relationship is Many — one Customer Case can reference multiple Policy records"
+        },
+        {
+          "id": "C",
+          "text": "The relationship type is Embedded Data — the Policy data is stored inside the Customer Case with no independent existence"
+        },
+        {
+          "id": "D",
+          "text": "The cardinality is Single — a Customer Case can only ever reference exactly one related Policy record"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Policies exist independently (Data reference) and one customer has many policies (Many cardinality).",
+      "rationale": "Because Insurance Policies exist as independent reusable records — not as data embedded within the Customer Case — the correct relationship type is Data reference. The cardinality is Many because a single Customer can be associated with multiple Policies. Embedded Data would be wrong here because Policies have independent existence and identity."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Data object",
+      "value": "Groups related fields to model an entity (common context); reusable across Case Types; can reference other objects."
+    },
+    {
+      "key": "Data relationship",
+      "value": "Container that relates data but stores none; relates object↔Case Type, object↔object, Case Type↔Case Type."
+    },
+    {
+      "key": "Four Field Types",
+      "value": "Embedded Data (in-case input, stored with Case), Data reference (reuse external object), Case reference (reuse another Case), Query (read-only, parameterized external lookup)."
+    },
+    {
+      "key": "Cardinality",
+      "value": "Single record (one set) vs. List of records (many sets) — chosen independently of the Field Type."
+    },
+    {
+      "key": "Decide by source",
+      "value": "In-case input → Embedded; external object reuse → Data reference; another Case → Case reference; parameterized read-only lookup → Query."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Data objects",
+      "url": "https://academy.pega.com/topic/data-objects/v4/in/96211/66606",
+      "duration": "15 min"
+    },
+    {
+      "title": "Data relationships",
+      "url": "https://academy.pega.com/topic/data-relationships/v5/in/96211/66606",
+      "duration": "15 min"
+    }
+  ]
+}
