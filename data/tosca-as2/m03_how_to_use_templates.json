@@ -1,0 +1,364 @@
+{
+  "moduleId": "TAS2-M03",
+  "moduleTitle": "Section 3 - How to Use Templates",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction",
+  "learningObjectives": [
+    "Link a TestSheet to a Template.",
+    "Link the TestSheet Values to the TestStep Values in the Template.",
+    "Use the Check Template and Jump to Schema functions.",
+    "Instantiate the Template."
+  ],
+  "estTime": "40 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Linking a TestSheet to a Template",
+      "elements": [
+        {
+          "type": "text",
+          "text": "A Template alone can't run as a test — it needs the TestSheet to supply the specific data for each generated TestCase (like knowing what color and transmission to put in our car-blueprint analogy)."
+        },
+        {
+          "type": "steps",
+          "title": "Link the TestSheet",
+          "items": [
+            "Select the TestSheet in the TestCaseDesign section, then drag and drop it onto the Template in the TestCase section.",
+            "Best practice: link a TestSheet to a Template as soon as it's created, to avoid confusion later about which Template relates to which TestSheet.",
+            "Each TestSheet should be linked to exactly ONE Template. If you need the same data in multiple Templates, use Classes (covered in Test Design Specialist Level 1) — do not link one TestSheet to several Templates."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Jump to Schema Definition — once linked, a new ribbon option appears under the TestCase tab. Right-click the Template → Jump to Schema Definition (shortcut: Ctrl+J) to instantly navigate to its linked TestSheet. You can also confirm the linked TestSheet's name via the Property tab."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Linking Values (the XL Reference)",
+      "elements": [
+        {
+          "type": "text",
+          "text": "Linking the TestSheet doesn't automatically tell Tosca which TestStepValue uses which piece of data — you must link the individual Values."
+        },
+        {
+          "type": "steps",
+          "title": "Link TestSheet Values to TestStepValues",
+          "items": [
+            "Best practice: drag and drop each Value from the TestSheet onto the relevant TestStepValue in the TestCase.",
+            "Example: drag the Attribute 'Size' from the TestSheet onto the 'Size' TestStepValue — this automatically creates an XL reference.",
+            "The XL reference contains the path Tosca follows to find the value in the TestSheet at runtime."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Check Template",
+          "description": "Right-click the Template → Check Template to validate that all XL references actually resolve to something in the TestSheet. Important: this ONLY checks that the links exist — it does NOT check for functionality errors in TestSteps or formulas. The function highlights the TestStepValue containing the broken link, not the XL reference text itself."
+        },
+        {
+          "type": "warning",
+          "text": "Check Template validates reference EXISTENCE only. It will not catch a wrong formula, a bad Condition, or incorrect TestStep logic — those still need manual review or a test run to surface."
+        },
+        {
+          "type": "note",
+          "text": "An XL reference can also be typed manually, using the syntax {XL[Attribute.SubAttribute]} or {XL[Attribute.SubAttribute.SubSubAttribute]} — but this is NOT best practice. Drag-and-drop is preferred since it avoids typos and guarantees the path actually matches the TestSheet's structure."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Instantiating the Template",
+      "elements": [
+        {
+          "type": "text",
+          "text": "Once the Template is complete and its Workstate is set to COMPLETE, the next step is Instantiation — the process where Tosca creates actual TestCases based on the TestSheet (and any Conditions, covered in a later lesson)."
+        },
+        {
+          "type": "steps",
+          "title": "Instantiate",
+          "items": [
+            "Select the Template → click Instantiate in the Ribbon's TestCase tab, OR",
+            "Right-click the Template → Create TemplateInstance from the Mini Toolbar, then confirm 'start instantiation now?', OR",
+            "Use the keyboard shortcut Ctrl+N, Ctrl+I.",
+            "The Template itself is unchanged; a new TemplateInstance folder appears below it containing the generated TestCases.",
+            "Run all TestCases in the Scratchbook to confirm they behave as expected."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "For our example, instantiation creates 4 TestCases — one per TestSheet Instance. Each generated TestCase shows only the steps/values relevant to it (e.g. the ValidValues TestCase uses the default size M; the Wrong-size TestCase uses the invalid XL) — Values from the TestSheet replace the References."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 3 — Link Template and Values, Instantiation",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS2 Exercise 3 — Link Template and Values, Instantiation — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Thinking Check Template catches all errors",
+      "trapDescription": "Candidates assume a passed Check Template means the Template is fully correct.",
+      "bestPractice": "Check Template only validates that XL references resolve to something in the TestSheet — it does NOT check TestStep functionality, formulas, or logic errors."
+    },
+    {
+      "title": "Linking one TestSheet to multiple Templates",
+      "trapDescription": "Learners reuse the same TestSheet across several Templates to save time.",
+      "bestPractice": "Each TestSheet should link to exactly one Template. For shared data across multiple Templates, use Classes instead (Test Design Specialist Level 1 topic)."
+    },
+    {
+      "title": "Forgetting to check the linked TestSheet before troubleshooting",
+      "trapDescription": "Candidates manually search for which TestSheet is linked to a Template.",
+      "bestPractice": "Right-click the Template → Jump to Schema Definition (Ctrl+J) instantly navigates to the linked TestSheet; the Property tab also shows its name."
+    },
+    {
+      "title": "Typing XL references manually instead of drag-and-drop",
+      "trapDescription": "Candidates hand-type {XL[Attribute.SubAttribute]} paths to save a step, introducing typos that silently break the link.",
+      "bestPractice": "XL references CAN be typed manually with {XL[Attribute.SubAttribute]} syntax, but this is not best practice — drag-and-drop from the TestSheet is safer and guarantees the path is correct."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "How do you link a TestSheet to a Template in Tosca?",
+      "options": [
+        {
+          "id": "A",
+          "text": "TestSheets link automatically to the most recently created Template."
+        },
+        {
+          "id": "B",
+          "text": "Right-click the Template and select 'Import TestSheet'."
+        },
+        {
+          "id": "C",
+          "text": "Select the TestSheet in TestCaseDesign, then drag and drop it onto the Template in the TestCase section."
+        },
+        {
+          "id": "D",
+          "text": "Copy the TestSheet's XML and paste it into the Template's properties."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "It's a drag-and-drop action, same direction as most Tosca linking.",
+      "rationale": "You select the TestSheet from TestCaseDesign and drag it onto the Template in the TestCase section to link them."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "What does the Check Template function actually validate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "That all formulas used in Conditions produce the correct output."
+        },
+        {
+          "id": "B",
+          "text": "That the ExecutionList linked to the Template is configured correctly."
+        },
+        {
+          "id": "C",
+          "text": "That every TestStep will execute correctly against the live SUT."
+        },
+        {
+          "id": "D",
+          "text": "That the XL references in the Template resolve to existing values in the linked TestSheet — nothing about TestStep functionality or formulas."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "It's about reference existence, not runtime correctness.",
+      "rationale": "Check Template only validates that XL references exist and resolve correctly in the linked TestSheet. It does not catch functionality errors in TestSteps or formulas — that's a common exam trap."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "What is the shortcut to jump directly from a Template to its linked TestSheet?",
+      "options": [
+        {
+          "id": "A",
+          "text": "F9."
+        },
+        {
+          "id": "B",
+          "text": "Ctrl+J (Jump to Schema Definition)."
+        },
+        {
+          "id": "C",
+          "text": "Ctrl+T."
+        },
+        {
+          "id": "D",
+          "text": "Ctrl+N, Ctrl+I."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Not the same shortcut as Instantiate.",
+      "rationale": "Ctrl+J is the shortcut for 'Jump to Schema Definition', which navigates from the Template directly to its linked TestSheet. Ctrl+N, Ctrl+I is the Instantiate shortcut, not this one."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "How do you link a value from the TestSheet to a specific TestStepValue in the Template?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Drag and drop the value from the TestSheet directly onto the TestStepValue — this creates an XL reference."
+        },
+        {
+          "id": "B",
+          "text": "Type the value's name manually into the TestStepValue field."
+        },
+        {
+          "id": "C",
+          "text": "XL references cannot be created manually; only Instantiate creates them."
+        },
+        {
+          "id": "D",
+          "text": "Use the Check Template function to auto-link all values."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Same drag-and-drop pattern as linking the TestSheet itself.",
+      "rationale": "Dragging and dropping a TestSheet value onto a TestStepValue creates an XL reference — the path Tosca follows at runtime to fetch the value from the TestSheet."
+    },
+    {
+      "questionId": "Q5",
+      "type": "multi-select",
+      "selectCount": 3,
+      "scenario": "Which THREE are valid ways to Instantiate a Template?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Right-click the Template → Create TemplateInstance from the Mini Toolbar."
+        },
+        {
+          "id": "B",
+          "text": "Select the Template and use the shortcut Ctrl+N, Ctrl+I."
+        },
+        {
+          "id": "C",
+          "text": "Rename the Template to 'Instance_1'."
+        },
+        {
+          "id": "D",
+          "text": "Select the Template, click Instantiate in the Ribbon's TestCase tab."
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "D"
+      ],
+      "hint": "One is a ribbon button, one is a context menu action, one is a keyboard shortcut.",
+      "rationale": "Instantiation can be triggered via the Ribbon's Instantiate button, via right-click → Create TemplateInstance, or via the Ctrl+N, Ctrl+I shortcut. Renaming does nothing functionally. No partial credit."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "If the same test data is required across several different Templates, what should you use instead of linking one TestSheet to all of them?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Classes."
+        },
+        {
+          "id": "B",
+          "text": "Multiple copies of the same TestSheet, pasted into each Template."
+        },
+        {
+          "id": "C",
+          "text": "RequirementSets."
+        },
+        {
+          "id": "D",
+          "text": "ExecutionLists."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This is flagged in the course as a Test Design Specialist Level 1 topic.",
+      "rationale": "Tosca recommends using Classes when the same data is needed across multiple Templates, rather than linking one TestSheet to several Templates (which is harder to maintain)."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "What is the manual syntax for typing an XL reference directly into a TestStepValue, and is it recommended?",
+      "options": [
+        {
+          "id": "A",
+          "text": "$XL{Attribute::SubAttribute}$ — valid and equally recommended as drag-and-drop."
+        },
+        {
+          "id": "B",
+          "text": "{XL[Attribute.SubAttribute]} — valid, but not best practice compared to drag-and-drop."
+        },
+        {
+          "id": "C",
+          "text": "There is no manual syntax; XL references can only ever be created by drag-and-drop."
+        },
+        {
+          "id": "D",
+          "text": "{CP[Attribute.SubAttribute]} — the recommended and only supported method."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Don't confuse this with the {CP[...]} syntax used for Test Configuration Parameters.",
+      "rationale": "An XL reference can be typed manually as {XL[Attribute.SubAttribute]} or {XL[Attribute.SubAttribute.SubSubAttribute]}, but Tosca's official guidance flags this as NOT best practice — drag-and-drop from the TestSheet is safer and avoids typos."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Link TestSheet → Template",
+      "value": "Drag & drop TestSheet (TestCaseDesign) onto the Template (TestCase section)."
+    },
+    {
+      "key": "1 TestSheet : 1 Template",
+      "value": "Use Classes if the same data must feed multiple Templates."
+    },
+    {
+      "key": "Jump to Schema Definition",
+      "value": "Ctrl+J — jumps from Template to its linked TestSheet."
+    },
+    {
+      "key": "Link Values",
+      "value": "Drag TestSheet value onto TestStepValue → creates an XL reference."
+    },
+    {
+      "key": "Check Template",
+      "value": "Validates XL reference existence ONLY — not TestStep/formula correctness."
+    },
+    {
+      "key": "Instantiate",
+      "value": "Ribbon button, right-click → Create TemplateInstance, or Ctrl+N, Ctrl+I."
+    },
+    {
+      "key": "Result",
+      "value": "A TemplateInstance folder with one generated TestCase per TestSheet Instance."
+    },
+    {
+      "key": "Manual XL syntax",
+      "value": "{XL[Attribute.SubAttribute]} — valid but NOT best practice; prefer drag-and-drop."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 03 - How to Use Templates",
+      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
+      "duration": "video"
+    }
+  ]
+}

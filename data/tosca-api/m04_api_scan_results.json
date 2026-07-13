@@ -1,0 +1,267 @@
+{
+  "moduleId": "TAPI-M04",
+  "moduleTitle": "Lesson 3 - API Scan Results",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
+  "learningObjectives": [
+    "Name the five tabs of the Message section and what each one shows.",
+    "Explain why testing directly in the API Scan (before exporting) is valuable.",
+    "Create an item via POST and verify it via GET within the same API Scan session.",
+    "Rename Messages to reflect their function ahead of exporting to Tosca."
+  ],
+  "estTime": "40 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "The Five Tabs of the Message Section",
+      "elements": [
+        {
+          "type": "table",
+          "headers": [
+            "Tab",
+            "What it shows"
+          ],
+          "rows": [
+            [
+              "Payload",
+              "The request or response message itself. On first load it's a structural template; fill it in to send real data."
+            ],
+            [
+              "Method",
+              "The HTTP Method used for the request (GET, POST, PUT, DELETE...). If Method is GET, the Payload may be empty depending on the SUT."
+            ],
+            [
+              "Endpoint",
+              "The API's base URL."
+            ],
+            [
+              "Resource",
+              "The resource identifier for this endpoint."
+            ],
+            [
+              "Params",
+              "Displays and edits parameters, such as the \"key\" Service Access Key."
+            ]
+          ]
+        },
+        {
+          "type": "list",
+          "title": "Additional tabs",
+          "items": [
+            "Authentication tab — for services requiring authentication configuration beyond a simple key parameter.",
+            "Attachments tab — displays and edits attachments, e.g. sending an image when testing an API that generates new user profiles with profile pictures.",
+            "Header section — shows either the request or response Headers, depending on which message view is currently selected."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "It's valuable to test directly in the API Scan before exporting anything to Tosca: this is where you discover the real default values returned by the server, which you'll need later as genuine test data in the exported TestCase. Modifications to a Message can also be made right here if a result isn't what you expect."
+        }
+      ],
+      "bulletPoints": [
+        "Payload is the main working area; Method/Endpoint/Resource/Params/Authentication/Attachments/Header are supporting tabs.",
+        "Testing in the API Scan first surfaces real server data you'll reuse as test values after exporting."
+      ]
+    },
+    {
+      "sectionTitle": "Worked Example: Create, Then Verify",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "Verify the shop list, add a shop, verify again",
+          "items": [
+            "In Shops_Get (inside the \"shops\" folder), set the \"key\" parameter to your Service Access Key. The Payload should be empty by default for this GET.",
+            "Send the request — the Response lists every shop/branch currently in the system.",
+            "Switch to Shops_Post, re-confirm the key parameter, then edit the Payload with the new shop's details, respecting the existing quotation marks and colon syntax.",
+            "Send the request — the view switches to Response mode; a 200 OK status code confirms the addition.",
+            "Send Shops_Get again to confirm the new shop now appears — by default, new entries appear last in the list."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "These Business Parameters (Business-relevant elements of a message, such as name, ID or address) work in a similar fashion to Business Parameters in a Tosca TestCase — but they are attached to the API Scan payload, not a Reusable TestStepBlock."
+        }
+      ],
+      "bulletPoints": [
+        "GET first to see what already exists, POST to add, GET again to confirm — a repeatable verification pattern.",
+        "Respect existing JSON syntax (quotes, colons) exactly when editing the Payload by hand."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 03 - Creating an Item",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 API Exercise 03 - Creating an Item — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 04 - Verify Items",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 API Exercise 04 - Verify Items — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Confusing the Method tab with the HTTP verb in the Payload",
+      "trapDescription": "Candidates look for the HTTP Method (GET/POST/PUT/DELETE) inside the Payload tab instead of the dedicated Method tab.",
+      "bestPractice": "The Method tab specifically identifies the HTTP Method used for the request. The Payload tab holds the message content/body, which can be empty for some GET requests depending on the SUT."
+    },
+    {
+      "title": "Skipping verification directly in the API Scan",
+      "trapDescription": "Candidates export straight to Tosca without first sending requests in the API Scan to see real server responses.",
+      "bestPractice": "Testing directly in the API Scan surfaces the actual default values returned by the server — valuable real test data to reuse once the Message is exported into a Tosca TestCase."
+    },
+    {
+      "title": "Breaking JSON syntax when editing the Payload",
+      "trapDescription": "Candidates add new values to the Payload but misplace quotation marks or colons, breaking the JSON structure.",
+      "bestPractice": "When manually editing values in the Payload, keep new content between the pre-existing quotation marks and after the colon exactly as the surrounding syntax expects."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Which tab in the API Scan's Message section shows the HTTP Method used for the request?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Payload"
+        },
+        {
+          "id": "B",
+          "text": "Method"
+        },
+        {
+          "id": "C",
+          "text": "Resource"
+        },
+        {
+          "id": "D",
+          "text": "Attachments"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "This tab is named exactly after what it shows.",
+      "rationale": "The Method tab identifies the HTTP Method used for the request (GET, POST, PUT, DELETE, etc.). In some cases, if the Method is GET, the Payload can be empty."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "Which tab would you use to send an image while testing an API that creates new user profiles with profile pictures?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Params"
+        },
+        {
+          "id": "B",
+          "text": "Endpoint"
+        },
+        {
+          "id": "C",
+          "text": "Attachments"
+        },
+        {
+          "id": "D",
+          "text": "Resource"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "This tab is specifically for files sent alongside a message.",
+      "rationale": "The Attachments tab displays and edits attachments, such as an image sent to test an API's capability to generate new user profiles including profile pictures."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Why is it valuable to test a Message directly in the API Scan before exporting it to Tosca?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Because the API Scan cannot export Messages that haven't been sent at least once."
+        },
+        {
+          "id": "B",
+          "text": "Because testing there reveals the real default values returned by the server, which become useful test data later."
+        },
+        {
+          "id": "C",
+          "text": "Because Tosca cannot connect to REST APIs directly."
+        },
+        {
+          "id": "D",
+          "text": "It isn't valuable — exporting first and testing afterward is always faster."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about what you gain by seeing an actual server response before building the TestCase.",
+      "rationale": "Testing directly in the API Scan surfaces real default values returned by the server — for example an address or an ID — which come in handy later as genuine test data in the exported TestCase."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A tester wants to confirm a complete list of shops without modifying any data. Which HTTP Method should the Message use?",
+      "options": [
+        {
+          "id": "A",
+          "text": "GET"
+        },
+        {
+          "id": "B",
+          "text": "POST"
+        },
+        {
+          "id": "C",
+          "text": "PUT"
+        },
+        {
+          "id": "D",
+          "text": "DELETE"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This method retrieves data without changing anything on the server.",
+      "rationale": "GET requests data from a specified resource without modifying it — the correct choice for retrieving the complete, unmodified list of shops."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Message section tabs",
+      "value": "Payload, Method, Endpoint, Resource, Params, Authentication, Attachments, Header."
+    },
+    {
+      "key": "Payload",
+      "value": "The message body — template on first load, editable before sending."
+    },
+    {
+      "key": "Method",
+      "value": "Shows the HTTP verb (GET/POST/PUT/DELETE) used by the request."
+    },
+    {
+      "key": "Test in API Scan first",
+      "value": "Reveals real server default values you'll reuse as test data after exporting to Tosca."
+    },
+    {
+      "key": "Verification pattern",
+      "value": "GET (see current state) → POST (add) → GET again (confirm the addition)."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 03 - API Scan Results (video)",
+      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
+      "duration": "video"
+    }
+  ]
+}

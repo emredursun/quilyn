@@ -75,7 +75,7 @@
     currentMode = 'lms';
     setLmsChrome(true);
     setNavActive('lms');
-    document.title = "PegaAcademy — PCBA & PCSA Exam Prep";
+    document.title = "Quilyn — Free Certification Exam Prep (Pega & Tricentis Tosca)";
     /* Engine already re-rendered sidebar + content; nothing else to do */
   }
 
@@ -91,7 +91,7 @@
     setLmsChrome(false);
     setNavActive('mock');
     setCrumbs('Mock Exams');
-    document.title = "Mock Exams — PegaAcademy";
+    document.title = "Mock Exams — Quilyn";
     contentEl.innerHTML = '<pega-mock-view></pega-mock-view>';
   }
 
@@ -107,7 +107,7 @@
     setLmsChrome(false);
     setNavActive('review');
     setCrumbs('Smart Review');
-    document.title = "Smart Review — PegaAcademy";
+    document.title = "Smart Review — Quilyn";
     contentEl.innerHTML = '<pega-review-view></pega-review-view>';
   }
 

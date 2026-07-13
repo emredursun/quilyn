@@ -1,0 +1,1244 @@
+{
+  "moduleId": "TAS1-M09",
+  "moduleTitle": "Section 9 - Guides & Reference",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+  "learningObjectives": [
+    "See the big picture: how Modules, TestCases, Execution, and Requirements link together.",
+    "Look up Tosca syntax fast: Buffer, XBuffer, TCP, random values, and dynamic dates.",
+    "Recall the most-used keyboard shortcuts to work faster in Tosca Commander.",
+    "Apply best-practice rules for a well-structured, maintainable TestCase.",
+    "Diagnose and fix the 20 most common Tosca execution errors quickly."
+  ],
+  "estTime": "1.5 hr",
+  "studyGuide": [
+    {
+      "sectionTitle": "The Big Picture — How Tosca Sections Connect (Mindmap)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The five Tosca Commander sections",
+          "description": "Each section owns one job; together they form the automation workflow.",
+          "items": [
+            "Modules — the technical map of the SUT, collected via XScan. To steer a control it must be uniquely identifiable (properties, anchor, parent).",
+            "TestCases — a sequence of actions (the path through the application) built from Modules.",
+            "Execution — runs TestCases/folders; organize with ExecutionLists; drag a TestCase onto an ExecutionList to create an ExecutionEntry; add Recovery Scenarios to keep runs going.",
+            "Requirements — plan test processes and monitor risk coverage (functional & non-functional); TestCases link here.",
+            "TestCaseDesign — NOT covered in AS1 (centralized test data; see the AS2 course)."
+          ]
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 250\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"gm\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">HOW THE TOSCA SECTIONS CONNECT</text><rect x=\"30\" y=\"96\" width=\"150\" height=\"60\" rx=\"10\" fill=\"rgba(217,119,6,0.10)\" stroke=\"#B45309\" stroke-width=\"2\"/><text x=\"105\" y=\"120\" text-anchor=\"middle\" fill=\"#B45309\" font-size=\"12\" font-weight=\"700\">Modules</text><text x=\"105\" y=\"138\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">Technical map of SUT (XScan)</text><rect x=\"285\" y=\"96\" width=\"150\" height=\"60\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"360\" y=\"120\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"12\" font-weight=\"700\">TestCases</text><text x=\"360\" y=\"138\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">Sequence of steps (the path)</text><rect x=\"540\" y=\"96\" width=\"150\" height=\"60\" rx=\"10\" fill=\"rgba(109,139,255,0.10)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"615\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Execution</text><text x=\"615\" y=\"138\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">Run + store results</text><path d=\"M 180 126 L 283 126\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#gm)\"/><text x=\"232\" y=\"119\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">build</text><path d=\"M 435 126 L 538 126\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#gm)\"/><text x=\"486\" y=\"119\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">drag = ExecutionEntry</text><rect x=\"285\" y=\"188\" width=\"150\" height=\"50\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/><text x=\"360\" y=\"209\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"12\" font-weight=\"700\">Requirements</text><text x=\"360\" y=\"226\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"8\">Coverage &amp; risk (weight)</text><path d=\"M 360 188 L 360 158\" stroke=\"#BA7517\" stroke-width=\"1.5\" marker-end=\"url(#gm)\" stroke-dasharray=\"4,3\"/><path d=\"M 435 205 C 560 205 615 175 615 158\" stroke=\"#BA7517\" stroke-width=\"1.5\" fill=\"none\" marker-end=\"url(#gm)\" stroke-dasharray=\"4,3\"/><text x=\"360\" y=\"176\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"8\">TestCase links to Requirement</text><rect x=\"30\" y=\"40\" width=\"150\" height=\"34\" rx=\"8\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\" stroke-dasharray=\"3,3\"/><text x=\"105\" y=\"55\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"10\" font-weight=\"600\">TestCaseDesign</text><text x=\"105\" y=\"68\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"7\">Not covered in AS1 (see AS2)</text></svg>",
+          "caption": "Modules build TestCases → TestCases run in Execution → Requirements track coverage. TestCaseDesign is an AS2 topic."
+        }
+      ],
+      "bulletPoints": [
+        "Modules feed TestCases; TestCases run in Execution; Requirements measure coverage.",
+        "A control must be uniquely identifiable to be steered (properties / anchor / parent).",
+        "Drag a TestCase onto an ExecutionList = ExecutionEntry."
+      ]
+    },
+    {
+      "sectionTitle": "Syntax Cheat Sheet — Text Expressions & Random Values",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "General syntax",
+          "description": "All Tosca expressions follow: {COMMAND[Parameter1][Parameter2]...} — curly braces outside, square brackets for each parameter."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Expression",
+            "Syntax",
+            "Example / Note"
+          ],
+          "rows": [
+            [
+              "Buffer (recall)",
+              "{B[Name]}",
+              "{B[Automobile]} — re-enters the saved value"
+            ],
+            [
+              "XBuffer",
+              "{XB[Name]}",
+              "Reads/buffers the DYNAMIC part of a string. Name may include numbers but must NOT be only numbers"
+            ],
+            [
+              "Test Config Parameter",
+              "{CP[Name]}",
+              "{CP[Browser]} — reuse a central config value"
+            ],
+            [
+              "Random integer (length)",
+              "{RND[n]}",
+              "{RND[7]} = 7-digit number. Max 18 digits"
+            ],
+            [
+              "Random integer (range)",
+              "{RND[min][max]}",
+              "{RND[-789][123]} — negatives allowed"
+            ],
+            [
+              "Random decimal (length)",
+              "{RNDDECIMAL[len][dec]}",
+              "{RNDDECIMAL[5][2]} = 5-digit, 2 decimals"
+            ],
+            [
+              "Random decimal (range)",
+              "{RNDDECIMAL[dec][min][max]}",
+              "{RNDDECIMAL[4][130][200]}"
+            ],
+            [
+              "Random text",
+              "{RANDOMTEXT[n]}",
+              "n-char letters+numbers. Max length 1024"
+            ],
+            [
+              "Random regex",
+              "{RANDOMREGEX[\"pattern\"]}",
+              "{RANDOMREGEX[\"^[A-Z][a-z]+[0-9]{4}$\"]}"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Taught in depth in Section 03 (Buffer/MATH/Random), Section 05 (TCP), and Section 08 (XBuffer). This is your one-stop syntax lookup."
+        }
+      ],
+      "bulletPoints": [
+        "{B[..]} recall a buffer · {XB[..]} buffer a dynamic string part · {CP[..]} config parameter.",
+        "RND max 18 digits; RANDOMTEXT max 1024 chars; regex patterns go in double quotes.",
+        "XBuffer name can contain numbers but cannot be ONLY numbers."
+      ]
+    },
+    {
+      "sectionTitle": "Dynamic Date & Time — Quick Reference",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Structure",
+          "description": "{EXPRESSION[BASEDATE][OFFSET][FORMAT]} — all variables are CASE SENSITIVE.",
+          "items": [
+            "Leave [BASEDATE] empty [] to use today's date.",
+            "Offset units: d=days, w=weeks, M=months (capital!), y=years, h=hours (1-12), H=hours (0-23), m=minutes, s=seconds.",
+            "Format codes: %d=1-digit day, dd=2-digit day, %M=1-digit month, MM=2-digit month, MMM=3-letter month, MMMM=full month name, yy=2-digit year, yyyy=4-digit year.",
+            "Basedate default formats: Date = dd.MM.yyyy, Time = hh:mm tt, DateTime = dd-MM-yyyy hh:mm tt."
+          ]
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Expression",
+            "Meaning",
+            "Example output"
+          ],
+          "rows": [
+            [
+              "{DATE}",
+              "Full date",
+              "30.04.2021"
+            ],
+            [
+              "{TIME}",
+              "Current time",
+              "hh:mm tt"
+            ],
+            [
+              "{DATETIME}",
+              "Date + time stamp",
+              "dd-MM-yyyy hh:mm tt"
+            ],
+            [
+              "{DAY} / {MONTH} / {YEAR}",
+              "Current day / month / 2-digit year",
+              "30 / 12 / 15"
+            ],
+            [
+              "{MONTHFIRST}",
+              "First day of the month",
+              "01.12.2021"
+            ],
+            [
+              "{MONTHLAST}",
+              "Last day of the month",
+              "31.12.2021"
+            ],
+            [
+              "{MONTHLAST[][-3y][MMMyyyy]}",
+              "Confirmed exam example",
+              "e.g. Jun2022"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Prefix",
+            "Effect",
+            "Example output"
+          ],
+          "rows": [
+            [
+              "{L..}",
+              "Localized to system settings (LDATE/LDAY/LMONTH/LYEAR)",
+              "{LDATE} = Monday, December 20, 2021"
+            ],
+            [
+              "{N..}",
+              "Always double figures (NDAY/NMONTH/NYEAR)",
+              "{NDAY} = 30 · {NMONTH} = 12"
+            ],
+            [
+              "{A..}",
+              "Abbreviated: day = first 2 letters, month = first 3 letters",
+              "{ADAY} = Mo · {AMONTH} = Jan"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "text": "All dynamic-date variables are CASE SENSITIVE. Taught in depth in Section 3; this is your quick-lookup reference."
+        }
+      ],
+      "bulletPoints": [
+        "Capital M = months, lowercase m = minutes; %d/%M = 1-digit, dd/MM = 2-digit.",
+        "Empty [] base date = today; offsets like [-3y] or [+4M] shift it.",
+        "Prefixes: {L..}=localized, {N..}=double figures, {A..}=abbreviated. All variables are case sensitive."
+      ]
+    },
+    {
+      "sectionTitle": "RowCount & ColumnCount — Quick Reference",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "RowCount / ColumnCount",
+          "description": "Functions that count the TOTAL rows / columns containing data in a table — INCLUDING the header row/column.",
+          "items": [
+            "Syntax in the table's value cell: RowCount==RowNum (RowNum = buffer name), ActionMode Buffer.",
+            "Result INCLUDES the header: a table with 4 data rows buffers RowNum = 5.",
+            "ColumnCount works identically for columns.",
+            "For data rows only, subtract the header: {MATH[{B[RowNum]}-1]}."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Use it to steer a whole table, size a loop/repetition dynamically, or verify an expected count. Taught in Section 08; here as a quick reference."
+        }
+      ],
+      "bulletPoints": [
+        "RowCount / ColumnCount include the header — subtract 1 for data-only rows.",
+        "Buffer the count (RowCount==RowNum, Buffer), then reuse it for repetitions or verifications."
+      ]
+    },
+    {
+      "sectionTitle": "Resolve the Reference — Quick Reference",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Reusable TestStepBlock (RTSB) Reference",
+          "description": "When you reuse a Library RTSB in a TestCase, it appears as a Reference and stays LINKED — any change in the Library propagates to every TestCase that uses it."
+        },
+        {
+          "type": "concept",
+          "term": "Resolve the Reference",
+          "description": "Unlinks a specific referenced block from the Library so you can customize it in that one TestCase without affecting the others.",
+          "items": [
+            "Right-click the referenced TestStepBlock -> 'Resolve Reference' (the icon changes).",
+            "After resolving, Library changes NO LONGER affect this block.",
+            "Revert with Ctrl+Z / Undo ONLY before saving — after saving it is permanent."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Use when one TestCase needs a different flow from the shared Library version. Taught in Section 03; here as a quick reference."
+        }
+      ],
+      "bulletPoints": [
+        "Referenced RTSB = linked to Library; edits in the Library reach all users of it.",
+        "Resolve Reference = unlink one instance for TestCase-specific changes.",
+        "Undo works only before saving; after saving the resolve is permanent."
+      ]
+    },
+    {
+      "sectionTitle": "Frequently Used Keyboard Shortcuts",
+      "elements": [
+        {
+          "type": "table",
+          "headers": [
+            "Shortcut",
+            "Creates / Does"
+          ],
+          "rows": [
+            [
+              "Ctrl+N, Ctrl+F",
+              "New Folder"
+            ],
+            [
+              "Ctrl+N, Ctrl+M",
+              "New Module"
+            ],
+            [
+              "Ctrl+N, Ctrl+T",
+              "New TestCase"
+            ],
+            [
+              "Ctrl+N, Ctrl+L",
+              "New TestStepLibrary"
+            ],
+            [
+              "Ctrl+N, Ctrl+.",
+              "New Test Configuration Parameter"
+            ],
+            [
+              "Ctrl+N, Ctrl+Y",
+              "New Business Parameter Container"
+            ],
+            [
+              "Ctrl+N, Ctrl+E",
+              "New ExecutionList"
+            ],
+            [
+              "Ctrl+N, Ctrl+W",
+              "New WHILE statement"
+            ],
+            [
+              "Ctrl+N, Ctrl+R",
+              "New RequirementSet / Requirement / Reusable TestStepBlock"
+            ],
+            [
+              "Ctrl+T",
+              "Search for a TestStep (fuzzy add Module)"
+            ],
+            [
+              "F6",
+              "Run TestCase/TestSteps in the ScratchBook"
+            ],
+            [
+              "F9",
+              "Hide / unhide unused TestStepValues (DoNothing)"
+            ],
+            [
+              "Ctrl+  (plus)",
+              "Expand TestSteps"
+            ],
+            [
+              "Ctrl-  (minus)",
+              "Collapse TestSteps"
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Most 'create' actions are a two-key chord starting with Ctrl+N. Memorize F6 (run in ScratchBook) and F9 (show/hide values) — they come up constantly."
+        }
+      ],
+      "bulletPoints": [
+        "Ctrl+N then a letter = create (F=Folder, M=Module, T=TestCase, E=ExecutionList, W=WHILE...).",
+        "F6 = run in ScratchBook · F9 = show/hide unused TestStepValues · Ctrl+T = add TestStep."
+      ]
+    },
+    {
+      "sectionTitle": "What Makes a Good TestCase — Best-Practice Job Aid",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "TestCase",
+          "description": "A good TestCase is complete, readable, and self-contained.",
+          "items": [
+            "Contains MULTIPLE TestSteps — an entire sequence through the application, rarely just one.",
+            "Marked with a WorkState: Planned, In Work, or Completed.",
+            "Once Completed, link it immediately to its Requirement AND its ExecutionList.",
+            "Contains NO IF statements; use Loops and Conditions only when necessary."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "TestStep Folders",
+          "description": "Organize TestSteps into clearly named folders.",
+          "items": [
+            "Recommended structure: Precondition, several Process folders, Postcondition.",
+            "Every TestCase should include a verification."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Modules",
+          "description": "Reusable technical building blocks.",
+          "items": [
+            "A single Module creates multiple TestSteps and can be reused any number of times.",
+            "A Module contains MULTIPLE controls (never just one) — all controls needed to steer one page.",
+            "Identify controls using the most STABLE methods available."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Point to remember: establish a clear naming convention for every element. Any user should recognize an element from its name alone."
+        }
+      ],
+      "bulletPoints": [
+        "Good TestCase = full sequence + WorkState + linked to Requirement & ExecutionList + a verification.",
+        "Avoid IF; use Loops/Conditions only when needed.",
+        "One Module per page, many controls, stable identification, clear names."
+      ]
+    },
+    {
+      "sectionTitle": "Troubleshooting — 20 Common Errors, Causes & Fixes",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "How to use this",
+          "description": "Match the on-screen error text to the table, read the likely cause, apply the fix. Grouped by theme for fast lookup."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Error (tabs & control identification)",
+            "Likely cause",
+            "Fix"
+          ],
+          "rows": [
+            [
+              "More than one matching tab found",
+              "Multiple tabs open for a similar page, or Module title too generic",
+              "Close all tabs except the SUT; make the Module URL/title less generic"
+            ],
+            [
+              "No matching tab was found",
+              "Module title/URL wrong, or wrong browser TCP",
+              "Adjust the property to match; use a wildcard (*) on the title"
+            ],
+            [
+              "More than one control found for action <X>",
+              "The control is not unique on the page",
+              "Rescan the Module; make the HTML control's identification unique"
+            ],
+            [
+              "Control for action <X> is not steerable",
+              "Control not visible, or disabled in the backend",
+              "Fix the TestStep sequence; ensure the control is enabled for input"
+            ],
+            [
+              "\"<Name>\" was not found",
+              "Wrong page, or ModuleAttribute properties not unique",
+              "Navigate to the correct page; correct the ModuleAttribute properties"
+            ],
+            [
+              "TestStepValues are not visible",
+              "'Hide DoNothing' is turned on",
+              "Press F9, or View tab -> Show DoNothing"
+            ],
+            [
+              "GenericGui has no default property to read from",
+              "ActionMode not set, or window not active during screenshot",
+              "Set the ActionMode; keep the window active for screenshot steps"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Error (expressions, buffers, TCPs)",
+            "Likely cause",
+            "Fix"
+          ],
+          "rows": [
+            [
+              "No suitable value found for \"{\" / special character",
+              "Special chars not escaped, or bad function syntax",
+              "Escape the special characters; add the missing brackets"
+            ],
+            [
+              "Expression could not be resolved / No suitable value found for \"DATE\"",
+              "Missing or incorrect brackets",
+              "Complete all brackets, e.g. {DATE[][][]}"
+            ],
+            [
+              "Buffer with name \"<X>\" was not found",
+              "The buffer was never set (runtime-only)",
+              "Create the buffer first; match the name exactly (case sensitive)"
+            ],
+            [
+              "Unknown value for Test Configuration Parameter <X>",
+              "Wrong TCP input (predefined values are case sensitive)",
+              "Spell it exactly, e.g. 'InternetExplorer' not 'Internet explorer'; use valid custom values"
+            ],
+            [
+              "No TCP with the key name \"<X>\" was found",
+              "TCP not created, or a typo in the reference",
+              "Create the TCP, or fix the reference name"
+            ],
+            [
+              "Synchronization Timeout cannot be converted to a number",
+              "Sync setting value is non-numeric",
+              "Set the synchronization value to a number in milliseconds (ms)"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Error (modules, references, structure)",
+            "Likely cause",
+            "Fix"
+          ],
+          "rows": [
+            [
+              "Unable to run... No feasible executor was found",
+              "A TestStepValue has no data, or the referenced Module no longer exists (Classic engines can't run)",
+              "Add data to the TestStepValue; restore the deleted Module"
+            ],
+            [
+              "Object reference not set to an instance of an object",
+              "A Reusable TestStepBlock no longer exists",
+              "Delete the reference and replace it with the relevant TestStep"
+            ],
+            [
+              "No ModuleAttribute associated",
+              "Module deleted, or ModuleAttribute removed after a rescan",
+              "Delete & re-add the TestStep, or delete the orphaned TestStepValue"
+            ],
+            [
+              "No TestCase assigned",
+              "The TestCase was deleted but the ExecutionEntry was not",
+              "Delete the ExecutionEntry"
+            ],
+            [
+              "Previous ControlGroup not supported / migrate ControlGroup",
+              "BusinessType is 'OldControlGroup' after an upgrade",
+              "Change BusinessType from 'OldControlGroup' to 'ControlGroup'"
+            ]
+          ]
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Error (connection & requirements)",
+            "Likely cause",
+            "Fix"
+          ],
+          "rows": [
+            [
+              "Document ... showing an alert / connection to SUT lost",
+              "SUT crashed/closed/refreshed, or steps out of order (Tosca moved on while looking for an earlier screen)",
+              "Check the SUT / page load; fix the order of steps and ModuleAttributes"
+            ],
+            [
+              "Exclamation mark on the Requirement after execution",
+              "The Requirement values are not updated",
+              "Right-click the Requirement -> 'Update Values'"
+            ]
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "'Not unique' control errors -> Rescan and tighten identification (or use a wildcard).",
+        "Expression errors -> almost always missing/incorrect brackets; complete them.",
+        "'Buffer not found' -> buffers are runtime-only; create it first and match the name exactly.",
+        "TCP predefined inputs are CASE SENSITIVE.",
+        "Requirement exclamation mark -> right-click -> Update Values."
+      ]
+    },
+    {
+      "sectionTitle": "Complete Exercise Workbook & Solutions",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "What these files are",
+          "description": "Consolidated practice material for the whole course — already taught step-by-step across Sections 00-08.",
+          "items": [
+            "AS1 Complete Exercise Workbook (PDF) — every exercise (05-31) in one document for offline practice.",
+            "AS1_Additional_Material_Base (.tsu) — the starter workspace template to import before the advanced exercises.",
+            "Solution workspaces (.zip / .tsu) — completed reference solutions to import and compare against your own work."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "To avoid duplication, the individual exercises are taught in their own sections (03-08). Use the workbook as a printable index and the solution workspaces to self-check."
+        }
+      ],
+      "bulletPoints": [
+        "Workbook = all exercises in one PDF (offline practice / printable index).",
+        "Import the .tsu base template before the advanced (Section 08) exercises.",
+        "Import the solution workspace to compare your build against the reference."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "TCP predefined inputs are case sensitive",
+      "trapDescription": "Candidates type browser/parameter values loosely (e.g., 'Internet explorer').",
+      "bestPractice": "Predefined TCP values must match exactly, e.g. 'InternetExplorer'. A wrong case/spelling throws 'Unknown value for Test Configuration Parameter'."
+    },
+    {
+      "title": "Every Tosca function needs complete brackets",
+      "trapDescription": "An incomplete expression throws 'could not be resolved' / 'No suitable value found for DATE'.",
+      "bestPractice": "Close every bracket you open. A date needs all three parameter slots: {DATE[][][]}."
+    },
+    {
+      "title": "A good TestCase contains NO IF statements",
+      "trapDescription": "Candidates assume IF is a best-practice building block.",
+      "bestPractice": "Per Tosca best practice, a good TestCase avoids IF statements and uses Loops/Conditions only when necessary."
+    },
+    {
+      "title": "'Not unique' vs 'not found' controls",
+      "trapDescription": "Both are identification problems but need different fixes.",
+      "bestPractice": "'More than one control found' = too generic -> rescan / tighten identification. '<Name> was not found' = wrong page or wrong properties -> go to the right page / fix the ModuleAttribute."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Which keyboard shortcut runs a TestCase or TestSteps in the ScratchBook?",
+      "options": [
+        {
+          "id": "A",
+          "text": "F6"
+        },
+        {
+          "id": "B",
+          "text": "F5"
+        },
+        {
+          "id": "C",
+          "text": "F9"
+        },
+        {
+          "id": "D",
+          "text": "Ctrl+R"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "It's a single function key.",
+      "rationale": "F6 runs the selected TestCase/TestSteps in the ScratchBook. F9 hides/unhides unused TestStepValues; F5 is not the ScratchBook run key."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "During execution you get: 'More than one control found for action X'. What is the correct fix?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Delete the TestCase and rebuild it from scratch."
+        },
+        {
+          "id": "B",
+          "text": "Rescan the Module and make the control's identification unique."
+        },
+        {
+          "id": "C",
+          "text": "Increase the synchronization timeout."
+        },
+        {
+          "id": "D",
+          "text": "Press F9 to reveal the control."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The control isn't unique on the page.",
+      "rationale": "The error means the control is not unique. Rescan the Module and tighten its identifying properties (or use a wildcard/anchor/parent) so Tosca finds exactly one control."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Your TestStepValues suddenly disappeared from view, though you know you entered them. What happened?",
+      "options": [
+        {
+          "id": "A",
+          "text": "They were deleted by the last run."
+        },
+        {
+          "id": "B",
+          "text": "The Module lost its ModuleAttributes."
+        },
+        {
+          "id": "C",
+          "text": "'Hide DoNothing' is on — press F9 (or View -> Show DoNothing) to reveal them."
+        },
+        {
+          "id": "D",
+          "text": "The TestCase WorkState is set to Planned."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "A single key toggles their visibility.",
+      "rationale": "When 'Hide DoNothing' is active, TestStepValues with no action are hidden. F9 (or View -> Show DoNothing) brings them back — nothing was deleted."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A test fails with 'Buffer with name X was not found'. What is the most likely reason and fix?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Buffers expire after 24 hours; recreate it daily."
+        },
+        {
+          "id": "B",
+          "text": "The buffer step runs, but F9 is hiding it."
+        },
+        {
+          "id": "C",
+          "text": "Buffers only work in ExecutionLists, not ScratchBook."
+        },
+        {
+          "id": "D",
+          "text": "The buffer was never set before it was used; create it first and match the name exactly (case sensitive)."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "Buffers are runtime-only and name-sensitive.",
+      "rationale": "A buffer must be set (at runtime) before it is recalled, and the recall name must match exactly. Ensure the buffering step runs earlier in the TestCase and the names align."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "After running an ExecutionList, a Requirement shows an exclamation mark. How do you clear it?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Right-click the Requirement and select 'Update Values'."
+        },
+        {
+          "id": "B",
+          "text": "Re-run the entire ExecutionList."
+        },
+        {
+          "id": "C",
+          "text": "Delete and re-link the TestCase."
+        },
+        {
+          "id": "D",
+          "text": "Change the Requirement weight."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "There's a dedicated right-click command.",
+      "rationale": "The exclamation mark means the Requirement's values are outdated. Right-click the Requirement -> 'Update Values' recalculates and clears it."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "Which statement reflects Tosca best practice for a well-built TestCase?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use IF statements liberally to branch logic."
+        },
+        {
+          "id": "B",
+          "text": "Avoid IF statements; structure steps into Precondition/Process/Postcondition folders with a verification, and link a Completed TestCase to its Requirement and ExecutionList."
+        },
+        {
+          "id": "C",
+          "text": "Keep each Module to a single control for precision."
+        },
+        {
+          "id": "D",
+          "text": "Leave TestSteps unnamed to maximize reuse."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Recall the 'Good TestCase' job aid.",
+      "rationale": "A good TestCase avoids IF, uses clearly named Precondition/Process/Postcondition folders plus a verification, and once Completed is linked to its Requirement and ExecutionList. Modules should hold MANY controls (one page), not one, and elements should be clearly named."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "In the Execution section, what do you do to create an ExecutionEntry?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Right-click the Modules folder and choose 'New Entry'."
+        },
+        {
+          "id": "B",
+          "text": "Link a Requirement to the ExecutionList."
+        },
+        {
+          "id": "C",
+          "text": "Drag a TestCase onto an ExecutionList."
+        },
+        {
+          "id": "D",
+          "text": "Run the ScratchBook."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "An entry represents one TestCase inside a list.",
+      "rationale": "Dragging a TestCase onto an ExecutionList creates an ExecutionEntry (a runnable reference to that TestCase). Modules hold the SUT map; Requirements track coverage — neither creates an ExecutionEntry."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "Using {RND[n]}, what is the maximum length (number of digits) Tosca allows for the random integer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "8 digits"
+        },
+        {
+          "id": "B",
+          "text": "10 digits"
+        },
+        {
+          "id": "C",
+          "text": "Unlimited"
+        },
+        {
+          "id": "D",
+          "text": "18 digits"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "It's a specific two-digit cap in the cheat sheet.",
+      "rationale": "{RND[n]} supports a maximum of 18 digits. For a range instead of a length, use {RND[min][max]} (negatives allowed)."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "You need a random number that includes decimal places (e.g., a 5-digit number with 2 decimals). Which expression is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "{RNDDECIMAL[5][2]}"
+        },
+        {
+          "id": "B",
+          "text": "{RND[5][2]}"
+        },
+        {
+          "id": "C",
+          "text": "{RANDOMTEXT[5]}"
+        },
+        {
+          "id": "D",
+          "text": "{DECIMAL[5][2]}"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "There's a dedicated decimal random function.",
+      "rationale": "{RNDDECIMAL[length][decimals]} creates a random number with decimals — {RNDDECIMAL[5][2]} = 5 digits, 2 decimal places. {RND[..]} produces integers only."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "Which statement about {RANDOMTEXT[n]} is correct?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It generates digits only, up to 18 characters."
+        },
+        {
+          "id": "B",
+          "text": "It generates a random alphanumeric string, up to a maximum length of 1024."
+        },
+        {
+          "id": "C",
+          "text": "It only works inside a MATH expression."
+        },
+        {
+          "id": "D",
+          "text": "It requires a regular expression in double quotes."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Letters + numbers, with an upper size limit.",
+      "rationale": "{RANDOMTEXT[n]} produces a random string of letters and numbers, with a maximum length of 1024. The regex-constrained variant is {RANDOMREGEX[\"pattern\"]}."
+    },
+    {
+      "questionId": "Q11",
+      "type": "single-select",
+      "scenario": "What is a valid constraint on the name used inside {XB[Name]}?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The name must be all uppercase."
+        },
+        {
+          "id": "B",
+          "text": "The name must be exactly 8 characters."
+        },
+        {
+          "id": "C",
+          "text": "The name may include numbers but must NOT consist only of numbers."
+        },
+        {
+          "id": "D",
+          "text": "The name must match a Test Configuration Parameter."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Numbers are allowed, but not numbers alone.",
+      "rationale": "For XBuffer, the buffer name may include numbers but must not consist ONLY of numbers. The value inside the brackets is the buffer name where the excluded dynamic part is stored."
+    },
+    {
+      "questionId": "Q12",
+      "type": "single-select",
+      "scenario": "You must generate a random value that starts with a capital letter, followed by lowercase letters, and ends with exactly four digits. Which expression fits?",
+      "options": [
+        {
+          "id": "A",
+          "text": "{RANDOMTEXT[\"^[A-Z][a-z]+[0-9]{4}$\"]}"
+        },
+        {
+          "id": "B",
+          "text": "{RND[\"^[A-Z][a-z]+[0-9]{4}$\"]}"
+        },
+        {
+          "id": "C",
+          "text": "{REGEX[A-Z][a-z][0-9]}"
+        },
+        {
+          "id": "D",
+          "text": "{RANDOMREGEX[\"^[A-Z][a-z]+[0-9]{4}$\"]}"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "A pattern in double quotes needs the regex-aware function.",
+      "rationale": "{RANDOMREGEX[\"pattern\"]} generates a random string constrained by a regular expression (in double quotes). {RANDOMTEXT[n]} takes only a length, not a pattern."
+    },
+    {
+      "questionId": "Q13",
+      "type": "single-select",
+      "scenario": "In a dynamic date offset such as {DATE[][+4M][MM]}, what does the capital 'M' represent, and how does it differ from lowercase 'm'?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Capital M = months; lowercase m = minutes."
+        },
+        {
+          "id": "B",
+          "text": "Capital M = minutes; lowercase m = months."
+        },
+        {
+          "id": "C",
+          "text": "They are interchangeable."
+        },
+        {
+          "id": "D",
+          "text": "Capital M = milliseconds; lowercase m = months."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Date variables are case sensitive.",
+      "rationale": "In dynamic date offsets, capital M = months and lowercase m = minutes. All dynamic-date variables are case sensitive, so mixing them is a common error."
+    },
+    {
+      "questionId": "Q14",
+      "type": "single-select",
+      "scenario": "A shopping-cart table has 4 rows of items plus a header row. You buffer RowCount==RowNum. What value does RowNum hold, and how do you get the data-row count?",
+      "options": [
+        {
+          "id": "A",
+          "text": "RowNum = 4; it already excludes the header."
+        },
+        {
+          "id": "B",
+          "text": "RowNum = 5 (includes the header); use {MATH[{B[RowNum]}-1]} for data rows."
+        },
+        {
+          "id": "C",
+          "text": "RowNum = 4; add 1 for the header."
+        },
+        {
+          "id": "D",
+          "text": "RowCount cannot count rows in a cart table."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "RowCount counts the header too.",
+      "rationale": "RowCount (and ColumnCount) INCLUDE the header, so 4 data rows + 1 header = 5. Subtract 1 with {MATH[{B[RowNum]}-1]} to get the data-only count."
+    },
+    {
+      "questionId": "Q15",
+      "type": "single-select",
+      "scenario": "You resolved a Library reference in a TestCase, then realize you want it linked again. When can you undo the resolve?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Any time, using Update Values."
+        },
+        {
+          "id": "B",
+          "text": "Never; resolving is always irreversible."
+        },
+        {
+          "id": "C",
+          "text": "Only with Ctrl+Z / Undo BEFORE saving — after saving it is permanent."
+        },
+        {
+          "id": "D",
+          "text": "Only by deleting and re-importing the whole Library."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Undo works within the current unsaved session.",
+      "rationale": "'Resolve the Reference' unlinks a referenced block so you can customize it independently. You can revert with Ctrl+Z/Undo only before saving; once saved, the unlink is permanent."
+    },
+    {
+      "questionId": "Q16",
+      "type": "single-select",
+      "scenario": "Which keyboard shortcut opens the fuzzy search to add a TestStep (Module) inside a TestCase?",
+      "options": [
+        {
+          "id": "A",
+          "text": "F9"
+        },
+        {
+          "id": "B",
+          "text": "F6"
+        },
+        {
+          "id": "C",
+          "text": "Ctrl+N, Ctrl+M"
+        },
+        {
+          "id": "D",
+          "text": "Ctrl+T"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "A single Ctrl+letter, not a chord.",
+      "rationale": "Ctrl+T opens the search to add a TestStep. Ctrl+N,Ctrl+M creates a Module; F6 runs in ScratchBook; F9 shows/hides unused TestStepValues."
+    },
+    {
+      "questionId": "Q17",
+      "type": "single-select",
+      "scenario": "Most 'create' actions in Tosca are a two-key chord starting with Ctrl+N. Which chord creates a new ExecutionList?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Ctrl+N, Ctrl+E"
+        },
+        {
+          "id": "B",
+          "text": "Ctrl+N, Ctrl+T"
+        },
+        {
+          "id": "C",
+          "text": "Ctrl+N, Ctrl+F"
+        },
+        {
+          "id": "D",
+          "text": "Ctrl+N, Ctrl+W"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "E for Execution.",
+      "rationale": "Ctrl+N, Ctrl+E creates an ExecutionList. Ctrl+N,Ctrl+F = Folder, Ctrl+N,Ctrl+T = TestCase, Ctrl+N,Ctrl+W = WHILE statement."
+    },
+    {
+      "questionId": "Q18",
+      "type": "single-select",
+      "scenario": "Per Tosca best practice (the 'Good TestCase' job aid), how many controls should a single Module contain?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Exactly one control, for precision."
+        },
+        {
+          "id": "B",
+          "text": "Multiple controls — all those needed to steer one page of the application."
+        },
+        {
+          "id": "C",
+          "text": "One control per TestCase that uses it."
+        },
+        {
+          "id": "D",
+          "text": "As few as possible, ideally none."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "One Module maps a whole page.",
+      "rationale": "A Module should contain MULTIPLE controls — all controls needed to steer one given page — never just one. Modules are reusable and identified with the most stable methods available."
+    },
+    {
+      "questionId": "Q19",
+      "type": "single-select",
+      "scenario": "Execution fails with 'No matching tab was found'. The Module's title is correct but the page title varies slightly between runs. What is a good fix?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Increase the synchronization timeout."
+        },
+        {
+          "id": "B",
+          "text": "Delete the TestCase and rebuild it."
+        },
+        {
+          "id": "C",
+          "text": "Use a wildcard (*) in the Module's title property so Tosca can match the tab."
+        },
+        {
+          "id": "D",
+          "text": "Press F9 to reveal the tab."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Make the title match more flexible.",
+      "rationale": "'No matching tab was found' means the title/URL doesn't match. Adjust the property to match, or use a wildcard (*) on the title so Tosca can find the tab despite small variations."
+    },
+    {
+      "questionId": "Q20",
+      "type": "single-select",
+      "scenario": "You get 'Unknown value for Test Configuration Parameter Browser'. You entered the value as 'Internet explorer'. What is wrong?",
+      "options": [
+        {
+          "id": "A",
+          "text": "TCPs cannot set the browser."
+        },
+        {
+          "id": "B",
+          "text": "You must wrap it as {CP[Internet explorer]}."
+        },
+        {
+          "id": "C",
+          "text": "The TCP must be defined at the folder level."
+        },
+        {
+          "id": "D",
+          "text": "Predefined TCP inputs are case sensitive — it must be exactly 'InternetExplorer'."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "Spelling and case must match exactly.",
+      "rationale": "Predefined TCP values are case sensitive and must be spelled exactly, e.g. 'InternetExplorer' (not 'Internet explorer'). A wrong case/spacing throws 'Unknown value for Test Configuration Parameter'."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Section links",
+      "value": "Modules -> build TestCases -> run in Execution. Requirements track coverage. TestCaseDesign = AS2."
+    },
+    {
+      "key": "Buffer / XBuffer / TCP",
+      "value": "{B[Name]} recall · {XB[Name]} buffer dynamic string part · {CP[Name]} config value."
+    },
+    {
+      "key": "Random values",
+      "value": "{RND[n]} / {RND[min][max]} · {RNDDECIMAL[..]} · {RANDOMTEXT[n]} (max 1024) · {RANDOMREGEX[\"..\"]}."
+    },
+    {
+      "key": "Dynamic date",
+      "value": "{EXPR[base][offset][format]}, case sensitive. Capital M=months, lowercase m=minutes. Empty []=today."
+    },
+    {
+      "key": "Must-know shortcuts",
+      "value": "F6 run in ScratchBook · F9 show/hide values · Ctrl+T add TestStep · Ctrl+N,Ctrl+<letter> create."
+    },
+    {
+      "key": "Good TestCase",
+      "value": "Full sequence, no IF, Precondition/Process/Postcondition + verification, clear names, linked to Requirement & ExecutionList."
+    },
+    {
+      "key": "Fix: not-unique control",
+      "value": "Rescan + tighten identification (or wildcard/anchor/parent)."
+    },
+    {
+      "key": "Fix: expression error",
+      "value": "Complete all brackets, e.g. {DATE[][][]}; escape special characters."
+    },
+    {
+      "key": "Fix: buffer not found",
+      "value": "Buffers are runtime-only; create first, match name exactly (case sensitive)."
+    },
+    {
+      "key": "Fix: TCP unknown value",
+      "value": "Predefined TCP inputs are case sensitive (e.g. 'InternetExplorer')."
+    },
+    {
+      "key": "Fix: Requirement '!'",
+      "value": "Right-click Requirement -> Update Values."
+    }
+  ],
+  "topics": [
+    {
+      "title": "AS1 Mindmap - How Tosca sections connect",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+      "duration": "PDF guide"
+    },
+    {
+      "title": "Text Expressions & Random Values (CHEATS)",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+      "duration": "PDF cheat sheet"
+    },
+    {
+      "title": "Dynamic Date & Time reference (TOSCAD)",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+      "duration": "PDF cheat sheet"
+    },
+    {
+      "title": "Frequently Used Keyboard Shortcuts",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+      "duration": "PDF reference"
+    },
+    {
+      "title": "RowCount & ColumnCount guide",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+      "duration": "PDF guide"
+    },
+    {
+      "title": "A Guide to Resolve the Reference",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+      "duration": "PDF guide"
+    },
+    {
+      "title": "What Makes a Good TestCase (Job Aid)",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+      "duration": "PDF job aid"
+    },
+    {
+      "title": "AS1 Troubleshooting Guide v2.0",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+      "duration": "PDF guide"
+    },
+    {
+      "title": "AS1 Complete Exercise Workbook & Solutions",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
+      "duration": "PDF + workspaces"
+    }
+  ]
+}

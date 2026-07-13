@@ -1,0 +1,821 @@
+{
+  "moduleId": "TAS1-M02",
+  "moduleTitle": "Section 2 - Modules",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2697/lesson-video-introduction-to-tricentis-model-based-test-automation",
+  "learningObjectives": [
+    "Explain Model-Based Test Automation (MBTA) and its advantages over scripted automation.",
+    "Describe the role and structure of Modules in Tricentis Tosca.",
+    "Use XScan to scan a web application and capture Controls, applying the correct launch method.",
+    "Apply all 5 XScan identification methods and choose the appropriate one for each scenario.",
+    "Create and use ControlGroups to simplify TestCase design.",
+    "Differentiate Standard Modules from project-specific modules and know when to use each."
+  ],
+  "estTime": "2 hr",
+  "studyGuide": [
+    {
+      "sectionTitle": "Model-Based Test Automation (MBTA)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Model-Based Test Automation",
+          "description": "A testing technique in which Models capture the technical information and expected behavior of the SUT. Business data is fed into these models to steer and test the system — no coding required."
+        },
+        {
+          "type": "concept",
+          "term": "Advantages of MBTA",
+          "description": "Three key reasons to choose MBTA over scripted automation:",
+          "items": [
+            "Save effort — models are created by scanning the SUT, not written by hand",
+            "Readability — end-to-end tests are easy to read due to descriptive module and step names",
+            "Reduced maintenance — models are reusable; update once and all referencing TestCases benefit"
+          ]
+        },
+        {
+          "type": "analogy",
+          "text": "MBTA is like building with LEGO: you scan your SUT once to create standardized bricks (Modules). Each TestCase is assembled by snapping bricks together. When the SUT changes, you update just the brick — not every model that used it."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 170\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arr1\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">MODEL-BASED TEST AUTOMATION — CORE FLOW</text><rect x=\"20\" y=\"30\" width=\"170\" height=\"120\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/><text x=\"105\" y=\"55\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"12\" font-weight=\"700\">SUT</text><text x=\"105\" y=\"73\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">Web application</text><text x=\"105\" y=\"87\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">(e.g., Demo Web Shop)</text><text x=\"105\" y=\"110\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"9\">XScan inspects</text><text x=\"105\" y=\"123\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"9\">DOM elements</text><path d=\"M 190 90 L 240 90\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#arr1)\"/><text x=\"215\" y=\"83\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">XScan</text><rect x=\"240\" y=\"30\" width=\"190\" height=\"120\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"335\" y=\"55\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Module</text><text x=\"335\" y=\"73\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Technical model of SUT section</text><text x=\"335\" y=\"87\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Contains Controls (UI elements)</text><text x=\"335\" y=\"108\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Reusable across all TestCases</text><text x=\"335\" y=\"121\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Update once → all tests benefit</text><path d=\"M 430 90 L 480 90\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#arr1)\"/><text x=\"455\" y=\"83\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">business</text><text x=\"455\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">data fed in</text><rect x=\"480\" y=\"30\" width=\"220\" height=\"120\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"590\" y=\"55\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"12\" font-weight=\"700\">TestCase</text><text x=\"590\" y=\"73\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Business logic + test data</text><text x=\"590\" y=\"87\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">References Module Controls</text><text x=\"590\" y=\"108\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"9\">No code — drag-and-drop</text><text x=\"590\" y=\"121\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"9\">assembly of steps</text></svg>",
+          "caption": "MBTA flow: XScan captures SUT structure as Modules; TestCases combine Modules with business data — no coding required."
+        }
+      ],
+      "bulletPoints": [
+        "MBTA separates technical details (Modules) from business logic (TestCases).",
+        "Reusable modules mean one update propagates to all TestCases automatically."
+      ]
+    },
+    {
+      "sectionTitle": "What is a Module?",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Module",
+          "description": "A representation of a SUT section (page, form, or panel) that Tosca can interact with. Contains one or more Controls, each mapping to an individual UI element."
+        },
+        {
+          "type": "concept",
+          "term": "Control",
+          "description": "A single UI element within a Module — such as a button, input field, or dropdown. Each Control has identifying properties Tosca uses to locate it on the SUT."
+        },
+        {
+          "type": "concept",
+          "term": "Module Attributes",
+          "description": "Properties describing the module itself: its name, the technology it targets (HTML, WPF, SAP GUI), and the Controls it contains."
+        },
+        {
+          "type": "concept",
+          "term": "Steer",
+          "description": "When Tosca executes a TestCase, it 'steers' the Controls in the SUT — meaning it interacts with them exactly as a user would: clicking buttons, entering text, selecting from dropdowns. Steering is the act of automated interaction with a Control."
+        }
+      ],
+      "bulletPoints": [
+        "Module = a SUT section; contains one or more Controls.",
+        "Control = one individual UI element (button, field, dropdown, label).",
+        "Steer = Tosca interacting with a Control as a user would.",
+        "Modules live in the Modules section of Tosca Commander."
+      ]
+    },
+    {
+      "sectionTitle": "Standard Modules",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Standard Modules",
+          "description": "Pre-built modules provided by Tricentis for common execution tasks — keyboard input, wait commands, file handling — that operate independently of the SUT."
+        },
+        {
+          "type": "concept",
+          "term": "Tricentis Standard Subset",
+          "description": "The package distributed by Tricentis that contains Standard Modules. Import it into any workspace to immediately access utility modules without scanning."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "",
+            "Standard Modules",
+            "Project Modules"
+          ],
+          "rows": [
+            [
+              "Source",
+              "Tricentis Standard Subset (pre-built)",
+              "Created by scanning your SUT"
+            ],
+            [
+              "SUT-specific?",
+              "No — generic utility actions",
+              "Yes — specific to your application"
+            ],
+            [
+              "Examples",
+              "Key press, Wait, File handling",
+              "Login form, Product search page"
+            ]
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Standard Modules: import once → use everywhere. No SUT scanning required.",
+        "Project modules: scan your SUT → model its specific pages and elements."
+      ]
+    },
+    {
+      "sectionTitle": "XScan — Scanning the SUT",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "XScan",
+          "description": "Tosca's built-in scanning tool that inspects web application elements through the browser and captures their technical properties to create Modules."
+        },
+        {
+          "type": "concept",
+          "term": "Launching XScan",
+          "description": "XScan is launched from Tosca Commander. The standard method taught in AS1: right-click a Module folder in the Modules section and select Scan >> Application. XScan opens alongside the browser ready to inspect the SUT."
+        },
+        {
+          "type": "steps",
+          "title": "Scanning Process",
+          "items": [
+            "Ensure the Tricentis Automation Extension is installed and active in Chrome.",
+            "Open the SUT page you want to model in Chrome.",
+            "In Tosca Commander, navigate to the Modules section and locate the target Module folder.",
+            "Right-click the Module folder and select Scan >> Application to launch XScan.",
+            "Hover over UI elements to inspect their properties in the XScan panel.",
+            "Click elements to add them as Controls to the current Module.",
+            "Rename Controls and the Module itself to reflect business functionality.",
+            "Save the Module and close XScan."
+          ]
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 120\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arr2\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">XSCAN WORKFLOW</text><rect x=\"10\" y=\"28\" width=\"118\" height=\"74\" rx=\"7\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"69\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\" font-weight=\"700\">Extension Active</text><text x=\"69\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Tricentis Automation</text><text x=\"69\" y=\"79\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Extension in Chrome</text><text x=\"69\" y=\"93\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">(required for web)</text><path d=\"M128 65 L145 65\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr2)\"/><rect x=\"145\" y=\"28\" width=\"118\" height=\"74\" rx=\"7\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"204\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\" font-weight=\"700\">Open SUT Page</text><text x=\"204\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Navigate to the</text><text x=\"204\" y=\"79\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">page to model</text><text x=\"204\" y=\"93\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">in Chrome</text><path d=\"M263 65 L280 65\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr2)\"/><rect x=\"280\" y=\"28\" width=\"130\" height=\"74\" rx=\"7\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"345\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\" font-weight=\"700\">Launch XScan</text><text x=\"345\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Right-click Module</text><text x=\"345\" y=\"79\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">folder → Scan</text><text x=\"345\" y=\"93\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">>> Application</text><path d=\"M410 65 L427 65\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr2)\"/><rect x=\"427\" y=\"28\" width=\"118\" height=\"74\" rx=\"7\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"486\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\" font-weight=\"700\">Click Elements</text><text x=\"486\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Hover to inspect</text><text x=\"486\" y=\"79\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Click to add as</text><text x=\"486\" y=\"93\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Control</text><path d=\"M545 65 L562 65\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr2)\"/><rect x=\"562\" y=\"28\" width=\"148\" height=\"74\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"636\" y=\"50\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"10\" font-weight=\"700\">Module Saved</text><text x=\"636\" y=\"66\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Controls captured</text><text x=\"636\" y=\"79\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">in Tosca Commander</text><text x=\"636\" y=\"93\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"9\">ready for TestCases</text></svg>",
+          "caption": "XScan workflow: Extension active → open SUT → right-click Module folder → Scan >> Application → click elements → save."
+        },
+        {
+          "type": "concept",
+          "term": "Module Naming Convention",
+          "description": "Within XScan, rename the Module using the pipe character as a separator: Application | Page. Example: 'WebShop | Log In Page'. This ensures consistent, readable Module names across the workspace."
+        },
+        {
+          "type": "concept",
+          "term": "Wildcard (*) in Technical Properties",
+          "description": "In XScan Technical Properties, the Title field accepts the wildcard character *. Setting Title to 'Demo Web Shop*' tells Tosca to match any window whose title begins with 'Demo Web Shop' — ensuring the Module works correctly across multiple SUT pages (e.g., Demo Web Shop, Demo Web Shop. Books)."
+        },
+        {
+          "type": "links",
+          "title": "Install the browser extension (required for XScan):",
+          "items": [
+            {
+              "label": "Tricentis Automation Extension — Chrome Web Store",
+              "url": "https://chrome.google.com/webstore/detail/tricentis-automation-exte/njjjlolnnicemgigahffncnddbioccpo",
+              "note": "Chrome"
+            },
+            {
+              "label": "Full Browser Extension Install Guide",
+              "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/xbrowser/xbrowser_scan.htm#TBox_Extension",
+              "note": "Chrome, Firefox & Edge"
+            }
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "XScan requires the Tricentis Automation Extension — without it, web scanning fails.",
+        "Launch: right-click Module folder → Scan >> Application.",
+        "Module naming: use pipe separator — 'App | Page' (e.g., 'WebShop | Log In Page').",
+        "Use * wildcard in Title to match multiple SUT pages."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 03 — Create Your First Module",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS1 Exercise 03 — Create Your First Module — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2697/lesson-video-introduction-to-tricentis-model-based-test-automation"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Identifying Controls: 5 Methods",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The 5 XScan Identification Methods",
+          "description": "XScan provides 5 ways to identify a control. Properties is the default; the other 4 handle scenarios where properties alone are insufficient:",
+          "items": [
+            "Properties (default) — uses stable HTML attributes (ID, name, class) to directly match the control",
+            "Parent — uses the parent container element to scope the search; useful when a control's own properties are shared by multiple elements on the page",
+            "Anchor — uses a stable nearby element as a reference point; ideal for dynamic controls",
+            "Image — identifies the control by a visual screenshot match of its appearance",
+            "Index — identifies the control by its ordinal position within its parent container"
+          ]
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 150\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">5 XSCAN IDENTIFICATION METHODS</text><rect x=\"10\" y=\"28\" width=\"130\" height=\"108\" rx=\"8\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"75\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Properties</text><text x=\"75\" y=\"65\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"8\">(DEFAULT)</text><text x=\"75\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Stable HTML</text><text x=\"75\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">attributes</text><text x=\"75\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">(ID, name,</text><text x=\"75\" y=\"123\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">class)</text><rect x=\"150\" y=\"28\" width=\"130\" height=\"108\" rx=\"8\" fill=\"rgba(217,119,6,0.08)\" stroke=\"#B45309\" stroke-width=\"2\"/><text x=\"215\" y=\"50\" text-anchor=\"middle\" fill=\"#B45309\" font-size=\"11\" font-weight=\"700\">Anchor</text><text x=\"215\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Stable nearby</text><text x=\"215\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">element as</text><text x=\"215\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">reference</text><text x=\"215\" y=\"123\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">point</text><rect x=\"290\" y=\"28\" width=\"130\" height=\"108\" rx=\"8\" fill=\"rgba(16,185,129,0.08)\" stroke=\"#059669\" stroke-width=\"2\"/><text x=\"355\" y=\"50\" text-anchor=\"middle\" fill=\"#059669\" font-size=\"11\" font-weight=\"700\">Image</text><text x=\"355\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Visual</text><text x=\"355\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">screenshot</text><text x=\"355\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">match of</text><text x=\"355\" y=\"123\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">the element</text><rect x=\"430\" y=\"28\" width=\"130\" height=\"108\" rx=\"8\" fill=\"rgba(139,92,246,0.08)\" stroke=\"#7C3AED\" stroke-width=\"2\"/><text x=\"495\" y=\"50\" text-anchor=\"middle\" fill=\"#7C3AED\" font-size=\"11\" font-weight=\"700\">Index</text><text x=\"495\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Ordinal</text><text x=\"495\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">position within</text><text x=\"495\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">parent</text><text x=\"495\" y=\"123\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">container</text><rect x=\"570\" y=\"28\" width=\"140\" height=\"108\" rx=\"8\" fill=\"rgba(236,72,153,0.08)\" stroke=\"#BE185D\" stroke-width=\"2\"/><text x=\"640\" y=\"50\" text-anchor=\"middle\" fill=\"#BE185D\" font-size=\"11\" font-weight=\"700\">Parent</text><text x=\"640\" y=\"84\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Parent</text><text x=\"640\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">container</text><text x=\"640\" y=\"110\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">scopes the</text><text x=\"640\" y=\"123\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">search</text></svg>",
+          "caption": "5 XScan identification methods — Properties is the default; choose the others when element properties are insufficient."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Aspect",
+            "Identify by Properties",
+            "Identify by Anchor"
+          ],
+          "rows": [
+            [
+              "How it works",
+              "Uses stable HTML attributes (ID, name, class) directly",
+              "Uses a stable nearby element as a reference point"
+            ],
+            [
+              "When to use",
+              "Element has unique, stable identifiers",
+              "Element properties change between sessions"
+            ],
+            [
+              "Reliability risk",
+              "Breaks if the stable attribute changes",
+              "Breaks only if the anchor element changes"
+            ]
+          ]
+        },
+        {
+          "type": "analogy",
+          "text": "Properties = finding a house by its street address (unique, direct). Anchor = finding a house by saying 'the blue building next to the post office' — useful when the address changes but the neighbour stays the same."
+        },
+        {
+          "type": "concept",
+          "term": "Anchor: Shortest Path vs. Coordinate",
+          "description": "When using Identify by Anchor, Tosca locates the target control via one of two strategies:",
+          "items": [
+            "Shortest Path — searches each DOM tree level for the target, starting from the anchor, going bottom to top up to the root element. Resolution-independent and robust.",
+            "Coordinate — finds the target by its exact on-screen coordinates relative to the anchor. Highly resolution-dependent — breaks if screen resolution changes."
+          ]
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 155\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">IDENTIFY BY ANCHOR: TWO SEARCH STRATEGIES</text><rect x=\"20\" y=\"28\" width=\"320\" height=\"116\" rx=\"10\" fill=\"rgba(109,139,255,0.07)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"180\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">Shortest Path</text><text x=\"180\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Searches each DOM tree level for the target,</text><text x=\"180\" y=\"85\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">starting from the anchor — bottom to top</text><text x=\"180\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">up to root element.</text><rect x=\"40\" y=\"108\" width=\"280\" height=\"24\" rx=\"5\" fill=\"rgba(16,185,129,0.12)\" stroke=\"#059669\" stroke-width=\"1\"/><text x=\"180\" y=\"124\" text-anchor=\"middle\" fill=\"#059669\" font-size=\"9\" font-weight=\"600\">✓ Resolution-independent — robust choice</text><rect x=\"380\" y=\"28\" width=\"320\" height=\"116\" rx=\"10\" fill=\"rgba(217,119,6,0.07)\" stroke=\"#B45309\" stroke-width=\"2\"/><text x=\"540\" y=\"52\" text-anchor=\"middle\" fill=\"#B45309\" font-size=\"13\" font-weight=\"700\">Coordinate</text><text x=\"540\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Finds the target by exact on-screen coordinates</text><text x=\"540\" y=\"85\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">relative to the anchor. Highly dependent</text><text x=\"540\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">on screen resolution.</text><rect x=\"400\" y=\"108\" width=\"280\" height=\"24\" rx=\"5\" fill=\"rgba(239,68,68,0.10)\" stroke=\"#DC2626\" stroke-width=\"1\"/><text x=\"540\" y=\"124\" text-anchor=\"middle\" fill=\"#DC2626\" font-size=\"9\" font-weight=\"600\">⚠ Breaks if screen resolution changes</text></svg>",
+          "caption": "Shortest Path traverses the DOM tree (robust); Coordinate uses pixel position (fragile — resolution-dependent)."
+        },
+        {
+          "type": "note",
+          "text": "The anchor control itself must be uniquely identifiable. If the anchor is not unique, neither the anchor nor its target controls can be reliably located."
+        }
+      ],
+      "bulletPoints": [
+        "5 identification methods: Properties, Parent, Anchor, Image, Index (NOT URL, Title, or View).",
+        "Properties is the default — use when the element has stable, unique attributes.",
+        "Parent scopes the search to a container — useful when many elements share the same properties.",
+        "Anchor for dynamic elements — the anchor itself must be unique.",
+        "Anchor strategies: Shortest Path (robust) vs. Coordinate (resolution-dependent)."
+      ]
+    },
+    {
+      "sectionTitle": "ControlGroup",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "ControlGroup",
+          "description": "A named grouping of related Controls within a Module. ControlGroups organize logically related UI elements (e.g., all category navigation links) under one named group, making TestCases easier to build and maintain."
+        },
+        {
+          "type": "steps",
+          "title": "Creating a ControlGroup",
+          "items": [
+            "In Tosca Commander, open the Module containing the Controls to group.",
+            "Hold Ctrl and click each ModuleAttribute (Control) to multi-select them.",
+            "Right-click the selection and choose 'Create ControlGroup'.",
+            "Name the ControlGroup to reflect its business purpose (e.g., 'Product Categories').",
+            "Save the Module."
+          ]
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 210\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">CONTROLGROUP — MODULE STRUCTURE</text><rect x=\"30\" y=\"28\" width=\"660\" height=\"172\" rx=\"10\" fill=\"rgba(109,139,255,0.05)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"50\" y=\"50\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Module: WebShop | Product Choice Categories</text><rect x=\"50\" y=\"58\" width=\"620\" height=\"130\" rx=\"8\" fill=\"rgba(217,119,6,0.07)\" stroke=\"#B45309\" stroke-width=\"1.5\" stroke-dasharray=\"5,3\"/><text x=\"70\" y=\"78\" fill=\"#B45309\" font-size=\"11\" font-weight=\"700\">ControlGroup: Product Categories</text><rect x=\"70\" y=\"86\" width=\"175\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.10)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"157\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"9\">BOOKS link</text><rect x=\"255\" y=\"86\" width=\"175\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.10)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"342\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"9\">COMPUTERS link</text><rect x=\"440\" y=\"86\" width=\"205\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.10)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"542\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"9\">ELECTRONICS link</text><rect x=\"70\" y=\"118\" width=\"175\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.10)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"157\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"9\">APPAREL &amp; SHOES link</text><rect x=\"255\" y=\"118\" width=\"200\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.10)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"355\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"9\">DIGITAL DOWNLOADS link</text><rect x=\"465\" y=\"118\" width=\"180\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.10)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"555\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"9\">JEWLERY link</text><rect x=\"70\" y=\"150\" width=\"175\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.10)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"157\" y=\"166\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"9\">GIFT CARDS link</text><text x=\"430\" y=\"166\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\" font-style=\"italic\">Ctrl+Click multi-select → Create ControlGroup</text></svg>",
+          "caption": "ControlGroup groups 7 related Controls under one name — reference the group in TestCases instead of individual controls."
+        },
+        {
+          "type": "note",
+          "text": "ControlGroups exist inside Modules — they are not a TestCase construct. Their primary benefit is simpler TestCase authoring: reference the group once rather than each Control individually."
+        }
+      ],
+      "bulletPoints": [
+        "ControlGroup = named group of related Controls within a Module.",
+        "Create: Ctrl+Click to multi-select Controls → right-click → Create ControlGroup.",
+        "Benefit: TestCases are easier to create and maintain."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 04 — Identify by Anchor and Create ControlGroup",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS1 Exercise 04 — Identify by Anchor and Create ControlGroup — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2697/lesson-video-introduction-to-tricentis-model-based-test-automation"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "MBTA advantages — all three must be known",
+      "trapDescription": "Exam questions ask you to identify the advantages of MBTA. Missing one (effort saving, readability, reduced maintenance) results in an incorrect multi-select answer.",
+      "bestPractice": "Memorise all three: (1) Save effort via scanning. (2) Readable end-to-end tests. (3) Reduced maintenance because models are reusable."
+    },
+    {
+      "title": "Tosca does NOT automatically fill test data into models",
+      "trapDescription": "A common distractor states: 'Tosca automatically fills test data into the models.' This is false. Test data flows FROM TestCases into Modules during execution — it is not auto-filled.",
+      "bestPractice": "MBTA advantage: you CREATE models by scanning. Data is fed in manually via TestCases. Tosca never auto-fills model data."
+    },
+    {
+      "title": "Module vs. Control",
+      "trapDescription": "Questions conflate Module (a representation of a SUT section) with Control (an individual element). Distractors swap the definitions.",
+      "bestPractice": "Module = group of Controls = one SUT section. Control = single UI element within a Module."
+    },
+    {
+      "title": "Standard Modules source",
+      "trapDescription": "Candidates assume Standard Modules are created by scanning. They are pre-built by Tricentis and distributed via the Standard Subset.",
+      "bestPractice": "Standard Modules come from the Tricentis Standard Subset — not from scanning your own SUT."
+    },
+    {
+      "title": "5 identification methods — URL is a distractor, Parent is correct",
+      "trapDescription": "Questions ask for all 5 identification methods. Many candidates include URL (wrong) and exclude Parent (correct). The full set is: Properties, Parent, Anchor, Image, Index.",
+      "bestPractice": "Memorise all 5: Properties (default), Parent, Anchor, Image, Index. URL, Title, and View are the three distractors — do not include them."
+    },
+    {
+      "title": "Anchor's Coordinate method is resolution-dependent",
+      "trapDescription": "Questions describe a test environment with varying screen resolutions and ask which Anchor strategy to avoid. Candidates incorrectly choose Shortest Path.",
+      "bestPractice": "Coordinate = fragile (breaks on resolution change). Shortest Path = robust (DOM-tree traversal, resolution-independent). Always prefer Shortest Path."
+    },
+    {
+      "title": "XScan requires the browser extension",
+      "trapDescription": "Distractors state XScan works without any browser extension. This is false for web applications.",
+      "bestPractice": "XScan for web apps requires the Tricentis Automation Extension to be installed and active in Chrome."
+    },
+    {
+      "title": "ControlGroup belongs to the Module, not the TestCase",
+      "trapDescription": "Questions ask where ControlGroups are defined. Candidates confuse them with TestCase-level groupings.",
+      "bestPractice": "ControlGroups are created inside a Module by grouping Controls. They are not a TestCase or ExecutionList construct."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What is Model-Based Test Automation (MBTA) in the context of Tricentis Tosca?",
+      "options": [
+        {
+          "id": "A",
+          "text": "An AI-based approach that automatically fixes broken tests by learning from past runs."
+        },
+        {
+          "id": "B",
+          "text": "A scripted automation technique that generates test code from UML diagrams."
+        },
+        {
+          "id": "C",
+          "text": "A process of manually documenting test cases in a model format before scripting them."
+        },
+        {
+          "id": "D",
+          "text": "A technique where Models capture the technical information and expected behavior of the SUT, and business data is fed into these models for testing — no coding required."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "Models contain technical info + expected behavior; business data is fed in separately.",
+      "rationale": "MBTA creates Models that capture the SUT's technical interface and expected behavior. Business test data is then fed into these models, enabling testing without writing code. This is the foundation of Tosca's codeless automation."
+    },
+    {
+      "questionId": "Q2",
+      "type": "multi-select",
+      "selectCount": 3,
+      "scenario": "Which THREE statements correctly describe advantages of Tricentis Model-Based Test Automation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "You can save effort because you can create models from scanning your System Under Test."
+        },
+        {
+          "id": "B",
+          "text": "You can read an end-to-end test easily."
+        },
+        {
+          "id": "C",
+          "text": "You can reduce maintenance due to the models being reusable."
+        },
+        {
+          "id": "D",
+          "text": "Tricentis Tosca will automatically fill test data into the models."
+        },
+        {
+          "id": "E",
+          "text": "Tests run faster than scripted automation because Tosca compiles modules to native machine code."
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Three are genuine MBTA advantages; two are invented distractors — one about auto-filling data, one about execution speed.",
+      "rationale": "The three MBTA advantages: (A) models created by scanning save effort, (B) readable tests, (C) reusable models reduce maintenance. Tosca does NOT automatically fill test data into models (D) — data flows from TestCases into modules during execution. Native machine code compilation (E) is invented."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A tester is looking at a Module in Tosca Commander. The Module contains individual entries that each map to a specific button or input field on the SUT. What are these individual entries called?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Controls"
+        },
+        {
+          "id": "B",
+          "text": "TestSteps"
+        },
+        {
+          "id": "C",
+          "text": "ExecutionItems"
+        },
+        {
+          "id": "D",
+          "text": "Attributes"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "They are the individual UI elements inside a Module.",
+      "rationale": "Controls are the individual UI elements (buttons, fields, dropdowns) captured within a Module. TestSteps belong to TestCases. ExecutionItems belong to ExecutionLists. Attributes describe the Module itself."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A tester needs modules for common utility actions like keyboard shortcuts and wait commands, without scanning the SUT. What is the quickest way to get these in Tosca?",
+      "options": [
+        {
+          "id": "A",
+          "text": "These actions cannot be automated in Tosca without coding."
+        },
+        {
+          "id": "B",
+          "text": "Scan the SUT repeatedly until utility modules are auto-generated."
+        },
+        {
+          "id": "C",
+          "text": "Write custom JavaScript modules inside Tosca Commander."
+        },
+        {
+          "id": "D",
+          "text": "Import the Tricentis Standard Subset, which contains pre-built Standard Modules."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "Tricentis provides a ready-made set for common tasks.",
+      "rationale": "The Tricentis Standard Subset contains pre-built Standard Modules for common execution tasks. Import it once and immediately use modules for keyboard input, waiting, and other standard actions — no SUT scanning needed."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "What is the role of XScan in Tricentis Tosca?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A built-in tool that scans the SUT's UI elements and captures their technical properties to create Modules."
+        },
+        {
+          "id": "B",
+          "text": "A vulnerability scanner that checks the SUT for security flaws."
+        },
+        {
+          "id": "C",
+          "text": "A reporting tool that scans execution logs for errors."
+        },
+        {
+          "id": "D",
+          "text": "A network scanner that maps the SUT's API endpoints."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "XScan reads the SUT's UI, not its security or network.",
+      "rationale": "XScan is Tosca's scanning tool used to inspect and capture the technical properties of UI elements in the SUT, creating or updating Modules. It is not a security or network tool."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "How do you launch XScan in Tosca Commander?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Select XScan in the 'Go to' ribbon."
+        },
+        {
+          "id": "B",
+          "text": "Right-click a Module folder in the Modules section and select Scan >> Application."
+        },
+        {
+          "id": "C",
+          "text": "Open the File menu and select New >> XScan Session."
+        },
+        {
+          "id": "D",
+          "text": "XScan launches automatically when you open a new project."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "You start from a Module folder via a right-click context menu.",
+      "rationale": "The standard method to launch XScan is to right-click a Module folder in the Modules section and select Scan >> Application. This opens XScan alongside the browser so you can begin scanning the SUT."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "During scanning, a tester discovers that a login button's HTML ID changes every time the page is loaded. Which identification method should they use?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Identify by Properties, using the changing ID as the primary identifier."
+        },
+        {
+          "id": "B",
+          "text": "Skip automating this element — dynamic IDs cannot be handled by Tosca."
+        },
+        {
+          "id": "C",
+          "text": "Identify by Anchor, using a stable nearby element as the reference point."
+        },
+        {
+          "id": "D",
+          "text": "Use a wildcard character in the ID property to match any value."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Changing properties → anchor to something stable nearby.",
+      "rationale": "When an element's own properties (like ID) are dynamic, Identify by Anchor uses a stable neighbouring element as a reference point to locate the target. This is the correct technique for dynamic elements."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "A tester notices that the 'Submit' button on a checkout page has a unique, stable ID of 'btn-submit-checkout' that never changes. Which identification method is most appropriate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Identify by Anchor — always safer for web elements."
+        },
+        {
+          "id": "B",
+          "text": "Scan the button multiple times and use the most common ID."
+        },
+        {
+          "id": "C",
+          "text": "Identify by Anchor — the SUT ID could change in future deployments."
+        },
+        {
+          "id": "D",
+          "text": "Identify by Properties — the stable, unique ID is ideal for direct property matching."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "Stable + unique attributes → Properties is the preferred method.",
+      "rationale": "When an element has a stable, unique identifier such as a fixed ID, Identify by Properties is the preferred and most reliable approach. Anchor identification adds unnecessary complexity when direct properties are stable."
+    },
+    {
+      "questionId": "Q9",
+      "type": "multi-select",
+      "selectCount": 5,
+      "scenario": "What are the 5 options to identify controls in XScan? (5 correct answers)",
+      "options": [
+        {
+          "id": "A",
+          "text": "Title"
+        },
+        {
+          "id": "B",
+          "text": "Properties"
+        },
+        {
+          "id": "C",
+          "text": "Parent"
+        },
+        {
+          "id": "D",
+          "text": "URL"
+        },
+        {
+          "id": "E",
+          "text": "View"
+        },
+        {
+          "id": "F",
+          "text": "Anchor"
+        },
+        {
+          "id": "G",
+          "text": "Image"
+        },
+        {
+          "id": "H",
+          "text": "Index"
+        }
+      ],
+      "correctOptions": [
+        "B",
+        "C",
+        "F",
+        "G",
+        "H"
+      ],
+      "hint": "Properties is the default. Anchor handles dynamic controls. Parent scopes by container. Two more complete the set — URL, Title, and View are distractors.",
+      "rationale": "The 5 XScan identification methods are: Properties (default), Parent, Anchor, Image, and Index. Title, URL, and View are NOT identification methods in XScan — they are common distractors. No partial credit."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "A test team runs their Tosca suite on multiple machines with different screen resolutions. They use 'Identify by Anchor' for several controls. Which Anchor search strategy should they choose to ensure the tests remain stable across all environments?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Shortest Path — it traverses the DOM tree and is resolution-independent."
+        },
+        {
+          "id": "B",
+          "text": "Coordinate — it uses the exact pixel position of the control relative to the anchor."
+        },
+        {
+          "id": "C",
+          "text": "Both strategies are equally resolution-independent."
+        },
+        {
+          "id": "D",
+          "text": "Neither strategy works across different screen resolutions."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "One strategy depends on pixel coordinates; the other on the DOM tree structure.",
+      "rationale": "Shortest Path traverses the DOM tree level by level starting from the anchor — this is independent of screen resolution and therefore robust. The Coordinate method uses exact on-screen pixel positions, making it fragile when resolution changes."
+    },
+    {
+      "questionId": "Q11",
+      "type": "single-select",
+      "scenario": "A tester has created a Module for the Demo Web Shop checkout page. The Module should also work correctly when the same checkout process opens in different browser tabs with slightly different titles (e.g., 'Demo Web Shop. Checkout'). How should the Technical Properties Title be set?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Leave Title empty so Tosca matches any window."
+        },
+        {
+          "id": "B",
+          "text": "Set Title to 'Demo Web Shop*' using a wildcard to match any window starting with that text."
+        },
+        {
+          "id": "C",
+          "text": "Set Title to the exact full title of every possible page, separated by semicolons."
+        },
+        {
+          "id": "D",
+          "text": "Wildcards are not supported in the Title field — create a separate Module per page."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "A single special character enables the Module to match multiple page title variants.",
+      "rationale": "Setting Title to 'Demo Web Shop*' uses the wildcard (*) to match any window whose title begins with 'Demo Web Shop'. This means one Module covers all related pages (e.g., Demo Web Shop, Demo Web Shop. Checkout, Demo Web Shop. Books) without duplication."
+    },
+    {
+      "questionId": "Q12",
+      "type": "single-select",
+      "scenario": "A tester has scanned 7 category links from the same navigation panel into a Module. They want to reference all 7 controls as a single named unit in TestCases. What should they create?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A TestSuite grouping the 7 TestCases together."
+        },
+        {
+          "id": "B",
+          "text": "A separate Module for each of the 7 controls."
+        },
+        {
+          "id": "C",
+          "text": "A ControlGroup inside the Module, containing the 7 Controls."
+        },
+        {
+          "id": "D",
+          "text": "An ExecutionList with 7 entries, one per control."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "The grouping lives inside the Module, not in TestCases or ExecutionLists.",
+      "rationale": "A ControlGroup is created inside a Module to group related Controls under a single named unit. This makes TestCase authoring simpler — reference the group rather than each control individually. It is a Module-level construct, not a TestCase or ExecutionList construct."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "MBTA",
+      "value": "Models capture SUT technical info + expected behavior; business data is fed in. No coding required."
+    },
+    {
+      "key": "MBTA advantages",
+      "value": "Save effort (scanning), readable tests, reduced maintenance (reusable models). NOT: auto-fill data."
+    },
+    {
+      "key": "Module",
+      "value": "Representation of a SUT section; contains Controls (individual UI elements)."
+    },
+    {
+      "key": "Control",
+      "value": "A single UI element inside a Module (button, field, dropdown, label)."
+    },
+    {
+      "key": "Steer",
+      "value": "Tosca interacting with a Control as a user would — clicking, typing, selecting."
+    },
+    {
+      "key": "Standard Modules",
+      "value": "Pre-built by Tricentis for common tasks. Distributed via the Tricentis Standard Subset."
+    },
+    {
+      "key": "XScan launch",
+      "value": "Right-click Module folder in Modules section → Scan >> Application."
+    },
+    {
+      "key": "Module naming",
+      "value": "Use pipe separator: 'App | Page' (e.g., 'WebShop | Log In Page')."
+    },
+    {
+      "key": "Wildcard *",
+      "value": "Set Title to 'Demo Web Shop*' to match any window starting with that text."
+    },
+    {
+      "key": "5 identification methods",
+      "value": "Properties (default), Parent, Anchor, Image, Index. NOT URL, Title, or View."
+    },
+    {
+      "key": "Identify by Properties",
+      "value": "Use when element has stable, unique attributes (ID, name, class)."
+    },
+    {
+      "key": "Identify by Anchor",
+      "value": "Use when element properties are dynamic — anchor to a stable nearby element."
+    },
+    {
+      "key": "Anchor: Shortest Path",
+      "value": "Traverses DOM tree — resolution-independent. Preferred strategy."
+    },
+    {
+      "key": "Anchor: Coordinate",
+      "value": "Uses pixel coordinates — breaks if screen resolution changes. Avoid."
+    },
+    {
+      "key": "ControlGroup",
+      "value": "Named group of Controls inside a Module. Ctrl+Click to multi-select → Create ControlGroup."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 05 - Introduction to Tricentis Model-Based Test Automation",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2697/lesson-video-introduction-to-tricentis-model-based-test-automation",
+      "duration": "video"
+    },
+    {
+      "title": "Lesson 06 - Standard Modules in Tricentis Tosca",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2699/lesson-video-standard-modules-in-tricentis-tosca",
+      "duration": "video"
+    },
+    {
+      "title": "Lesson 07 - Introduction to XScan",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2700/lesson-video-introduction-to-xscan",
+      "duration": "video"
+    },
+    {
+      "title": "Lesson 08 - Scan your SUT with XScan",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2703/lesson-video-scan-your-sut-with-xscan",
+      "duration": "video"
+    },
+    {
+      "title": "Lesson 09 - Identify Controls by Properties in XScan",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2706/lesson-video-identify-controls-by-properties-in-xscan",
+      "duration": "video"
+    },
+    {
+      "title": "Lesson 10 - Identify Controls by Anchor in XScan",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2711/lesson-video-identify-controls-by-anchor-in-xscan",
+      "duration": "video"
+    }
+  ]
+}

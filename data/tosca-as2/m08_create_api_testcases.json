@@ -1,0 +1,514 @@
+{
+  "moduleId": "TAS2-M08",
+  "moduleTitle": "Section 8 - API Theory & Create API TestCases",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction",
+  "learningObjectives": [
+    "Convert an API TestCase into a functioning Template.",
+    "Link values from the TestSheet to the API Template.",
+    "Instantiate the API Template and run the TemplateInstances.",
+    "Build a concrete API TestCase (Verify Product by SKU) using Common Parameters and the correct Insert/Verify ActionModes."
+  ],
+  "estTime": "45 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Where API TestCases Come From",
+      "elements": [
+        {
+          "type": "text",
+          "text": "Scenario: test that countries and country IDs are combined correctly by the system. You're given a subset directly from the developer and a TestSheet from the Test Design Specialist, and need to build the TestCases for this new DemoWebShop functionality."
+        },
+        {
+          "type": "concept",
+          "term": "API Scan",
+          "description": "Tosca can scan an application's API to collect relevant Request/Response pairs and export them as a raw TestCase. In this course, developers already performed the scan for you. The exported raw TestCase needs adjusting: TestSteps must be renamed and polished, following a clear, consistent structure and naming convention so anyone can follow the flow. The final structure should resemble a UI TestCase — easier to understand and to automate."
+        },
+        {
+          "type": "note",
+          "text": "Want to go deeper into API Scanning itself? See the dedicated \"Automation Specialist for API\" course."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "The One Key Difference from UI TestCases",
+      "elements": [
+        {
+          "type": "analogy",
+          "text": "Like ordering at a restaurant — you can't receive food without placing an order first, and an order is pointless without a response (your food) coming back."
+        },
+        {
+          "type": "warning",
+          "text": "In API TestCases, every Message that performs a function must be expressed as a Request + Response TestStep PAIR. A Request without a Response (or vice versa) is incomplete and must be fixed before proceeding."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Building the API Template (Same Flow as UI)",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "From raw export to working Template",
+          "items": [
+            "Clean up the exported raw TestCase: rename/polish TestSteps into a clear, consistent structure.",
+            "Convert the TestCase to a Template — identical process to UI Templates.",
+            "Link the Template to the provided TestSheet.",
+            "Link the individual TestSheet Attributes to the Template's TestStepValues.",
+            "Add Conditions as needed.",
+            "Check Template for errors, then Instantiate — creating the TemplateInstances.",
+            "Run the TestCases to test the new DemoWebShop functionality."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Besides the Request/Response pairing requirement, the entire Template workflow (linking, Conditions, Check Template, Instantiate) is IDENTICAL to UI test automation — nothing new to learn mechanically, just a different kind of TestStep."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Exercise 8a: Build the API TestCase",
+      "elements": [
+        {
+          "type": "text",
+          "text": "Scenario: some DemoWebShop products recently had their SKU changed. Since the SKU isn't visible on the UI, you need an API TestCase — \"Verify Product by SKU\" — to check that BlueJeans still has the expected SKU/ID, using the API Scan subset the developers provided."
+        },
+        {
+          "type": "steps",
+          "title": "Create and fill the TestCase",
+          "items": [
+            "Under the TestCase root, create a folder \"API\", then inside it a folder \"8a API TestCase\".",
+            "Create a TestCase named \"Verify Product by SKU\" in that folder.",
+            "Add the Module \"GetProductBySku\" and \"GetProductBySku Response\" to the TestCase.",
+            "Fill in the request values: sku = BlueJeans (ActionMode Insert), usernameOrEmail = {CP[Email]} (Insert), userPassword = {CP[Password]} (Insert).",
+            "Fill in the response values to verify: Id = 36 (ActionMode Verify), Name = Blue Jeans (Verify).",
+            "Set the TestCase WorkState to Completed, then run it in the Scratchbook."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "{CP[...]} — Common/Configuration Parameter",
+          "description": "{CP[Email]} and {CP[Password]} reference reusable, project-wide Configuration Parameters (e.g. login credentials) — not a TestSheet. They can be dropped into any TestStepValue directly, independent of Attribute/Instance linking, which is why they show up here before any TestSheet is even linked in 8a."
+        },
+        {
+          "type": "warning",
+          "text": "Use the correct ActionMode for each direction: request values (sku, usernameOrEmail, userPassword) use Insert; Response values you're checking (Id, Name) use Verify. Mixing these up is the most common mistake in this exercise."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Exercise 8b: Convert to Template, Link Values, Instantiate",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "Templatize it, exactly like a UI TestCase",
+          "items": [
+            "Duplicate the \"8a API TestCase\" folder and rename it \"8b Convert to Template, Link Values and Instantiate\".",
+            "Convert the \"Verify Product by SKU\" TestCase to a Template.",
+            "Link the \"Verify Product by SKU\" TestSheet (TestCaseDesign → \"8 API\") to the Template.",
+            "Link the TestSheet Attributes to the TestStepValues: sku → {XL[sku]}, usernameOrEmail → {XL[Email]}, userPassword → {XL[Password]}, Id → {XL[Id]}, Name → {XL[Name]}.",
+            "Delete any extra/leftover Value still sitting next to a newly-linked XL path.",
+            "Instantiate the Template, then run the TemplateInstances in the Scratchbook."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Before dragging and dropping Values from the TestSheet onto the Template, delete the existing Values in the TestStepValues first — same rule as everywhere else in this course: Tosca appends the new XL reference instead of replacing an existing value."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 8 — API TestCases",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS2 Exercise 8 — API TestCases: Build, Templatize, Link Values & Instantiate — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Leaving a Request without its matching Response (or vice versa)",
+      "trapDescription": "Candidates copy over API TestSteps from the raw export without verifying every Message is a complete Request+Response pair.",
+      "bestPractice": "Each API Message must be expressed as a Request AND Response TestStep pair — one without the other is incomplete."
+    },
+    {
+      "title": "Assuming API Templates need a totally different workflow",
+      "trapDescription": "Learners think API TestCase Templates require new/different Tosca mechanics compared to UI Templates.",
+      "bestPractice": "Once TestSteps are cleaned up, the Template workflow (link TestSheet, link Values, add Conditions, Check Template, Instantiate) is exactly the same as for UI TestCases."
+    },
+    {
+      "title": "Using the wrong ActionMode on Response values",
+      "trapDescription": "Candidates set Response TestStepValues (like Id and Name) to Insert instead of Verify, or vice versa for request values.",
+      "bestPractice": "Request values (sku, usernameOrEmail, userPassword) use Insert. Response values you're checking (Id, Name) use Verify."
+    },
+    {
+      "title": "Confusing {CP[...]} with {XL[...]}",
+      "trapDescription": "Candidates assume every value must come from a linked TestSheet ({XL[...]}), missing that {CP[Email]}/{CP[Password]} are reusable Configuration Parameters usable without any TestSheet link.",
+      "bestPractice": "{CP[...]} pulls from project-wide Configuration Parameters (e.g. shared login credentials); {XL[...]} pulls from a linked TestSheet Instance. They're independent mechanisms."
+    },
+    {
+      "title": "Leaving leftover Values next to a newly-linked XL path",
+      "trapDescription": "After linking TestSheet Attributes to TestStepValues in Exercise 8b, candidates don't notice an old static Value still sitting alongside the new XL reference.",
+      "bestPractice": "After linking, check each TestStepValue and delete any extra/leftover Value that isn't the new XL reference."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "How were the raw API TestCases in this lesson originally generated?",
+      "options": [
+        {
+          "id": "A",
+          "text": "By manually typing every TestStep from scratch."
+        },
+        {
+          "id": "B",
+          "text": "By scanning the application's API with Tosca's API Scan feature, collecting Request/Response pairs, and exporting the result."
+        },
+        {
+          "id": "C",
+          "text": "By importing a Swagger file directly with no further steps needed."
+        },
+        {
+          "id": "D",
+          "text": "By recording a UI session and converting it automatically."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The developers had already done this preparation step.",
+      "rationale": "API TestCases are generated via Tosca's API Scan feature, which collects relevant Request/Response pairs from the application and exports them as a raw TestCase needing cleanup."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "What is the one key structural difference between an API TestCase and a UI TestCase in Tosca?",
+      "options": [
+        {
+          "id": "A",
+          "text": "API TestCases can only be run manually, never via ExecutionLists."
+        },
+        {
+          "id": "B",
+          "text": "API TestCases cannot be converted into Templates."
+        },
+        {
+          "id": "C",
+          "text": "API TestCases don't use TestSheets or Conditions."
+        },
+        {
+          "id": "D",
+          "text": "Each API Message must be expressed as a Request and Response TestStep pair."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "Think of the restaurant analogy — an order and its response.",
+      "rationale": "In API TestCases, every function-performing Message needs a matching Request and Response TestStep pair — this is the key difference from UI TestCases. Everything else in the workflow is the same."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Once an API TestCase's TestSteps are cleaned up and renamed, how does the rest of the Template-building process compare to UI TestCases?",
+      "options": [
+        {
+          "id": "A",
+          "text": "API Templates require a completely separate Instantiate command."
+        },
+        {
+          "id": "B",
+          "text": "API Templates skip the Check Template step entirely."
+        },
+        {
+          "id": "C",
+          "text": "It's identical: link the TestSheet, link Values, add Conditions, Check Template, then Instantiate."
+        },
+        {
+          "id": "D",
+          "text": "API Templates cannot use Conditions."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "The mechanics are the same; only the TestStep type (Request/Response) differs.",
+      "rationale": "Aside from the Request/Response pairing requirement, the Template workflow — linking the TestSheet and Values, adding Conditions, Check Template, and Instantiate — is exactly the same as for UI TestCases."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "Which course should you take if you want to go deeper into Tosca's API Scan capabilities specifically?",
+      "options": [
+        {
+          "id": "A",
+          "text": "\"Automation Specialist Level 1 (AS1)\""
+        },
+        {
+          "id": "B",
+          "text": "\"Test Design Specialist Level 1\""
+        },
+        {
+          "id": "C",
+          "text": "\"Automation Specialist for API\""
+        },
+        {
+          "id": "D",
+          "text": "There is no follow-up course for API testing."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "It's a course specifically dedicated to API testing depth.",
+      "rationale": "The 'Automation Specialist for API' course covers API Scan and API testing capabilities in more depth than AS2."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "In the \"Verify Product by SKU\" TestCase, what does {CP[Email]} represent?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A reusable, project-wide Configuration Parameter — like a shared login credential — independent of any TestSheet."
+        },
+        {
+          "id": "B",
+          "text": "A link to an Instance on a linked TestSheet."
+        },
+        {
+          "id": "C",
+          "text": "A buffered value from an earlier TestStep."
+        },
+        {
+          "id": "D",
+          "text": "An invalid syntax that Tosca will reject."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Notice this value is used in Exercise 8a, before any TestSheet is linked.",
+      "rationale": "{CP[...]} pulls from a Configuration Parameter — a reusable, project-wide value like login credentials — usable in any TestStepValue without linking a TestSheet. This is different from {XL[...]} (TestSheet link) and {B[...]} (buffered value)."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "In \"GetProductBySku Response\", what ActionMode should the Id and Name TestStepValues use?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Insert"
+        },
+        {
+          "id": "B",
+          "text": "Verify"
+        },
+        {
+          "id": "C",
+          "text": "Buffer"
+        },
+        {
+          "id": "D",
+          "text": "WaitOn"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "You're checking what came back, not sending data.",
+      "rationale": "Response values are checked against expected results, so they use ActionMode Verify. Insert is for request/input values like sku, usernameOrEmail, and userPassword."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "What must you do before dragging and dropping TestSheet Values onto the API Template in Exercise 8b?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Delete the existing Values in the TestStepValues first."
+        },
+        {
+          "id": "B",
+          "text": "Set the WorkState to COMPLETED first."
+        },
+        {
+          "id": "C",
+          "text": "Resolve every Reference in the TestCase."
+        },
+        {
+          "id": "D",
+          "text": "Nothing — Tosca automatically replaces old values with new XL references."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This is the same rule that applies everywhere else in this course.",
+      "rationale": "Tosca appends a new XL reference to the end of an existing value rather than replacing it — so the existing Value must be deleted first."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "After linking the TestSheet Attributes to the TestStepValues in Exercise 8b, what should you check for?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Any extra/leftover Value still sitting next to the newly-linked XL path, and delete it."
+        },
+        {
+          "id": "B",
+          "text": "Whether the Module was renamed to \"GetProductBySku Response\"."
+        },
+        {
+          "id": "C",
+          "text": "Whether the ExecutionList folder exists."
+        },
+        {
+          "id": "D",
+          "text": "Nothing further is needed once the XL reference is visible."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Linking can leave a stray value behind if the field wasn't fully cleared.",
+      "rationale": "If a leftover static Value remains alongside the new XL reference after linking, it must be deleted — otherwise the TestStepValue may not behave as intended."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "What are web services?",
+      "options": [
+        {
+          "id": "A",
+          "text": "They include both network dependent and independent APIs"
+        },
+        {
+          "id": "B",
+          "text": "APIs that require a network to operate"
+        },
+        {
+          "id": "C",
+          "text": "APIs that do not require a network to operate"
+        },
+        {
+          "id": "D",
+          "text": "Tosca functionalities that allow us to test websites"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "It's the narrower of the two API categories — the one that needs a connection.",
+      "rationale": "Web services are the subset of APIs that specifically require a network to operate (e.g. HTTP-based Request/Response calls) — unlike local/native APIs, which can run without any network."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "What does API stand for?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Application Processing Intelligence"
+        },
+        {
+          "id": "B",
+          "text": "Application Programming Input"
+        },
+        {
+          "id": "C",
+          "text": "Application Programming Interface"
+        },
+        {
+          "id": "D",
+          "text": "Application Processing Information"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "The last word describes what connects two applications — a boundary they talk across.",
+      "rationale": "API stands for Application Programming Interface — a set of rules that lets applications communicate with each other, with or without a network (web services being the network-dependent subset)."
+    },
+    {
+      "questionId": "Q11",
+      "type": "single-select",
+      "scenario": "Why do we need to do API Testing?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A function is available but doesn't have an UI"
+        },
+        {
+          "id": "B",
+          "text": "So we can read the code"
+        },
+        {
+          "id": "C",
+          "text": "API testing does not require Internet connection"
+        },
+        {
+          "id": "D",
+          "text": "We don't need to do API testing as everything can be accessed through the UI"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think back to the SKU field — you couldn't see it anywhere on the DemoWebShop UI.",
+      "rationale": "API Testing lets you verify functionality that exists in the system but has no UI to test it through — like checking a product's SKU, which isn't shown anywhere on the DemoWebShop screens."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "API Scan",
+      "value": "Scans the application's API, collects Request/Response pairs, exports a raw TestCase."
+    },
+    {
+      "key": "Cleanup needed",
+      "value": "Rename/polish TestSteps into a clear, consistent, UI-TestCase-like structure."
+    },
+    {
+      "key": "Key difference",
+      "value": "Every API Message = a Request + Response TestStep PAIR."
+    },
+    {
+      "key": "Rest of the workflow",
+      "value": "Identical to UI Templates: link TestSheet + Values → Conditions → Check Template → Instantiate."
+    },
+    {
+      "key": "Go deeper",
+      "value": "\"Automation Specialist for API\" course covers API Scan in more depth."
+    },
+    {
+      "key": "{CP[...]} syntax",
+      "value": "Configuration Parameter — reusable project-wide value (e.g. credentials), independent of any TestSheet."
+    },
+    {
+      "key": "Request vs. Response ActionMode",
+      "value": "Request values (sku, usernameOrEmail, userPassword) = Insert. Response values (Id, Name) = Verify."
+    },
+    {
+      "key": "Before linking XL",
+      "value": "Delete the existing Value in the TestStepValue first — Tosca appends, not replaces."
+    },
+    {
+      "key": "After linking XL",
+      "value": "Check for and delete any leftover Value still sitting next to the new XL path."
+    }
+  ],
+  "topics": [
+    {
+      "title": "API Testing (theory video)",
+      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
+      "duration": "video"
+    },
+    {
+      "title": "Lesson 08 - Create API TestCases",
+      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
+      "duration": "video"
+    }
+  ]
+}

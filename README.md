@@ -1,8 +1,10 @@
-# PegaAcademy — Free PCBA & PCSA Exam Prep
+# Quilyn — Free Certification Exam Prep
 
-A free, offline-capable study app for the **Pega Certified Business Architect (PCBA)** and **Pega Certified System Architect (PCSA)** certification exams.
+A free, offline-capable study app for IT certification exams — **Pega** (PCBA, PCSA) and **Tricentis Tosca** (AS1, AS2, API testing). Structured study guides, practice questions, mock exams, and spaced-repetition review. No account required, no tracking, works offline.
 
-**[Live App →](https://emredursun.github.io/certify-pega/)**
+**[Live App →](https://emredursun.github.io/quilyn/)**
+
+> Built as personal study material while preparing for these certifications, now shared as open source so others revising the same exams can benefit.
 
 ---
 
@@ -12,6 +14,9 @@ A free, offline-capable study app for the **Pega Certified Business Architect (P
 |-------|---------|------|
 | Pega Certified Business Architect (PCBA) | 19 modules | 65% pass · 90 min |
 | Pega Certified System Architect (PCSA) | 48 modules | 65% pass · 90 min |
+| Tricentis Tosca Automation Specialist Level 1 (AS1) | 10 sections | practice + reference |
+| Tricentis Tosca Automation Specialist Level 2 (AS2) | 10 sections | practice + reference |
+| Tricentis Tosca API Testing | 14 sections | practice + reference |
 
 ### Per-module features
 - **Study Guide** — Core Concept cards, analogies, and worked examples
@@ -35,8 +40,8 @@ A free, offline-capable study app for the **Pega Certified Business Architect (P
 ## Run locally
 
 ```bash
-git clone https://github.com/emredursun/certify-pega.git
-cd certify-pega
+git clone https://github.com/emredursun/quilyn.git
+cd quilyn
 python3 -m http.server 8000
 # Open http://localhost:8000
 ```
@@ -48,7 +53,7 @@ python3 -m http.server 8000
 ## Project structure
 
 ```
-certify-pega/
+quilyn/
 ├── index.html                    App shell & entry point
 ├── manifest.json                 PWA manifest
 ├── sw.js                         Service worker (offline caching)
@@ -66,12 +71,18 @@ certify-pega/
 │       ├── app-shell.js          Theme, nav, search & settings wiring
 │       ├── search.js             Global module search overlay
 │       └── settings.js           Progress backup/restore & heatmap
+├── icon.svg                      App icon / favicon
 └── data/
     ├── registry.json             Track & module manifest
     ├── mock-exams.json           Mock exam question bank
     ├── business-architect/       19 PCBA module JSON files
-    └── system-architect/         48 PCSA module JSON files
+    ├── system-architect/         48 PCSA module JSON files
+    ├── tosca-as1/                Tricentis Tosca AS1 section JSON files
+    ├── tosca-as2/                Tricentis Tosca AS2 section JSON files
+    └── tosca-api/                Tricentis Tosca API Testing section JSON files
 ```
+
+All content is authored as original study notes (concept cards, summaries, practice questions). Official third-party course materials — Tricentis exercise workbooks, transcripts, and Tosca subset (`.tsu`) files — are **not** included in this repository; the relevant modules link to the official Tricentis Academy courses instead.
 
 ---
 
@@ -84,6 +95,12 @@ The UI renders it automatically — no code changes needed.
 
 ---
 
+## Disclaimer
+
+Quilyn is an independent, unofficial study aid created by a learner, for learners. It is **not affiliated with, endorsed by, or sponsored by** Pegasystems Inc. or Tricentis GmbH. "Pega" is a trademark of Pegasystems Inc.; "Tricentis" and "Tosca" are trademarks of Tricentis GmbH. All study notes and practice questions are original content written to aid revision and are not reproductions of official exam questions. Always refer to the official [Pega Academy](https://academy.pega.com/) and [Tricentis Academy](https://academy.tricentis.com/) for authoritative material.
+
+---
+
 ## License
 
-MIT — free to use, fork, and adapt.
+[MIT](LICENSE) — free to use, fork, and adapt. See the license for a note on content and trademarks.

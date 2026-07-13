@@ -1,0 +1,520 @@
+{
+  "moduleId": "TAS2-M07",
+  "moduleTitle": "Section 7 - Build Template and Link Values Recap",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction",
+  "learningObjectives": [
+    "Automate an end-to-end process, covering a more complicated use case.",
+    "Build a Template from a more advanced TestCase, leaving the correct References unresolved.",
+    "Link TestSheet Values, including buffered {MATH[]} calculations, to TestStepValues.",
+    "Combine Conditions (including the manually-typed Instance.Character condition) so the Template instantiates correctly."
+  ],
+  "estTime": "45 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Scenario: Discount Codes",
+      "elements": [
+        {
+          "type": "text",
+          "text": "The developers added a Discount Code feature: entering the correct code (exact syntax) unlocks a benefit — one code removes shipping costs, another gives a flat $5 discount regardless of order total. An incorrect code must be rejected with a message, and no discount applied. You must test that the right discount applies for each valid code, and that invalid codes are rejected with no discount given."
+        },
+        {
+          "type": "note",
+          "text": "Before attempting this exercise, re-watch Lesson 2 (Building a Template), Lesson 3 (Linking Values and Instantiation), and Lesson 5 (Setting Conditions) — this lesson combines all three into one end-to-end task."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 880 340\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"440\" y=\"26\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"17\" font-weight=\"700\">Lesson 7 = Lesson 2 + Lesson 3 + Lesson 5, Combined</text><text x=\"440\" y=\"46\" text-anchor=\"middle\" fill=\"var(--pa-muted)\" font-size=\"11.5\">Re-watch these three lessons first — this exercise merges them into one end-to-end task.</text><rect x=\"20\" y=\"70\" width=\"240\" height=\"70\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-line-2)\" stroke-width=\"1.5\"/><rect x=\"34\" y=\"88\" width=\"34\" height=\"34\" rx=\"7\" fill=\"var(--pa-brand)\"/><text x=\"51\" y=\"111\" text-anchor=\"middle\" fill=\"#fff\" font-size=\"17\" font-weight=\"800\">T</text><text x=\"82\" y=\"100\" fill=\"var(--pa-ink)\" font-size=\"13\" font-weight=\"700\">Lesson 2</text><text x=\"82\" y=\"117\" fill=\"var(--pa-muted)\" font-size=\"11\">Building a Template</text><rect x=\"20\" y=\"160\" width=\"240\" height=\"70\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-line-2)\" stroke-width=\"1.5\"/><rect x=\"30\" y=\"178\" width=\"46\" height=\"30\" rx=\"6\" fill=\"var(--pa-surface-1)\" stroke=\"var(--pa-brand-3)\" stroke-width=\"2\"/><text x=\"53\" y=\"199\" text-anchor=\"middle\" fill=\"var(--pa-brand-3)\" font-size=\"13\" font-weight=\"800\">XL</text><text x=\"82\" y=\"190\" fill=\"var(--pa-ink)\" font-size=\"13\" font-weight=\"700\">Lesson 3</text><text x=\"82\" y=\"207\" fill=\"var(--pa-muted)\" font-size=\"11\">Link Values &amp; Instantiate</text><rect x=\"20\" y=\"250\" width=\"240\" height=\"70\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-line-2)\" stroke-width=\"1.5\"/><polygon points=\"51,268 68,285 51,302 34,285\" fill=\"var(--pa-warn-bg)\" stroke=\"var(--pa-warn)\" stroke-width=\"2\"/><text x=\"82\" y=\"280\" fill=\"var(--pa-ink)\" font-size=\"13\" font-weight=\"700\">Lesson 5</text><text x=\"82\" y=\"297\" fill=\"var(--pa-muted)\" font-size=\"11\">Setting Conditions</text><line x1=\"260\" y1=\"105\" x2=\"436\" y2=\"177\" stroke=\"var(--pa-brand)\" stroke-width=\"2.2\"/><g transform=\"translate(436,177) rotate(22.3)\"><polygon points=\"-10,-6 8,0 -10,6\" fill=\"var(--pa-brand)\"/></g><line x1=\"260\" y1=\"195\" x2=\"432\" y2=\"195\" stroke=\"var(--pa-brand)\" stroke-width=\"2.2\"/><g transform=\"translate(432,195) rotate(0)\"><polygon points=\"-10,-6 8,0 -10,6\" fill=\"var(--pa-brand)\"/></g><line x1=\"260\" y1=\"285\" x2=\"436\" y2=\"213\" stroke=\"var(--pa-brand)\" stroke-width=\"2.2\"/><g transform=\"translate(436,213) rotate(-22.3)\"><polygon points=\"-10,-6 8,0 -10,6\" fill=\"var(--pa-brand)\"/></g><circle cx=\"480\" cy=\"195\" r=\"50\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-brand)\" stroke-width=\"2.5\"/><circle cx=\"480\" cy=\"177\" r=\"17\" fill=\"var(--pa-brand)\"/><text x=\"480\" y=\"183\" text-anchor=\"middle\" fill=\"#fff\" font-size=\"15\" font-weight=\"800\">7</text><text x=\"480\" y=\"208\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"12\" font-weight=\"700\">Lesson 7</text><text x=\"480\" y=\"223\" text-anchor=\"middle\" fill=\"var(--pa-muted)\" font-size=\"9.5\">End-to-End Template</text><line x1=\"530\" y1=\"195\" x2=\"596\" y2=\"195\" stroke=\"var(--pa-brand)\" stroke-width=\"2.2\"/><g transform=\"translate(596,195) rotate(0)\"><polygon points=\"-10,-6 8,0 -10,6\" fill=\"var(--pa-brand)\"/></g><rect x=\"604\" y=\"157\" width=\"256\" height=\"76\" rx=\"10\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok)\" stroke-width=\"1.5\"/><circle cx=\"630\" cy=\"195\" r=\"17\" fill=\"var(--pa-ok)\"/><path d=\"M622,197 l6,7 l13,-16\" stroke=\"#fff\" stroke-width=\"3\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/><text x=\"662\" y=\"191\" fill=\"var(--pa-ink)\" font-size=\"13\" font-weight=\"700\">Successful Run</text><text x=\"662\" y=\"208\" fill=\"var(--pa-muted)\" font-size=\"11\">Discount Code ExecutionList</text></svg>",
+          "caption": "Lesson 7 pulls together Template creation (Lesson 2), linking Values + Instantiation (Lesson 3), and Conditions (Lesson 5) into one combined, end-to-end exercise — the Discount Code Template."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "End-to-End Recap: Building a Working Template",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "The full process, combined",
+          "items": [
+            "Create the TestCase that will be converted (resolving References first if needed).",
+            "Convert the TestCase to a Template.",
+            "Link the Template to the relevant TestSheet, then link the individual TestSheet Instances to the relevant Template TestStepValues.",
+            "Add Conditions to define when parts of the Template should (or shouldn't) run.",
+            "Check Template, then Instantiate — this produces the working, functioning TestCases."
+          ]
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Exercise 7a: Build the Template",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "Convert the Discount Code TestCase into a Template",
+          "items": [
+            "Copy the existing \"Discount Code\" TestCase (from the \"Automation Specialist 1 TestCases\" folder) into a new TestCase folder, then convert it to a Template.",
+            "Resolve the References for every folder EXCEPT \"Precondition_Reference\" and \"Order Product_Reference\" — those two are deliberately left as References.",
+            "Rename \"Start Checkout\" → \"Verify Coupon Code\", and rename \"Shopping Cart Procedures\" → \"Enter Code\".",
+            "Add the Reusable TestStepBlock \"Empty Shopping Cart, Log out and Close Browser\", resolve its Reference, and rename it to \"Empty Shopping Cart\"."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Not every folder gets its Reference resolved when building a Template from a more advanced TestCase. \"Precondition_Reference\" and \"Order Product_Reference\" stay as References here — only the folders that need Template-specific changes get resolved."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Exercise 7b: Link Values",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "Link the TestSheet and its Values",
+          "items": [
+            "Link the \"Calculate Discount\" TestSheet (TestCaseDesign → \"7 Calculate Discount\") to the Template.",
+            "Link the Email and Password Attributes to the Business Parameters TestStepValues, and the Discount Code Attribute to the Enter Code TestStepValue — clear each existing value before dragging the new XL reference in.",
+            "Set the Coupon Applied TestStepValue's ActionMode to WaitOn, so Tosca waits for the confirmation message to appear before verifying its InnerText against the TestSheet.",
+            "Right-click the \"Verification of Prices\" TestStep and select Allow Reorder — this is required before its TestStepValues (the Cart total rows) can be rearranged."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "{MATH[]} and {B[]} syntax",
+          "description": "{MATH[...]} runs an inline calculation in a TestStepValue — e.g. multiplying a buffered price by a buffered quantity to get the Sub-Total. {B[Name]} reads back a value that was buffered earlier in the TestCase (via a \"Buffer\" TestStepValue), so the Shipping, Discount, and Total rows can reuse {B[SubTotal]} and {B[Shipping]} instead of recalculating them from scratch."
+        },
+        {
+          "type": "warning",
+          "text": "The Discount TestStepValues need a leading minus sign in their {MATH[]} formula — a discount must verify as a negative number, since it's subtracted from the order total."
+        },
+        {
+          "type": "note",
+          "text": "Hints from the exercise: clear a TestStepValue's existing value before dragging a new XL reference onto it — Tosca appends the new XL to the end of the current value rather than replacing it. If a {MATH[]} calculation isn't evaluating correctly, check whether the TestStepValue's DataType needs to be switched to \"Numeric\". Tosca's decimal separator and other number formats live under Settings → TBox → Number formats."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Exercise 7c: Set Conditions & Instantiation",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Invalid Instance symbol",
+          "description": "Recall from Lesson 1: an Invalid Instance is symbolized by an X in the center of a square and contains a value the SUT should reject. For a Discount Code TestCase, once the invalid code is rejected, the verification is complete — the order process should stop there rather than continuing needlessly."
+        },
+        {
+          "type": "text",
+          "text": "On the TestStepFolder level, an invalid-Instance TestCase should stop right after Verify Application, skipping the Workflow and Verification folders entirely and jumping straight to the Postcondition."
+        },
+        {
+          "type": "warning",
+          "text": "Writing one long Condition string with an OR operator for every possible Instance is impractical, hard to read, and high-maintenance."
+        },
+        {
+          "type": "concept",
+          "term": "The Instance.Character != \"Invalid\" trick",
+          "description": "Instead of enumerating every valid Instance with ORs, set the Workflow and Verification TestStepFolder Conditions to 'Instance.Character' != \"Invalid\". This single, business-readable condition means: run this folder every time the current Instance is NOT Invalid — automatically covering every valid case without listing them individually."
+        },
+        {
+          "type": "steps",
+          "title": "Apply it to the Discount Code Template",
+          "items": [
+            "Add 'Instance.Character' != \"Invalid\" at the folder level to: Checkout Process, Verification of Prices, Confirmation, and Verification of Success — these only make sense for a code that was accepted.",
+            "Add the opposite condition, 'Instance.Character' == \"Invalid\", to the \"Empty Shopping Cart\" folder — the cart only needs emptying after an invalid code was entered and rejected.",
+            "For the Cart total TestStepValues, combine Attributes with AND to pick the right formula — e.g. 'Workflow.Discount Type' == \"Discount Type Percentage\" AND 'Workflow.Discount Assignment' == \"Discount Assignment Total\" selects the percentage-on-total Discount formula."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Unlike Conditions built from TestSheet Instances, the Instance.Character condition can't be dragged and dropped — it must be typed manually into the Condition column."
+        },
+        {
+          "type": "note",
+          "text": "Wrap Attribute names that contain spaces in single quotes in the Condition column (e.g. 'Workflow.Discount Assignment'). Attribute names without spaces can skip the quotes. Drag and drop the relevant Instances onto the Condition fields first, then adjust the logical statement."
+        },
+        {
+          "type": "steps",
+          "title": "Finish: Check, Instantiate, Link, Run",
+          "items": [
+            "Use Check Template to catch errors, then Instantiate to generate the TestCases.",
+            "Link the \"TemplateInstance of Discount Code\" folder to the specific Requirement: DemoWebShop → WebShop Frontend → Shopping cart → \"Discounts\" — the individual Requirement, not the whole RequirementSet (see Section 6).",
+            "Create an ExecutionList named \"7 Discount Code\" in the ExecutionLists folder, link the TemplateInstance folder to it, and run it."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "If Tosca reports \"No matching tab was found\", the module is usually unstable — rescan the module and remap the elements to fix it."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 7 — Build, Link, and Instantiate the Discount Code Template",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS2 Exercise 7 — Build Template, Link Values, Set Conditions & Instantiation — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Resolving every single Reference",
+      "trapDescription": "Candidates resolve ALL References when converting the Discount Code TestCase to a Template, including \"Precondition_Reference\" and \"Order Product_Reference\".",
+      "bestPractice": "Leave \"Precondition_Reference\" and \"Order Product_Reference\" as References — only resolve the folders that actually need Template-specific TestStep changes."
+    },
+    {
+      "title": "Writing a long OR chain for 'every valid Instance'",
+      "trapDescription": "Candidates try to list every valid Instance with OR conditions to decide when the Workflow/Verification folders should run.",
+      "bestPractice": "Use 'Instance.Character' != \"Invalid\" on the TestStepFolder Condition instead — one readable condition instead of a long OR chain."
+    },
+    {
+      "title": "Not stopping the invalid path early",
+      "trapDescription": "Learners let an invalid-code TestCase continue through the full Workflow and Verification folders instead of jumping to Postcondition after rejection is verified.",
+      "bestPractice": "Once the invalid Discount Code is rejected and verified, the TestCase should skip straight to the Postcondition — no need to continue the order process."
+    },
+    {
+      "title": "Trying to drag-and-drop the Instance.Character condition",
+      "trapDescription": "Candidates expect to drag an Instance onto the Condition column for Instance.Character, the way they do for every other Condition in this course.",
+      "bestPractice": "Instance.Character isn't a TestSheet Instance — it must be typed manually into the Condition column, both the != \"Invalid\" and == \"Invalid\" variants."
+    },
+    {
+      "title": "Forgetting Allow Reorder before rearranging TestStepValues",
+      "trapDescription": "Candidates try to drag TestStepValues into a new order under \"Verification of Prices\" without enabling it first.",
+      "bestPractice": "Right-click the TestStep and select Allow Reorder before you can rearrange its TestStepValues."
+    },
+    {
+      "title": "Dragging a new XL reference onto an already-filled TestStepValue",
+      "trapDescription": "Candidates drag a new XL reference onto a TestStepValue that still has its old value, expecting it to replace the old one.",
+      "bestPractice": "Clear the existing value first — Tosca appends the new XL reference to the end of the current value instead of replacing it."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What are the 4 core steps to build a fully working Template, in order?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Create the ExecutionList → Link RequirementSet → Convert to Template → Add Conditions."
+        },
+        {
+          "id": "B",
+          "text": "Create the TestSheet → Instantiate → Convert to Template → Add Conditions."
+        },
+        {
+          "id": "C",
+          "text": "Create the TestCase → Convert to Template → Link TestSheet + Values → Add Conditions → Check Template + Instantiate."
+        },
+        {
+          "id": "D",
+          "text": "Add Conditions → Create the TestCase → Link Values → Convert to Template."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "TestCase and TestSheet come first; Conditions and Instantiation come last.",
+      "rationale": "The correct order: build/prepare the TestCase, convert it to a Template, link the TestSheet and its Values to TestStepValues, add Conditions, then Check Template and Instantiate."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "How is an Invalid Instance symbolized on a TestSheet?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A green circle."
+        },
+        {
+          "id": "B",
+          "text": "A blue square with a 'T'."
+        },
+        {
+          "id": "C",
+          "text": "A red exclamation mark."
+        },
+        {
+          "id": "D",
+          "text": "An X in the center of a square."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "It's a distinct icon from the regular Instance icon.",
+      "rationale": "An Invalid Instance is symbolized by an X in the center of a square, containing a value the SUT is expected to reject."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Instead of writing one long OR condition listing every valid Discount Code Instance, what is the recommended Condition on the Workflow/Verification TestStepFolders?",
+      "options": [
+        {
+          "id": "A",
+          "text": "'Instance.Character' == \"Valid1\" OR == \"Valid2\" OR == \"Valid3\" (one per valid code)"
+        },
+        {
+          "id": "B",
+          "text": "'Instance.Character' != \"Invalid\""
+        },
+        {
+          "id": "C",
+          "text": "No condition — always run both folders regardless of validity."
+        },
+        {
+          "id": "D",
+          "text": "'Discount.Code' == \"\""
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "One readable condition covering all valid cases, using the != operator.",
+      "rationale": "'Instance.Character' != \"Invalid\" runs the folder for every Instance that is NOT invalid — a single, business-readable condition instead of a long OR chain per valid code."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "For an invalid Discount Code TestCase, what should happen after the rejection message is verified?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The TestCase should skip the Workflow and Verification folders and go straight to the Postcondition."
+        },
+        {
+          "id": "B",
+          "text": "The TestCase should restart from the beginning."
+        },
+        {
+          "id": "C",
+          "text": "The TestCase should continue through the full checkout process anyway."
+        },
+        {
+          "id": "D",
+          "text": "The TestCase should pause and wait for manual input."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "There's no need to keep testing an order that's already been correctly rejected.",
+      "rationale": "Once the invalid code's rejection is verified, the order process serves no further purpose — the TestCase jumps directly to Postcondition, skipping Workflow and Verification."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "When converting the Discount Code TestCase into a Template, which two folders should be left as References instead of being resolved?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Checkout Process and Confirmation."
+        },
+        {
+          "id": "B",
+          "text": "Precondition_Reference and Order Product_Reference."
+        },
+        {
+          "id": "C",
+          "text": "Verification of Prices and Verification of Success."
+        },
+        {
+          "id": "D",
+          "text": "Every folder must be resolved — none stay as References."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Their names still literally say \"_Reference\".",
+      "rationale": "\"Precondition_Reference\" and \"Order Product_Reference\" are deliberately left as References — not every folder needs to be resolved when building a Template."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "Why does the \"Coupon Applied\" TestStepValue need its ActionMode set to WaitOn?",
+      "options": [
+        {
+          "id": "A",
+          "text": "So Tosca waits for the confirmation message to appear before verifying its InnerText."
+        },
+        {
+          "id": "B",
+          "text": "So Tosca skips the verification entirely."
+        },
+        {
+          "id": "C",
+          "text": "So the TestStep runs twice."
+        },
+        {
+          "id": "D",
+          "text": "WaitOn has no effect on verification TestSteps."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "The message may take a moment to render after the code is submitted.",
+      "rationale": "WaitOn makes Tosca wait for the element (and its text) to appear before checking it, instead of failing immediately if the message hasn't rendered yet."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "What must you do before you can rearrange the TestStepValues under \"Verification of Prices\"?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Right-click the TestStep and select Allow Reorder."
+        },
+        {
+          "id": "B",
+          "text": "Delete and recreate the TestStep."
+        },
+        {
+          "id": "C",
+          "text": "Set the WorkState to COMPLETED."
+        },
+        {
+          "id": "D",
+          "text": "Nothing — TestStepValues can always be freely reordered."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "It's a right-click context menu option on the TestStep itself.",
+      "rationale": "TestStepValues can only be rearranged after enabling Allow Reorder via the TestStep's right-click context menu."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "Why can't the Instance.Character condition be linked the same way as other Conditions in this course?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Because it isn't a TestSheet Instance — it must be typed manually into the Condition column."
+        },
+        {
+          "id": "B",
+          "text": "Because Instance.Character conditions are deprecated in Tosca."
+        },
+        {
+          "id": "C",
+          "text": "Because it can only be set on TestStepValues, never on TestStepFolders."
+        },
+        {
+          "id": "D",
+          "text": "Because it requires a separate license."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Every other Condition in this course was set by dragging an Instance from the TestSheet.",
+      "rationale": "Unlike other Conditions, which are dragged and dropped from TestSheet Instances, Instance.Character must be typed manually into the Condition column."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "What Condition should be applied to the \"Empty Shopping Cart\" folder, and why?",
+      "options": [
+        {
+          "id": "A",
+          "text": "'Instance.Character' == \"Invalid\" — so the cart is only emptied after an invalid code was entered and rejected."
+        },
+        {
+          "id": "B",
+          "text": "'Instance.Character' != \"Invalid\" — so the cart is only emptied for valid codes."
+        },
+        {
+          "id": "C",
+          "text": "No Condition — the cart should always be emptied regardless of code validity."
+        },
+        {
+          "id": "D",
+          "text": "'Workflow.Discount Type' == \"Discount Type Flat\"."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This is the opposite of the Condition used on Checkout Process, Verification of Prices, Confirmation, and Verification of Success.",
+      "rationale": "\"Empty Shopping Cart\" gets the opposite Condition from the valid-path folders: 'Instance.Character' == \"Invalid\", so the cart is emptied specifically after a wrong code was entered and rejected."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "What does Tosca's \"No matching tab was found\" error usually mean, and how do you fix it?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The module is unstable — rescan the module and remap the elements."
+        },
+        {
+          "id": "B",
+          "text": "The license has expired — contact Tricentis support."
+        },
+        {
+          "id": "C",
+          "text": "The TestSheet is linked to the wrong Template — delete and relink it."
+        },
+        {
+          "id": "D",
+          "text": "The ExecutionList folder is missing — recreate it."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "It's a scanning/mapping issue, not a licensing or linking issue.",
+      "rationale": "\"No matching tab was found\" usually indicates an unstable module — rescanning the module and remapping its elements resolves it."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Full Template build",
+      "value": "Create TestCase → Convert to Template → Link TestSheet+Values → Add Conditions → Check Template → Instantiate."
+    },
+    {
+      "key": "Invalid Instance icon",
+      "value": "X in the center of a square."
+    },
+    {
+      "key": "Instance.Character != \"Invalid\"",
+      "value": "Business-readable shortcut to cover 'every valid Instance' without a long OR chain — must be typed manually, not drag-and-dropped."
+    },
+    {
+      "key": "Invalid path",
+      "value": "Skip Workflow/Verification folders → go straight to Postcondition after rejection is verified."
+    },
+    {
+      "key": "Unresolved References",
+      "value": "Precondition_Reference and Order Product_Reference stay as References — not everything gets resolved."
+    },
+    {
+      "key": "Allow Reorder",
+      "value": "Right-click a TestStep → Allow Reorder before its TestStepValues can be rearranged."
+    },
+    {
+      "key": "WaitOn",
+      "value": "Set ActionMode to WaitOn so Tosca waits for a message to appear before verifying its InnerText."
+    },
+    {
+      "key": "Clearing old values",
+      "value": "Delete a TestStepValue's existing value before dragging a new XL reference — Tosca appends instead of replacing."
+    },
+    {
+      "key": "Quoting Attribute names",
+      "value": "Wrap Attribute names containing spaces in single quotes in the Condition column, e.g. 'Workflow.Discount Assignment'."
+    },
+    {
+      "key": "\"No matching tab was found\"",
+      "value": "Usually means the module is unstable — rescan the module and remap the elements."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 07 - Build Template & Link Values Recap",
+      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
+      "duration": "video"
+    }
+  ]
+}

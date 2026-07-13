@@ -1,5 +1,5 @@
 /* =====================================================================
-   PegaAcademy — enhancement.js  (additive decoration layer)
+   Quilyn — enhancement.js  (additive decoration layer)
    Runs AFTER engine.js. Never removes or replaces engine output.
    Guards every mutation with data-enh to stay idempotent.
    ===================================================================== */

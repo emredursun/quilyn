@@ -1,5 +1,5 @@
 /* =====================================================================
-   PegaAcademy — store.js
+   Quilyn — store.js
    Tier-1 Reactive State Manager using ES6 Proxies.
    Automatically persists to localStorage and notifies subscribed
    components of state mutations.

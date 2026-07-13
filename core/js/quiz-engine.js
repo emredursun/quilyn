@@ -1,5 +1,5 @@
 /* =====================================================================
-   PegaAcademy — quiz-engine.js
+   Quilyn — quiz-engine.js
    Polymorphic Quiz Core: handles Single-Select and Multi-Select
    questions with strict, zero-partial-credit Pega exam scoring.
 
@@ -20,7 +20,7 @@
 (function (global) {
   "use strict";
 
-  var LETTERS = ["A", "B", "C", "D", "E", "F"];
+  var LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
   function setsEqual(a, b) {
     if (a.length !== b.length) return false;
@@ -234,9 +234,8 @@
         '<div class="opts">' + optsHtml + "</div>" +
         '<div class="controls">' +
           '<button class="pa-btn primary check" type="button">Check answer</button>' +
-          '<button class="pa-btn hint" type="button">💡 Hint</button>' +
         "</div>" +
-        '<div class="hintbox">' + (q.hint || "") + "</div>" +
+        (q.hint ? '<div class="hint-wrap"><button class="pa-hint-btn" type="button"><span class="hint-icon">💡</span> Hint <span class="hint-caret">▾</span></button><div class="hintbox">' + q.hint + "</div></div>" : "") +
         '<div class="verdict"></div>' +
         '<div class="rationale"><b>Rationale:</b> ' + (q.rationale || "") + "</div>";
 
@@ -244,12 +243,16 @@
 
       var optEls = card.querySelectorAll(".pa-opt");
       var checkBtn = card.querySelector(".check");
-      var hintBtn = card.querySelector(".hint");
+      var hintBtn = card.querySelector(".pa-hint-btn");
       var hintBox = card.querySelector(".hintbox");
 
-      hintBtn.addEventListener("click", function () {
-        hintBox.classList.toggle("show");
-      });
+      if (hintBtn && hintBox) {
+        hintBtn.addEventListener("click", function () {
+          var open = hintBox.classList.toggle("show");
+          hintBtn.classList.toggle("open", open);
+          hintBtn.querySelector(".hint-caret").textContent = open ? "▴" : "▾";
+        });
+      }
 
       /* ---- Restore persisted state for this question ---- */
       if (saved.graded) {

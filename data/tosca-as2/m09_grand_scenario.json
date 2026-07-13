@@ -1,0 +1,342 @@
+{
+  "moduleId": "TAS2-M09",
+  "moduleTitle": "Section 9 - Grand Scenario",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction",
+  "learningObjectives": [
+    "Apply everything from Lessons 1-8 in one consolidated, more complex Template: TestSheets, Templates, linking Values, Conditions, and price verification.",
+    "Build a data-driven test that configures and orders a customized computer, verifying the calculated price at every step."
+  ],
+  "estTime": "1 hr",
+  "studyGuide": [
+    {
+      "sectionTitle": "Grand Scenario: Order Your Own Computer",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Objective",
+          "description": "Build your own data-driven test to automate ordering a customized computer from the DemoWebShop — practicing everything learned in the course in one more complex, project-like Template."
+        },
+        {
+          "type": "text",
+          "text": "Business context: products (like computers) have configurable features, each affecting price. You'll select different computer features (each with a defined price), place the order, and verify Tosca calculates the correct total — using a Template built from the Product Configuration TestSheet."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Feature",
+            "Options & Surcharge"
+          ],
+          "rows": [
+            [
+              "Base package",
+              "Cheap computer = $800.00 (standard) · Expensive computer = $1,800.00"
+            ],
+            [
+              "Processor",
+              "Slow = $0 · Medium = $15.00 (standard) · Fast = $100.00"
+            ],
+            [
+              "RAM",
+              "2 GB = $0 · 4 GB = $20.00 (standard) · 8 GB = $60.00"
+            ],
+            [
+              "Hard Disk Drive",
+              "320 GB = $0 (standard) · 400 GB = $100.00"
+            ],
+            [
+              "Software",
+              "Office Suite = standard · Image Viewer = +$5.00 · Office Suite (alt) = +$100.00 · Another Office Suite = +$40.00 (only ONE Office Suite allowed per order)"
+            ],
+            [
+              "Payment",
+              "COD (Cash on Delivery) only — remember its surcharge in the Total price calculation"
+            ]
+          ]
+        },
+        {
+          "type": "steps",
+          "title": "TestCase flow",
+          "items": [
+            "Open browser, navigate to the DemoWebShop, and log in.",
+            "Navigate to Computers → Computer Category → Desktop.",
+            "Select \"Build your own cheap computer\" or \"Build your own expensive computer\".",
+            "Customize the computer per the TestSheet's Instance.",
+            "Checkout: add to cart, select payment method (COD), pay.",
+            "During Checkout, verify (1) the Sub Total matches the TestSheet's Product price, and (2) the Total calculated by Tosca matches the Total shown by the SUT.",
+            "Confirm the order, log out, and close the browser."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "If BOTH Office Suite options are selected in the same order, the TestCase should skip the checkout process entirely and log out immediately — this is an intentionally invalid combination."
+        },
+        {
+          "type": "note",
+          "text": "All needed Modules live under: Web Shop >> Products >> Products Category Computers Module Folder — check there first instead of scanning the SUT yourself."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Hints",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Key hints from the official exercise",
+          "items": [
+            "You choose the delivery method — remember to add its surcharge (if any) to the Total price calculation.",
+            "This TestCase's structure closely resembles the Discount Code TestCase from Lesson 7 — reuse that logic.",
+            "Precondition Attributes to watch: Precondition >> Customer >> Type of User >> Email, and >> Password — both pull from the Test Configuration Parameters Email and Password.",
+            "Verification: the Verification >> Product Price Attribute represents the Sub-Total price of the product.",
+            "All needed Modules, ReusableTestStepBlocks, and the TestSheet are provided in the base subset."
+          ]
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Original Grand Scenario Document",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 Grand Scenario — Order Your Own Computer — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+        },
+        {
+          "type": "note",
+          "text": "🗂️ The Tosca workspace subset (.tsu) template for this section is official Tricentis course material and is not redistributed here. Download it from the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Forgetting the COD payment surcharge in the Total price",
+      "trapDescription": "Candidates verify feature surcharges (processor, RAM, HDD, software) but forget to include the payment method's own surcharge in the final Total calculation.",
+      "bestPractice": "COD (Cash on Delivery) may add its own fee — always include the payment method surcharge in the Total price verification, alongside the delivery method fee."
+    },
+    {
+      "title": "Not handling the 'both Office Suites selected' edge case",
+      "trapDescription": "Learners build a TestCase that always proceeds through checkout, even when an invalid software combination (both Office Suites) is selected.",
+      "bestPractice": "When both Office Suite options are selected in the same order, the TestCase must skip checkout and log out immediately, instead of trying to complete an invalid order."
+    },
+    {
+      "title": "Missing the Precondition login Attributes",
+      "trapDescription": "Candidates hard-code login Email/Password instead of using the Test Configuration Parameters.",
+      "bestPractice": "The Precondition >> Customer >> Type of User >> Email/Password Attributes should pull from the Test Configuration Parameters Email and Password, not hard-coded values."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "In the Grand Scenario, what is the base price of the 'Expensive computer' starter package?",
+      "options": [
+        {
+          "id": "A",
+          "text": "There is no base price — it's calculated purely from add-ons."
+        },
+        {
+          "id": "B",
+          "text": "$800.00"
+        },
+        {
+          "id": "C",
+          "text": "$1,000.00"
+        },
+        {
+          "id": "D",
+          "text": "$1,800.00"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "The 'Cheap computer' is the standard-priced option at $800.",
+      "rationale": "The Expensive computer starter package has a base price of $1,800.00, versus $800.00 for the standard Cheap computer."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A customer selects both the 'Office Suite' and 'Another Office Suite' software options on the same order. What should the TestCase do?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Pause and prompt the user to choose one manually."
+        },
+        {
+          "id": "B",
+          "text": "Skip the checkout process and log out immediately, since only one Office Suite is allowed per system."
+        },
+        {
+          "id": "C",
+          "text": "Automatically remove one of the two Office Suites and continue."
+        },
+        {
+          "id": "D",
+          "text": "Proceed through checkout and add both surcharges to the Total."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The scenario states only one Office Suite can be bought with the same system.",
+      "rationale": "Only one Office Suite can be combined with the system. If both are selected, this is an invalid combination — the TestCase should skip checkout and log out immediately."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Which Attribute represents the Sub-Total price of the product for verification purposes?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Precondition >> Customer >> Type of User >> Email"
+        },
+        {
+          "id": "B",
+          "text": "Verification >> Product Price"
+        },
+        {
+          "id": "C",
+          "text": "Instance.Character"
+        },
+        {
+          "id": "D",
+          "text": "Workflow >> Payment Method >> Credit Card"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "It's under the Verification branch of the TestSheet, not Precondition.",
+      "rationale": "The Verification >> Product Price Attribute represents the Sub-Total price of the product, used to verify Tosca's calculation against the SUT's displayed price."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What should you remember to include in the Total price calculation, besides the computer's configured features?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A fixed 10% tax applied to every order."
+        },
+        {
+          "id": "B",
+          "text": "Any surcharge from the chosen delivery method and the COD payment method."
+        },
+        {
+          "id": "C",
+          "text": "The Discount Code surcharge, which always applies."
+        },
+        {
+          "id": "D",
+          "text": "Nothing else — only feature surcharges affect the Total."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Two extra sources of surcharge are called out in the hints.",
+      "rationale": "The hints explicitly call out remembering the delivery method's fee and the COD payment method's surcharge when calculating the Total price — beyond just the computer's own configured features."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "Which existing TestCase's structure does the Grand Scenario most closely resemble, according to the exercise hints?",
+      "options": [
+        {
+          "id": "A",
+          "text": "None — it's a completely new structure."
+        },
+        {
+          "id": "B",
+          "text": "The Shirt Size TestCase from Lesson 1."
+        },
+        {
+          "id": "C",
+          "text": "The API country/ID TestCase from Lesson 8."
+        },
+        {
+          "id": "D",
+          "text": "The Discount Code TestCase from Lesson 7."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "Both involve verifying a calculated price/value against valid vs invalid conditions.",
+      "rationale": "The official hints state the Grand Scenario's TestCase structure is similar to the Discount Code TestCase, including reusing the surcharge/verification logic pattern."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "Where can you find all the Modules needed for the Grand Scenario?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Web Shop >> Products >> Products Category Computers Module Folder."
+        },
+        {
+          "id": "B",
+          "text": "You must scan the SUT yourself — no Modules are provided."
+        },
+        {
+          "id": "C",
+          "text": "Execution >> ExecutionLists >> Grand Scenario."
+        },
+        {
+          "id": "D",
+          "text": "Requirements >> DemoWebShop >> Computers."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "It's a Module Folder, not the Requirements or Execution section.",
+      "rationale": "All needed Modules are already provided under Web Shop >> Products >> Products Category Computers Module Folder — no need to scan the SUT from scratch."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Objective",
+      "value": "Build a data-driven Template to order a customized computer and verify price calculation end-to-end."
+    },
+    {
+      "key": "Base packages",
+      "value": "Cheap ($800) or Expensive ($1,800)."
+    },
+    {
+      "key": "Configurable surcharges",
+      "value": "Processor, RAM, HDD, Software — each with its own price rule."
+    },
+    {
+      "key": "Invalid combo",
+      "value": "Both Office Suites selected → skip checkout, log out immediately."
+    },
+    {
+      "key": "Verification",
+      "value": "Verification >> Product Price = Sub-Total; also check Tosca's Total vs the SUT's Total."
+    },
+    {
+      "key": "Login Attributes",
+      "value": "Precondition >> Customer >> Type of User >> Email/Password, sourced from Test Configuration Parameters."
+    },
+    {
+      "key": "Payment",
+      "value": "COD only — include its surcharge in the Total price."
+    },
+    {
+      "key": "Where the Modules are",
+      "value": "Web Shop >> Products >> Products Category Computers Module Folder."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Grand Scenario (file)",
+      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
+      "duration": "PDF"
+    },
+    {
+      "title": "Grand Scenario Solution (video)",
+      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
+      "duration": "video"
+    }
+  ]
+}

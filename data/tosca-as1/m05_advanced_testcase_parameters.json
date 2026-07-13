@@ -1,0 +1,412 @@
+{
+  "moduleId": "TAS1-M05",
+  "moduleTitle": "Section 5 - Advanced TestCase Parameters",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3001/lesson-video-self-defined-test-configuration-parameters",
+  "learningObjectives": [
+    "Create and use Self-Defined Test Configuration Parameters to centralize test data, referenced with {CP[Name]}.",
+    "Use wildcards (e.g., Discount*) to match Controls or values flexibly.",
+    "Create Business Parameters on a Library's Reusable TestStepBlock and link them with {PL[Name]}.",
+    "Explain how Business Parameters change RTSB Reference values per TestCase without modifying the Library.",
+    "Distinguish Business Parameters ({PL}) from standard TCPs ({CP}) and explain when to use each."
+  ],
+  "estTime": "1 hr",
+  "studyGuide": [
+    {
+      "sectionTitle": "Self-Defined Test Configuration Parameters",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Self-Defined Test Configuration Parameter (TCP)",
+          "description": "A custom parameter defined by the tester at the TestCase or TestFolder level. Stores a reusable value referenced across multiple TestSteps using {CP[ParameterName]}."
+        },
+        {
+          "type": "concept",
+          "term": "TCP Scope",
+          "description": "Where you define a TCP determines how widely it is accessible:",
+          "items": [
+            "TestFolder level — inherited by ALL TestCases within that folder",
+            "TestCase level — available to THAT TestCase only",
+            "Best practice: define at the highest appropriate level to maximize reuse"
+          ]
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">TCP SCOPE — FOLDER LEVEL vs. TESTCASE LEVEL</text><rect x=\"20\" y=\"28\" width=\"680\" height=\"50\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">TestFolder  (TCP defined here)</text><text x=\"360\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">e.g., {CP[BaseURL]} = https://demowebshop.tricentis.com — defined ONCE</text><line x1=\"185\" y1=\"78\" x2=\"185\" y2=\"96\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><line x1=\"360\" y1=\"78\" x2=\"360\" y2=\"96\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><line x1=\"535\" y1=\"78\" x2=\"535\" y2=\"96\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><rect x=\"30\" y=\"96\" width=\"310\" height=\"40\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/><text x=\"185\" y=\"113\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"11\" font-weight=\"700\">TestCase A</text><text x=\"185\" y=\"128\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">inherits {CP[BaseURL]} from folder</text><rect x=\"380\" y=\"96\" width=\"310\" height=\"40\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/><text x=\"535\" y=\"113\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"11\" font-weight=\"700\">TestCase B</text><text x=\"535\" y=\"128\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">inherits {CP[BaseURL]} from folder</text><text x=\"360\" y=\"160\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\" font-weight=\"600\">Folder-level TCP syntax in TestStep value:</text><rect x=\"250\" y=\"168\" width=\"220\" height=\"16\" rx=\"4\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"360\" y=\"180\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">{CP[NameOfTheTCP]}</text></svg>",
+          "caption": "TCP defined at folder level is inherited by ALL child TestCases — define once, reuse everywhere."
+        },
+        {
+          "type": "concept",
+          "term": "TCP Syntax (confirmed exam question)",
+          "description": "Reference a TCP in a TestStep value field using exactly: {CP[NameOfTheTCP]}",
+          "items": [
+            "Outer curly braces { } — mandatory",
+            "CP in square brackets [ ] — mandatory prefix",
+            "Parameter name in square brackets — e.g., {CP[BaseURL]}"
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Wrong syntax variants on the exam: CP[Name] (missing braces), {TCP[Name]} (wrong prefix), [CP{Name}] (brackets/braces swapped). Only {CP[NameOfTheTCP]} is valid."
+        },
+        {
+          "type": "concept",
+          "term": "Self-Defined TCP example (Exercise 19)",
+          "description": "Three TCPs defined on the TestCase, then referenced in TestSteps:",
+          "items": [
+            "Browser = Chrome — sets the browser for the run",
+            "DiscountName = AutomationDiscount2 — referenced as {CP[DiscountName]} in the 'Enter discount code' Input step",
+            "DiscountPercentage = 0.20 — referenced inside a MATH formula: {MATH[({B[SubTotal]}+10)*{CP[DiscountPercentage]}]}",
+            "TCPs combine freely with Buffers and MATH inside the same expression"
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Wildcards",
+          "description": "A stand-in character for other characters, used to simplify a search or a data match. The asterisk * matches any sequence of characters.",
+          "items": [
+            "Example: Discount* matches 'Discount', 'Discount:', 'Discount Amount', etc.",
+            "Useful when a Control's exact label varies or contains extra characters.",
+            "Exercise 19 tip: if the 'Discount' option is missing from a dropdown, manually add a column and use the wildcard Discount* to match it."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Change the TCP value once → all referencing TestSteps update automatically.",
+        "Common use cases: base URLs, test user credentials, environment names, timeouts.",
+        "Folder-level TCP = define once, inherited by all children. No need to repeat.",
+        "A TCP can be used standalone {CP[Name]} or nested inside MATH formulas with Buffers.",
+        "Wildcard * = stand-in for any characters; use Discount* to match flexible labels."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 19 — Set Self-Defined Test Configuration Parameters",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS1 Exercise 19 — Set Self-Defined Test Configuration Parameters — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3001/lesson-video-self-defined-test-configuration-parameters"
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Business Parameters",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Business Parameters",
+          "description": "Parameters created on a Reusable TestStepBlock (RTSB) in a Library. They let you change the VALUES used by an RTSB Reference in a specific TestCase WITHOUT modifying the RTSB in the Library. They are the business-relevant elements of your TestSteps whose values you want to steer per TestCase."
+        },
+        {
+          "type": "concept",
+          "term": "{PL} Parameter Link Syntax (confirmed exercise detail)",
+          "description": "Dragging a Business Parameter onto a TestStepValue field creates a Parameter Link: {PL[ParameterName]}",
+          "items": [
+            "PL = Parameter Link — connects the TestStepValue to the Business Parameter.",
+            "{PL[URL]}, {PL[Email]}, {PL[Password]} — the value is supplied at the RTSB Reference level in each TestCase.",
+            "Do NOT confuse with {CP[...]} (Test Configuration Parameter) — different prefix, different purpose."
+          ]
+        },
+        {
+          "type": "list",
+          "title": "How to create and use Business Parameters (Exercise 20 procedure):",
+          "items": [
+            "1. In the Library, open the RTSB folder (e.g., 'Precondition').",
+            "2. Add Business Parameters to it (e.g., URL, Email, Password).",
+            "3. Drag each Business Parameter onto the relevant TestStepValue field to create a {PL} link.",
+            "4. In the TestCase, navigate to the RTSB Reference (e.g., Precondition_Reference >> Business Parameters).",
+            "5. Enter the actual value for each Business Parameter for that specific TestCase.",
+            "6. The values apply only to that TestCase's Reference — the Library RTSB stays unchanged."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Business Parameters are defined in the LIBRARY (on the RTSB), but their VALUES are entered at the RTSB Reference inside each TestCase. Changing a value at the Reference does NOT change the Library — that is the whole point."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Aspect",
+            "Standard TCP",
+            "Business Parameter"
+          ],
+          "rows": [
+            [
+              "Syntax",
+              "{CP[Name]}",
+              "{PL[Name]}"
+            ],
+            [
+              "Defined on",
+              "TestCase or TestFolder",
+              "Reusable TestStepBlock in a Library"
+            ],
+            [
+              "Purpose",
+              "Centralize a config value across TestSteps",
+              "Override RTSB Reference values per TestCase without editing the Library"
+            ],
+            [
+              "Value set where",
+              "On the TestCase/folder that defines it",
+              "At the RTSB Reference inside each TestCase"
+            ]
+          ]
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arrBP\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">BUSINESS PARAMETER — DEFINED IN LIBRARY, VALUED PER TESTCASE</text><rect x=\"230\" y=\"28\" width=\"260\" height=\"56\" rx=\"8\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"2\"/><text x=\"360\" y=\"49\" text-anchor=\"middle\" fill=\"#2B2580\" font-size=\"12\" font-weight=\"700\">Library — RTSB 'Precondition'</text><text x=\"360\" y=\"66\" text-anchor=\"middle\" fill=\"#534AB7\" font-size=\"9\">Business Params: URL, Email, Password</text><text x=\"360\" y=\"78\" text-anchor=\"middle\" fill=\"#534AB7\" font-size=\"9\">Linked in steps as {PL[URL]} {PL[Email]} {PL[Password]}</text><line x1=\"200\" y1=\"84\" x2=\"160\" y2=\"110\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arrBP)\"/><line x1=\"360\" y1=\"84\" x2=\"360\" y2=\"110\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arrBP)\"/><line x1=\"520\" y1=\"84\" x2=\"560\" y2=\"110\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arrBP)\"/><rect x=\"20\" y=\"112\" width=\"210\" height=\"72\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/><text x=\"125\" y=\"131\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"11\" font-weight=\"700\">TestCase A</text><text x=\"125\" y=\"148\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Precondition_Reference</text><text x=\"125\" y=\"164\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">URL = demowebshop...</text><text x=\"125\" y=\"177\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">own Email / Password</text><rect x=\"255\" y=\"112\" width=\"210\" height=\"72\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/><text x=\"360\" y=\"131\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"11\" font-weight=\"700\">TestCase B</text><text x=\"360\" y=\"148\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Precondition_Reference</text><text x=\"360\" y=\"164\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">different Email / Password</text><text x=\"360\" y=\"177\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">same {PL} links, own values</text><rect x=\"490\" y=\"112\" width=\"210\" height=\"72\" rx=\"7\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/><text x=\"595\" y=\"131\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"11\" font-weight=\"700\">TestCase C</text><text x=\"595\" y=\"148\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Precondition_Reference</text><text x=\"595\" y=\"164\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">own values, Library</text><text x=\"595\" y=\"177\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">RTSB stays unchanged</text></svg>",
+          "caption": "Business Parameters are defined ONCE on the Library RTSB ({PL} links), but each TestCase supplies its OWN values at its RTSB Reference — the Library is never modified."
+        }
+      ],
+      "bulletPoints": [
+        "Business Parameter = changeable value for an RTSB Reference, set per TestCase, without touching the Library.",
+        "Syntax {PL[Name]} (Parameter Link) — different from {CP[Name]} (Test Configuration Parameter).",
+        "Define on the Library RTSB → drag onto TestStepValue to create {PL} link → set value at each TestCase's Reference.",
+        "Changes apply to all TestCases using that RTSB, but each can have its own parameter values."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 20 — Create Business Parameters",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS1 Exercise 20 — Create Business Parameters — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3001/lesson-video-self-defined-test-configuration-parameters"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Defining TCP at the wrong scope level",
+      "trapDescription": "When a parameter is needed across many TestCases in the same folder, candidates define it individually on each TestCase. This defeats scope inheritance.",
+      "bestPractice": "Define TCPs at the HIGHEST applicable level. A TCP on a TestFolder is automatically inherited by every child TestCase — define it once, it applies everywhere below."
+    },
+    {
+      "title": "{PL} vs {CP} — different prefixes, different purposes",
+      "trapDescription": "Candidates use {CP[...]} for a Business Parameter or {PL[...]} for a TCP. The exam offers both as distractors.",
+      "bestPractice": "{CP[Name]} = Test Configuration Parameter (config value on TestCase/folder). {PL[Name]} = Parameter Link to a Business Parameter (RTSB value). Dragging a Business Parameter onto a TestStepValue creates the {PL} link automatically."
+    },
+    {
+      "title": "Business Parameter value is set at the Reference, not the Library",
+      "trapDescription": "Candidates think editing a Business Parameter value changes the Library RTSB. It does not — and that is the whole point of Business Parameters.",
+      "bestPractice": "Business Parameters are DEFINED on the Library RTSB, but their VALUES are entered at the RTSB Reference inside each TestCase. The Library RTSB stays unchanged, so each TestCase can supply its own values."
+    },
+    {
+      "title": "Business Parameters vs. TCP — when to use each",
+      "trapDescription": "Candidates confuse the two parameter types' roles.",
+      "bestPractice": "Use a TCP {CP[...]} to centralize a single config value across TestSteps. Use a Business Parameter {PL[...]} to make a Reusable TestStepBlock's values changeable per TestCase without editing the Library."
+    },
+    {
+      "title": "Wildcards for flexible matching",
+      "trapDescription": "Candidates fail when a Control's label has extra characters (e.g., 'Discount:' vs 'Discount') and don't know how to match it.",
+      "bestPractice": "Use the wildcard * as a stand-in for any characters. 'Discount*' matches 'Discount', 'Discount:', 'Discount Amount', etc. Handy when a dropdown option is missing or a label varies."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A tester has the URL 'https://demowebshop.tricentis.com' hard-coded into 40 TestSteps across multiple TestCases. When the test environment changes, all 40 steps must be updated individually. What is the correct Tosca approach to manage this value centrally?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Create a Self-Defined TCP named 'BaseURL' at the TestFolder level and reference it with {CP[BaseURL]} — change it once to update all 40 TestSteps."
+        },
+        {
+          "id": "B",
+          "text": "Create a Business Parameter — it is designed for centrally managing technical URL values."
+        },
+        {
+          "id": "C",
+          "text": "Use a Dynamic Value expression to auto-generate the URL at runtime."
+        },
+        {
+          "id": "D",
+          "text": "Hard-coded values cannot be parameterized in Tosca — individual TestStep edits are required."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This is a technical config value managed by testers — which parameter type fits that audience?",
+      "rationale": "A Self-Defined TCP defined at the TestFolder level is the correct solution. It centralizes the URL value — change it once and all inheriting TestCases update automatically. Business Parameters are for non-technical business users managing business-domain data, not technical configuration values like URLs."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A tester defines a TCP named 'BaseURL' on a TestFolder. There are 15 TestCases inside this folder. How many times does the tester need to define 'BaseURL' to make it available in all 15 TestCases?",
+      "options": [
+        {
+          "id": "A",
+          "text": "15 times — once per TestCase."
+        },
+        {
+          "id": "B",
+          "text": "Once on the folder — it is inherited by all child TestCases."
+        },
+        {
+          "id": "C",
+          "text": "Twice — once on the folder and once on the first TestCase."
+        },
+        {
+          "id": "D",
+          "text": "TCPs cannot be defined on folders; they must be defined on individual TestCases."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Folder-level = inherited by all children.",
+      "rationale": "A TCP defined at the TestFolder level is inherited by all TestCases within that folder. Define it once on the folder — not 15 times on each individual TestCase."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A business analyst (non-technical) needs to update the 'ProductName' test value before each test run without navigating Tosca's technical configuration. Which parameter type is most appropriate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A Self-Defined Test Configuration Parameter (TCP)."
+        },
+        {
+          "id": "B",
+          "text": "A Dynamic Value expression."
+        },
+        {
+          "id": "C",
+          "text": "A Business Parameter — presented in a user-friendly interface for non-technical users."
+        },
+        {
+          "id": "D",
+          "text": "A Standard Module attribute."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Non-technical user + business data = one specific parameter type.",
+      "rationale": "Business Parameters are designed to make a Reusable TestStepBlock's values changeable per TestCase. They are presented in a simplified interface and let stakeholders steer business-relevant values without editing the Library RTSB. Standard TCPs are for centralizing technical configuration."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A tester drags a Business Parameter named 'Email' from a Library RTSB onto a TestStepValue field. What link is created in the value field?",
+      "options": [
+        {
+          "id": "A",
+          "text": "{CP[Email]}"
+        },
+        {
+          "id": "B",
+          "text": "{BP[Email]}"
+        },
+        {
+          "id": "C",
+          "text": "{B[Email]}"
+        },
+        {
+          "id": "D",
+          "text": "{PL[Email]}"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "Parameter Link — note the prefix.",
+      "rationale": "Dragging a Business Parameter onto a TestStepValue creates a Parameter Link: {PL[Email]}. {CP[...]} is a Test Configuration Parameter, {B[...]} is a Buffer recall, and {BP[...]} is not valid Tosca syntax."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "Three TestCases all reference the same 'Precondition' Reusable TestStepBlock from a Library. Each needs to log in with a DIFFERENT email and password. How do Business Parameters solve this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Define Business Parameters on the RTSB once; set each TestCase's own values at its RTSB Reference — the Library stays unchanged."
+        },
+        {
+          "id": "B",
+          "text": "Edit the RTSB in the Library three times, once per TestCase."
+        },
+        {
+          "id": "C",
+          "text": "Resolve the Reference in all three TestCases and hard-code the credentials."
+        },
+        {
+          "id": "D",
+          "text": "Create three separate Libraries, one per credential set."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Define once on the Library, value per TestCase at the Reference.",
+      "rationale": "Business Parameters are defined once on the Library RTSB (as {PL} links). Each TestCase then supplies its own values at its RTSB Reference (e.g., Precondition_Reference >> Business Parameters). The Library RTSB is never modified, so all three TestCases share one block but use different credentials."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "While selecting a table cell, the 'Discount' option does not appear in the dropdown, but the actual label on screen reads 'Discount:'. What is the recommended way to match it?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Rescan the entire Module to force the option to appear."
+        },
+        {
+          "id": "B",
+          "text": "Manually add a column field and use the wildcard Discount* to match the label."
+        },
+        {
+          "id": "C",
+          "text": "Create a Business Parameter named Discount."
+        },
+        {
+          "id": "D",
+          "text": "Use {CP[Discount]} in the value field."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "A stand-in character handles the extra ':'.",
+      "rationale": "A wildcard (*) is a stand-in for any characters. Manually adding a column and using 'Discount*' matches 'Discount:', 'Discount Amount', or any label that begins with 'Discount'. This is the exact tip given in Exercise 19 for a missing dropdown option."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "TCP syntax",
+      "value": "{CP[Name]} — outer braces, CP in square brackets, name in square brackets. Can nest in MATH with Buffers."
+    },
+    {
+      "key": "TCP scope",
+      "value": "Folder-level TCPs are inherited by all child TestCases. Define at the highest applicable level."
+    },
+    {
+      "key": "Wildcards",
+      "value": "* = stand-in for any characters. Discount* matches 'Discount', 'Discount:', etc. Use for flexible label/data matching."
+    },
+    {
+      "key": "Business Parameters",
+      "value": "Defined on a Library RTSB; make the RTSB Reference values changeable per TestCase WITHOUT editing the Library."
+    },
+    {
+      "key": "{PL} Parameter Link syntax",
+      "value": "Drag a Business Parameter onto a TestStepValue → creates {PL[Name]}. Value entered at the RTSB Reference per TestCase."
+    },
+    {
+      "key": "{CP} vs {PL}",
+      "value": "{CP[Name]} = Test Configuration Parameter (config value). {PL[Name]} = Parameter Link to a Business Parameter (RTSB value)."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 22 - Self-Defined Test Configuration Parameters",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3001/lesson-video-self-defined-test-configuration-parameters",
+      "duration": "video"
+    },
+    {
+      "title": "Lesson 23 - Business Parameters",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3006/lesson-video-business-parameters",
+      "duration": "video"
+    }
+  ]
+}

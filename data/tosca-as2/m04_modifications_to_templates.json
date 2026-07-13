@@ -1,0 +1,345 @@
+{
+  "moduleId": "TAS2-M04",
+  "moduleTitle": "Section 4 - Modifications to Templates",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction",
+  "learningObjectives": [
+    "Define what a Verification Attribute is.",
+    "Modify an existing Template.",
+    "Re-Instantiate a modified Template."
+  ],
+  "estTime": "40 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Scenario: A New SUT Feature to Verify",
+      "elements": [
+        {
+          "type": "text",
+          "text": "The SUT (built with Agile) added a new feature: after clicking Add to Cart with a chosen quantity, a message appears — green/success for a positive whole number, red/error for a negative one. You already have Modules, Template, TestCases, and TemplateInstances from the previous version; you now receive an updated TestSheet with new Verification Attributes to test this message."
+        },
+        {
+          "type": "concept",
+          "term": "Verification Attribute",
+          "description": "A new type of Attribute — shown in green — that is NOT an input to the SUT. Instead, it holds a value Tosca compares against the SUT's actual output. If the two values match once entered into the TestCase, the verification succeeds; otherwise it fails."
+        },
+        {
+          "type": "text",
+          "text": "In the new TestSheet, the Quantity Attribute has 2 Instances: +4 (valid) and -4 (invalid). For +4, the Verification Attribute checks for the message \"The product has been added to your shopping cart\"; for -4, it checks for \"Quantity should be positive\". After modifying the Template and Instantiating, this produces 2 TestCases that validate the system message."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Modifying an Existing Template",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "Modification workflow",
+          "items": [
+            "Check the Template for any References to resolve BEFORE modifying it, so changes don't feed through to the shared Library.",
+            "Identify all TestSteps that need modification, and add any new steps required to verify the new message(s).",
+            "Link the new, revised TestSheet to the Template — linking a new TestSheet automatically removes the link to the old one.",
+            "Check the XL links: if Attributes/Instances are named identically in both old and new TestSheets, Tosca updates the links automatically — but verify them carefully.",
+            "Manually add any brand-new links (like the Verification Values) to their respective TestStepValues.",
+            "Run Check Template again to catch missed or forgotten links.",
+            "Delete the OLD TemplateInstance folder before instantiating with the new TestSheet."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Changes and new values are NOT reflected in existing TemplateInstances until you Instantiate again. Skipping this step means your 'updated' TestCases still run on old data."
+        },
+        {
+          "type": "note",
+          "text": "A TestStepValue can only hold one link at a time. Before linking a NEW Attribute to a TestStepValue that's already linked to a different Attribute, you must first delete the existing Value — otherwise the new link won't take."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Instantiate vs. Re-Instantiate",
+      "elements": [
+        {
+          "type": "table",
+          "headers": [
+            "Situation",
+            "What to do"
+          ],
+          "rows": [
+            [
+              "Test Design Specialist provided a brand-new TestSheet",
+              "Link the new TestSheet (removes old link) → delete the old TemplateInstance folder → Instantiate (Ctrl+N, Ctrl+I)."
+            ],
+            [
+              "Test Design Specialist amended the EXISTING TestSheet (same file, new rows/values)",
+              "Modify the Template if needed → use Re-Instantiate — it refreshes existing TemplateInstances AND adds any new ones, without deleting anything manually."
+            ]
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Re-Instantiate can be run by right-clicking the TemplateInstance folder → ReInstantiate. It's the safer, additive option when the underlying TestSheet was just updated rather than replaced."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 4 — Adapt the TestSheet and the Template",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS2 Exercise 4 — Adapt the TestSheet and the Template — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Forgetting to (re)instantiate after modifying a Template",
+      "trapDescription": "Candidates update a Template's links and TestSteps but never re-run instantiation, then wonder why the TestCases still show old behavior.",
+      "bestPractice": "Modifications only reach the TestCasesInstances after Instantiation (new TestSheet) or Re-Instantiation (amended TestSheet)."
+    },
+    {
+      "title": "Not deleting the old TemplateInstance folder before a new TestSheet link",
+      "trapDescription": "When replacing the TestSheet entirely, learners instantiate without removing the previous TemplateInstance folder, leading to duplicate/stale TestCases.",
+      "bestPractice": "When linking a completely NEW TestSheet, delete the old TemplateInstance folder before Instantiating. Re-Instantiate is only for an amended (same) TestSheet."
+    },
+    {
+      "title": "Assuming an Attribute is a Verification Attribute by default",
+      "trapDescription": "Candidates confuse a normal input Attribute with a Verification Attribute.",
+      "bestPractice": "A Verification Attribute is shown in GREEN and is compared against the SUT's actual output, not fed in as input."
+    },
+    {
+      "title": "Trying to re-link a TestStepValue without clearing the old value first",
+      "trapDescription": "Candidates drag a new Attribute onto a TestStepValue that's already linked to a different Attribute, and the new link doesn't take (or silently conflicts).",
+      "bestPractice": "A TestStepValue holds only one link at a time. Delete the existing Value first, then drag the new Attribute onto the now-empty TestStepValue."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What color is a Verification Attribute shown in, and what is its purpose?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Blue — it indicates the Attribute belongs to a Template."
+        },
+        {
+          "id": "B",
+          "text": "Red — it marks an Attribute as required."
+        },
+        {
+          "id": "C",
+          "text": "Verification Attributes have no distinct color; they're identical to regular Attributes."
+        },
+        {
+          "id": "D",
+          "text": "Green — its value is compared against the SUT's actual output rather than being fed in as an input."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "It's the same color used for 'success' states in many UIs.",
+      "rationale": "A Verification Attribute is shown in green. Its value is used by Tosca to verify the SUT's output — not as input data — and the TestCase step succeeds only if the two values match."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "You link a brand-new TestSheet (replacing the old one) to an existing Template. What must you do before Instantiating?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Delete the old TemplateInstance folder first."
+        },
+        {
+          "id": "B",
+          "text": "Nothing extra — Instantiate always overwrites old TemplateInstances automatically."
+        },
+        {
+          "id": "C",
+          "text": "Rename the Template."
+        },
+        {
+          "id": "D",
+          "text": "Convert the Template back to a TestCase first."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This step is different from a Re-Instantiate scenario.",
+      "rationale": "When replacing the TestSheet entirely, you must delete the old TemplateInstance folder before Instantiating, to avoid duplicate or stale TestCases."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "The Test Design Specialist just added 2 new rows to the SAME existing TestSheet (didn't replace the file). What is the correct next action?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Nothing needs to be done since the TestSheet wasn't replaced."
+        },
+        {
+          "id": "B",
+          "text": "Use Re-Instantiate — it refreshes existing TemplateInstances and adds new ones."
+        },
+        {
+          "id": "C",
+          "text": "Delete the entire TemplateInstance folder and Instantiate from scratch."
+        },
+        {
+          "id": "D",
+          "text": "Manually create the 2 new TestCases by hand."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "This is the safer, additive option for an amended (not replaced) TestSheet.",
+      "rationale": "Re-Instantiate is designed for exactly this case: an amended existing TestSheet. It refreshes data in existing TemplateInstances and adds any new ones without manual deletion."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "When you link a new TestSheet to a Template that already had one linked, what happens to the old link?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It's automatically removed when the new TestSheet is linked."
+        },
+        {
+          "id": "B",
+          "text": "The Template becomes invalid and must be recreated."
+        },
+        {
+          "id": "C",
+          "text": "The old TestSheet link must be manually removed first, or the Template will error."
+        },
+        {
+          "id": "D",
+          "text": "Both TestSheets remain linked simultaneously."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Tosca handles this switch automatically.",
+      "rationale": "Linking a new TestSheet automatically removes the link to the previous one — a Template can only have one linked TestSheet at a time."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A TestStepValue is already linked to the Attribute 'Email'. You now want to link it instead to a new Attribute, 'Value - Email', from an updated TestSheet. What must you do first?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Delete and recreate the entire TestStep."
+        },
+        {
+          "id": "B",
+          "text": "Nothing — dragging the new Attribute automatically replaces the old link."
+        },
+        {
+          "id": "C",
+          "text": "Rename the TestStepValue first."
+        },
+        {
+          "id": "D",
+          "text": "Delete the existing Value from the TestStepValue, then drag the new Attribute onto it."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "A TestStepValue can only hold one link at a time.",
+      "rationale": "A TestStepValue holds only one link at a time. Before linking a new Attribute to a TestStepValue that already has a value from a different Attribute, you must delete the existing Value first — otherwise the new link won't take."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "What is the correct process to link a TestSheet to a Template?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Right click on the Template, select Instantiation, choose the TestSheet."
+        },
+        {
+          "id": "B",
+          "text": "Drag and drop the TestSheet onto the Template."
+        },
+        {
+          "id": "C",
+          "text": "Right click on the TestSheet and select the correct Template from the list."
+        },
+        {
+          "id": "D",
+          "text": "Drag the TestSheet and drop it onto the TemplateInstances."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "It's a direct drag-and-drop action between the two objects, not a menu selection.",
+      "rationale": "You link a TestSheet to a Template by dragging it from the TestCaseDesign section and dropping it directly onto the Template in the TestCase section — not via Instantiation, a TestSheet-side menu, or the TemplateInstances folder."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "Is it necessary to Instantiate a Template?",
+      "options": [
+        {
+          "id": "A",
+          "text": "No, I can link a Template to an ExecutionList and the {XL[ ]} References are translated during runtime."
+        },
+        {
+          "id": "B",
+          "text": "Yes, because {XL[ ]} References are only translated during Instantiation."
+        },
+        {
+          "id": "C",
+          "text": "Yes, because you link the Template to a TestSheet during Instantiation."
+        },
+        {
+          "id": "D",
+          "text": "No, this is done automatically by Tosca during runtime."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Recall: 'a Template cannot be run as a test itself' — it needs one more step first.",
+      "rationale": "Yes, Instantiation is required. A Template cannot be run as a TestCase on its own — its {XL[ ]} References only get translated into actual, usable values when the Template is Instantiated, which is what produces the real, runnable TestCases in the TemplateInstance folder."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Verification Attribute",
+      "value": "Green Attribute — its value is checked against the SUT's actual output, not used as input."
+    },
+    {
+      "key": "Modify workflow",
+      "value": "Resolve refs → edit/add TestSteps → link new TestSheet → verify XL links → add new links manually → Check Template."
+    },
+    {
+      "key": "New TestSheet (replaced)",
+      "value": "Delete old TemplateInstance folder → Instantiate (Ctrl+N, Ctrl+I)."
+    },
+    {
+      "key": "Amended TestSheet (same file)",
+      "value": "Use Re-Instantiate — refreshes + adds instances, no manual deletion."
+    },
+    {
+      "key": "Auto-linking",
+      "value": "If Attribute/Instance names match old vs new TestSheet, Tosca updates XL links automatically — but verify."
+    },
+    {
+      "key": "Re-linking a TestStepValue",
+      "value": "Delete the existing Value first — a TestStepValue holds only one link at a time."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 04 - Modifications to Templates",
+      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
+      "duration": "video"
+    }
+  ]
+}

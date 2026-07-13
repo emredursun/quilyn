@@ -1,0 +1,568 @@
+{
+  "moduleId": "TAS1-M07",
+  "moduleTitle": "Section 7 - Requirements",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3017/lesson-video-requirements",
+  "learningObjectives": [
+    "Distinguish functional from non-functional Requirements.",
+    "Explain the structure of the Requirements hierarchy in Tosca (RequirementFolder → RequirementSet → Requirement).",
+    "Define how Requirement weights are calculated using frequency class and damage class.",
+    "Link TestCases to individual Requirements and ExecutionLists to the RequirementSet.",
+    "Use 'Update Outdated Values' to refresh coverage and execution status after linking.",
+    "Understand the relationship between Requirements and test coverage."
+  ],
+  "estTime": "1 hr",
+  "studyGuide": [
+    {
+      "sectionTitle": "Requirements: Types & Hierarchy",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Requirements",
+          "description": "Criteria the system under test (SUT) is expected to fulfill. They map business requirements to checks that confirm the application works properly.",
+          "items": [
+            "Functional requirement — a functionality the SUT must carry out (e.g., 'the web shop must be able to process payments').",
+            "Non-functional requirement — a quality/operational attribute rather than a specific behavior (e.g., security, reliability, performance, maintainability, scalability, usability)."
+          ]
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Level",
+            "Name",
+            "Role",
+            "What links here?"
+          ],
+          "rows": [
+            [
+              "Top",
+              "RequirementFolder",
+              "Optional grouping that structures RequirementSets one level up",
+              "Nothing (organizational)"
+            ],
+            [
+              "Middle",
+              "RequirementSet",
+              "Represents an aspect of the app (e.g., 'Webshop Frontend'); organizes Requirements",
+              "ExecutionLists link HERE"
+            ],
+            [
+              "Bottom",
+              "Requirement",
+              "Individual, atomic, testable criterion",
+              "TestCases link HERE"
+            ]
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Two different link targets (confirmed by Exercise 22): TestCases link to individual Requirements (bottom level). The ExecutionList is dragged onto the RequirementSet (middle level, e.g., 'Webshop Frontend') — NOT onto an individual Requirement."
+        },
+        {
+          "type": "analogy",
+          "text": "Think of a filing cabinet: RequirementFolder = the cabinet, RequirementSet = a drawer, Requirement = an individual document. You attach a TestCase sticky note to a specific document, but you register the whole ExecutionList against the drawer (the Set)."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 210\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">REQUIREMENTS HIERARCHY — WHERE TESTCASES vs EXECUTIONLISTS LINK</text><rect x=\"160\" y=\"28\" width=\"400\" height=\"44\" rx=\"8\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><text x=\"360\" y=\"47\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"13\" font-weight=\"700\">RequirementFolder</text><text x=\"360\" y=\"63\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Top: optional grouping of RequirementSets</text><line x1=\"360\" y1=\"72\" x2=\"360\" y2=\"86\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><rect x=\"130\" y=\"86\" width=\"460\" height=\"48\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2.5\"/><text x=\"360\" y=\"106\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"13\" font-weight=\"700\">RequirementSet (e.g., Webshop Frontend)</text><text x=\"360\" y=\"123\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">← ExecutionLists link HERE (drop the list onto the Set)</text><line x1=\"360\" y1=\"134\" x2=\"360\" y2=\"148\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><rect x=\"110\" y=\"148\" width=\"500\" height=\"48\" rx=\"8\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2.5\"/><text x=\"360\" y=\"168\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"13\" font-weight=\"700\">Requirement (individual, atomic)</text><text x=\"360\" y=\"185\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">← TestCases link HERE (drop the TestCase onto the Requirement)</text></svg>",
+          "caption": "Top-to-bottom: RequirementFolder → RequirementSet → Requirement. TestCases link to individual Requirements; ExecutionLists link to the RequirementSet."
+        }
+      ],
+      "bulletPoints": [
+        "Requirement types: functional (what the SUT must do) vs non-functional (security, performance, usability, etc.).",
+        "Hierarchy top-to-bottom: RequirementFolder → RequirementSet → Requirement.",
+        "RequirementFolder is a level UP from RequirementSet — it groups Sets, not the other way around.",
+        "TestCase → individual Requirement. ExecutionList → RequirementSet. (Different targets.)"
+      ]
+    },
+    {
+      "sectionTitle": "Requirement Weights",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Requirement Weight",
+          "description": "A calculated risk score (integer 1–10) representing the priority and risk of a Requirement. Derived automatically by Tosca — not manually entered.",
+          "items": [
+            "Input 1: Frequency Class — how often the failure occurs if the requirement is unmet",
+            "Input 2: Damage Class — the severity of the impact if the requirement fails",
+            "Formula: exponential function of (Frequency Class, Damage Class)",
+            "Output: integer from 1 (lowest risk) to 10 (highest risk)"
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Weight is CALCULATED by Tosca from the two class inputs — it is not a field you type into directly. This is a confirmed AS1 exam question."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 140\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arr6\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">REQUIREMENT WEIGHT CALCULATION</text><rect x=\"20\" y=\"28\" width=\"220\" height=\"50\" rx=\"8\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"130\" y=\"47\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Frequency Class</text><text x=\"130\" y=\"63\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">How often failure occurs if req. is unmet</text><rect x=\"20\" y=\"86\" width=\"220\" height=\"50\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/><text x=\"130\" y=\"105\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"12\" font-weight=\"700\">Damage Class</text><text x=\"130\" y=\"121\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">Severity of impact if req. fails</text><path d=\"M 240 53 L 320 53\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#arr6)\"/><path d=\"M 240 111 L 320 111\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#arr6)\"/><rect x=\"320\" y=\"42\" width=\"180\" height=\"70\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><text x=\"410\" y=\"65\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">Tosca Formula</text><text x=\"410\" y=\"83\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Exponential function</text><text x=\"410\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">(calculated automatically)</text><path d=\"M 500 77 L 560 77\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#arr6)\"/><rect x=\"560\" y=\"42\" width=\"140\" height=\"70\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"630\" y=\"68\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"12\" font-weight=\"700\">Weight</text><text x=\"630\" y=\"84\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"10\">Integer 1–10</text><text x=\"630\" y=\"99\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"9\">10 = highest risk</text></svg>",
+          "caption": "Weight is auto-calculated by Tosca from Frequency Class + Damage Class. Result: integer 1–10. Not manually entered."
+        }
+      ],
+      "bulletPoints": [
+        "Higher weight = higher risk = higher test priority.",
+        "Frequency Class: how often? Damage Class: how bad? → Tosca calculates the weight.",
+        "Weight range: integer 1–10 (not 1–5, not a decimal)."
+      ]
+    },
+    {
+      "sectionTitle": "Linking TestCases and ExecutionLists to Requirements",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Linking TestCases",
+          "description": "Drag a COMPLETED TestCase onto an individual Requirement to create a link. This provides traceability: which tests cover which requirements. Link at the Requirement (atomic, bottom) level."
+        },
+        {
+          "type": "concept",
+          "term": "Linking ExecutionLists",
+          "description": "Drag an ExecutionList onto a RequirementSet to associate its execution results with that set of requirements — enabling execution/coverage reporting across the whole set."
+        },
+        {
+          "type": "concept",
+          "term": "Update Outdated Values",
+          "description": "After linking TestCases and ExecutionLists, right-click the RequirementSet and select 'Update Outdated Values' to refresh the calculated coverage and execution status. Without this, displayed values may be stale.",
+          "items": [
+            "Right-click the RequirementSet (e.g., 'Webshop Frontend') → 'Update Outdated Values'.",
+            "Recalculates coverage and pulls in the latest execution results from linked ExecutionLists.",
+            "Run it whenever links change or new results come in."
+          ]
+        },
+        {
+          "type": "steps",
+          "title": "Linking workflow (Exercise 22 procedure):",
+          "items": [
+            "Confirm the TestCases are COMPLETED and Business Parameters are entered.",
+            "In Requirements, expand the target RequirementSet (e.g., Webshop Frontend).",
+            "Drag each COMPLETED TestCase onto its matching individual Requirement.",
+            "In the Execution section, drag the ExecutionList onto the RequirementSet.",
+            "Right-click the RequirementSet → 'Update Outdated Values'. Save your work."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Test Coverage",
+          "description": "Once TestCases are linked, Tosca shows requirement coverage — which requirements have linked tests (covered) and which do not (unverified)."
+        }
+      ],
+      "bulletPoints": [
+        "TestCase → individual Requirement. ExecutionList → RequirementSet. Different targets.",
+        "After linking, run 'Update Outdated Values' on the RequirementSet to refresh coverage/results.",
+        "Unlinked Requirements appear as gaps in the coverage report — find and cover them."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 22 — Link TestCases and ExecutionLists to Requirements",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS1 Exercise 22 — Link TestCases and ExecutionLists to Requirements — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3017/lesson-video-requirements"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "TestCases link to Requirement — not RequirementSet or Folder",
+      "trapDescription": "Exam asks: 'To which level in the Requirement structure are TestCases linked?' Options include RequirementFolder, RequirementSet, and Requirement. This is a confirmed AS1 exam question.",
+      "bestPractice": "TestCases link to the individual Requirement — the most specific, atomic level. NOT to RequirementSet or RequirementFolder."
+    },
+    {
+      "title": "ExecutionList links to the RequirementSet, not an individual Requirement",
+      "trapDescription": "Candidates assume ExecutionLists link at the same level as TestCases (the individual Requirement). In Exercise 22 the ExecutionList is dropped on the RequirementSet.",
+      "bestPractice": "TestCase → individual Requirement (bottom level). ExecutionList → RequirementSet (middle level). They have DIFFERENT link targets."
+    },
+    {
+      "title": "Hierarchy order — Folder is ABOVE Set",
+      "trapDescription": "Candidates place RequirementSet above RequirementFolder. Distractors reverse the order.",
+      "bestPractice": "Top-to-bottom: RequirementFolder → RequirementSet → Requirement. A RequirementFolder groups RequirementSets (a level up), not the reverse."
+    },
+    {
+      "title": "Update Outdated Values must be run after linking",
+      "trapDescription": "Candidates link TestCases/ExecutionLists but see stale coverage or execution status and think linking failed.",
+      "bestPractice": "After linking, right-click the RequirementSet → 'Update Outdated Values' to recalculate coverage and pull in the latest execution results."
+    },
+    {
+      "title": "Functional vs non-functional Requirements",
+      "trapDescription": "Candidates mislabel a performance/security criterion as functional.",
+      "bestPractice": "Functional = what the SUT must DO (e.g., process payments). Non-functional = quality attributes of operation (security, performance, reliability, usability, scalability, maintainability)."
+    },
+    {
+      "title": "Weight formula — exponential, not integer sum",
+      "trapDescription": "Candidates assume weight is simply frequency + damage, expressed as a simple sum or a scale from 1-5.",
+      "bestPractice": "Weight is calculated via an exponential function from frequency class and damage class. Result is an integer from 1 to 10. This is a confirmed AS1 exam question."
+    },
+    {
+      "title": "Weight is not manually assigned",
+      "trapDescription": "Candidates think testers manually type in the weight value.",
+      "bestPractice": "Weight is CALCULATED by Tosca from the frequency and damage class inputs. It is derived, not directly entered."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "KC1",
+      "type": "single-select",
+      "source": "Official Knowledge Check - Section 07",
+      "scenario": "How often can you use a TestCase in the same ExecutionList?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Unlimited"
+        },
+        {
+          "id": "B",
+          "text": "Once"
+        },
+        {
+          "id": "C",
+          "text": "Twice"
+        },
+        {
+          "id": "D",
+          "text": "The number is set in the TestCase properties tab"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "There is no cap on reuse.",
+      "rationale": "A TestCase can be used an UNLIMITED number of times in the same ExecutionList. Each entry is an independent execution. This is a verbatim official Knowledge Check question."
+    },
+    {
+      "questionId": "KC2",
+      "type": "single-select",
+      "source": "Official Knowledge Check - Section 07",
+      "scenario": "How do we define the final weight of a Requirement?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It is expressed in integers ranging from 1 to 10"
+        },
+        {
+          "id": "B",
+          "text": "It is calculated using an exponential function that takes into consideration frequency class and damage class"
+        },
+        {
+          "id": "C",
+          "text": "It is expressed in integers ranging from 1 to 5"
+        },
+        {
+          "id": "D",
+          "text": "It is pre-defined based on the requirement complexity"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The question asks HOW it is defined (the method), not the value range.",
+      "rationale": "The weight is DEFINED by an exponential function combining frequency class and damage class. Watch the trap: although the resulting value IS an integer from 1 to 10, the question asks how the weight is defined — so the method (exponential function) is the correct answer, not the range. Verbatim official Knowledge Check question."
+    },
+    {
+      "questionId": "KC3",
+      "type": "single-select",
+      "source": "Official Knowledge Check - Section 07",
+      "scenario": "To which level in the Requirement structure are TestCases linked?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Requirement Folder"
+        },
+        {
+          "id": "B",
+          "text": "RequirementSet"
+        },
+        {
+          "id": "C",
+          "text": "Requirement"
+        },
+        {
+          "id": "D",
+          "text": "TestCases are not linked to the Requirement section"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "The most specific, atomic level.",
+      "rationale": "TestCases link to the individual Requirement — the atomic, testable unit at the bottom of the hierarchy. Note: ExecutionLists link to the RequirementSet, but TestCases link to the Requirement. Verbatim official Knowledge Check question."
+    },
+    {
+      "questionId": "KC4",
+      "type": "single-select",
+      "source": "Official Knowledge Check - Section 07",
+      "scenario": "In which section of Tosca are libraries used?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Requirements"
+        },
+        {
+          "id": "B",
+          "text": "Module"
+        },
+        {
+          "id": "C",
+          "text": "TestCaseDesign"
+        },
+        {
+          "id": "D",
+          "text": "TestCase"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "Libraries hold reusable test sequences.",
+      "rationale": "Libraries are used in the TestCase section — they store Reusable TestStepBlocks that other TestCases reference. NOT in Module, TestCaseDesign, or Requirements. Verbatim official Knowledge Check question (cross-topic, from Section 03)."
+    },
+    {
+      "questionId": "KC5",
+      "type": "single-select",
+      "source": "Official Knowledge Check - Section 07",
+      "scenario": "What is the correct syntax for using a Test Configuration Parameter in a TestStep?",
+      "options": [
+        {
+          "id": "A",
+          "text": "{CP[NameOfTheTCP]}"
+        },
+        {
+          "id": "B",
+          "text": "[CP{NameOfTheTCP}]"
+        },
+        {
+          "id": "C",
+          "text": "CP[NameOfTheTCP]"
+        },
+        {
+          "id": "D",
+          "text": "{TCP[NameOfTheTCP]}"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Outer curly braces, CP prefix, name in square brackets.",
+      "rationale": "{CP[NameOfTheTCP]} is correct: outer curly braces are mandatory, CP is the prefix, and the name goes in square brackets. TCP is the wrong prefix. Verbatim official Knowledge Check question (cross-topic, from Sections 03/05)."
+    },
+    {
+      "questionId": "KC6",
+      "type": "single-select",
+      "source": "Official Knowledge Check - Section 07",
+      "scenario": "What is the correct expression, if you want Tosca to enter a date that is: the last day of the month, 3 years ago from the testing date, with 4 digits for years and 3 words abbreviation for month?",
+      "options": [
+        {
+          "id": "A",
+          "text": "{MONTHFIRST[][-3y-1d][mmmyyyyy]}"
+        },
+        {
+          "id": "B",
+          "text": "{MONTHLAST[][-3y][MMMyyyy]}"
+        },
+        {
+          "id": "C",
+          "text": "{MONTHLAST[][-3y][MONTHyear]}"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "MONTHLAST for the last day; -3y for 3 years ago; MMMyyyy for 3-letter month + 4-digit year.",
+      "rationale": "{MONTHLAST[][-3y][MMMyyyy]} is correct: MONTHLAST = last day of month, [] = today as start, [-3y] = minus 3 years, [MMMyyyy] = 3-letter month abbreviation + 4-digit year. Verbatim official Knowledge Check question (cross-topic, from Section 03)."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A test team wants to demonstrate that their ExecutionList covers a specific compliance requirement. What should they do?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Add the requirement text as a comment inside the ExecutionList."
+        },
+        {
+          "id": "B",
+          "text": "Copy the Requirement into the ExecutionList description field."
+        },
+        {
+          "id": "C",
+          "text": "Link the ExecutionList to the relevant Requirement in the Requirements section."
+        },
+        {
+          "id": "D",
+          "text": "ExecutionLists cannot be linked to Requirements in Tosca."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Tosca supports linking ExecutionLists to Requirements.",
+      "rationale": "ExecutionLists can be linked to Requirements in Tosca, providing traceability from execution run to requirement. This enables formal compliance reporting and coverage analysis."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What is the correct hierarchy in the Requirements section of Tosca Commander, from top to bottom?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Requirement → RequirementSet → RequirementFolder"
+        },
+        {
+          "id": "B",
+          "text": "RequirementSet → RequirementFolder → Requirement"
+        },
+        {
+          "id": "C",
+          "text": "RequirementSet → Requirement → RequirementFolder"
+        },
+        {
+          "id": "D",
+          "text": "RequirementFolder → RequirementSet → Requirement"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "A Folder groups Sets — so the Folder sits a level UP.",
+      "rationale": "The hierarchy is RequirementFolder (top grouping) → RequirementSet (aspect of the app) → Requirement (individual, testable item). A RequirementFolder is a level up that structures RequirementSets. TestCases link to the individual Requirement at the bottom."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "In Exercise 22, after linking the TestCases, where is the ExecutionList 'Web Shop' dragged and dropped?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Onto the RequirementSet 'Webshop Frontend'."
+        },
+        {
+          "id": "B",
+          "text": "Onto each individual Requirement, one at a time."
+        },
+        {
+          "id": "C",
+          "text": "Onto the RequirementFolder at the very top."
+        },
+        {
+          "id": "D",
+          "text": "ExecutionLists cannot be linked to Requirements."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "ExecutionLists and TestCases have different link targets.",
+      "rationale": "The ExecutionList is dropped onto the RequirementSet ('Webshop Frontend'), while TestCases are linked to individual Requirements. TestCase → Requirement; ExecutionList → RequirementSet."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "After dragging TestCases and an ExecutionList to Requirements, the coverage and execution status shown still look outdated. What is the correct next step?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Delete and re-create the links."
+        },
+        {
+          "id": "B",
+          "text": "Right-click the RequirementSet and select 'Update Outdated Values'."
+        },
+        {
+          "id": "C",
+          "text": "Re-run the entire ExecutionList from scratch."
+        },
+        {
+          "id": "D",
+          "text": "Restart Tosca Commander to force a refresh."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "There is a dedicated right-click command to refresh values.",
+      "rationale": "'Update Outdated Values' (right-click the RequirementSet) recalculates coverage and pulls in the latest execution results from linked ExecutionLists. This is the exact step 5 in Exercise 22."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "Which of the following is a NON-functional requirement for an online web shop?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The shop must be able to process credit card payments."
+        },
+        {
+          "id": "B",
+          "text": "The shop must let users add items to a cart."
+        },
+        {
+          "id": "C",
+          "text": "The shop must load any product page within 2 seconds (performance)."
+        },
+        {
+          "id": "D",
+          "text": "The shop must calculate shipping costs."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Non-functional = a quality attribute, not a specific behavior.",
+      "rationale": "Performance (page load within 2 seconds) is a non-functional requirement — it describes an operational quality attribute. Processing payments, adding to cart, and calculating shipping are functional requirements (specific behaviors the SUT must perform)."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Requirement types",
+      "value": "Functional = what the SUT must DO. Non-functional = quality attributes (security, performance, usability...)."
+    },
+    {
+      "key": "Requirements hierarchy",
+      "value": "RequirementFolder → RequirementSet → Requirement (top to bottom). Folder is a level UP from Set."
+    },
+    {
+      "key": "TestCase linking level",
+      "value": "TestCases link to the individual Requirement (bottom, atomic level)."
+    },
+    {
+      "key": "ExecutionList linking level",
+      "value": "ExecutionLists link to the RequirementSet (middle level) — different target than TestCases."
+    },
+    {
+      "key": "Update Outdated Values",
+      "value": "Right-click the RequirementSet → 'Update Outdated Values' to refresh coverage & execution status after linking."
+    },
+    {
+      "key": "Weight calculation",
+      "value": "Exponential function of frequency class + damage class. Result: integer 1–10. Auto-calculated, not typed."
+    },
+    {
+      "key": "Frequency class",
+      "value": "How often the failure occurs if the requirement is unmet."
+    },
+    {
+      "key": "Damage class",
+      "value": "Severity of impact if the requirement fails."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 25 - Requirements",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3017/lesson-video-requirements",
+      "duration": "video"
+    },
+    {
+      "title": "Lesson 26 - Weight Requirements",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3018/lesson-video-weight-requirements",
+      "duration": "video"
+    },
+    {
+      "title": "Lesson 27 - Link Requirements",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3689/lesson-video-link-requirements",
+      "duration": "video"
+    },
+    {
+      "title": "Knowledge Check",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3692/knowledge-check",
+      "duration": "6 questions"
+    }
+  ]
+}

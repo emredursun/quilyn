@@ -1,5 +1,5 @@
 /* =====================================================================
-   PegaAcademy — search.js
+   Quilyn — search.js
    Global module search overlay.
    Exposes window.PegaSearch = { show, hide }
    ===================================================================== */

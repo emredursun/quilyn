@@ -1,0 +1,355 @@
+{
+  "moduleId": "TAPI-M01",
+  "moduleTitle": "Getting Started - API & Webservice Theory",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases/lessons/1804/introduction-to-automating-api-test-cases",
+  "learningObjectives": [
+    "Define API, Webservice, and XML in your own words.",
+    "Name the two main Webservice implementation methods (SOAP and REST) and the HTTP methods they leverage.",
+    "Identify the two Systems Under Test (SUTs) used in this course and why two are needed.",
+    "Generate and understand the purpose of the Service Access Key used to authenticate against the training coffeeshop."
+  ],
+  "estTime": "30 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "What is an API?",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "API (Application Programming Interface)",
+          "description": "The messenger program used to interact with an application. Unlike a UI, which is designed to be human-readable, an API is machine-readable — it speaks the language of the software directly."
+        },
+        {
+          "type": "analogy",
+          "text": "A computer mouse is a physical API: clicking left or right is a physical action, but the interaction with the computer happens through an API, and the response appears on screen — even though you never touched the underlying code."
+        },
+        {
+          "type": "concept",
+          "term": "Webservice",
+          "description": "A service offered by one electronic device to enable communication with other electronic devices via the World Wide Web. When a social media platform shows a map or an ad without writing that code itself, it has outsourced the job to a Webservice via an API request."
+        },
+        {
+          "type": "note",
+          "text": "APIs are broader than Webservices: a Webservice is specifically the network-dependent subset of APIs (it requires a network to operate), while APIs in general can also be local/native and not require a network at all."
+        }
+      ],
+      "bulletPoints": [
+        "API = Application Programming Interface — the interface an application exposes for other software, not for humans.",
+        "Webservices are the network-dependent category of APIs; this course focuses on Webservices reached over HTTP."
+      ]
+    },
+    {
+      "sectionTitle": "SOAP vs. REST and HTTP Methods",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "SOAP and REST",
+          "description": "The two main Webservice implementation methods covered in this course. Both use the same underlying protocol, HTTP, but leverage it differently and support different message formats."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "HTTP Method",
+            "Purpose"
+          ],
+          "rows": [
+            [
+              "GET",
+              "Requests data from a specified resource"
+            ],
+            [
+              "POST",
+              "Submits data to be processed to a specified resource"
+            ],
+            [
+              "HEAD",
+              "Same as GET but returns only HTTP headers and no document body"
+            ],
+            [
+              "PUT",
+              "Uploads a representation of the specified URI (updates an existing entry)"
+            ],
+            [
+              "DELETE",
+              "Deletes the specified resource"
+            ]
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "SOAP (Simple Object Access Protocol) uses only the POST method — every action, whatever it needs to do, must be translated into a POST. REST (Representational State Transfer) can leverage all conventional HTTP methods directly (GET, POST, PUT, DELETE, ...)."
+        },
+        {
+          "type": "note",
+          "text": "Message format is another key difference: SOAP uses only XML, while REST can work with a wider array of formats (XML, JSON, plain text). This makes REST more flexible, though SOAP remains extremely widespread in enterprise systems."
+        }
+      ],
+      "bulletPoints": [
+        "SOAP = POST only, XML only. REST = all HTTP methods, multiple formats (XML/JSON/text).",
+        "POST creates a new entry; PUT updates an existing one — this distinction matters when choosing a Method in the API Scan."
+      ]
+    },
+    {
+      "sectionTitle": "What is XML?",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "XML (Extensible Markup Language)",
+          "description": "A markup language, much like HTML, that defines a set of rules for encoding documents in a format that is both human-readable and machine-readable. XML is self-descriptive and designed to store and transport data, and it simplifies data sharing and platform changes."
+        }
+      ],
+      "bulletPoints": [
+        "XML underpins SOAP messages and is also used as a standalone data/document format (e.g. an offline address book or product catalog)."
+      ]
+    },
+    {
+      "sectionTitle": "The Systems Under Test (SUTs) for This Course",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Two SUTs, one per Webservice method",
+          "description": "This course needs two Systems Under Test — one for each Webservice implementation method being tested."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "SUT",
+            "Used for",
+            "Notes"
+          ],
+          "rows": [
+            [
+              "DemoWebShop (demowebshop.tricentis.com)",
+              "SOAP",
+              "The same SUT used in Automation Specialist Level 1 & 2."
+            ],
+            [
+              "Coffeeshop (webservice.toscacloud.com/training)",
+              "REST",
+              "An in-development app for designing and ordering a custom coffee. Requires a Service Access Key/token to access."
+            ]
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Service Access Key",
+          "description": "A token required to authenticate against the Coffeeshop REST service, generated at http://webservice.toscacloud.com/training. The key creates a temporary (24-hour) profile pre-loaded with basic data that you can freely add to and edit without disrupting other users."
+        },
+        {
+          "type": "warning",
+          "text": "The Service Access Key expires after 24 hours. If more than 24 hours pass while working through the REST section, generate a new key — and watch for accidentally copying a stray space along with the key, which causes a 'Key not recognized' error in Swagger, the API Scan, and Tosca Commander alike."
+        }
+      ],
+      "bulletPoints": [
+        "DemoWebShop = SOAP SUT (same one from AS1/AS2). Coffeeshop = REST SUT (new for this course).",
+        "The Coffeeshop's per-user key/token requirement is representative of how most real REST services authenticate.",
+        "Save the Service Access Key to a text file in your course folder so it's easy to paste without extra spaces."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Mixing up SOAP and REST's HTTP method support",
+      "trapDescription": "Candidates think REST is limited to POST like SOAP, or that SOAP can use GET/PUT/DELETE directly.",
+      "bestPractice": "SOAP only leverages POST for every operation. REST can use all conventional HTTP methods (GET, POST, PUT, DELETE) directly."
+    },
+    {
+      "title": "Mixing up SOAP and REST's supported formats",
+      "trapDescription": "Candidates assume both SOAP and REST support the same range of message formats.",
+      "bestPractice": "SOAP only uses XML. REST supports a wider range of formats, including XML, JSON, and plain text — making REST more flexible."
+    },
+    {
+      "title": "Assuming a Webservice and an API are the same thing",
+      "trapDescription": "Candidates use 'API' and 'Webservice' interchangeably in scenario questions about network dependency.",
+      "bestPractice": "A Webservice specifically requires a network to operate; it is the network-dependent subset of the broader API category, which also includes non-networked/local interfaces."
+    },
+    {
+      "title": "Forgetting the Service Access Key expires",
+      "trapDescription": "Candidates assume a Service Access Key generated once will work throughout the entire course.",
+      "bestPractice": "The Service Access Key expires after 24 hours. Any REST work that spans more than a day requires regenerating the key at webservice.toscacloud.com/training."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Which HTTP method(s) does SOAP use to perform all of its operations?",
+      "options": [
+        {
+          "id": "A",
+          "text": "GET only"
+        },
+        {
+          "id": "B",
+          "text": "POST only"
+        },
+        {
+          "id": "C",
+          "text": "GET, POST, PUT, and DELETE"
+        },
+        {
+          "id": "D",
+          "text": "SOAP does not use HTTP"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Whatever the action, SOAP has to translate it into one specific verb.",
+      "rationale": "SOAP uses only POST as its leverage method on HTTP — every action needed from the implementation is translated into a POST request. REST, by contrast, can use all conventional HTTP methods directly."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "Which message format(s) can REST work with?",
+      "options": [
+        {
+          "id": "A",
+          "text": "XML only"
+        },
+        {
+          "id": "B",
+          "text": "JSON only"
+        },
+        {
+          "id": "C",
+          "text": "A wider array of formats, such as XML, JSON, and plain text"
+        },
+        {
+          "id": "D",
+          "text": "REST cannot carry a message body"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "This is one of the reasons REST is considered more flexible than SOAP.",
+      "rationale": "REST supports a wider array of message formats (XML, JSON, text, and more), while SOAP is limited to XML only. This flexibility is a key differentiator between the two implementation methods."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Which System Under Test is used for the SOAP lessons in this course?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Coffeeshop"
+        },
+        {
+          "id": "B",
+          "text": "The DemoWebShop, the same SUT used in AS1 and AS2"
+        },
+        {
+          "id": "C",
+          "text": "A brand-new banking demo application"
+        },
+        {
+          "id": "D",
+          "text": "No SUT is needed for SOAP lessons"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "You should already recognize it from Automation Specialist Level 1 & 2.",
+      "rationale": "The SOAP lessons reuse the DemoWebShop (demowebshop.tricentis.com), the exact same SUT used throughout AS1 and AS2. The Coffeeshop is used instead for the REST lessons."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What is required to access and interact with the Coffeeshop REST service used in this course?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A username and password only, like the DemoWebShop"
+        },
+        {
+          "id": "B",
+          "text": "A Service Access Key (token), generated at webservice.toscacloud.com/training, valid for 24 hours"
+        },
+        {
+          "id": "C",
+          "text": "No authentication is required"
+        },
+        {
+          "id": "D",
+          "text": "A one-time key that never expires"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The token creates a temporary, per-user profile — and it doesn't last forever.",
+      "rationale": "The Coffeeshop requires a Service Access Key/token, generated at webservice.toscacloud.com/training, which creates a temporary 24-hour profile. The key must be regenerated if more than 24 hours pass."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A learner pastes their Service Access Key into the API Scan and receives an error saying the key is not recognized. What is the most likely cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The API Scan does not support authentication keys."
+        },
+        {
+          "id": "B",
+          "text": "A stray space was copied along with the key, or the 24-hour key has expired."
+        },
+        {
+          "id": "C",
+          "text": "The key only works in Swagger, never in the API Scan."
+        },
+        {
+          "id": "D",
+          "text": "Service Access Keys cannot be used with POST requests."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Two very mundane causes account for almost every 'key not recognized' error.",
+      "rationale": "The most common causes of a 'Key not recognized' error are an accidentally copied blank/space character alongside the key, or the key's 24-hour validity window having expired. This applies equally in Swagger, the API Scan, and Tosca Commander."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "API",
+      "value": "Application Programming Interface — machine-readable interface for interacting with an application, not a human-facing UI."
+    },
+    {
+      "key": "Webservice",
+      "value": "The network-dependent subset of APIs — a service reached over the web (this course: over HTTP)."
+    },
+    {
+      "key": "SOAP",
+      "value": "Only leverages HTTP POST; only supports XML messages."
+    },
+    {
+      "key": "REST",
+      "value": "Leverages GET/POST/PUT/DELETE directly; supports XML, JSON, text, and more."
+    },
+    {
+      "key": "XML",
+      "value": "Human- and machine-readable markup language for storing/transporting data — underlies SOAP and standalone data files alike."
+    },
+    {
+      "key": "SUTs in this course",
+      "value": "DemoWebShop (SOAP, reused from AS1/AS2) and Coffeeshop (REST, new, token-based auth)."
+    },
+    {
+      "key": "Service Access Key",
+      "value": "Generated at webservice.toscacloud.com/training; valid 24 hours; save it to a text file to avoid paste errors."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Automation Specialist for API Theory Lesson (video)",
+      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
+      "duration": "10 min"
+    },
+    {
+      "title": "Service Access Key generator",
+      "url": "http://webservice.toscacloud.com/training",
+      "duration": "external"
+    }
+  ]
+}

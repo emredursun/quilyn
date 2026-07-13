@@ -1,0 +1,488 @@
+{
+  "moduleId": "TAPI-M06",
+  "moduleTitle": "Lesson 5 - API Modules",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
+  "learningObjectives": [
+    "Distinguish API Modules, Business Parameters, and ActionModes inside Tosca Commander.",
+    "Add Business Parameters from the Technical View, including from non-code elements like Status Code.",
+    "Understand the DefaultActionMode Tosca assigns based on Request vs. Response and Add vs. Buffer.",
+    "Update Modules and TestCases project-wide after the underlying API changes."
+  ],
+  "estTime": "45 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "API Modules and the Technical View",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "API Module",
+          "description": "Contains the technical information imported from the API Scan. Every exported Message produces two Modules (Request + Response) because the two views hold different technical information — even though they were linked together in the API Scan, they become fully independent once in Tosca."
+        },
+        {
+          "type": "concept",
+          "term": "Technical View tab",
+          "description": "A tab on the Module — new compared to the Details and Test Configuration tabs you know from UI Modules — that mirrors the Message section of the API Scan exactly. This is where Business Parameters are created."
+        },
+        {
+          "type": "note",
+          "text": "Because Request and Response Modules are independent in Tosca (unlike in the API Scan, where they're linked), different Business Parameters can be added to each one freely."
+        }
+      ],
+      "bulletPoints": [
+        "Rearrange the imported folder structure so the TestCase reads business-friendly, not just as a mirror of the raw API Scan tree.",
+        "The Technical View is the recommended place to create Business Parameters, since the technical detail is derived automatically from the API's definition files."
+      ]
+    },
+    {
+      "sectionTitle": "Business Parameters",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Business Parameter",
+          "description": "A business-relevant element of a message — such as a name, ID, or address — added from the Technical View so a non-technical reader can understand what a TestStep does without looking at raw API code. When added, it acts as a ModuleAttribute that Tosca uses to execute the TestCase."
+        },
+        {
+          "type": "warning",
+          "text": "Business Parameters here are Module Attributes derived from the API Scan payload — they are NOT the same concept as the Business Parameters used in Reusable TestStepBlocks (covered in the AS1 course). Don't conflate the two."
+        },
+        {
+          "type": "list",
+          "title": "What can become a Business Parameter",
+          "items": [
+            "Any value inside the code (e.g. name, description, ID) — select part of a line, or a whole code block, to add multiple at once.",
+            "Non-code elements too: e.g. the Status Code drop-down can be added, letting a TestCase verify the expected status code was returned.",
+            "Response Time, Method, Endpoint, and individual rows in the Parameters or Header tabs can all become Business Parameters.",
+            "Selecting the opening curly bracket { at the top of a payload block (and everything inside it) adds a whole group of items at once as a value range — selecting only the closing bracket } does not work."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "You don't need to select an entire line — a partial selection is enough to add it as a Business Parameter.",
+        "Grouped Business Parameters (like a whole \"Item\" block) can be filtered later using the Constraint ActionMode."
+      ]
+    },
+    {
+      "sectionTitle": "DefaultActionMode: How Tosca Chooses",
+      "elements": [
+        {
+          "type": "warning",
+          "text": "Official Best Practice — Insert: If the Module was created from a Request in the API Scan, the default ActionMode will be Insert when a Value is filled in. Insert allows Tosca to create objects in the SUT using the API and write a new value."
+        },
+        {
+          "type": "warning",
+          "text": "Official Best Practice — Verify: If the linked Module was created from a Response in the API Scan, the default ActionMode will be Verify when a Value is filled in. Verify compares the value in the TestStep with that in the API — the text entered in the Value column is case sensitive."
+        },
+        {
+          "type": "warning",
+          "text": "Official Best Practice — Buffer: If the Buffer button was clicked instead of the Add button when creating the Business Parameter, the default ActionMode will be set to Buffer when a Value is entered. Buffer only applies for a Response Module, not a Request Module — a Response will return the Value, whereas a Request is, by definition, inputting data."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Add type used",
+            "Module type",
+            "Resulting DefaultActionMode"
+          ],
+          "rows": [
+            [
+              "Add",
+              "Request Module",
+              "Insert — writes a new value into the SUT via the API."
+            ],
+            [
+              "Add",
+              "Response Module",
+              "Verify — compares the value in the TestStep against what the API returned."
+            ],
+            [
+              "Buffer",
+              "Response Module",
+              "Buffer — stores the returned value for reuse. Only applies to a Response; a Request is, by definition, inputting data, not receiving it."
+            ]
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Add on a Request → Insert. Add on a Response → Verify. Buffer only ever applies to a Response.",
+        "Verify comparisons are case-sensitive — double-check the exact text entered in the Value column matches what the API actually returns."
+      ]
+    },
+    {
+      "sectionTitle": "Updating Modules When the API Changes",
+      "elements": [
+        {
+          "type": "warning",
+          "text": "Official course Best Practice: Any changes made in the API Scan will NOT synchronize with the Modules or TestCases imported into Tosca, after they have been exported. Changes will need to be updated manually, or using the Update button in the API Home Menu."
+        },
+        {
+          "type": "concept",
+          "term": "Update Button (API Home Menu)",
+          "description": "Updates changes made to the API Scan after it has been exported to Tricentis Tosca. It is the ribbon counterpart to editing a Business Parameter manually — either approach pushes a change through, but only the Update button does it for every reference to that element at once."
+        },
+        {
+          "type": "steps",
+          "title": "Propagating a changed parameter name project-wide (manual route)",
+          "items": [
+            "Edit the value in the Payload of the affected Module first.",
+            "Select the Business Attribute in the left pane.",
+            "Highlight the parameter name in the Technical View tab.",
+            "Click \"Update\" in the ribbon."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "This same Update button can also be triggered from inside the API Scan itself (select the Modules in Tosca > Open Selected Modules > edit > Update) — covered again in Lesson 7, useful when many server-side changes have accumulated at once."
+        }
+      ],
+      "bulletPoints": [
+        "Editing the Payload alone is NOT enough — you must explicitly use the manual route or the Update button to propagate the change to every TestCase using that Business Attribute.",
+        "Skipping this step is the most common reason a previously-passing TestCase suddenly fails.",
+        "Memorize the official phrasing for the exam: API Scan changes never auto-synchronize; only manual edits or the Update button push them through."
+      ]
+    },
+    {
+      "sectionTitle": "Lesson 5 - Official Key Points Recap",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Key Points (verbatim from the course's end-of-lesson summary slides):",
+          "items": [
+            "Any part of the Technical View can be added as a Business Parameter.",
+            "Any changes made in the API Scan will not synchronize with the Modules or TestCases imported into Tosca automatically.",
+            "Modules created from Requests will have the default ActionMode Insert when a Value is entered.",
+            "Modules created from Responses will have the default ActionMode Verify when a Value is entered.",
+            "If the Buffer button is clicked instead of the Add button, the default ActionMode will be set to Buffer."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "These 5 points are the exact official recap for Lesson 5 — treat them as the minimum you must be able to recall word-for-word for the exam."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 06 - Adding Business Parameters",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 API Exercise 06 - Adding Business Parameters — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Confusing API Business Parameters with RTSB Business Parameters",
+      "trapDescription": "Candidates assume Business Parameters added from a Module's Technical View are the same mechanism as Business Parameters in Reusable TestStepBlocks from AS1.",
+      "bestPractice": "API Business Parameters are Module Attributes derived from the API Scan payload. They are conceptually different from the Business Parameters used in Reusable TestStepBlocks — don't conflate the two on the exam."
+    },
+    {
+      "title": "Assuming only code values can become Business Parameters",
+      "trapDescription": "Candidates think only literal data fields (name, ID, address) inside the payload can be turned into Business Parameters.",
+      "bestPractice": "Non-code elements can be added too — e.g. the Status Code drop-down, Response Time, Method, and Endpoint can all become Business Parameters usable for verification in the TestCase."
+    },
+    {
+      "title": "Selecting only the closing bracket to add a group",
+      "trapDescription": "Candidates select the closing curly bracket } at the bottom of a payload block, expecting the whole block to be added as a value range.",
+      "bestPractice": "To add an entire block as a grouped Business Parameter (value range), select from the OPENING curly bracket { downward through the items you want — selecting only the closing bracket does not work."
+    },
+    {
+      "title": "Expecting Buffer to apply to Request values",
+      "trapDescription": "Candidates try to use the Buffer ActionMode on a Request Module's value.",
+      "bestPractice": "Buffer only applies to Response Modules — a Response returns a value that can be stored, whereas a Request is, by definition, sending data in, not receiving it."
+    },
+    {
+      "title": "Believing API Scan edits auto-sync to Tosca",
+      "trapDescription": "Candidates change a parameter name in the API Scan (or directly in the Module payload) and expect all TestCases using it to update automatically.",
+      "bestPractice": "Changes never auto-synchronize. After editing the Payload, select the Business Attribute, highlight the parameter name in the Technical View, and click \"Update\" in the ribbon to propagate the change project-wide."
+    },
+    {
+      "title": "Not knowing the two valid ways to push an API Scan change into Tosca",
+      "trapDescription": "Candidates think there is only a single required procedure for handling API Scan changes, or that the Update button is optional cosmetic convenience.",
+      "bestPractice": "Official course Best Practice: changes must be updated either manually (edit the Payload, then Business Attribute + Technical View + ribbon Update) OR using the Update button in the API Home Menu. Both are valid — the Update button is simply the faster, bulk-refresh route."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Are Business Parameters added to an API Module's Technical View the same thing as the Business Parameters used in Reusable TestStepBlocks from the AS1 course?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Yes, they are identical mechanisms."
+        },
+        {
+          "id": "B",
+          "text": "No — API Business Parameters are Module Attributes derived from the API Scan payload, a different concept from RTSB Business Parameters."
+        },
+        {
+          "id": "C",
+          "text": "They are the same only for Response Modules."
+        },
+        {
+          "id": "D",
+          "text": "RTSB Business Parameters replaced API Business Parameters in newer Tosca versions."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The course explicitly calls out this is a common point of confusion.",
+      "rationale": "API Business Parameters are Module Attributes derived from the underlying API's payload. They are a distinct concept from the Business Parameters used in Reusable TestStepBlocks, which were covered in AS1."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A tester wants a TestCase to verify that a Message returned the expected HTTP Status Code. How can they achieve this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "This is not possible — Status Code cannot become a Business Parameter."
+        },
+        {
+          "id": "B",
+          "text": "Add the Status Code drop-down as a Business Parameter, then verify it in the TestCase."
+        },
+        {
+          "id": "C",
+          "text": "Only the Payload's data fields can ever become Business Parameters."
+        },
+        {
+          "id": "D",
+          "text": "Status Code can only be checked manually outside of Tosca."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Business Parameters aren't limited to data fields inside the payload body.",
+      "rationale": "Non-code elements like the Status Code drop-down can be added as Business Parameters, just like Response Time, Method, and Endpoint — enabling the TestCase to verify the expected status code was returned."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A tester highlights only the closing curly bracket } at the bottom of a payload block and clicks Add, expecting to create a grouped value range for the whole block. What happens?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It works exactly as expected."
+        },
+        {
+          "id": "B",
+          "text": "It does not work — the OPENING curly bracket { must be selected (down through the desired items) to add the whole block."
+        },
+        {
+          "id": "C",
+          "text": "Tosca automatically selects the correct bracket regardless."
+        },
+        {
+          "id": "D",
+          "text": "It adds every Module in the project as a group."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Order matters here — start from the top of the block, not the bottom.",
+      "rationale": "To add a whole block of items as a grouped Business Parameter (value range), you must select starting from the OPENING curly bracket { downward through the items. Selecting only the closing bracket } does not work."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A tester clicks \"Buffer\" (instead of \"Add\") on a value inside a Request Module in the Technical View. What is the expected behavior?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Buffer works normally on Request Modules, just like on Response Modules."
+        },
+        {
+          "id": "B",
+          "text": "Buffer only applies to Response Modules — a Request is inputting data, not receiving it, so there's nothing to buffer."
+        },
+        {
+          "id": "C",
+          "text": "Buffer converts the Request into a Response automatically."
+        },
+        {
+          "id": "D",
+          "text": "Buffer deletes the value instead of storing it."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about which direction data flows for a Request vs. a Response.",
+      "rationale": "The Buffer ActionMode only meaningfully applies to Response Modules, since a Response returns a value that can be captured and stored. A Request is, by definition, sending data to the server, not receiving anything to buffer."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "The server-side parameter name \"City\" is renamed to \"Town\". A tester updates the value in the Module's Payload but does not do anything else. What happens when they run the affected TestCase?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The TestCase passes normally — changes sync automatically."
+        },
+        {
+          "id": "B",
+          "text": "The TestCase fails, because Business Parameters and TestSteps elsewhere in the project were not updated to match."
+        },
+        {
+          "id": "C",
+          "text": "Tosca deletes the outdated TestCase automatically."
+        },
+        {
+          "id": "D",
+          "text": "Nothing changes until the project is closed and reopened."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Editing the Payload is only step one of a two-step process.",
+      "rationale": "Changes made in the Payload do not automatically propagate to Business Parameters, Modules, or TestSteps elsewhere. The Business Attribute must be selected, the parameter name highlighted in the Technical View, and \"Update\" clicked in the ribbon to push the change project-wide — otherwise the TestCase will fail."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "Per the course's official \"Best Practice\" slide, what happens to changes made in the API Scan after a Message has already been exported to Tosca?",
+      "options": [
+        {
+          "id": "A",
+          "text": "They synchronize automatically with the Modules and TestCases in Tosca."
+        },
+        {
+          "id": "B",
+          "text": "They do NOT synchronize automatically — they must be updated manually or via the Update button in the API Home Menu."
+        },
+        {
+          "id": "C",
+          "text": "They synchronize automatically, but only for Response Modules."
+        },
+        {
+          "id": "D",
+          "text": "The API Scan blocks further changes once a Message has been exported."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "This is stated verbatim as a course \"Best Practice\" slide.",
+      "rationale": "The course's official Best Practice states: changes made in the API Scan will not synchronize with the Modules or TestCases imported into Tosca after export. They must be updated manually, or using the Update button in the API Home Menu."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "What exactly does the \"Update\" button in the API Home Menu do?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It re-scans the entire API from scratch, discarding all existing Modules."
+        },
+        {
+          "id": "B",
+          "text": "It updates changes made to the API Scan after it has been exported to Tricentis Tosca."
+        },
+        {
+          "id": "C",
+          "text": "It converts all Request Modules into Response Modules."
+        },
+        {
+          "id": "D",
+          "text": "It permanently locks a Module against further edits."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Its name describes exactly what it does — no more, no less.",
+      "rationale": "The Update button's defined purpose is to update changes made to the API Scan after it has been exported to Tricentis Tosca — it is the ribbon-based alternative to manually editing each Business Attribute one by one."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "A Business Parameter is added (using Add, not Buffer) to a Module that was created from a Request in the API Scan. What is its default ActionMode once a Value is filled in?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Verify"
+        },
+        {
+          "id": "B",
+          "text": "Insert"
+        },
+        {
+          "id": "C",
+          "text": "Buffer"
+        },
+        {
+          "id": "D",
+          "text": "WaitOn"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about what a Request does: it sends data TO the SUT.",
+      "rationale": "Official Best Practice: if the Module was created from a Request in the API Scan, the default ActionMode is Insert once a Value is filled in — Insert allows Tosca to create objects in the SUT using the API and write a new value."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "A Business Parameter is added (using Add, not Buffer) to a Module that was created from a Response in the API Scan. What is its default ActionMode once a Value is filled in, and what should you double-check about that value?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Insert — and the value must be numeric."
+        },
+        {
+          "id": "B",
+          "text": "Verify — and the text entered in the Value column is case sensitive."
+        },
+        {
+          "id": "C",
+          "text": "Buffer — and the value is stored for later reuse only."
+        },
+        {
+          "id": "D",
+          "text": "WaitOn — and the value must match a regular expression."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "A Response is something Tosca reads back and checks, not writes.",
+      "rationale": "Official Best Practice: if the linked Module was created from a Response in the API Scan, the default ActionMode is Verify once a Value is filled in. Verify compares the TestStep value with the API's value, and the text entered in the Value column is case sensitive."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "API Module",
+      "value": "Holds technical info imported from the API Scan; every Message produces a Request Module + a Response Module, fully independent in Tosca."
+    },
+    {
+      "key": "Business Parameter",
+      "value": "A business-relevant element (or even a non-code item like Status Code) added from the Technical View — NOT the same as RTSB Business Parameters."
+    },
+    {
+      "key": "Grouped values",
+      "value": "Select from the opening { downward to add a whole block as a value range in one go."
+    },
+    {
+      "key": "DefaultActionMode",
+      "value": "Add on Request → Insert. Add on Response → Verify. Buffer → only valid on a Response."
+    },
+    {
+      "key": "Updating after API changes",
+      "value": "Official Best Practice: API Scan changes never auto-sync. Update manually (Payload + Business Attribute + Technical View + ribbon Update), or use the Update button in the API Home Menu — or the TestCase will fail."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 05 - API Modules (video)",
+      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
+      "duration": "video"
+    }
+  ]
+}

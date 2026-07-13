@@ -1,0 +1,419 @@
+{
+  "moduleId": "TAS1-M04",
+  "moduleTitle": "Section 4 - Advanced Module Actions",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2997/lesson-video-advanced-module-actions",
+  "learningObjectives": [
+    "Use Rescan to update an existing Module when the SUT's UI changes.",
+    "Apply Value Range to restrict acceptable values for a Control.",
+    "Perform Module Merge to combine two Modules into one and resolve duplicate scanning."
+  ],
+  "estTime": "30 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Rescan",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Rescan",
+          "description": "Re-scans an existing Module's Controls against the live SUT to update their technical properties — without deleting or recreating the Module."
+        },
+        {
+          "type": "list",
+          "title": "When to use Rescan:",
+          "items": [
+            "A UI redesign changed an element's class, ID, or attribute",
+            "A developer updated an element's property that Tosca uses to identify it",
+            "A new, more reliable property became available for identification",
+            "After a SUT deployment that modifies UI elements"
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Do NOT delete and recreate a Module when the SUT changes — this breaks all TestCase references. Rescan UPDATES the existing Module in place, preserving all references."
+        },
+        {
+          "type": "list",
+          "title": "How to rescan (Exercise 18 procedure):",
+          "items": [
+            "Open the SUT page you want to rescan and leave it open.",
+            "Right-click the Module → choose to rescan it.",
+            "Keep the already-selected Controls AND add any new Controls (e.g., 'Update shopping cart' button, 'Apply coupon' button).",
+            "Rename Controls during the rescan for business readability (e.g., 'discountcouponcode textbox' → 'Enter discount code').",
+            "Use 'Mark on Screen' to locate the correct element (e.g., to identify the right table)."
+          ]
+        },
+        {
+          "type": "analogy",
+          "text": "Rescan is like updating your contact book when a friend moves — you don't create a new contact, you update the existing address so all references to that contact remain valid."
+        }
+      ],
+      "bulletPoints": [
+        "Rescan = update in place. All TestCases referencing the module automatically use the updated properties.",
+        "During a rescan you can ADD new Controls and RENAME existing ones — not just refresh properties.",
+        "Use Rescan proactively after any SUT deployment that changes UI elements."
+      ]
+    },
+    {
+      "sectionTitle": "Value Range",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Value Range",
+          "description": "A property set on a Control within a Module that defines the list of acceptable values for that Control. Acts as a validation layer at the Module level."
+        },
+        {
+          "type": "list",
+          "title": "How Value Range works:",
+          "items": [
+            "Defined on the Control inside the Module — not on the TestCase or TestStep",
+            "Restricts what values can be entered or verified for that element",
+            "If a TestStep tries to use a value outside the range, Tosca flags it as invalid",
+            "Common use case: a dropdown that only accepts 'EUR', 'USD', or 'GBP'"
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Value Range Syntax (confirmed exercise detail)",
+          "description": "When entering multiple values into a Value Range, separate them with semicolons and use NO spaces between values.",
+          "items": [
+            "Correct: AutomationDiscount2;PercentageTotal;PercentageShipping;FlatTotal",
+            "Wrong: AutomationDiscount2, PercentageTotal (commas + spaces)",
+            "Wrong: AutomationDiscount2; PercentageTotal (spaces after semicolons)",
+            "Separator = semicolon ( ; ) only. Spaces would be treated as part of the value."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Value Range is defined at the Module/Control level — it applies everywhere that Control is used, across all TestCases."
+        }
+      ],
+      "bulletPoints": [
+        "Value Range prevents invalid test data errors at the source — the Module definition.",
+        "More robust than per-TestCase validation: define once, enforced everywhere.",
+        "Separate range values with semicolons and NO spaces: value1;value2;value3."
+      ]
+    },
+    {
+      "sectionTitle": "Module Merge",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Module Merge",
+          "description": "Combines two separate Modules that represent the same SUT element into one authoritative Module. After merging, all TestSteps referencing either original module are updated automatically."
+        },
+        {
+          "type": "concept",
+          "term": "Target Module vs. Source Module (key exam concept)",
+          "description": "In a merge, one Module is the Target and the other is the Source.",
+          "items": [
+            "Target Module = the one you KEEP. It survives the merge.",
+            "Source Module = the one that gets DELETED after its selected Attributes are copied into the Target.",
+            "If the wrong Module is set as Target, use the 'Switch Modules' option to swap them.",
+            "You choose which Attributes to bring from the Source into the Target.",
+            "Tosca automatically links Attributes that have identical properties in both Modules."
+          ]
+        },
+        {
+          "type": "list",
+          "title": "How to merge two Modules (Exercise 18 procedure):",
+          "items": [
+            "Select both Modules simultaneously using CTRL+Click.",
+            "On the Modules tab in the top ribbon, select 'Merge Modules'.",
+            "Confirm the correct Module is the Target — if not, click 'Switch Modules'.",
+            "Select the Attributes to bring from the Source into the Target.",
+            "Tosca 15.0+: if a Self-Healing steering parameter warning appears, click the red cross icon to remove that property.",
+            "Click 'Merge' — Tosca reports how many Attributes were updated, relinks all usages, and deletes the Source Module.",
+            "Click 'Close' and rename the surviving Module if needed."
+          ]
+        },
+        {
+          "type": "list",
+          "title": "Why merge duplicate Modules:",
+          "items": [
+            "Duplicate Modules are created when multiple team members scan the same SUT page independently",
+            "Maintaining two Modules for the same element doubles the maintenance effort",
+            "A SUT change would need to be applied to both duplicates — merge eliminates this risk",
+            "After merge: one authoritative Module, all TestCase references consolidated"
+          ]
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Feature",
+            "Rescan",
+            "Module Merge"
+          ],
+          "rows": [
+            [
+              "Problem solved",
+              "Module properties are outdated",
+              "Two Modules exist for the same SUT element"
+            ],
+            [
+              "Input",
+              "One existing Module + live SUT",
+              "Two existing Modules"
+            ],
+            [
+              "Output",
+              "Same Module with updated properties",
+              "One merged Module replacing both"
+            ]
+          ]
+        },
+        {
+          "type": "analogy",
+          "text": "Module Merge is like deduplicating your contact list: if 'John Smith' is entered twice with slightly different phone numbers, you merge them into one complete, authoritative entry."
+        },
+        {
+          "type": "diagram",
+          "svg": "<svg viewBox=\"0 0 720 210\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arr4\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">RESCAN vs. MODULE MERGE — WHEN TO USE EACH</text><rect x=\"20\" y=\"28\" width=\"320\" height=\"170\" rx=\"10\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"180\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">Rescan</text><text x=\"180\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Problem: Module properties are outdated</text><rect x=\"40\" y=\"80\" width=\"280\" height=\"26\" rx=\"5\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"180\" y=\"97\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\">Input: 1 Module + live SUT</text><rect x=\"40\" y=\"112\" width=\"280\" height=\"26\" rx=\"5\" fill=\"rgba(109,139,255,0.12)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"180\" y=\"129\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\">Output: same Module, updated properties</text><rect x=\"40\" y=\"144\" width=\"280\" height=\"44\" rx=\"5\" fill=\"rgba(109,139,255,0.05)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"180\" y=\"162\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">All TestCase references preserved</text><text x=\"180\" y=\"178\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Do NOT delete + recreate</text><rect x=\"380\" y=\"28\" width=\"320\" height=\"170\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"540\" y=\"52\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"13\" font-weight=\"700\">Module Merge</text><text x=\"540\" y=\"70\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"10\">Problem: same SUT element scanned twice</text><rect x=\"400\" y=\"80\" width=\"280\" height=\"26\" rx=\"5\" fill=\"rgba(30,138,91,0.12)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"540\" y=\"97\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"10\">Input: 2 existing duplicate Modules</text><rect x=\"400\" y=\"112\" width=\"280\" height=\"26\" rx=\"5\" fill=\"rgba(30,138,91,0.12)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"540\" y=\"129\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"10\">Output: 1 merged authoritative Module</text><rect x=\"400\" y=\"144\" width=\"280\" height=\"44\" rx=\"5\" fill=\"rgba(30,138,91,0.05)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"540\" y=\"162\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">All TestCase references auto-updated</text><text x=\"540\" y=\"178\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Review after onboarding new team members</text></svg>",
+          "caption": "Rescan: one outdated Module → re-sync with live SUT. Module Merge: two duplicate Modules → combine into one."
+        }
+      ],
+      "bulletPoints": [
+        "Module Merge: same SUT element scanned twice → merge into one.",
+        "Review for duplicates regularly — especially after onboarding new team members."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 18 — Apply Rescan, Value Range and Module Merge",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 AS1 Exercise 18 — Apply Rescan, Value Range and Module Merge — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2997/lesson-video-advanced-module-actions"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Rescan ≠ delete and recreate",
+      "trapDescription": "Distractors suggest deleting the old Module and creating a new one when the SUT changes. This would break all referencing TestCases.",
+      "bestPractice": "Rescan UPDATES the existing Module in place. All TestCases continue to reference it without changes."
+    },
+    {
+      "title": "Value Range is set on the Module, not the TestCase",
+      "trapDescription": "Candidates place Value Range configuration in the TestStep or TestCase properties.",
+      "bestPractice": "Value Range is a property of a Control inside a Module. It constrains what values are permissible for that Control everywhere it is used."
+    },
+    {
+      "title": "Module Merge purpose",
+      "trapDescription": "Questions ask when to use Module Merge. Candidates confuse it with Rescan (updating an outdated module).",
+      "bestPractice": "Module Merge = combining duplicate Modules into one. Rescan = updating a single Module's properties from the live SUT."
+    },
+    {
+      "title": "Value Range separator — semicolon, no spaces",
+      "trapDescription": "Candidates separate Value Range entries with commas or add spaces after the semicolon. Spaces become part of the value and break matching.",
+      "bestPractice": "Separate Value Range entries with semicolons and NO spaces: value1;value2;value3. Commas and spaces are wrong."
+    },
+    {
+      "title": "Target Module survives, Source Module is deleted",
+      "trapDescription": "Candidates think the Source Module is kept, or that both survive. In a merge, the Source is deleted after its Attributes are copied to the Target.",
+      "bestPractice": "Target Module = the one you keep. Source Module = the one deleted. If the wrong one is set as Target, use 'Switch Modules' before merging."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "After a SUT deployment, a button's HTML class attribute changed from 'btn-primary' to 'btn-action'. The existing Module still references the old class. What is the correct action?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Rescan the existing Module to update the Control's properties with the new attribute."
+        },
+        {
+          "id": "B",
+          "text": "Delete the old Module and scan the button again to create a new one."
+        },
+        {
+          "id": "C",
+          "text": "Manually edit every TestStep that uses this Module to reflect the new attribute."
+        },
+        {
+          "id": "D",
+          "text": "No action needed — Tosca automatically detects SUT changes."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Update in place — don't delete.",
+      "rationale": "Rescan updates the existing Module's Control properties from the live SUT. This is far safer than deleting and recreating (which would break TestCase references) or manually editing every TestStep."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A tester notices that the same 'Login' page was scanned by two team members, resulting in two separate Modules for the same page with overlapping Controls. What is the recommended solution?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Keep both Modules and use whichever is more complete."
+        },
+        {
+          "id": "B",
+          "text": "Use Module Merge to combine the two Modules into one authoritative module."
+        },
+        {
+          "id": "C",
+          "text": "Delete one Module and manually update all TestCases that referenced it."
+        },
+        {
+          "id": "D",
+          "text": "Use Rescan on both modules to synchronize their properties."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Two Modules for the same element = merge them.",
+      "rationale": "Module Merge combines duplicate Modules into one. After merging, all referencing TestSteps are updated automatically. Keeping both creates maintenance burden; deleting one requires manual TestCase updates."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A 'Currency' dropdown Control should only accept 'EUR', 'USD', or 'GBP'. A tester wants to enforce this constraint at the Module level. Which feature should they use?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Use ActionMode Constraint to restrict the value."
+        },
+        {
+          "id": "B",
+          "text": "Add a Verify step in every TestCase that uses this Control."
+        },
+        {
+          "id": "C",
+          "text": "Create a separate Module for each currency option."
+        },
+        {
+          "id": "D",
+          "text": "Set a Value Range on the Control in the Module."
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "hint": "The constraint belongs at the Module/Control level.",
+      "rationale": "Value Range is a Module-level property that defines acceptable values for a Control. Setting it on the Currency Control ensures that any TestStep using that Control is automatically restricted to the allowed values — no per-TestCase verification needed."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A tester adds four discount codes to a Value Range on a Control. Which entry is formatted correctly?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Code1, Code2, Code3, Code4"
+        },
+        {
+          "id": "B",
+          "text": "Code1; Code2; Code3; Code4"
+        },
+        {
+          "id": "C",
+          "text": "Code1;Code2;Code3;Code4"
+        },
+        {
+          "id": "D",
+          "text": "Code1 Code2 Code3 Code4"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Semicolons, and watch out for spaces.",
+      "rationale": "Value Range entries are separated by semicolons with NO spaces: Code1;Code2;Code3;Code4. Commas (A) are wrong. Spaces after semicolons (B) become part of the value and break matching. Spaces alone (D) are not a valid separator."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "During a Module Merge, the tester wants to make sure the correct Module is kept and the duplicate is removed. Which statement is true about the Target and Source Modules?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The Target Module is kept; the Source Module is deleted after its Attributes are copied over."
+        },
+        {
+          "id": "B",
+          "text": "The Source Module is kept; the Target Module is deleted."
+        },
+        {
+          "id": "C",
+          "text": "Both Modules are kept and linked together."
+        },
+        {
+          "id": "D",
+          "text": "Tosca randomly chooses which Module to keep."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Target = the one that stays.",
+      "rationale": "The Target Module is the one you keep; the Source Module is deleted after its selected Attributes are copied into the Target. If the wrong Module is set as Target, use 'Switch Modules' to swap them before merging."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "A tester is rescanning a Module and notices a newly added 'Apply coupon' button on the page that is not yet in the Module. What can they do during the rescan?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Nothing — rescan only refreshes properties of existing Controls."
+        },
+        {
+          "id": "B",
+          "text": "Add the new Control to the Module and optionally rename it during the rescan."
+        },
+        {
+          "id": "C",
+          "text": "They must create a separate new Module for the button and merge it later."
+        },
+        {
+          "id": "D",
+          "text": "Delete the Module and start a fresh scan to include the button."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Rescan can do more than refresh — it can grow the Module.",
+      "rationale": "During a rescan you can keep the already-selected Controls AND add new ones (like the 'Apply coupon' button), and you can rename Controls for readability. You do not need to create a separate Module or delete and recreate the existing one."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Rescan",
+      "value": "Updates an existing Module's Control properties from the live SUT. Preserves all TestCase references."
+    },
+    {
+      "key": "Value Range",
+      "value": "Set on a Control in the Module. Restricts allowable values for that Control across all TestCases."
+    },
+    {
+      "key": "Value Range syntax",
+      "value": "Separate values with semicolons, NO spaces: value1;value2;value3."
+    },
+    {
+      "key": "Module Merge",
+      "value": "Combines duplicate Modules (same SUT element scanned multiple times) into one authoritative module."
+    },
+    {
+      "key": "Target vs Source Module",
+      "value": "Target = kept. Source = deleted after Attributes copied over. Use 'Switch Modules' to swap. CTRL+Click both → Modules ribbon → Merge Modules."
+    },
+    {
+      "key": "Rescan capabilities",
+      "value": "Right-click Module → rescan. Can refresh properties, ADD new Controls, and RENAME Controls — all without breaking references."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 21 - Advanced Module Actions",
+      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2997/lesson-video-advanced-module-actions",
+      "duration": "video"
+    }
+  ]
+}

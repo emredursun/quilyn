@@ -1,0 +1,295 @@
+{
+  "moduleId": "TAPI-M02",
+  "moduleTitle": "Lesson 1 - Introduction to the API Scan",
+  "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
+  "learningObjectives": [
+    "Start the API Scan from Tricentis Tosca and know the two ways to open it.",
+    "Scan a REST URI and navigate the resulting Operations and Messages.",
+    "Distinguish the Payload, Request, and Response views for a Message.",
+    "Send a POST request with a Service Access Key and interpret common HTTP status codes."
+  ],
+  "estTime": "45 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Opening the API Scan",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Two ways to open the API Scan",
+          "description": "The API Scan can be started either from the ApiScanStandalone.exe file directly, or from inside Tricentis Tosca via the API Testing tab on the Home ribbon. This course always opens it from inside Tosca, since every exercise exports results into Tosca Commander."
+        },
+        {
+          "type": "steps",
+          "title": "Starting a scan from Tosca",
+          "items": [
+            "Best practice: create a new Component Folder in Tosca before starting a new API Scan, so the exported results land somewhere organized.",
+            "On the Home ribbon, open the API Testing tab, then click the API Scan button.",
+            "Choose \"Start API Scan\" to scan a new URI or file, or \"Open selected module\" to reopen a previously scanned and saved project.",
+            "Two scan options are available: scan a file (JSON or XML) from a local/shared drive, or scan a URI."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "The first time the API Scan opens there is nothing loaded; every subsequent time it defaults to reopening your last saved project."
+        }
+      ],
+      "bulletPoints": [
+        "Create the Component Folder BEFORE starting the scan — that's where the exported Modules/TestCases will land.",
+        "Scan URI vs. Scan file: URI scans a live endpoint; file scans a local JSON/XML document."
+      ]
+    },
+    {
+      "sectionTitle": "Operations, Messages, and the Payload",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Operations and Messages",
+          "description": "Operations contain Messages. A Message's content is only loaded the first time you click its Operation — this avoids the performance cost of generating content for every message up-front on a large, complex API."
+        },
+        {
+          "type": "concept",
+          "term": "Payload",
+          "description": "The area where you interact with and check responses. When a Message is first selected, the Payload shows a representation of what can be sent as a Request. Sending that default content usually returns an error — you must fill in appropriate data first. Some Requests (e.g. a GET) can have an empty Payload by design. Unneeded elements can be deleted from the Payload if they aren't relevant to what you're testing."
+        },
+        {
+          "type": "steps",
+          "title": "Sending your first REST request (Shops_Post example)",
+          "items": [
+            "Navigate to the \"shops\" folder and the Shops_Post message.",
+            "Enter the previously generated Service Access Key as the \"key\" parameter.",
+            "Fill in the new shop's properties (country, city, name) in the Payload.",
+            "Confirm the Method is set to POST — POST creates a new entry, PUT updates an existing one.",
+            "Send the message and check the Response tab."
+          ]
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Status Code",
+            "Meaning"
+          ],
+          "rows": [
+            [
+              "200 OK",
+              "The request succeeded"
+            ],
+            [
+              "404",
+              "The resource was not found"
+            ],
+            [
+              "500",
+              "The server is down or unreachable"
+            ]
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "The Payload's default content is a template, not real data — fill it in before sending to get a meaningful response.",
+        "POST = create a new entry. PUT = update an existing entry. Using the wrong one is a common mistake.",
+        "200 OK confirms success; you can also verify a change directly on the SUT's own page (e.g. the Coffeeshop site)."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-On: Exercise 01 - Exploring the REST Protocol",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 API Exercise 01 - Exploring the REST Protocol — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Waiting for every Message to preload",
+      "trapDescription": "Candidates assume all Messages under an Operation are loaded as soon as the API is scanned.",
+      "bestPractice": "A Message's content only loads the first time you click its Operation. This avoids performance issues when scanning larger, more complex APIs — only the empty Operation names load upfront."
+    },
+    {
+      "title": "Sending the default Payload as-is",
+      "trapDescription": "Candidates send the Request without editing the Payload and are confused when they get an error back.",
+      "bestPractice": "The default Payload is only a structural template. You must fill in real, valid data before sending — unless the Method is GET, where an empty Payload is often correct by design."
+    },
+    {
+      "title": "Confusing POST and PUT",
+      "trapDescription": "Candidates use PUT to create a brand-new entry, or POST to update an existing one.",
+      "bestPractice": "POST creates a new entry (e.g. adding a new shop). PUT updates an existing entry. Choosing the wrong Method causes the request to fail or behave unexpectedly."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "In the API Scan's Project Tree, when is a Message's payload content actually generated?",
+      "options": [
+        {
+          "id": "A",
+          "text": "As soon as the URI is scanned, for every Message at once."
+        },
+        {
+          "id": "B",
+          "text": "Only the first time you click on its Operation."
+        },
+        {
+          "id": "C",
+          "text": "Only after the Message has been exported to Tosca."
+        },
+        {
+          "id": "D",
+          "text": "Messages never load content — only Operations do."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about why this matters for a large, complex API.",
+      "rationale": "A Message is only loaded after you click on its Operation for the first time. Loading every message upfront on a large API would be slow and could cause general performance issues."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A tester wants to add a brand-new coffee shop branch to the Coffeeshop service. Which HTTP Method should the Message use?",
+      "options": [
+        {
+          "id": "A",
+          "text": "GET"
+        },
+        {
+          "id": "B",
+          "text": "PUT"
+        },
+        {
+          "id": "C",
+          "text": "POST"
+        },
+        {
+          "id": "D",
+          "text": "DELETE"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "This method is used to create something new; a different one updates something that already exists.",
+      "rationale": "POST is used to create a new entry, such as adding a new coffee shop branch. PUT is used to update an existing entry — using it here would be incorrect."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "After sending a Request message in the API Scan, what does a Status Code of 200 mean?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The resource was not found."
+        },
+        {
+          "id": "B",
+          "text": "The server is down or unreachable."
+        },
+        {
+          "id": "C",
+          "text": "The request succeeded (OK)."
+        },
+        {
+          "id": "D",
+          "text": "The request is still pending."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "This is the most common 'everything worked' status code.",
+      "rationale": "200 OK confirms the request succeeded. 404 means the resource wasn't found, and 500 indicates the server is down or unreachable."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "Which of the following is best practice before starting a new API Scan from inside Tricentis Tosca?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Create a new Component Folder to organize where the export will land."
+        },
+        {
+          "id": "B",
+          "text": "Delete all existing Component Folders in the project."
+        },
+        {
+          "id": "C",
+          "text": "Disable the Home ribbon's API Testing tab."
+        },
+        {
+          "id": "D",
+          "text": "Always scan a file instead of a URI."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "This is about keeping your Tosca project organized before you generate new artifacts.",
+      "rationale": "Best practice is to create a new Component Folder in Tosca before initiating a new API Scan — the scanned API information will be stored there once exported, keeping the session organized."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A learner sends a Shops_Get request expecting to see all coffee shops, but forgot to fill in the \"key\" parameter with their Service Access Key. What is the most likely result?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The request succeeds normally, since the key is optional."
+        },
+        {
+          "id": "B",
+          "text": "The request fails or returns an error, since the Coffeeshop requires the key to authenticate."
+        },
+        {
+          "id": "C",
+          "text": "Tosca automatically fills in the key from the last session."
+        },
+        {
+          "id": "D",
+          "text": "The Method automatically switches from GET to POST."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Recall why the Coffeeshop needs a Service Access Key in the first place.",
+      "rationale": "The Coffeeshop requires the Service Access Key as the \"key\" parameter to authenticate every request. Without it (or with an incorrect/expired key), the request will fail or return an error."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Two ways to open API Scan",
+      "value": "Standalone .exe, or from Tosca's Home ribbon > API Testing tab (used throughout this course)."
+    },
+    {
+      "key": "Before scanning",
+      "value": "Create a Component Folder in Tosca first, to organize the export destination."
+    },
+    {
+      "key": "Message loading",
+      "value": "A Message's content loads only on first click of its Operation — performance optimization for large APIs."
+    },
+    {
+      "key": "Payload default",
+      "value": "Structural template, not real data — must be filled in before sending (except some GETs, which can be empty)."
+    },
+    {
+      "key": "POST vs. PUT",
+      "value": "POST = create new entry. PUT = update existing entry."
+    },
+    {
+      "key": "Status codes",
+      "value": "200 OK = success. 404 = not found. 500 = server down/unreachable."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 01 - Introduction to the API Scan (video)",
+      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
+      "duration": "video"
+    }
+  ]
+}

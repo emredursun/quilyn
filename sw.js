@@ -1,8 +1,9 @@
-const CACHE_NAME = 'pega-lms-v7';
+const CACHE_NAME = 'quilyn-v17';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
+  './icon.svg',
   './core/css/theme.css',
   './core/css/views.css',
   './core/js/quiz-engine.js',

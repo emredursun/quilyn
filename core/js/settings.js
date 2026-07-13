@@ -1,5 +1,5 @@
 /* =====================================================================
-   PegaAcademy — settings.js
+   Quilyn — settings.js
    Progress backup (export/import) and settings modal.
    Exposes window.PegaSettings = { show, hide }
    ===================================================================== */
@@ -38,7 +38,7 @@
     var url = URL.createObjectURL(blob);
     var a = document.createElement('a');
     a.href = url;
-    a.download = 'pegaacademy-progress-' + new Date().toISOString().slice(0, 10) + '.json';
+    a.download = 'quilyn-progress-' + new Date().toISOString().slice(0, 10) + '.json';
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
