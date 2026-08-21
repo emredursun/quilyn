@@ -1,0 +1,219 @@
+{
+  "moduleId": "TDS1-M04",
+  "moduleTitle": "Lesson 4 - Combinatorial Methods",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+  "learningObjectives": [
+    "Compare the four combinatorial methods Tosca supports: All Combinations, Orthogonal, Pairwise, and Linear Expansion.",
+    "Calculate the resulting number of TestCases for All Combinations, Orthogonal, and Linear Expansion given a set of Attributes and Instances.",
+    "Manually build Linear Expansion combinations at both the Attribute level and the TestSheet level.",
+    "Use Arrange Instances, Merge Instance Duplicates, and the F9 shortcut to keep a TestSheet manageable."
+  ],
+  "estTime": "30 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "The four combinatorial methods",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "All Combinations",
+          "description": "Every possible combination of Instance values across the combined Attributes is generated. This produces the highest number of TestCases — for 3 Attributes with 3 Instances each, that's 3 × 3 × 3 = 27 combinations. Thorough, but the TestCase count (and execution time) grows very fast as Attributes/Instances are added."
+        },
+        {
+          "type": "concept",
+          "term": "Orthogonal",
+          "description": "Produces the lowest possible number of combinations. The only requirement is that every Instance value is used at least once. The number of resulting combinations equals the highest Instance count among the combined Attributes — for 3 Attributes with 3 Instances each, that's just 3 combinations. If Attributes have unequal Instance counts, values from the Attribute(s) with fewer Instances repeat until the Attribute with the most Instances is exhausted."
+        },
+        {
+          "type": "concept",
+          "term": "Pairwise",
+          "description": "Combines every possible pair of values between two Attributes. Not a primary focus of this course."
+        },
+        {
+          "type": "concept",
+          "term": "Linear Expansion (Tricentis-recommended)",
+          "description": "Starts from a StraightThrough baseline — the first TestCase uses the StraightThrough Instance from every combined Attribute (essentially the smoke test). Every subsequent combination swaps out exactly one StraightThrough Instance for a single non-StraightThrough Instance. This continues until every non-StraightThrough Instance has appeared at least once. Each generated TestCase therefore differs from the baseline in only one place, giving it a clear, isolated test focus."
+        }
+      ],
+      "bulletPoints": [
+        "All Combinations = most TestCases, most thorough, slowest to execute.",
+        "Orthogonal = fewest TestCases (= the largest per-Attribute Instance count), fastest to execute, but a failure doesn't point to a clear cause.",
+        "Linear Expansion = moderate TestCase count, each with exactly one variable changed from the baseline — easy to debug on failure."
+      ]
+    },
+    {
+      "sectionTitle": "Choosing a method",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "It depends on the project",
+          "description": "The right method depends on the Requirement's specification level, regulatory/legal constraints, and project context. Some industries mandate All Combinations for specific high-risk Requirements. Where there's no such constraint, Tricentis recommends Linear Expansion as the default because of its balance between coverage and clarity of test focus."
+        }
+      ],
+      "bulletPoints": [
+        "Default recommendation: Linear Expansion, unless project/legal requirements say otherwise."
+      ]
+    },
+    {
+      "sectionTitle": "Building combinations manually in Tosca",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Instances as combination columns",
+          "description": "Once generated, combinations appear as Instance columns on the level where they were built — at the TestSheet level, or at an individual Attribute's level. Each combined Instance column represents one TestCase-to-be. Under Linear Expansion, the first generated column is the all-StraightThrough baseline; each subsequent column swaps in one non-StraightThrough value."
+        },
+        {
+          "type": "concept",
+          "term": "Combining at Attribute level vs TestSheet level",
+          "description": "Combinations don't have to be built only at the top TestSheet level — they can also be built lower, on an individual Attribute (e.g. combining just the sub-Attributes under 'Credit Card'). Once an Attribute-level combination exists, the TestSheet level only needs to reference the Instance name from that Attribute, and its values auto-populate. Attribute-level combinations show highlighted in light yellow at the TestSheet level, so you can see at a glance that a block of data was pre-combined lower down."
+        },
+        {
+          "type": "note",
+          "text": "You must be focused on a particular level (TestSheet or a specific Attribute) to see that level's Instance columns."
+        }
+      ],
+      "bulletPoints": [
+        "Attribute-level combinations = reusable building blocks; TestSheet-level combinations = the final TestCase set."
+      ]
+    },
+    {
+      "sectionTitle": "Keeping a TestSheet manageable",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Arrange Instances",
+          "description": "Right-click the TestSheet, or use 'Optimize Instances' → 'Arrange Instances' in the Ribbon, to sort Instance columns into a consistent order: StraightThrough first, then Valid Inner, then Invalid, then Boundary, then Invalid Boundary."
+        },
+        {
+          "type": "concept",
+          "term": "Merge Instance Duplicates",
+          "description": "Available in the Ribbon and the context menu — finds Instance columns that are identical and removes all but one, keeping the TestSheet lean."
+        },
+        {
+          "type": "note",
+          "text": "Hover over the TestSheet icon to see how many Instances exist at that level."
+        },
+        {
+          "type": "note",
+          "text": "Press F9 to hide/reveal the Instance rows in the TestCase Design section. This doesn't delete anything — it's purely a view toggle to make large, complex TestSheets easier to read at a glance."
+        },
+        {
+          "type": "note",
+          "text": "📄 Exercise 04a-04b (Data Combinations - Manual Linear Expansion, Lower Levels & TestSheet Level) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ],
+      "bulletPoints": [
+        "Arrange Instances = consistent sort order. Merge Instance Duplicates = remove redundant columns. F9 = show/hide Instance rows (view only, non-destructive)."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Calculating Orthogonal combinations by multiplying Instance counts",
+      "trapDescription": "Using the All Combinations formula (multiplying every Attribute's Instance count together) when asked for the Orthogonal result.",
+      "bestPractice": "Orthogonal produces a number of combinations equal to the LARGEST single Attribute's Instance count — not the product of all of them. Multiplying is the All Combinations formula."
+    },
+    {
+      "title": "Assuming Linear Expansion produces the fewest TestCases",
+      "trapDescription": "Confusing Linear Expansion's 'moderate, focused' result set with Orthogonal's 'minimum count' result set.",
+      "bestPractice": "Orthogonal produces the fewest TestCases (no clear per-case focus). Linear Expansion produces a moderate count — one baseline plus one TestCase per non-StraightThrough Instance — each with a single, clear point of difference from the baseline."
+    },
+    {
+      "title": "Building Linear Expansion combinations without marking a StraightThrough first",
+      "trapDescription": "Generating combinations before any Instance has been flagged as StraightThrough.",
+      "bestPractice": "Linear Expansion needs a defined StraightThrough baseline before combining — without it, there's no 'happy path' TestCase to expand outward from."
+    },
+    {
+      "title": "Thinking F9 deletes Instances",
+      "trapDescription": "Pressing F9 to 'clean up' a busy TestSheet and assuming the Instances are gone.",
+      "bestPractice": "F9 only toggles the visibility of Instance rows in the current view — the Instances and their combinations are untouched. Press F9 again to reveal them."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A TestSheet has 3 Attributes, each with 4 Instances. How many TestCases result from All Combinations?",
+      "options": [
+        { "id": "A", "text": "4" },
+        { "id": "B", "text": "12" },
+        { "id": "C", "text": "64" },
+        { "id": "D", "text": "7" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "All Combinations multiplies every Attribute's Instance count together.",
+      "rationale": "All Combinations generates every possible combination: 4 × 4 × 4 = 64 TestCases."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "Using the same TestSheet (3 Attributes, each with 4 Instances), how many TestCases result from the Orthogonal method?",
+      "options": [
+        { "id": "A", "text": "64" },
+        { "id": "B", "text": "12" },
+        { "id": "C", "text": "4" },
+        { "id": "D", "text": "3" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "Orthogonal's result equals the largest per-Attribute Instance count, not a product.",
+      "rationale": "Orthogonal only requires each Instance value be used at least once; the number of combinations equals the highest Instance count on any one Attribute — here, 4."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A TestSheet has 4 combined Attributes with a total of 9 non-StraightThrough Instances across them. Using Linear Expansion, how many TestCases result in total?",
+      "options": [
+        { "id": "A", "text": "9 (one per non-StraightThrough Instance, no baseline)." },
+        { "id": "B", "text": "10 — the StraightThrough baseline, plus one TestCase per non-StraightThrough Instance." },
+        { "id": "C", "text": "4 — one per Attribute." },
+        { "id": "D", "text": "36 — all combinations of the 4 Attributes and 9 Instances." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Linear Expansion always starts with one all-StraightThrough baseline TestCase, then adds one per remaining Instance.",
+      "rationale": "Linear Expansion produces one baseline TestCase (all StraightThrough values), plus exactly one additional TestCase per non-StraightThrough Instance — so 1 + 9 = 10 TestCases total."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What order does 'Arrange Instances' sort Instance columns into on a TestSheet?",
+      "options": [
+        { "id": "A", "text": "Alphabetical by Instance name only." },
+        { "id": "B", "text": "StraightThrough, then Valid Inner, then Invalid, then Boundary, then Invalid Boundary." },
+        { "id": "C", "text": "Boundary first, StraightThrough last." },
+        { "id": "D", "text": "Random order, refreshed each time it's run." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The baseline always comes first, then increasing levels of edge-case complexity.",
+      "rationale": "Arrange Instances groups columns as: StraightThrough → Valid Inner → Invalid → Boundary → Invalid Boundary, giving a consistent, readable order."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A tester presses F9 on a large TestSheet and the Instance rows disappear from view. What just happened?",
+      "options": [
+        { "id": "A", "text": "All Instances and their combinations were permanently deleted." },
+        { "id": "B", "text": "The Instance rows were merged as duplicates." },
+        { "id": "C", "text": "The Instance rows were only hidden from the current view; pressing F9 again reveals them." },
+        { "id": "D", "text": "The TestSheet was converted into a Class." }
+      ],
+      "correctOptions": ["C"],
+      "hint": "This is a view toggle, not a data operation.",
+      "rationale": "F9 hides/reveals the Instance rows purely as a display convenience for large, complex TestSheets — no data is changed or removed."
+    }
+  ],
+  "quickRecap": [
+    { "key": "All Combinations", "value": "Every possible combo — highest TestCase count. Formula: product of all Instance counts." },
+    { "key": "Orthogonal", "value": "Every value used once — lowest TestCase count. Formula: largest single Attribute's Instance count." },
+    { "key": "Pairwise", "value": "Combines each pair of values between two Attributes (not a course focus)." },
+    { "key": "Linear Expansion", "value": "Tricentis-recommended default. StraightThrough baseline + 1 TestCase per non-StraightThrough Instance. Clear single-variable focus per TestCase." },
+    { "key": "Arrange Instances", "value": "Sorts columns: StraightThrough → Valid Inner → Invalid → Boundary → Invalid Boundary." },
+    { "key": "Merge Instance Duplicates", "value": "Removes identical Instance columns, keeping one." },
+    { "key": "F9", "value": "Show/hide Instance rows — a view toggle only, non-destructive." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 04 - Combinatorial Methods (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+      "duration": "video"
+    }
+  ]
+}

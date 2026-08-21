@@ -1,0 +1,323 @@
+{
+  "moduleId": "TMOB-M08",
+  "moduleTitle": "Lesson 8 - Advanced Mobile Modules & Troubleshooting",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1311/getting-started-with-mobile-test-automation-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Use hardware button and orientation Modules to simulate physical device interaction.",
+    "Automate biometric prompts on Android and iOS, including the Perfecto-specific biometrics Modules.",
+    "Move files on and off the device and manage Appium session lifecycle explicitly.",
+    "Apply a systematic troubleshooting checklist to mobile automation failures."
+  ],
+  "estTime": "30 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Hardware buttons and orientation",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Simulating physical device controls",
+          "items": [
+            "ME3.0 Hardware Button Operations — simulates physical buttons: Home, Back (Android), volume, and power, for flows that depend on hardware-level interaction rather than an on-screen control.",
+            "ME3.0 Set Device Orientation — rotates the device between portrait and landscape, for apps or screens whose layout or behaviour changes with orientation."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Hardware Button Operations = simulate physical buttons (Home/Back/volume/power).",
+        "Set Device Orientation = rotate portrait/landscape for orientation-dependent flows."
+      ]
+    },
+    {
+      "sectionTitle": "Biometrics",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Biometric automation Modules",
+          "items": [
+            "Use Android fingerprint authentication — simulates a fingerprint match against an Android biometric prompt.",
+            "Use iOS biometric authentication — simulates Face ID / Touch ID matching an iOS biometric prompt.",
+            "Set iOS biometrics enrollment — configures whether the simulated device/simulator is treated as having biometrics enrolled at all, a prerequisite before the authentication Module can succeed.",
+            "Use Perfecto biometrics authentication / Handle Perfecto Image Injection — biometrics and camera-input simulation specific to devices hosted on the Perfecto cloud device lab, for teams whose device farm is Perfecto-backed rather than local/USB."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Enrollment state and authentication are separate steps on iOS — a biometric authentication Module will not succeed against a simulator that hasn't first been configured as enrolled via Set iOS biometrics enrollment."
+        }
+      ],
+      "bulletPoints": [
+        "Android and iOS each have their own biometric Modules — they are not interchangeable.",
+        "On iOS: enrollment must be set before authentication can be simulated.",
+        "Perfecto-specific Modules exist for teams using the Perfecto cloud device lab rather than local devices."
+      ]
+    },
+    {
+      "sectionTitle": "File transfer and session lifecycle",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Moving data and managing sessions",
+          "items": [
+            "Upload File to Mobile Device / Download File from Mobile Device — moves files between the automation host and the device's filesystem, useful for seeding test data or retrieving generated output (e.g. an exported PDF or report) for verification.",
+            "Get Appium Session Id — retrieves the underlying session identifier, useful when correlating Tosca execution against raw Appium/TMA logs during troubleshooting.",
+            "End Appium Session — explicitly closes the session rather than relying on it to time out, freeing the device for the next TestCase or the next person in a shared device-farm setting."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Upload/Download File Modules move data between host and device filesystem.",
+        "Get Appium Session Id helps correlate Tosca-level failures with raw driver logs.",
+        "End Appium Session explicitly frees a shared device rather than waiting on a timeout."
+      ]
+    },
+    {
+      "sectionTitle": "Android Snackbar",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "A dedicated Module for a transient component",
+          "description": "Android Snackbar steers the Android Snackbar component specifically — the brief, auto-dismissing message bar that appears at the bottom of the screen (e.g. 'Item deleted — Undo'). Because it disappears on its own after a short delay, generic control-steering can miss it entirely; this dedicated Module exists to interact with it reliably within its visible window."
+        }
+      ],
+      "bulletPoints": [
+        "Snackbars are transient and auto-dismiss — a dedicated Module exists because generic steering can miss the window."
+      ]
+    },
+    {
+      "sectionTitle": "A systematic troubleshooting checklist",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "When a mobile TestCase fails to connect or execute",
+          "items": [
+            "Check the TMA console: is the device listed as Ready (not Busy or Offline)?",
+            "Query GET /api/devices directly on the TMA host — confirm connected:true, busy:false.",
+            "Verify the TCP values against documented format — TMAServer trailing slash, correct DeviceName, correct AppPackage/AppActivity or BundleID.",
+            "For Remote setups, confirm TMA was started with --rest-address, and that the port is open through any firewall.",
+            "Only after all of the above, investigate network/proxy causes."
+          ]
+        },
+        {
+          "type": "list",
+          "title": "Common error patterns and what they usually mean",
+          "items": [
+            "'Could not create TMA session: Ensure that the requested device is connected' — despite the wording, this is very often a malformed TMAServer TCP (missing trailing slash), not an actual device problem.",
+            "Device visible in the OS/Finder/Explorer but invisible to TMA — almost always a missing prerequisite (USB debugging, Developer Mode, phone-data access) rather than a Tosca problem.",
+            "APK install fails with a certificate error — an old v1-only-signed APK on a newer Android version; re-sign with apksigner.",
+            "Scan succeeds but execution fails on the same connection — check the TMAServer trailing slash specifically, since the Scan wizard's Add connection dialog is more forgiving than execution."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Diagnostic order: TMA console → REST API health check → TCP format check → firewall/network — in that order, not the reverse.",
+        "The most confusing error messages in mobile automation are the ones that name the wrong layer (a URL problem reported as a device problem)."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Assuming Android and iOS biometric Modules are interchangeable",
+      "trapDescription": "Using the Android fingerprint Module against an iOS biometric prompt, or vice versa.",
+      "bestPractice": "Android and iOS each require their own dedicated biometric Modules — they target platform-specific biometric APIs and are not interchangeable."
+    },
+    {
+      "title": "Trying to simulate iOS biometric authentication without setting enrollment first",
+      "trapDescription": "Calling the iOS biometric authentication Module against a simulator that has never been configured as having biometrics enrolled.",
+      "bestPractice": "Set iOS biometrics enrollment first — authentication cannot succeed against a target that isn't configured as enrolled."
+    },
+    {
+      "title": "Letting Appium sessions linger on a shared device",
+      "trapDescription": "Finishing a TestCase without explicitly ending its Appium session, leaving the device unavailable to the next test or teammate until a timeout expires.",
+      "bestPractice": "Use End Appium Session explicitly to free the device promptly, especially in shared device-farm or CI settings."
+    },
+    {
+      "title": "Interpreting connection error text literally",
+      "trapDescription": "Reading 'Ensure that the requested device is connected' and spending time reconnecting or replacing the device.",
+      "bestPractice": "This exact message is frequently caused by a malformed TMAServer TCP (missing trailing slash), not an actual device problem — verify the TCP format before touching the device or network."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What must be configured before Use iOS biometric authentication can succeed?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The device's region and language settings."
+        },
+        {
+          "id": "B",
+          "text": "Biometrics enrollment must be set via Set iOS biometrics enrollment."
+        },
+        {
+          "id": "C",
+          "text": "The app must be reinstalled immediately beforehand."
+        },
+        {
+          "id": "D",
+          "text": "LiveView must be enabled."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Enrollment and authentication are two separate steps on iOS.",
+      "rationale": "Set iOS biometrics enrollment configures whether the target is treated as having biometrics enrolled at all — a prerequisite before the authentication Module can succeed."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A brief 'Item deleted — Undo' bar appears at the bottom of an Android screen and auto-dismisses after a few seconds. Which Module is purpose-built for steering it?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Click On Screen"
+        },
+        {
+          "id": "B",
+          "text": "Android Snackbar"
+        },
+        {
+          "id": "C",
+          "text": "ME3.0 Hardware Button Operations"
+        },
+        {
+          "id": "D",
+          "text": "Send Text Input To Focused Control"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "It's a named Android UI component, not a generic gesture.",
+      "rationale": "Android Snackbar is a dedicated Module for the Android Snackbar component specifically — because it auto-dismisses quickly, generic steering can miss the window, which is why a dedicated Module exists."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A TestCase execution fails with 'Could not create TMA session: Ensure that the requested device is connected,' even though the same device connects fine during Mobile Scan. What should be checked first?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Whether the device's USB cable is faulty."
+        },
+        {
+          "id": "B",
+          "text": "Whether the TMAServer TCP value ends with a trailing slash."
+        },
+        {
+          "id": "C",
+          "text": "Whether the device needs a factory reset."
+        },
+        {
+          "id": "D",
+          "text": "Whether the app under test has been updated."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "This exact wording is a known symptom of one specific configuration mistake.",
+      "rationale": "This error message very often indicates a missing trailing slash on the TMAServer TCP — the Scan wizard's Add connection dialog tolerates its absence, while execution does not, which is exactly the symptom described."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "In a shared device-farm setting, what is the benefit of explicitly calling End Appium Session at the end of a TestCase?",
+      "options": [
+        {
+          "id": "A",
+          "text": "It improves control identification accuracy."
+        },
+        {
+          "id": "B",
+          "text": "It frees the device promptly for the next TestCase or teammate, instead of waiting for a session timeout."
+        },
+        {
+          "id": "C",
+          "text": "It is required before Upload File to Mobile Device can run."
+        },
+        {
+          "id": "D",
+          "text": "It disables biometric prompts for the next session."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about what happens to a device left in a lingering session.",
+      "rationale": "Ending the session explicitly frees the device promptly, which matters in shared device-farm or CI environments where the next TestCase or person is waiting — rather than leaving the device tied up until a timeout expires."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "Following the recommended troubleshooting order, what should be checked immediately after confirming the device shows Ready in the TMA console?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Firewall and proxy configuration."
+        },
+        {
+          "id": "B",
+          "text": "A direct GET /api/devices call to confirm connected/busy/statusReady values."
+        },
+        {
+          "id": "C",
+          "text": "Whether the app under test needs to be reinstalled."
+        },
+        {
+          "id": "D",
+          "text": "The device's biometric enrollment status."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Confirm device health independently of the TMA console UI before checking anything network-related.",
+      "rationale": "The recommended order checks the TMA console, then confirms device health directly via GET /api/devices, then verifies TCP format, and only then investigates network/firewall causes — each step rules out one layer before moving to the next."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Hardware buttons",
+      "value": "ME3.0 Hardware Button Operations (Home/Back/volume/power) · ME3.0 Set Device Orientation (portrait/landscape)."
+    },
+    {
+      "key": "Biometrics",
+      "value": "Separate Modules per platform (Android fingerprint, iOS biometric) plus Perfecto-specific ones. iOS requires Set iOS biometrics enrollment before authentication."
+    },
+    {
+      "key": "File transfer",
+      "value": "Upload File to Mobile Device / Download File from Mobile Device — move data to/from the device filesystem."
+    },
+    {
+      "key": "Session lifecycle",
+      "value": "Get Appium Session Id (for log correlation) · End Appium Session (free the device promptly, especially on shared farms)."
+    },
+    {
+      "key": "Android Snackbar",
+      "value": "Dedicated Module for the auto-dismissing Snackbar component — generic steering can miss its short visible window."
+    },
+    {
+      "key": "Troubleshooting order",
+      "value": "TMA console Ready → GET /api/devices → verify TCP format (trailing slash!) → Remote --rest-address/firewall → only then network/proxy."
+    },
+    {
+      "key": "Misleading error",
+      "value": "'Ensure that the requested device is connected' is frequently a malformed TMAServer TCP, not a real device problem."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Mobile Engine 3.0 (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Configure local or remote test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/configure_mobile_local_remote_tests.htm",
+      "duration": "docs"
+    }
+  ]
+}

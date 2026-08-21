@@ -1,0 +1,203 @@
+{
+  "moduleId": "TDS1-M09",
+  "moduleTitle": "Lesson 9 - Best Practices",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+  "learningObjectives": [
+    "Apply the core Attribute structure and reuse-via-Class principles across multiple TestSheets.",
+    "Structure Agile acceptance criteria using the Given-When-Then pattern inside a TestSheet.",
+    "Build a TestSheet's structure externally (Notepad/Excel) and import it with Create Element Structure from Clipboard.",
+    "Apply Tricentis' readability and maintainability guidelines when designing TestSheets."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Design for reuse",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Spot reuse early",
+          "description": "When creating multiple TestSheets, watch for Attribute structures that will show up again elsewhere, and convert them into Classes (Lesson 6) rather than rebuilding them each time. A Class can then be amended — immediately or as the project evolves — to include new data variations, and every TestSheet referencing it benefits."
+        },
+        {
+          "type": "concept",
+          "term": "The recommended core structure",
+          "description": "Keep using the four-Attribute skeleton from Lesson 2 as the backbone of every TestSheet: Administration (BusinessRelevant = No), Precondition and Process (BusinessRelevant = Yes), and Verification (BusinessRelevant = Result). Populate each with the relevant sub-Attributes and Instances for that Requirement."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Structuring for Agile: Given-When-Then",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Given-When-Then",
+          "description": "A template for writing acceptance tests for user stories, useful when TestCase Design needs to reflect an Agile way of working. An acceptance test built this way has three parts: Given (the context and preconditions), When (the action being carried out), Then (the observable, expected outcome)."
+        },
+        {
+          "type": "concept",
+          "term": "Worked example",
+          "description": "User story: 'As a returning customer, I want my saved shipping address pre-filled at checkout, so I can complete an order faster.' Written as Given-When-Then: Given a registered customer with a saved shipping address is logged in, When they proceed to checkout, Then the saved address should be pre-filled and the customer should be able to confirm the order without re-entering it."
+        },
+        {
+          "type": "note",
+          "text": "This maps naturally onto the core Attribute structure: Given → Precondition, When → Process, Then → Verification."
+        }
+      ],
+      "bulletPoints": [
+        "Given = Precondition, When = Process, Then = Verification — the Agile pattern and the Tricentis core structure line up directly."
+      ]
+    },
+    {
+      "sectionTitle": "Building structure outside Tosca first",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Why plan externally",
+          "description": "For a large or complex TestSheet, it can be faster to sketch the Attribute hierarchy in Notepad or Excel first, then import it in one shot, instead of creating each Attribute by hand inside Tosca."
+        },
+        {
+          "type": "list",
+          "title": "Two supported formats",
+          "items": [
+            "Notepad — one Attribute per line; a Tab indent marks it as a sub-Attribute of the line above.",
+            "Excel — one Attribute per cell/row; a value one column to the RIGHT (instead of a tab) marks it as a sub-Attribute of the cell above."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "After building the structure, select and copy it all, then right-click the target TestSheet and choose 'Create Element Structure from Clipboard' (also available in the Ribbon). Tosca creates the matching Attribute hierarchy automatically."
+        }
+      ],
+      "bulletPoints": [
+        "Notepad uses Tab indentation; Excel uses an extra column to the right — don't mix the two conventions up."
+      ]
+    },
+    {
+      "sectionTitle": "Readability & maintainability guidelines",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Tricentis' recommendations",
+          "items": [
+            "Use short, comprehensible TestCase/Instance names that state the test focus explicitly.",
+            "Use Character markers (StraightThrough / Valid / Invalid) meaningfully, not arbitrarily.",
+            "Expand Attributes that need detail; use clear, business-readable names throughout.",
+            "Put Concrete or Value Attributes under a logical parent Attribute so their purpose is obvious.",
+            "Only convert an Attribute structure into a Class if it will be reused at least twice — a Class for something used once is unnecessary overhead.",
+            "Describe Attributes in business language (what the business cares about), not the technical language of Modules/TestSteps.",
+            "Every TestCase/Instance should be meaningful, test a real business function, and link back to a Requirement.",
+            "Every TestSheet Instance should have a clearly defined Verification.",
+            "Base TestCase variations on Equivalence Classes, to maximize coverage while minimizing redundancy.",
+            "If an Attribute has more than 6-8 items on one level, restructure them under sub-Attributes for readability.",
+            "The final TestSheet is assigned to the TestCase Template, so its TestCases can be instantiated for execution.",
+            "Boundary Value Instances usually aren't needed in regression tests, since boundary behavior rarely changes release to release (see Lesson 3)."
+          ]
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Hands-on",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 Exercise 09a-09b (Create and Adapt Class, Use Classes) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Turning every Attribute structure into a Class",
+      "trapDescription": "Converting a one-off Attribute structure into a Class 'just in case' it might be reused later.",
+      "bestPractice": "Only convert a structure into a Class once it's actually reused at least twice — Classes add indirection that isn't worth it for single-use data."
+    },
+    {
+      "title": "Mixing up the Notepad and Excel structure conventions",
+      "trapDescription": "Using Tab indentation inside an Excel sheet, or an extra column inside Notepad, when building a structure to paste into Tosca.",
+      "bestPractice": "Notepad uses Tab indentation to indicate a sub-Attribute. Excel uses a value one column to the RIGHT instead. Mixing the two produces a broken structure when pasted via 'Create Element Structure from Clipboard'."
+    },
+    {
+      "title": "Writing Attributes in technical, Module/TestStep language",
+      "trapDescription": "Naming Attributes after technical implementation details (e.g. field IDs, control names) instead of business meaning.",
+      "bestPractice": "Attributes should be described in business language, so anyone reading the TestSheet — not just automation engineers — understands what's being tested."
+    },
+    {
+      "title": "Including Boundary Instances in a regression suite",
+      "trapDescription": "Running Boundary Value TestCases every regression cycle alongside StraightThrough and Valid Inner cases.",
+      "bestPractice": "Boundary behavior is generally stable release to release unless the underlying range changes, so Boundary Instances are typically kept as one-time tests, not part of the recurring regression set."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "An Attribute structure is used in exactly one TestSheet and there are no plans to reuse it elsewhere. Should it be converted into a Class?",
+      "options": [
+        { "id": "A", "text": "Yes, always — Classes are always the safer choice." },
+        { "id": "B", "text": "No — Tricentis recommends using Classes only for structures reused at least twice." },
+        { "id": "C", "text": "Only if it has more than 6 Attributes." },
+        { "id": "D", "text": "Only if it contains Boundary Instances." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Think about when the extra indirection of a Class actually pays off.",
+      "rationale": "Best practice is to use Classes only for structures reused at least twice; converting single-use structures adds unnecessary overhead."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A tester builds a TestSheet's Attribute structure in Excel before importing it. How should sub-Attributes be indicated?",
+      "options": [
+        { "id": "A", "text": "With a Tab character, same as Notepad." },
+        { "id": "B", "text": "By placing the value one column to the right of its parent." },
+        { "id": "C", "text": "By using a different font color." },
+        { "id": "D", "text": "Excel structures cannot be imported into Tosca." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Excel doesn't use Tab indentation the way Notepad does — it uses spatial columns instead.",
+      "rationale": "In Excel, a sub-Attribute is indicated by placing it one column to the right of its parent (instead of a Tab indent, which is the Notepad convention). Both can then be pasted in via 'Create Element Structure from Clipboard'."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Using the Given-When-Then pattern, which part of an acceptance test corresponds to the Precondition Attribute?",
+      "options": [
+        { "id": "A", "text": "Given" },
+        { "id": "B", "text": "When" },
+        { "id": "C", "text": "Then" },
+        { "id": "D", "text": "None — Given-When-Then doesn't map to the core Attribute structure." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "Precondition describes the setup state needed before the action happens.",
+      "rationale": "Given (context/preconditions) maps to the Precondition Attribute, When (the action) maps to Process, and Then (expected outcome) maps to Verification."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "An Attribute has 14 child items directly underneath it. According to Tricentis' readability guidelines, what should be done?",
+      "options": [
+        { "id": "A", "text": "Nothing — flat lists of any size are fine." },
+        { "id": "B", "text": "Restructure the items under sub-Attributes, since more than 6-8 items on one level hurts readability." },
+        { "id": "C", "text": "Convert all 14 items into a single Value Attribute." },
+        { "id": "D", "text": "Delete items until only 6 remain." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "There's a specific threshold mentioned for when a flat list should become nested.",
+      "rationale": "Tricentis recommends structuring Attributes with more than 6-8 items on one level beneath sub-Attributes, to keep the TestSheet readable."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Reuse rule", "value": "Convert to a Class only when a structure is reused at least twice." },
+    { "key": "Given-When-Then mapping", "value": "Given → Precondition, When → Process, Then → Verification." },
+    { "key": "External structure building", "value": "Notepad = Tab indent for sub-Attributes; Excel = one column to the right. Import via 'Create Element Structure from Clipboard'." },
+    { "key": "Naming", "value": "Business language, not technical Module/TestStep language; names should state the test focus." },
+    { "key": "Attribute sizing", "value": "Restructure under sub-Attributes once a level exceeds ~6-8 items." },
+    { "key": "Boundary Instances", "value": "Usually one-time tests, not part of the regular regression suite." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 09 - Best Practices (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+      "duration": "video"
+    }
+  ]
+}

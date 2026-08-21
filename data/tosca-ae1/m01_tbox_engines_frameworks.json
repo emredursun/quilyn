@@ -1,0 +1,360 @@
+{
+  "moduleId": "AE1-M01",
+  "moduleTitle": "TBox Theory - Engines and Frameworks",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+  "learningObjectives": [
+    "Explain what the TBox framework is and what problem an automation framework solves.",
+    "Describe how Engines 3.0 sit on top of TBox and steer their respective technologies.",
+    "Distinguish GUI engines from non-GUI engines and give examples of each.",
+    "Explain how a Module is bound to an Engine, and why the TestCase-building workflow is identical across technologies.",
+    "Reference a specific table row by value ($) or by index (#), and narrow a TestStep to one row with Constraint.",
+    "Describe how TC Shell and the Tosca REST API let you inspect and drive a Tosca project without opening Tosca Commander."
+  ],
+  "estTime": "40 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "What an automation framework is",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The problem a framework solves",
+          "description": "Every technology exposes its controls differently: a browser has a DOM, a Windows application has native window handles, an Excel workbook has cells and ranges, a mail server speaks a protocol. Without a framework, automating each would mean a different tool, a different scripting model, and a different skill set per technology — and no way to build one TestCase that crosses them."
+        },
+        {
+          "type": "concept",
+          "term": "TBox",
+          "description": "The Tosca TBox framework is the .NET-based foundation that all Engines 3.0 are built on, for both GUI and non-GUI tests. It provides one common interface across every supported technology, so the differences between technologies are absorbed by the Engine rather than pushed up into your TestCases. TBox and its Engines 3.0 are part of the standard Tricentis Tosca installation — nothing extra to install for the core engines."
+        },
+        {
+          "type": "note",
+          "text": "Tricentis cites two concrete benefits of the TBox architecture: higher performance in both creating and executing tests, and one common interface for all supported technologies."
+        }
+      ],
+      "bulletPoints": [
+        "The framework's job is to make 'steer a web button' and 'steer an Excel cell' look the same to the person building the TestCase.",
+        "TBox is standard — it ships with Tosca, it is not a separate product."
+      ]
+    },
+    {
+      "sectionTitle": "Engines 3.0",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "What an Engine does",
+          "description": "An Engine is the technology-specific layer that knows how to find and manipulate controls in one kind of application. It translates the generic instruction coming from the TestCase — 'set this value', 'verify this value', 'click this' — into whatever that particular technology actually requires."
+        },
+        {
+          "type": "list",
+          "title": "Engines you will meet across Tosca (AE1 covers the non-web ones)",
+          "items": [
+            "XBrowser Engine 3.0 — web applications across Chrome, Edge, Firefox (the AS1/AS2 territory).",
+            "Excel UI Engine 3.0 — the Microsoft Excel user interface: application window, dialogs, and loaded worksheets.",
+            "PDF Engine — PDF documents, including comparison reporting between files.",
+            "UIA Engine 3.0 — Windows controls via the Microsoft UI Automation framework.",
+            "Win32 Engine — Windows desktop applications steered through server processes.",
+            "Mobile Engine 3.0 — native Android apps and mobile web applications.",
+            "API Engine 3.0 — web services and API endpoints (the API Testing course's territory).",
+            "Plus technology-specific engines outside AE1's scope: SAP, Java, Salesforce."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "AE1's lesson list is essentially a tour of the non-web engines: Excel, PDF, Mail, UIA/WinX, Mobile."
+      ]
+    },
+    {
+      "sectionTitle": "GUI vs non-GUI engines",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "GUI engines",
+          "description": "Steer something a human could see and click: a browser page, an Excel worksheet, a Windows dialog, a mobile screen. Identification is about locating a visible control."
+        },
+        {
+          "type": "concept",
+          "term": "Non-GUI engines",
+          "description": "Steer backend systems with no visual component — the XML and JSON engines, API calls, protocol-level interactions. There is no screen to look at; the Engine works directly against the data or the service."
+        },
+        {
+          "type": "note",
+          "text": "TBox deliberately supports both categories through the same framework. That is what allows a single TestCase to, for example, submit a web form, then verify the resulting record via an API call, then check that the confirmation PDF was generated correctly."
+        }
+      ],
+      "bulletPoints": [
+        "GUI = there is a control to find on a screen. Non-GUI = there is data or a service to address directly.",
+        "Both are steered through the same TBox interface, which is why they mix freely in one TestCase."
+      ]
+    },
+    {
+      "sectionTitle": "Modules, XModules, and engine binding",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "XModules",
+          "description": "Engines 3.0 use XModules to steer test objects. An XModule is the Tosca object that represents a piece of the application under test, and it carries the information the Engine needs to find that object again at execution time. XModules can be structured hierarchically and referenced across many TestCases — the same reuse model you already know from web automation."
+        },
+        {
+          "type": "concept",
+          "term": "How the Engine gets chosen",
+          "description": "You do not pick an Engine manually per TestStep. The Engine is determined by the Module: when you scan an application, Tosca creates Modules bound to the appropriate Engine for that technology, and every TestStep created from that Module is steered by it. This is why the same TestCase can mix a web TestStep and an Excel TestStep without any special handling — each TestStep inherits its Engine from its Module."
+        },
+        {
+          "type": "concept",
+          "term": "Why the workflow never changes",
+          "description": "Because the Engine is hidden behind the Module, the mechanics you learned in AS1/AS2 carry over unchanged: drag a Module onto a TestCase to create a TestStep, fill in TestStepValues, set ActionMode to Input, Verify, Buffer or Select, and run. Learning a new Engine in AE1 is therefore mostly about learning what that technology exposes — which properties exist on an Excel cell, what an Anchor means in a PDF — not about learning a new way to build tests."
+        }
+      ],
+      "bulletPoints": [
+        "Module → Engine → technology. You choose the Module; the Engine follows automatically.",
+        "ActionModes (Input / Verify / Buffer / Select) behave the same across every Engine."
+      ]
+    },
+    {
+      "sectionTitle": "Bonus: steering a specific table row",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Two ways to reach one row: $ (by value) vs # (by index)",
+          "description": "A scanned table gives you a row-level TestStepValue that can be pointed at a specific row two different ways. The # notation targets a row by its ordinal position — the 3rd row, the 12th row — regardless of what data it holds. The $ notation instead targets the row whose cell matches a value you supply, so the TestStep finds 'the row where Order ID = 4021' rather than 'row number 7'. Index-based steering breaks the moment a row is inserted, deleted, or re-sorted; value-based steering survives it, which is why $ is generally the more resilient choice for tables whose row order can change between runs."
+        },
+        {
+          "type": "concept",
+          "term": "HeaderRow",
+          "description": "A steering parameter that tells Tosca which row of the scanned table holds the column headers. Once set, later TestStepValues can address a column by its header text instead of a raw column number — 'the Total column' rather than 'column 4' — which keeps the TestCase readable and keeps it working if columns are reordered but not renamed."
+        },
+        {
+          "type": "concept",
+          "term": "Constraint ActionMode",
+          "description": "Used to narrow a table TestStep down to one specific row before acting on a different cell in that same row — for example, constrain to the row where the Product column reads 'Laptop', then verify or buffer the Price cell in that row. Constraint is what makes $-style value matching usable across multi-column tables: you locate the row by one column's value and then operate on another."
+        },
+        {
+          "type": "note",
+          "text": "Row and cell values in a table TestStep also accept REGEX instead of a literal string, so a row can be matched by pattern — a date, an order number with a variable suffix — rather than an exact value that would otherwise have to be hardcoded and would break on the next test run."
+        },
+        {
+          "type": "note",
+          "text": "📄 This technique comes from an official Tricentis hands-on guide; the material itself is not redistributed here — the mechanism is described above so it can be recognised and applied."
+        }
+      ],
+      "bulletPoints": [
+        "# = row by position. $ = row by a cell's value. Prefer $ when row order can change between runs.",
+        "HeaderRow lets later steps address a column by its header text instead of a raw index.",
+        "Constraint locks a TestStep onto one row (found via $) so a different cell in that row can then be read or verified.",
+        "Table values also accept REGEX, for matching a pattern instead of a fixed literal."
+      ]
+    },
+    {
+      "sectionTitle": "Bonus: operating Tosca outside Tosca Commander",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "TC Shell",
+          "description": "TC Shell is the command-line control of Tosca Commander itself — it lets you navigate a Workspace, read or modify a TestStepValue, and run an ExecutionList entirely from the command line, without the Tosca Commander UI ever opening. It has two modes: interactive, where you type commands one at a time and get the same range of functions the GUI offers; and script, where a batch of commands is read from a script data file with no opportunity to intervene — the mode built for running an extensive test portfolio unattended, for instance from a CI pipeline."
+        },
+        {
+          "type": "concept",
+          "term": "Interactive mode: jumptonode and task",
+          "description": "You start by copying an object's NodePath from its Properties pane in Tosca Commander (Workspace closed before touching TC Shell). From a command prompt in the Tosca Commander install directory, TCShell.exe -workspace \"<path to .tws>\" -login \"<user>\" <password> opens the Workspace; jumptonode \"<NodePath>\" then moves the shell's focus to that TestStepValue or ExecutionList; and task lists every action available at that point — for a TestStepValue that includes Modify Value, for an ExecutionList it includes Run — selected by number or by name."
+        },
+        {
+          "type": "concept",
+          "term": "Script mode: .tcs and .bat",
+          "description": "The same jumptonode / task commands, written into a plain-text .tcs script file instead of typed live, let TC Shell replay a whole sequence — update a TestStepValue, then jump to an ExecutionList and run it — with zero interaction. A short .bat file wrapping TCShell.exe -workspace <path> -login <user> <password> <path to the .tcs file> then turns that sequence into something a build server can double-click or call from a pipeline step."
+        },
+        {
+          "type": "concept",
+          "term": "Tosca REST API: downloading an execution report",
+          "description": "Separately from TC Shell, a Tosca Server installation exposes a REST API that can, among other things, print an ExecutionList's report to a file without anyone opening Tosca Commander at all. It requires the Tricentis.Tosca.RestApiService Windows service to be running (disabled by default) and the service's config file to point WorkspaceBasePath at the folder holding the Workspaces it should serve. On the ExecutionEntries object being printed, the PrintOutputFormat property has to be set to ASKUSER first — otherwise the report endpoint has nothing to act on."
+        },
+        {
+          "type": "note",
+          "text": "The report endpoint follows the shape http(s)://<server>:<port>/rest/ToscaCommander/<workspacename>/object/<id>/task/PrintReport?reportName=<name>&outputFilepath=<target path>, where <id> is the ExecutionList's UniqueId copied from its Properties pane. It is called with Basic Authentication (a Tosca username/password) and a plain GET; a 200 OK response means the file was written to the target path."
+        },
+        {
+          "type": "note",
+          "text": "📄 Both techniques come from official Tricentis hands-on guides; the material itself is not redistributed here — the mechanisms are described above so they can be recognised and applied."
+        }
+      ],
+      "bulletPoints": [
+        "TC Shell = Tosca Commander from the command line. Interactive mode for one-off changes; script mode (.tcs + a wrapping .bat) for unattended runs.",
+        "Always close Tosca Commander before using TC Shell against the same Workspace.",
+        "jumptonode \"<NodePath>\" moves the shell's focus; task lists what can be done there (Modify Value, Run, …).",
+        "The REST API report endpoint needs Tricentis.Tosca.RestApiService running, WorkspaceBasePath configured, and the ExecutionEntries object's PrintOutputFormat set to ASKUSER before it will produce a file."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Thinking each Engine needs its own way of building TestCases",
+      "trapDescription": "Assuming that automating Excel or PDF requires a different TestCase structure or scripting approach than web automation.",
+      "bestPractice": "The whole purpose of TBox is one common interface. Modules, TestSteps, TestStepValues, and ActionModes work identically across engines — only what the technology exposes differs."
+    },
+    {
+      "title": "Believing TBox or Engines 3.0 are separate add-ons",
+      "trapDescription": "Looking for a separate installer or licence for the TBox framework.",
+      "bestPractice": "The TBox framework and its Engines 3.0 are part of the standard Tricentis Tosca installation. (Individual technologies may still need their own prerequisites — Excel installed, a mobile agent deployed — but the engines themselves ship with Tosca.)"
+    },
+    {
+      "title": "Trying to assign an Engine to a TestStep manually",
+      "trapDescription": "Looking for an Engine dropdown on the TestStep when a control isn't behaving as expected.",
+      "bestPractice": "Engine selection follows from the Module, which is created when you scan the application. If the wrong Engine is steering something, the fix is at the Module/scan level, not the TestStep."
+    },
+    {
+      "title": "Assuming non-GUI means 'no automation possible'",
+      "trapDescription": "Treating backend steps as something that must be verified manually because there is no screen.",
+      "bestPractice": "TBox explicitly supports non-GUI engines (XML, JSON, API). Backend verification is a first-class part of an end-to-end TestCase, not an exception to it."
+    },
+    {
+      "title": "Steering a table row by # when the row order can change",
+      "trapDescription": "Hardcoding row #7 to always mean a specific order, then having the TestCase silently check the wrong row after the data set changes.",
+      "bestPractice": "Prefer $ (steer by a cell's value) over # (steer by position) whenever rows can be inserted, removed, or re-sorted between runs. Use Constraint to lock onto the row found by value before touching a different cell in it."
+    },
+    {
+      "title": "Running TC Shell against a Workspace that is still open in Tosca Commander",
+      "trapDescription": "Starting TCShell.exe -workspace ... while the same project is open in the Tosca Commander GUI, and getting inconsistent or failing results.",
+      "bestPractice": "Close Tosca Commander before pointing TC Shell at the same Workspace — the two are not meant to hold it open simultaneously."
+    },
+    {
+      "title": "Calling the REST API PrintReport endpoint without setting PrintOutputFormat",
+      "trapDescription": "Sending a well-formed GET to the /task/PrintReport endpoint and getting no usable file back.",
+      "bestPractice": "The ExecutionEntries object being printed needs its PrintOutputFormat property set to ASKUSER first, from Tosca Commander, before the report endpoint has anything to generate."
+    },
+    {
+      "title": "Expecting the Tosca REST API to work from a bare Tosca Commander install",
+      "trapDescription": "Trying to call the /rest/ToscaCommander/... endpoint on a machine that only has Tosca Commander installed.",
+      "bestPractice": "The REST API is served by a separate Tosca Server installation, with the Tricentis.Tosca.RestApiService started (it is disabled by default) and WorkspaceBasePath configured to point at the Workspaces folder."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What is the role of the TBox framework in Tosca?",
+      "options": [
+        { "id": "A", "text": "It is a separate licensed product for performance testing." },
+        { "id": "B", "text": "It is the .NET-based foundation all Engines 3.0 are built on, giving one common interface across every supported technology for both GUI and non-GUI tests." },
+        { "id": "C", "text": "It is the scripting language used to write Tosca TestCases." },
+        { "id": "D", "text": "It only applies to web application testing." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Think about what makes automating Excel feel the same as automating a web page.",
+      "rationale": "TBox is the shared .NET foundation for all Engines 3.0, covering GUI and non-GUI tests alike. It absorbs the differences between technologies so the TestCase-building workflow stays constant, and it ships as part of the standard Tosca installation."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A TestCase contains one TestStep steering a web page and another steering an Excel worksheet. How does Tosca know which Engine to use for each TestStep?",
+      "options": [
+        { "id": "A", "text": "The tester selects the Engine from a dropdown on each TestStep." },
+        { "id": "B", "text": "Each TestStep inherits its Engine from the Module it was created from." },
+        { "id": "C", "text": "Tosca tries every Engine until one succeeds." },
+        { "id": "D", "text": "A single TestCase cannot mix technologies." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The binding happens one level above the TestStep.",
+      "rationale": "Modules are bound to an Engine when the application is scanned, and every TestStep created from a Module is steered by that Module's Engine. This is exactly what lets one TestCase mix technologies with no special handling."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Which of the following is a non-GUI engine?",
+      "options": [
+        { "id": "A", "text": "XBrowser Engine 3.0" },
+        { "id": "B", "text": "Excel UI Engine 3.0" },
+        { "id": "C", "text": "XML Engine 3.0" },
+        { "id": "D", "text": "Mobile Engine 3.0" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "Which one has no screen or visible control to locate?",
+      "rationale": "The XML Engine 3.0 works directly against data with no visual component, making it a non-GUI engine. XBrowser, Excel UI, and Mobile all steer visible controls on a screen."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What do Engines 3.0 use to steer test objects?",
+      "options": [
+        { "id": "A", "text": "XModules" },
+        { "id": "B", "text": "ExecutionLists" },
+        { "id": "C", "text": "Requirements" },
+        { "id": "D", "text": "TestSheets" }
+      ],
+      "correctOptions": ["A"],
+      "hint": "It is the object that represents a piece of the application under test.",
+      "rationale": "Engines 3.0 use XModules to steer test objects. An XModule carries the identification information the Engine needs, can be structured hierarchically, and is reusable across TestCases."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A table's rows are re-sorted differently on every test run, but a TestCase must always find the row for a specific Order ID. Which row-referencing approach should it use?",
+      "options": [
+        { "id": "A", "text": "# — reference the row by its fixed position." },
+        { "id": "B", "text": "$ — reference the row by the value in a cell, such as the Order ID column." },
+        { "id": "C", "text": "HeaderRow — it replaces the need to identify a specific row at all." },
+        { "id": "D", "text": "Neither; re-sorted tables cannot be steered." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "One notation is resilient to row order changing; the other is not.",
+      "rationale": "$ finds a row by matching a cell's value, so it keeps working when rows are inserted, removed, or re-sorted. # finds a row by fixed position, which breaks the moment the order changes. HeaderRow addresses columns by name, not rows."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "A TestStep needs to find the table row where Product = 'Laptop', then verify the Price cell in that same row. Which mechanism makes that possible?",
+      "options": [
+        { "id": "A", "text": "REGEX alone, with no other setting." },
+        { "id": "B", "text": "The Constraint ActionMode, to lock the TestStep onto the row matched by Product before acting on Price." },
+        { "id": "C", "text": "The # notation, referencing the row by index." },
+        { "id": "D", "text": "Re-scanning the table for every possible Product value." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "One column locates the row; a different column is then read.",
+      "rationale": "Constraint narrows a table TestStep to the one row matching a given value, so a different cell in that same row — like Price — can then be verified or buffered. This is what makes $-style value matching practical across multi-column tables."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "Before using TC Shell against a Workspace, what must be true?",
+      "options": [
+        { "id": "A", "text": "Tosca Commander must have that same Workspace open." },
+        { "id": "B", "text": "Tosca Commander must be closed." },
+        { "id": "C", "text": "The Workspace must be read-only." },
+        { "id": "D", "text": "A REST API service must be running." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "TC Shell and the Commander GUI are not meant to hold the same Workspace open together.",
+      "rationale": "Tosca Commander should be closed before driving the same Workspace through TC Shell. The REST API is a separate mechanism, served by Tosca Server, unrelated to TC Shell."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "A GET request to the Tosca REST API's PrintReport endpoint returns 200 OK, but no report file is produced. What was most likely missed?",
+      "options": [
+        { "id": "A", "text": "The ExecutionEntries object's PrintOutputFormat property was never set to ASKUSER." },
+        { "id": "B", "text": "The request used Basic Authentication instead of no authentication." },
+        { "id": "C", "text": "TC Shell was not running at the same time." },
+        { "id": "D", "text": "The report was requested in interactive mode instead of script mode." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "One property on the object being printed has to be set from Tosca Commander first.",
+      "rationale": "The PrintReport endpoint needs the target ExecutionEntries object's PrintOutputFormat set to ASKUSER before it has anything to generate. Basic Authentication is actually required, not to be avoided; TC Shell and interactive/script mode are unrelated to the REST API."
+    }
+  ],
+  "quickRecap": [
+    { "key": "TBox", "value": ".NET-based framework underpinning all Engines 3.0; ships with standard Tosca." },
+    { "key": "Why it exists", "value": "One common interface across every technology — higher performance, and no per-technology workflow to relearn." },
+    { "key": "Engine", "value": "The technology-specific layer that knows how to find and manipulate controls in one kind of application." },
+    { "key": "GUI vs non-GUI", "value": "GUI = a visible control to locate (XBrowser, Excel UI, Mobile). Non-GUI = data or service, no screen (XML, JSON, API)." },
+    { "key": "XModule", "value": "The object Engines 3.0 use to steer test objects; hierarchical and reusable." },
+    { "key": "Engine binding", "value": "Determined by the Module, not chosen per TestStep — which is why one TestCase can mix technologies freely." },
+    { "key": "Table row referencing", "value": "# = by index (fragile to reordering). $ = by a cell's value (resilient). Constraint locks onto the row found by value; HeaderRow names columns by their header text; values also accept REGEX." },
+    { "key": "TC Shell", "value": "Command-line control of Tosca Commander. Interactive mode = typed commands (jumptonode, task). Script mode = a .tcs file run via a .bat, for unattended execution. Close Tosca Commander first." },
+    { "key": "Tosca REST API reporting", "value": "Served by Tosca Server (Tricentis.Tosca.RestApiService + WorkspaceBasePath). Set PrintOutputFormat to ASKUSER on the ExecutionEntries object, then GET .../task/PrintReport?reportName=...&outputFilepath=... with Basic Auth." }
+  ],
+  "topics": [
+    {
+      "title": "TBox Theory Lesson - Engines and Frameworks",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+      "duration": "video"
+    }
+  ]
+}

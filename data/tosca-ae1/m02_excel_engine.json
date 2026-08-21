@@ -1,0 +1,342 @@
+{
+  "moduleId": "AE1-M02",
+  "moduleTitle": "Lesson 1 - Excel Engine",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+  "learningObjectives": [
+    "Distinguish steering an Excel workbook as a file from steering the Excel application's user interface.",
+    "Use the TBox Excel Standard Modules to open, manipulate, and close a workbook, respecting the mandatory open/close pattern.",
+    "Read, write, and verify cell contents and technical cell properties using Excel Ranges.",
+    "Compare two Excel workbooks and execute an existing Excel macro from a TestCase."
+  ],
+  "estTime": "45 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Two different ways to reach Excel",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Excel Standard Modules (file-level, background)",
+          "description": "The TBox Excel Modules manipulate the workbook as a file, in the background. Excel's window never has to be visible and the user interface is never driven. This is the faster, more stable approach and it is what you use for the vast majority of Excel automation: reading reference data, writing results, verifying calculated values. You find these under Standard modules → TBox XEngines → Excel."
+        },
+        {
+          "type": "concept",
+          "term": "Excel UI Engine 3.0 (application-level)",
+          "description": "The Excel UI Engine 3.0 scans and steers the Microsoft Excel user interface itself — the main application window, its dialogs, and the worksheets with embedded controls currently loaded by the application. Use it when the thing under test genuinely is the Excel UI: a dialog that must appear, a ribbon interaction, an embedded control a user would click."
+        },
+        {
+          "type": "note",
+          "text": "The choice matters for reliability. If you only need a cell's value, do not open Excel's window to read it — use the Standard Modules. Drive the UI only when the UI is the thing being tested."
+        },
+        {
+          "type": "list",
+          "title": "The ten Excel Modules, as they appear in the AE1 workspace",
+          "items": [
+            "TBox Open Excel Workbook — mandatory first step.",
+            "TBox Close Excel Workbook — required final step; controls saving.",
+            "TBox Define Excel Range — declares the range later steps act on.",
+            "TBox Excel Range Manipulation — read, write, and verify cell data and technical properties.",
+            "TBox Clear Excel Range — clears content, formatting, notes, comments, hyperlinks or outlines.",
+            "TBox Create Excel Worksheet — adds a sheet at a chosen position.",
+            "TBox Delete Excel Worksheet — removes a sheet.",
+            "TBox Update Excel Worksheet — renames and repositions a sheet.",
+            "TBox Excel 1:1 File Compare — compares two workbooks.",
+            "TBox Run Excel Macro — executes an existing macro."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "'Steer an Excel workbook' → Standard Modules, background, file-level.",
+        "'Steer the Excel application' → Excel UI Engine 3.0, visible UI, control-level."
+      ]
+    },
+    {
+      "sectionTitle": "The mandatory open/close pattern",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "TBox Open Excel Workbook",
+          "description": "The mandatory first step of any Excel Standard Module sequence. It opens the workbook in the background and can handle password-protected files and read-only access. Nothing else in the Excel Module family works until the workbook has been opened."
+        },
+        {
+          "type": "concept",
+          "term": "TBox Close Excel Workbook",
+          "description": "The required final step. Besides closing the workbook it controls whether and where changes are saved — you can save to a specified path and in a specified file format, which is how you produce an output file that differs from the input."
+        },
+        {
+          "type": "warning",
+          "text": "Forgetting the Close step is the classic Excel automation mistake. The workbook stays open in the background, the file can remain locked, changes may not be written, and subsequent TestCases that touch the same file will fail for reasons that look unrelated."
+        }
+      ],
+      "bulletPoints": [
+        "Every Excel Standard Module sequence is a sandwich: Open → (work) → Close.",
+        "'Save as' behavior lives on the Close step, not on the manipulation steps."
+      ]
+    },
+    {
+      "sectionTitle": "Working with data: Ranges",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "TBox Define Excel Range",
+          "description": "Establishes a named range that later steps operate on. It needs the workbook, the worksheet, and the cell boundaries. Defining a range once and referring to it afterwards keeps a TestCase readable and avoids repeating cell coordinates in every step."
+        },
+        {
+          "type": "concept",
+          "term": "TBox Excel Range Manipulation",
+          "description": "The workhorse Module. It reads and writes cell data, and it also reaches the technical properties of cells — formulas, formatting, colors, fonts, and comments. Because it supports verification as well as input, this is the Module that satisfies the course objective 'verify Microsoft Excel cell special properties': you are not just checking the displayed value, you are checking that the underlying formula, the fill colour, or the font is what it should be."
+        },
+        {
+          "type": "concept",
+          "term": "TBox Clear Excel Range",
+          "description": "Removes content from a range — and selectively, not just the values: formatting, notes, comments, hyperlinks, or outlines can each be cleared. Useful for resetting a sheet between test runs."
+        },
+        {
+          "type": "note",
+          "text": "Worksheet-level structure has its own Modules: TBox Create Excel Worksheet (add a sheet, positioned first, last, or at a specific index), TBox Delete Excel Worksheet, and TBox Update Excel Worksheet (rename a sheet and move it within the workbook)."
+        }
+      ],
+      "bulletPoints": [
+        "Define Range = declare where. Range Manipulation = read/write/verify what. Clear Range = reset.",
+        "'Cell special properties' means the technical layer — formula, formatting, colour, font, comment — not just the visible value."
+      ]
+    },
+    {
+      "sectionTitle": "Comparing workbooks and running macros",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "TBox Excel 1:1 File Compare",
+          "description": "Compares two Excel files across specified sheets, covering cell contents, formatting, and objects. The result can optionally be exported to a text file, which is what makes it usable as evidence in a test report rather than just a pass/fail flag. This is the standard answer to 'the report we generate must match the expected report'."
+        },
+        {
+          "type": "concept",
+          "term": "TBox Run Excel Macro",
+          "description": "Executes an existing Microsoft Excel macro from a TestStep, with a configurable timeout. Note the word existing — this Module runs a macro that already lives in the workbook; it is not a way to write VBA from Tosca. The timeout matters because a long-running macro would otherwise hang the TestCase."
+        },
+        {
+          "type": "note",
+          "text": "📄 The AE1 Excel lesson is the largest in the course (23 sub-lessons and exercises). Official Tricentis Academy exercise material is not redistributed here — work through it inside the official course."
+        }
+      ],
+      "bulletPoints": [
+        "1:1 File Compare covers contents, formatting AND objects — not only cell values.",
+        "Run Excel Macro triggers an existing macro; set the timeout deliberately."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Omitting the Open or Close Excel Workbook step",
+      "trapDescription": "Dropping a TBox Excel Range Manipulation Module straight into a TestCase and expecting it to work on its own.",
+      "bestPractice": "TBox Open Excel Workbook is the mandatory first step and TBox Close Excel Workbook the required final one. Everything in between depends on the workbook being open, and skipping Close can leave the file locked and changes unsaved."
+    },
+    {
+      "title": "Driving the Excel UI when the file-level Modules would do",
+      "trapDescription": "Using the Excel UI Engine to open Excel's window and click through it just to read or write a cell value.",
+      "bestPractice": "The Standard Modules work on the file in the background — faster and far more stable. Reserve the Excel UI Engine 3.0 for cases where the Excel user interface itself is genuinely what is being tested."
+    },
+    {
+      "title": "Thinking 'cell special properties' means the displayed value",
+      "trapDescription": "Verifying only the text a cell shows and considering the cell fully tested.",
+      "bestPractice": "TBox Excel Range Manipulation also reaches technical properties — formulas, formatting, colours, fonts, comments. A cell can display the right number while holding the wrong formula, and only a property-level verification catches that."
+    },
+    {
+      "title": "Expecting Run Excel Macro to create a macro",
+      "trapDescription": "Looking for a way to author VBA code inside the TestStep.",
+      "bestPractice": "TBox Run Excel Macro executes a macro that already exists in the workbook. Authoring the macro is outside Tosca's scope; Tosca triggers it and enforces a timeout."
+    },
+    {
+      "title": "Saving on the wrong step",
+      "trapDescription": "Looking for a save option on the manipulation Modules after changing cell values.",
+      "bestPractice": "Saving — including saving to a different path or file format — is configured on TBox Close Excel Workbook. The manipulation steps change the in-memory workbook; Close decides what happens to it."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A TestCase needs to read a value from a cell in an existing workbook and verify it. What is the mandatory first Module in the Excel Standard Module sequence?",
+      "options": [
+        {
+          "id": "A",
+          "text": "TBox Define Excel Range"
+        },
+        {
+          "id": "B",
+          "text": "TBox Open Excel Workbook"
+        },
+        {
+          "id": "C",
+          "text": "TBox Excel Range Manipulation"
+        },
+        {
+          "id": "D",
+          "text": "TBox Run Excel Macro"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Nothing can be read from a workbook that has not been opened.",
+      "rationale": "TBox Open Excel Workbook is the mandatory first step of any Excel Standard Module sequence. It opens the file in the background (handling passwords and read-only if needed); every other Excel Module depends on it, and TBox Close Excel Workbook must end the sequence."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A tester needs to confirm that a cell not only displays 1500 but also contains the correct SUM formula and the expected fill colour. Which Module handles this?",
+      "options": [
+        {
+          "id": "A",
+          "text": "TBox Excel 1:1 File Compare"
+        },
+        {
+          "id": "B",
+          "text": "TBox Clear Excel Range"
+        },
+        {
+          "id": "C",
+          "text": "TBox Excel Range Manipulation"
+        },
+        {
+          "id": "D",
+          "text": "TBox Create Excel Worksheet"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "The same Module that writes cell data also reaches the technical layer beneath it.",
+      "rationale": "TBox Excel Range Manipulation reads, writes and verifies both cell data and technical cell properties — formulas, formatting, colours, fonts and comments. This is what the objective 'verify Excel cell special properties' refers to."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Where do you configure whether an edited workbook is saved, and to which path and file format?",
+      "options": [
+        {
+          "id": "A",
+          "text": "On TBox Open Excel Workbook"
+        },
+        {
+          "id": "B",
+          "text": "On each TBox Excel Range Manipulation step"
+        },
+        {
+          "id": "C",
+          "text": "On TBox Close Excel Workbook"
+        },
+        {
+          "id": "D",
+          "text": "In the Tosca project settings"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "The decision about what happens to the file belongs to the step that finishes with it.",
+      "rationale": "TBox Close Excel Workbook controls saving, including saving to a specified path and file format. The manipulation Modules change the workbook in the background; Close determines whether and where those changes are written."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A generated Excel report must match an expected reference file, including formatting and embedded objects — not just cell values. Which Module fits?",
+      "options": [
+        {
+          "id": "A",
+          "text": "TBox Excel 1:1 File Compare"
+        },
+        {
+          "id": "B",
+          "text": "TBox Define Excel Range"
+        },
+        {
+          "id": "C",
+          "text": "TBox Update Excel Worksheet"
+        },
+        {
+          "id": "D",
+          "text": "Two TBox Excel Range Manipulation steps compared manually"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "There is a dedicated comparison Module, and it goes beyond cell contents.",
+      "rationale": "TBox Excel 1:1 File Compare compares two Excel files across specified sheets, covering cell contents, formatting and objects, and can export the comparison result to a text file for reporting."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "When should you use the Excel UI Engine 3.0 rather than the Excel Standard Modules?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Always — it is the more modern approach."
+        },
+        {
+          "id": "B",
+          "text": "When the Excel user interface itself is what is being tested: application window, dialogs, or embedded controls a user would interact with."
+        },
+        {
+          "id": "C",
+          "text": "Only when the workbook is password protected."
+        },
+        {
+          "id": "D",
+          "text": "Whenever a cell value needs to be read."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "One approach drives a visible UI; the other works on the file in the background.",
+      "rationale": "The Excel UI Engine 3.0 scans and steers the Excel user interface — main window, dialogs, and loaded worksheets with embedded controls. For reading and writing data, the background Standard Modules are faster and more stable, so the UI Engine is reserved for testing the UI itself."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Two approaches",
+      "value": "Standard Modules = file-level, background. Excel UI Engine 3.0 = the visible Excel application."
+    },
+    {
+      "key": "Where they live",
+      "value": "Standard modules → TBox XEngines → Excel."
+    },
+    {
+      "key": "Mandatory pattern",
+      "value": "TBox Open Excel Workbook → work → TBox Close Excel Workbook."
+    },
+    {
+      "key": "Saving",
+      "value": "Configured on Close — including save-as path and file format."
+    },
+    {
+      "key": "Ranges",
+      "value": "Define Excel Range (where) → Excel Range Manipulation (read/write/verify, incl. formulas, formatting, colours, fonts, comments) → Clear Excel Range (reset)."
+    },
+    {
+      "key": "Worksheets",
+      "value": "Create / Delete / Update Excel Worksheet — add, remove, rename and reposition sheets."
+    },
+    {
+      "key": "Compare",
+      "value": "TBox Excel 1:1 File Compare — cell contents, formatting and objects; optional export to text file."
+    },
+    {
+      "key": "Macros",
+      "value": "TBox Run Excel Macro — executes an EXISTING macro, with a configurable timeout."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 01 - Excel Engine",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+      "duration": "video"
+    },
+    {
+      "title": "Excel Modules reference (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2023.1/en-us/content/standard_subset/engines_3.0/excel.htm",
+      "duration": "docs"
+    }
+  ]
+}

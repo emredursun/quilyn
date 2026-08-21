@@ -1,0 +1,197 @@
+{
+  "moduleId": "TDS2-M02",
+  "moduleTitle": "Lesson 1 - Preparing your Project for using TDS",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+  "learningObjectives": [
+    "Install Tosca Server with the Test Data Service feature enabled.",
+    "Access the Test Data Management page and create a new TDS repository.",
+    "Choose between the Sqlite and In Memory repository types.",
+    "Configure TestDataEndpoint and TestDataRepository in Tosca Commander to connect it to a TDS repository."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Installing Tosca Server with TDS",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Version matching",
+          "description": "Tosca Server must be downloaded in the same version as your Tosca Commander (e.g. Commander 12.0 needs Server 12.0). Get it from the Support Portal, then launch the InstallShield Wizard and select Test Data Service as a feature to install — it's part of the standard Tosca Server installation."
+        },
+        {
+          "type": "note",
+          "text": "Also download the course's Base structure subset (.tsu file) and save it locally — it gets imported into your new Tosca project workspace in a later step."
+        },
+        {
+          "type": "concept",
+          "term": "After installation",
+          "description": "The Tosca Server webpage launches automatically once setup completes, showing the Test Data Object Viewer icon — the single entry point to every TDS feature."
+        }
+      ],
+      "bulletPoints": [
+        "Tosca Server version must match Tosca Commander version.",
+        "Test Data Service is selected as an installable feature during the InstallShield Wizard, not a separate download."
+      ]
+    },
+    {
+      "sectionTitle": "Accessing the Test Data Management page",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The endpoint URL",
+          "description": "To reach the Tosca Server webpage, enter http://<server address>:<port> in a browser. <server address> is the host name or IP (e.g. localhost), and <port> is whatever was set during installation (e.g. 81). The port only needs to be typed if it was changed from the default."
+        },
+        {
+          "type": "concept",
+          "term": "Reaching the repositories view",
+          "description": "Clicking the Test Data Object Viewer icon navigates to the Test Data Management page, at http://<SERVER IP or localhost>:<port>/TestDataObjectViewer. This page lists every configured repository as a tile."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Creating a TDS repository",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Create Repository dialog",
+          "description": "On the Test Data Management page, click 'Create Repository' and define four properties."
+        },
+        {
+          "type": "list",
+          "title": "Repository properties",
+          "items": [
+            "Name — a unique name for the new repository.",
+            "Type — Sqlite (a lightweight database; requires the path to where the .db file is saved) or In Memory (data stored temporarily in the computer's memory, cleared when it stops running).",
+            "Location — path to the .db file. Default: %PROGRAMDATA%\\TestDataService\\<reponame>.db.",
+            "Description — up to 200 characters describing the repository."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "TDS type names cannot contain any of these characters: / ? # [ ] @ ! $ & ' ( ) * + , ; = \\ :"
+        },
+        {
+          "type": "note",
+          "text": "Clicking Save creates the database repository immediately — it's then ready to receive test records."
+        }
+      ],
+      "bulletPoints": [
+        "Sqlite = persistent, file-backed. In Memory = temporary, cleared on restart.",
+        "Repository names must avoid the reserved special characters listed above."
+      ]
+    },
+    {
+      "sectionTitle": "Connecting Tosca Commander to the repository",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Step 1 — import the Base subset",
+          "description": "Import the course's Base structure .tsu subset into your new project workspace. This brings in the TestDataService Configurations object you'll need next."
+        },
+        {
+          "type": "concept",
+          "term": "Step 2 — define the TestDataService Configurations",
+          "description": "In the Configurations folder, open the TestDataService configurations and set two test configuration parameters: TestDataEndpoint (the http location to retrieve test records from) and TestDataRepository (which TDS repository to query)."
+        },
+        {
+          "type": "concept",
+          "term": "Step 3 — drag and drop onto the right folders",
+          "description": "The Configurations only take effect where they're attached. Drag and drop them onto your TestCase root folder and the relevant Execution List folder(s) — or, for convenience, onto the Component Folder if the same configuration should apply to every TestCase."
+        },
+        {
+          "type": "warning",
+          "text": "Best practice for real projects: if different TestCases need to talk to different repositories, don't apply one global configuration everywhere. Instead, drag empty configuration parameters onto the individual TestCase and Execution List folders that need them, and define each one's values separately."
+        }
+      ],
+      "bulletPoints": [
+        "TestDataEndpoint = where to reach TDS. TestDataRepository = which repository to use.",
+        "One global config (Component Folder) works when every TestCase shares the same repository; per-folder configs are needed when they don't."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-on",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 Exercise 01A-01C (Enabling TDS through Tosca Server, Creation of TDS Repository, Connect to TDS Repository) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Installing a Tosca Server version that doesn't match Commander",
+      "trapDescription": "Downloading whichever Tosca Server version is newest, without checking it against the installed Tosca Commander version.",
+      "bestPractice": "Tosca Server must be the same version as Tosca Commander — e.g. Commander 12.0 requires Server 12.0."
+    },
+    {
+      "title": "Applying one global TDS configuration when repositories differ per TestCase",
+      "trapDescription": "Dragging a single, fully-defined TestDataService Configuration onto the Component Folder even though different TestCases need to talk to different repositories.",
+      "bestPractice": "When TestCases genuinely need different repositories, drag EMPTY configuration parameters onto each TestCase/Execution List folder individually and define their values separately — a single global config only works when everything shares one repository."
+    },
+    {
+      "title": "Forgetting the Location property still needs a valid path for Sqlite",
+      "trapDescription": "Selecting Sqlite as the repository Type but leaving Location blank or wrong.",
+      "bestPractice": "Sqlite repositories are file-backed — Location must point to where the .db file is (or will be) saved. In Memory is the only type that doesn't need this."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A team wants a repository whose data does NOT persist after the Tosca Server restarts. Which repository Type should they choose?",
+      "options": [
+        { "id": "A", "text": "Sqlite" },
+        { "id": "B", "text": "In Memory" },
+        { "id": "C", "text": "Both persist data equally." },
+        { "id": "D", "text": "Neither type is available in TDS." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "One type is file-backed (persistent); the other lives only in RAM while the server runs.",
+      "rationale": "In Memory stores data temporarily in the computer's memory — it does not persist like Sqlite, which is file-backed and requires a Location path to its .db file."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "The same TDS configuration parameters (TestDataEndpoint, TestDataRepository) apply to every TestCase and Execution List in a project. According to this lesson, where can they be dragged and dropped?",
+      "options": [
+        { "id": "A", "text": "Only onto individual TestSteps." },
+        { "id": "B", "text": "Either onto the Component Folder, or onto the TestCase root folder and the relevant Execution List folder(s)." },
+        { "id": "C", "text": "Nowhere — global configurations aren't supported." },
+        { "id": "D", "text": "Only onto the Requirements section." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "There are two equally valid answers here, both mentioned explicitly in the lesson.",
+      "rationale": "When one configuration should apply everywhere, it can be dropped either on the Component Folder (so it applies to all objects) or on the TestCase root folder plus the relevant Execution List folder(s)."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Which of the following is a valid TDS repository/type name?",
+      "options": [
+        { "id": "A", "text": "Customer#Details" },
+        { "id": "B", "text": "Customer[Details]" },
+        { "id": "C", "text": "CustomerDetails" },
+        { "id": "D", "text": "Customer;Details" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "TDS type names have a specific list of forbidden special characters.",
+      "rationale": "TDS type names cannot include / ? # [ ] @ ! $ & ' ( ) * + , ; = \\ : — 'CustomerDetails' is the only option free of any reserved character."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Install requirement", "value": "Tosca Server version must match Tosca Commander version; select 'Test Data Service' as a feature during install." },
+    { "key": "Access URL", "value": "http://<server address>:<port> → Test Data Object Viewer icon → Test Data Management page." },
+    { "key": "Create Repository fields", "value": "Name, Type (Sqlite/In Memory), Location, Description (≤200 chars)." },
+    { "key": "Forbidden characters", "value": "/ ? # [ ] @ ! $ & ' ( ) * + , ; = \\ :" },
+    { "key": "TestDataService Configurations", "value": "TestDataEndpoint (where) + TestDataRepository (which repo) — drag onto Component Folder, or TestCase root + Execution List folders." },
+    { "key": "Different repos per TestCase", "value": "Drag empty configs onto individual folders and define values separately." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 1 - Preparing your Project for using TDS (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+      "duration": "video"
+    }
+  ]
+}

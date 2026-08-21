@@ -1,0 +1,229 @@
+{
+  "moduleId": "TDS1-M02",
+  "moduleTitle": "Lesson 2 - Attributes",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+  "learningObjectives": [
+    "Explain the role of a TestSheet within the TestCase Design section.",
+    "Create and structure Attributes to represent the business objects and behaviors under test.",
+    "Distinguish the system-assigned AttrType (Logical vs Physical) from the user-assigned BusinessRelevant property.",
+    "Apply the four recommended core Attributes: Administration, Precondition, Process, and Verification."
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "TestSheets and Attributes",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "TestSheet",
+          "description": "The highest-level object in the TestCase Design section. A TestSheet organizes the test data and logical test structure for one Requirement — as a rule of thumb, one TestSheet is created per Requirement, and the TestCases built from it will cover that Requirement."
+        },
+        {
+          "type": "concept",
+          "term": "Attribute",
+          "description": "A characteristic or business object involved in the behavior being tested — for example, a credit-card drop-down on a checkout form. Attributes describe *what varies*; the specific values an Attribute can take (e.g. Visa, Mastercard) are added later as Instances (Lesson 3)."
+        },
+        {
+          "type": "concept",
+          "term": "Structuring Attributes",
+          "description": "Like Requirements, Attributes can be layered — every Attribute may have sub-Attributes, depending on how much detail the TestSheet needs."
+        }
+      ],
+      "bulletPoints": [
+        "One TestSheet per Requirement is the standard rule of thumb.",
+        "Attribute = the characteristic; Instance (next lesson) = the specific value of that characteristic."
+      ]
+    },
+    {
+      "sectionTitle": "AttrType: Logical vs Physical",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "AttrType is system-determined, not user-set",
+          "description": "Every Attribute has an AttrType property with value 'Logical' or 'Physical'. This isn't something you choose from a dropdown — Tosca sets it automatically based on structure: an Attribute with sub-Attributes underneath it is Logical; an Attribute with none is Physical."
+        }
+      ],
+      "bulletPoints": [
+        "Logical = has sub-Attributes. Physical = does not. Tosca decides this for you based on structure."
+      ]
+    },
+    {
+      "sectionTitle": "The four core Attributes",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Recommended structure",
+          "description": "Tricentis recommends starting every TestSheet with four top-level logical Attributes, so that any reader can immediately see the role each block of data plays."
+        },
+        {
+          "type": "list",
+          "title": "Administration / Precondition / Process / Verification",
+          "items": [
+            "Administration — metadata about the TestCase itself (designer, contact person, test stage, comments). Not actual test data, and not business relevant.",
+            "Precondition — prerequisite data needed to get the application/workspace into the right starting state (e.g. login credentials). Required to run, but not the focus of the test.",
+            "Process — the actual data being tested; directly relevant to the TestCase's purpose.",
+            "Verification — data used to check whether the process behaved as expected; comparison/expected-result values."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Administration = context, not test data. Precondition = setup. Process = what's under test. Verification = expected outcome."
+      ]
+    },
+    {
+      "sectionTitle": "BusinessRelevant property",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Three possible values",
+          "description": "BusinessRelevant is set by the user (unlike AttrType) and controls whether an Attribute's data affects TestCase combinations."
+        },
+        {
+          "type": "list",
+          "title": "Yes / No / Result",
+          "items": [
+            "Yes (default) — the Attribute is business relevant and should be considered when combining data into TestCases. Typical for Precondition and Process.",
+            "No — the Attribute (and its sub-Attributes) is not relevant to combinations. Typical for Administration.",
+            "Result — the Attribute (and its sub-Attributes) holds verification data used for comparisons. Typical for Verification."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Setting BusinessRelevant on a parent Attribute propagates that value down to all of its sub-Attributes."
+        }
+      ],
+      "bulletPoints": [
+        "Map the four core Attributes to BusinessRelevant like this: Administration=No, Precondition=Yes, Process=Yes, Verification=Result."
+      ]
+    },
+    {
+      "sectionTitle": "Building it in Tosca",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Creating a TestSheet (3 ways)",
+          "items": [
+            "Ribbon: Create Object → TestSheet",
+            "Right-click a Folder → 'Create TestSheet' from the Mini-Toolbar",
+            "Shortcut: Ctrl+N, Ctrl+T"
+          ]
+        },
+        {
+          "type": "list",
+          "title": "Creating an Attribute (3 ways)",
+          "items": [
+            "Ribbon: Create Object → Attribute",
+            "Right-click → 'Create Attribute'",
+            "Shortcut: Ctrl+N, Ctrl+A"
+          ]
+        },
+        {
+          "type": "note",
+          "text": "BusinessRelevant is set on the Attribute's Properties tab (Yes/No/Result dropdown), or toggled with Ctrl+F7 or the corresponding Ribbon button. The Attribute's color changes in the tree to reflect its current value."
+        },
+        {
+          "type": "note",
+          "text": "📄 Exercise 02a-02b (TestSheet and Basic Attribute Structure, Attribute Structure — Process and Verification) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ],
+      "bulletPoints": [
+        "Best practice: mirror the Requirements Folder structure in the TestCase Design section (not always followed in training workspaces for simplicity)."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Trying to manually set AttrType",
+      "trapDescription": "Looking for a dropdown or button to set an Attribute's AttrType to Logical or Physical.",
+      "bestPractice": "AttrType is calculated automatically by Tosca based on structure — Logical if the Attribute has sub-Attributes, Physical if it does not. It is not user-editable."
+    },
+    {
+      "title": "Leaving Administration as BusinessRelevant = Yes",
+      "trapDescription": "Forgetting to set the Administration Attribute's business relevance, so metadata like 'Test Designer' gets pulled into combinatorics.",
+      "bestPractice": "Administration should be set to BusinessRelevant = No, since it holds context/metadata, not data that should influence which combinations are generated."
+    },
+    {
+      "title": "Confusing Precondition and Process",
+      "trapDescription": "Placing the actual data under test inside Precondition, or setup/login data inside Process.",
+      "bestPractice": "Precondition holds prerequisite setup data (not the test's focus, e.g. login info); Process holds the data that is actually the focus of the TestCase."
+    },
+    {
+      "title": "Assuming BusinessRelevant settings apply per-Attribute only",
+      "trapDescription": "Manually re-setting BusinessRelevant on every sub-Attribute after already setting it on the parent.",
+      "bestPractice": "BusinessRelevant set on a parent Attribute automatically propagates to all of its sub-Attributes — no need to repeat it lower in the tree."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "An Attribute called 'Credit Card' contains sub-Attributes for card number, expiry date, and card type. What AttrType will Tosca assign to 'Credit Card'?",
+      "options": [
+        { "id": "A", "text": "Physical, because it represents a physical payment card." },
+        { "id": "B", "text": "Logical, because it contains sub-Attributes." },
+        { "id": "C", "text": "The user must choose manually via a dropdown." },
+        { "id": "D", "text": "AttrType only applies to Instances, not Attributes." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "AttrType is derived from structure, not chosen by the user.",
+      "rationale": "AttrType is set automatically by Tosca: an Attribute with sub-Attributes is Logical; one without is Physical. It cannot be manually assigned."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "Which BusinessRelevant value should the Verification Attribute typically use?",
+      "options": [
+        { "id": "A", "text": "Yes" },
+        { "id": "B", "text": "No" },
+        { "id": "C", "text": "Result" },
+        { "id": "D", "text": "Verification Attributes don't use BusinessRelevant." }
+      ],
+      "correctOptions": ["C"],
+      "hint": "This value flags an Attribute as holding comparison/expected-outcome data.",
+      "rationale": "Verification is typically set to BusinessRelevant = Result, indicating it holds data used for verifications/comparisons rather than data that should drive combinatorics."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A tester sets the top-level Administration Attribute's BusinessRelevant to 'No'. What happens to its sub-Attributes (e.g. 'Test Designer', 'Comments')?",
+      "options": [
+        { "id": "A", "text": "Nothing — each sub-Attribute must be set individually." },
+        { "id": "B", "text": "They automatically inherit BusinessRelevant = No from the parent." },
+        { "id": "C", "text": "They are deleted." },
+        { "id": "D", "text": "They automatically switch to AttrType = Physical." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "BusinessRelevant is a property that flows down the tree.",
+      "rationale": "Setting BusinessRelevant on a parent Attribute propagates that setting to all of its sub-Attributes automatically."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "Which shortcut creates a new Attribute directly (without using the Ribbon or right-click menu)?",
+      "options": [
+        { "id": "A", "text": "Ctrl+N, Ctrl+T" },
+        { "id": "B", "text": "Ctrl+N, Ctrl+R" },
+        { "id": "C", "text": "Ctrl+N, Ctrl+A" },
+        { "id": "D", "text": "Ctrl+F7" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "T is for TestSheet, R is for Requirement — this one is for the object covered in this lesson.",
+      "rationale": "Ctrl+N, Ctrl+A creates an Attribute. Ctrl+N, Ctrl+T creates a TestSheet, Ctrl+N, Ctrl+R creates a Requirement, and Ctrl+F7 toggles BusinessRelevant on a selected Attribute."
+    }
+  ],
+  "quickRecap": [
+    { "key": "TestSheet", "value": "Top-level TestCase Design object; one per Requirement, as a rule of thumb." },
+    { "key": "Attribute", "value": "A characteristic/business object; can have sub-Attributes." },
+    { "key": "AttrType", "value": "System-assigned: Logical (has sub-Attributes) or Physical (does not). Not user-editable." },
+    { "key": "Core 4 Attributes", "value": "Administration (No), Precondition (Yes), Process (Yes), Verification (Result)." },
+    { "key": "BusinessRelevant", "value": "Yes / No / Result — user-set, propagates to sub-Attributes, controls inclusion in combinatorics." },
+    { "key": "Create Attribute shortcut", "value": "Ctrl+N, Ctrl+A. Toggle BusinessRelevant: Ctrl+F7." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 02 - Attributes (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+      "duration": "video"
+    }
+  ]
+}

@@ -1,0 +1,193 @@
+{
+  "moduleId": "TDS1-M10",
+  "moduleTitle": "Lesson 10 - Automatic Generation of Instances",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+  "learningObjectives": [
+    "Generate Instance combinations automatically at both the Attribute level and the TestSheet level.",
+    "Set up the empty Instance Folder required before generating at a lower Attribute level.",
+    "Explain why a StraightThrough must be marked before generating with Linear Expansion.",
+    "Distinguish Generate Instances from Complete Instances when a TestSheet changes after combinations already exist."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Automating what you've done manually",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The goal",
+          "description": "TestCase Design exists to generate complete test data sets from the Attributes and Instances you've defined. Everything built manually so far — combining at a lower Attribute level or at the TestSheet level using Linear Expansion — can instead be generated automatically by Tosca in one action."
+        },
+        {
+          "type": "concept",
+          "term": "How it works",
+          "description": "Focus on the level where you want combinations created, and Tosca instantly combines every structural element beneath that level according to the combinatorial method you select."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Generating at a lower Attribute level",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Prerequisite: an empty Instance Folder",
+          "description": "To generate Instances automatically on a specific Attribute, that Attribute first needs an empty Instance Folder — because the lower Attributes being combined will automatically combine into the next Instance Folder above them. Create this by adding an Instance (which creates both the Instance itself and its containing Instance Folder), then deleting just the Instance while keeping the Folder."
+        },
+        {
+          "type": "concept",
+          "term": "Generating",
+          "description": "With the Instance Folder in place, select the Attributes to combine, right-click, choose 'Generate Instances', and pick the combinatorial method. The combinations appear as Instance columns according to that method."
+        },
+        {
+          "type": "warning",
+          "text": "If using Linear Expansion, the StraightThrough Instances MUST be marked before generating. Linear Expansion needs a baseline (the all-StraightThrough combination) to expand outward from — without it, the method has nothing to switch values against."
+        }
+      ],
+      "bulletPoints": [
+        "Attribute-level generation needs: an empty Instance Folder first, then right-click → Generate Instances → choose method.",
+        "Mark StraightThrough Instances BEFORE generating if using Linear Expansion."
+      ]
+    },
+    {
+      "sectionTitle": "Generating at the TestSheet level",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Simpler — no Folder setup needed",
+          "description": "At the TestSheet level, there's no need to pre-create an Instance Folder. Just right-click the TestSheet itself, select Generate Instances, and choose the method. Any combinations already created at lower levels are automatically taken into account when Tosca generates at the TestSheet level."
+        },
+        {
+          "type": "note",
+          "text": "Attributes set to BusinessRelevant = No or Result are excluded from automatic generation — only BusinessRelevant = Yes Attributes participate in combinatorics."
+        }
+      ],
+      "bulletPoints": [
+        "TestSheet-level generation: right-click the TestSheet → Generate Instances → choose method. No Folder prep required.",
+        "Only BusinessRelevant = Yes Attributes are combined; No/Result Attributes are skipped."
+      ]
+    },
+    {
+      "sectionTitle": "Generate Instances vs Complete Instances",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The problem with re-generating after a change",
+          "description": "If a new Attribute is added later and 'Generate Instances' is run again, Tosca does not account for the combinations that already existed — it can recombine everything and potentially create duplicates."
+        },
+        {
+          "type": "concept",
+          "term": "Complete Instances",
+          "description": "The fix: 'Complete Instances' only creates the new combinations required to cover the newly added Attribute, leaving existing combinations untouched and un-duplicated. It works the same way as Generate Instances — available at both the TestSheet and Attribute level, via right-click → Complete Instances → choose method."
+        }
+      ],
+      "bulletPoints": [
+        "Generate Instances = (re)builds combinations from scratch at that level — risk of duplicating existing ones if run again later.",
+        "Complete Instances = adds only what's newly needed, preserving what's already there. Use this after the TestSheet has changed."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-on",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 Exercise 10a-10c (Combine to Checkout - Combine Precondition, Combine to TestSheet and add Values) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Forgetting the empty Instance Folder before generating at Attribute level",
+      "trapDescription": "Trying to right-click and Generate Instances on an Attribute that has no Instance Folder set up yet.",
+      "bestPractice": "Attribute-level automatic generation requires an empty Instance Folder first — created by adding then deleting an Instance (keeping the Folder) — because lower Attributes combine into the next Instance Folder above them."
+    },
+    {
+      "title": "Generating with Linear Expansion before marking a StraightThrough",
+      "trapDescription": "Running Generate Instances with Linear Expansion selected, without any Instance flagged as StraightThrough.",
+      "bestPractice": "Linear Expansion needs a defined StraightThrough baseline before it can generate — mark it first, or the method has nothing to expand from."
+    },
+    {
+      "title": "Using Generate Instances after adding a new Attribute to an existing TestSheet",
+      "trapDescription": "Re-running Generate Instances on a TestSheet that already has combinations, after adding a new Attribute — resulting in duplicated or reshuffled combinations.",
+      "bestPractice": "Use 'Complete Instances' instead, which only creates the new combinations needed for the newly added Attribute and leaves existing combinations untouched."
+    },
+    {
+      "title": "Expecting Administration/Verification Attributes to affect automatic combinations",
+      "trapDescription": "Assuming a BusinessRelevant = No or Result Attribute will be factored into Generate/Complete Instances.",
+      "bestPractice": "Only BusinessRelevant = Yes Attributes are considered in automatic generation — No and Result Attributes are excluded from combinatorics entirely."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A tester wants to automatically generate Instances on a specific lower-level Attribute for the first time. What must exist before they can do this?",
+      "options": [
+        { "id": "A", "text": "A completed TestCase Template." },
+        { "id": "B", "text": "An empty Instance Folder on that Attribute." },
+        { "id": "C", "text": "At least one Class Reference." },
+        { "id": "D", "text": "Nothing — Generate Instances works immediately with no setup." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The lower Attributes being combined need somewhere to combine into.",
+      "rationale": "Attribute-level generation requires an empty Instance Folder first, created by adding an Instance and then deleting it while keeping the Folder — the combined results land in this Folder."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A tester selects Linear Expansion and clicks Generate Instances, but no Instance has been marked as StraightThrough anywhere. What happens?",
+      "options": [
+        { "id": "A", "text": "Tosca automatically picks one Instance per Attribute as StraightThrough." },
+        { "id": "B", "text": "Linear Expansion cannot properly generate combinations without a defined StraightThrough baseline first." },
+        { "id": "C", "text": "It behaves exactly like All Combinations instead." },
+        { "id": "D", "text": "Nothing — StraightThrough is irrelevant to automatic generation." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Recall what Linear Expansion fundamentally needs to expand outward from.",
+      "rationale": "Linear Expansion needs a StraightThrough baseline — the all-StraightThrough combination — to expand from by swapping one value at a time. It must be marked before generating."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A TestSheet already has combinations built, and a new Attribute is added. What should the tester use to add just the new combinations without disturbing the existing ones?",
+      "options": [
+        { "id": "A", "text": "Generate Instances" },
+        { "id": "B", "text": "Complete Instances" },
+        { "id": "C", "text": "Arrange Instances" },
+        { "id": "D", "text": "Resolve Class Reference" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "One option rebuilds from scratch and risks duplicates; the other only adds what's missing.",
+      "rationale": "Complete Instances only creates the new combinations required to cover the newly added Attribute, leaving the pre-existing combinations untouched — unlike Generate Instances, which can recombine everything and duplicate existing data."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "Which Attributes are excluded from Tosca's automatic Instance generation?",
+      "options": [
+        { "id": "A", "text": "Attributes with AttrType = Physical." },
+        { "id": "B", "text": "Attributes with BusinessRelevant = No or Result." },
+        { "id": "C", "text": "Attributes with more than 3 Instances." },
+        { "id": "D", "text": "No Attributes are ever excluded." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Only Attributes flagged as relevant to combinatorics are included.",
+      "rationale": "Automatic generation only considers BusinessRelevant = Yes Attributes; those set to No (like Administration) or Result (like Verification) are excluded from combinatorics."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Automatic generation", "value": "Focus on a level, right-click → Generate Instances, choose the combinatorial method." },
+    { "key": "Attribute-level prerequisite", "value": "An empty Instance Folder must exist first (add then delete an Instance, keep the Folder)." },
+    { "key": "TestSheet-level generation", "value": "No Folder prep needed; already-combined lower levels are automatically taken into account." },
+    { "key": "Linear Expansion requirement", "value": "StraightThrough Instances must be marked BEFORE generating." },
+    { "key": "Excluded from generation", "value": "BusinessRelevant = No or Result Attributes." },
+    { "key": "Complete Instances", "value": "Adds only the new combinations needed after a TestSheet change — preserves existing combinations (unlike re-running Generate Instances)." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 10 - Automatic Generation of Instances (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+      "duration": "video"
+    }
+  ]
+}

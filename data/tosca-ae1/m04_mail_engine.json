@@ -1,0 +1,367 @@
+{
+  "moduleId": "AE1-M04",
+  "moduleTitle": "Lesson 3 - Mail Engine",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+  "learningObjectives": [
+    "Define a mail server connection and explain when the connection is actually established.",
+    "Send and reply to email from a TestCase using the Send Mail Module.",
+    "Choose correctly between Receive Mail Simple and Receive Mail Expert.",
+    "Identify which mail protocols are supported and when OAuth 2.0 authentication is required.",
+    "Configure a personal Gmail mailbox for testing (App Password, IMAP/SMTP settings) and avoid the Connection Name collision between send and receive steps."
+  ],
+  "estTime": "35 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Why mail automation matters",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Mail as part of the business process",
+          "description": "Very few end-to-end processes finish inside the application. Register an account and a confirmation email arrives; place an order and an order confirmation follows; reset a password and the whole flow depends on a link that only exists in an inbox. If the test stops at the web page, the part the customer actually receives goes untested."
+        },
+        {
+          "type": "concept",
+          "term": "Mail Engine 3.0",
+          "description": "The Tosca Mail Engine 3.0 automates tests against email. Like the other Engines 3.0 it is part of the standard Tricentis Tosca installation, and its Modules belong to the Standard subset — you find them under Standard modules → TBox XEngines → Mail."
+        },
+        {
+          "type": "list",
+          "title": "The five Mail Modules, as they appear in the AE1 workspace",
+          "items": [
+            "Connect to Mail Server — defines a generic mail server connection.",
+            "Connect to Exchange Server — a dedicated Module for Microsoft Exchange connections.",
+            "Send Mail — sends or replies to a message via SMTP.",
+            "Receive Mail Simple — checks for one specific, single email.",
+            "Receive Mail Expert — checks for specific emails with richer matching criteria."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Mail Engine 3.0 ships with standard Tosca; its Modules live in the Standard subset."
+      ]
+    },
+    {
+      "sectionTitle": "Connecting to the mail server",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Connect to Mail Server",
+          "description": "A dedicated TestStep defines the connection to the mail server — host, protocol, credentials. Note the subtlety: this step defines the connection, but the actual connection is established during the sending or receiving step, not at the moment the Connect step runs. A Connect step that passes is therefore not by itself proof that the server is reachable."
+        },
+        {
+          "type": "concept",
+          "term": "Connect to Exchange Server",
+          "description": "A separate Module dedicated to Microsoft Exchange, sitting alongside the generic Connect to Mail Server in the same folder. Where the target mailbox is on Exchange, this is the more direct route than configuring a generic connection."
+        },
+        {
+          "type": "concept",
+          "term": "OAuth 2.0 for Exchange Online / Microsoft 365",
+          "description": "Microsoft has been deprecating basic authentication for SMTP and EWS, and Tosca supports OAuth 2.0 as the modern alternative. Tricentis documents a dedicated Connect to Cloud Mail Server Module for this. Hands-on finding: in the AE1 base subset, Connect to Exchange Server itself already exposes an Authentication Type selector (defaulting to 'Direct', i.e. basic username/password) plus App Id and Tenant Id fields — switching Authentication Type away from 'Direct' and supplying an Azure AD app registration's App Id and Tenant Id gives OAuth 2.0 against Exchange Online from that same Module, no separate Connect to Cloud Mail Server step required."
+        },
+        {
+          "type": "warning",
+          "text": "The App Id and Tenant Id come from an Azure AD App Registration with mail permissions, which needs admin consent. In a locked-down corporate tenant a regular employee usually cannot self-provision this — expect to need IT/Azure admin involvement, or to use a personal mailbox instead for a training exercise."
+        },
+        {
+          "type": "list",
+          "title": "Supported protocols",
+          "items": [
+            "Sending — SMTP.",
+            "Receiving — Exchange server, POP3, or IMAP only."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Connect defines the connection; send/receive establishes it.",
+        "Receiving is limited to Exchange, POP3 and IMAP — there is no generic 'any mailbox' option.",
+        "Cloud/Microsoft 365 targets need OAuth 2.0 — either via Connect to Cloud Mail Server, or by switching Connect to Exchange Server's Authentication Type off 'Direct' and supplying an App Id/Tenant Id."
+      ]
+    },
+    {
+      "sectionTitle": "Real-world setup notes: Gmail and corporate mailboxes",
+      "elements": [
+        {
+          "type": "warning",
+          "text": "Connect to Exchange Server only speaks EWS (Exchange Web Services) — a Microsoft-proprietary protocol. Gmail, and any non-Exchange provider, does not implement EWS at all. Pointing this Module's Exchange Web Services Url at a Gmail account will never authenticate, no matter what credentials are supplied. For Gmail (or any IMAP/SMTP provider), use the generic Connect to Mail Server Module instead."
+        },
+        {
+          "type": "concept",
+          "term": "Gmail: exact server values that work",
+          "description": "Connect to Mail Server, configured for RECEIVING: Mail Server = imap.gmail.com, Port = 993, Enable Security = True, Protocol = IMAP. Configured for SENDING (a separate TestStep): Mail Server = smtp.gmail.com, Port = 587, Enable Security = True, Protocol = SMTP."
+        },
+        {
+          "type": "list",
+          "title": "Gmail account checklist before Tosca can connect",
+          "items": [
+            "Turn on 2-Step Verification (myaccount.google.com/security) — the App Passwords option does not exist until this is on.",
+            "Generate an App Password (myaccount.google.com/apppasswords) and use that 16-character value in Tosca's Password field — never the real account password.",
+            "IMAP no longer needs a separate on/off toggle in current Gmail — Settings → Forwarding and POP/IMAP shows only sub-options (auto-expunge, folder limits) once IMAP is already available by default.",
+            "If authentication still fails after the above, check the inbox for a Google 'Security alert' / blocked sign-in email and confirm the attempt ('Yes, that was me') — Google sometimes blocks a brand-new tool's very first connection as suspicious."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Give SMTP and IMAP connections DIFFERENT Connection Name values, even against the same mailbox. A Connect to Mail Server step registers its resource under whatever Connection Name you give it, bound to whichever protocol that step configured. If a Send Mail step and a Receive step both reference the same Connection Name, but that name was last configured for the other protocol, you get an error like 'Resource '<name>' does not support sending emails' — the resource exists, it is just registered as the wrong protocol."
+        },
+        {
+          "type": "note",
+          "text": "Corporate Microsoft 365 tenants almost always block Basic/'Direct' authentication via Conditional Access policies, even with a fully correct password — the request fails with 401 Unauthorized before credentials are meaningfully checked at all. For a training exercise, a personal mailbox (Gmail or a personal Outlook.com account) avoids this entirely, and avoids running third-party automation tooling against a corporate work identity."
+        }
+      ],
+      "bulletPoints": [
+        "EWS = Exchange/Outlook only. Gmail and most other providers need Connect to Mail Server (IMAP + SMTP), not Connect to Exchange Server.",
+        "One Connection Name per protocol — never share a Connection Name between an SMTP step and an IMAP step.",
+        "Gmail needs 2-Step Verification ON + an App Password — the real account password will be rejected."
+      ]
+    },
+    {
+      "sectionTitle": "Sending mail",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Send Mail",
+          "description": "The Send Mail Module sends — or replies to — an email message via SMTP. Typical uses in a test are triggering an inbound process (a system that acts on incoming mail), or generating a message the test will later verify was received and correctly handled."
+        }
+      ],
+      "bulletPoints": [
+        "Send Mail covers both new messages and replies."
+      ]
+    },
+    {
+      "sectionTitle": "Receiving mail: Simple vs Expert",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Receive Mail Simple",
+          "description": "Checks whether you received one specific, single email. This is the right choice for the common case: 'after registering, did the confirmation email arrive?' One expected message, one check."
+        },
+        {
+          "type": "concept",
+          "term": "Receive Mail Expert",
+          "description": "Checks whether specific emails — plural — were received. Use it when a single message is not the unit of interest: several notifications are expected, or a more elaborate set of criteria has to be evaluated across messages."
+        },
+        {
+          "type": "note",
+          "text": "Both Simple and Expert support the same protocols: Exchange server, POP3, or IMAP only. The Simple/Expert choice is about how many messages and how much matching complexity you need — not about which mail server you are talking to."
+        },
+        {
+          "type": "note",
+          "text": "📄 Official Tricentis Academy exercise material for this lesson is not redistributed here — complete the exercises inside the official course. This lesson needs a working mail account, so check that prerequisite before starting."
+        }
+      ],
+      "bulletPoints": [
+        "Simple = one specific email. Expert = specific emails, plural, with richer matching.",
+        "Protocol support is identical between them."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Assuming the Connect step proves the server is reachable",
+      "trapDescription": "Seeing the Connect to Mail Server TestStep pass and concluding the mail configuration is correct.",
+      "bestPractice": "The Connect step defines the connection; the connection is actually established during the send or receive step. Configuration errors surface at send/receive time, not at Connect."
+    },
+    {
+      "title": "Reaching for Receive Mail Expert by default",
+      "trapDescription": "Using the Expert Module for a straightforward 'did the confirmation email arrive?' check because it sounds more capable.",
+      "bestPractice": "Receive Mail Simple exists precisely for a single specific email and keeps the TestStep readable. Use Expert when you genuinely need to check multiple emails or more complex matching criteria."
+    },
+    {
+      "title": "Expecting webmail or arbitrary mail services to work",
+      "trapDescription": "Trying to point the receive Modules at a mail service that exposes neither Exchange, POP3, nor IMAP.",
+      "bestPractice": "Receiving supports Exchange server, POP3, or IMAP only. A service without one of those protocols cannot be read by the Mail Engine, regardless of which receive Module you choose."
+    },
+    {
+      "title": "Using basic authentication against Microsoft 365",
+      "trapDescription": "Configuring a standard SMTP connection with username and password for a Microsoft-hosted mailbox.",
+      "bestPractice": "Microsoft has deprecated basic authentication for SMTP. Use OAuth 2.0 for cloud mail services instead — via Connect to Cloud Mail Server, or by switching Connect to Exchange Server's Authentication Type off 'Direct' and supplying an App Id/Tenant Id. This is now the working path, not merely the recommended one — and a corporate tenant's Conditional Access policy will typically reject 'Direct' auth with a 401 even when the password is correct."
+    },
+    {
+      "title": "Reusing one Connection Name for both SMTP and IMAP",
+      "trapDescription": "Configuring one Connect to Mail Server step for IMAP and another for SMTP against the same mailbox, but giving both steps the same Connection Name.",
+      "bestPractice": "Each Connect to Mail Server step registers its resource under its Connection Name, bound to whichever protocol that specific step used. Give SMTP and IMAP connections distinct names (e.g. GmailSmtpConnection / GmailImapConnection) — reusing one name means whichever step ran last 'wins' that name, and the other operation fails with an error like 'Resource does not support sending emails'."
+    },
+    {
+      "title": "Pointing Connect to Exchange Server at a non-Exchange mailbox",
+      "trapDescription": "Entering a Gmail (or other non-Microsoft) address and password into Connect to Exchange Server's Exchange Web Services Url field, expecting it to connect.",
+      "bestPractice": "Connect to Exchange Server only speaks EWS, a Microsoft-only protocol — it cannot reach Gmail or other non-Exchange providers regardless of credentials. Use the generic Connect to Mail Server Module configured with the provider's own IMAP (receive) and SMTP (send) server/port instead."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A TestCase must verify that a single order-confirmation email arrived after checkout. Which Module is the appropriate choice?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Send Mail"
+        },
+        {
+          "id": "B",
+          "text": "Receive Mail Simple"
+        },
+        {
+          "id": "C",
+          "text": "Receive Mail Expert"
+        },
+        {
+          "id": "D",
+          "text": "Connect to Cloud Mail Server"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "One specific, single email is expected.",
+      "rationale": "Receive Mail Simple checks whether one specific, single email was received — exactly this scenario. Receive Mail Expert is for checking multiple emails or more complex matching criteria."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "Which protocols does the Mail Engine support for RECEIVING email?",
+      "options": [
+        {
+          "id": "A",
+          "text": "SMTP only"
+        },
+        {
+          "id": "B",
+          "text": "Exchange server, POP3, or IMAP only"
+        },
+        {
+          "id": "C",
+          "text": "Any protocol the mail server exposes"
+        },
+        {
+          "id": "D",
+          "text": "HTTP and HTTPS webmail interfaces"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "SMTP is the sending protocol — receiving uses a different set.",
+      "rationale": "Both Receive Mail Simple and Receive Mail Expert support Exchange server, POP3 or IMAP only. SMTP is used by Send Mail for sending, not for reading a mailbox."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "When is the connection to the mail server actually established?",
+      "options": [
+        {
+          "id": "A",
+          "text": "As soon as the Connect to Mail Server TestStep executes."
+        },
+        {
+          "id": "B",
+          "text": "During the sending or receiving step."
+        },
+        {
+          "id": "C",
+          "text": "When the Tosca workspace is opened."
+        },
+        {
+          "id": "D",
+          "text": "Only at the end of the ExecutionList."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The Connect step defines something; it does not yet do it.",
+      "rationale": "The Connect to Mail Server TestStep defines the connection, but the actual connection happens during sending or receiving. A passing Connect step is therefore not proof that the mail server is reachable."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A test must send mail through a Microsoft 365 mailbox. Which Module should be used and why?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Send Mail with basic authentication — it is simplest."
+        },
+        {
+          "id": "B",
+          "text": "Connect to Cloud Mail Server, because Microsoft has deprecated basic authentication for SMTP and OAuth 2.0 is required."
+        },
+        {
+          "id": "C",
+          "text": "Receive Mail Expert, because cloud mailboxes are read-only."
+        },
+        {
+          "id": "D",
+          "text": "Microsoft 365 mailboxes cannot be automated with Tosca."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The authentication method, not the sending Module, is what changed.",
+      "rationale": "Microsoft has deprecated basic authentication for SMTP. The Connect to Cloud Mail Server Module connects to mail services using OAuth 2.0, which is the supported path for cloud-hosted mailboxes."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Mail Engine 3.0",
+      "value": "Part of standard Tosca; Modules under Standard modules → TBox XEngines → Mail (Standard subset)."
+    },
+    {
+      "key": "Connect to Mail Server",
+      "value": "Defines the connection — the connection itself is made during send/receive."
+    },
+    {
+      "key": "OAuth 2.0 for Exchange Online",
+      "value": "Via Connect to Cloud Mail Server, OR by switching Connect to Exchange Server's Authentication Type off 'Direct' and supplying an App Id/Tenant Id — both need an Azure AD app registration."
+    },
+    {
+      "key": "Gmail server values",
+      "value": "IMAP (receive): imap.gmail.com:993. SMTP (send): smtp.gmail.com:587. Both need Enable Security = True."
+    },
+    {
+      "key": "Gmail auth requirement",
+      "value": "2-Step Verification ON + an App Password — the real account password is rejected."
+    },
+    {
+      "key": "Connection Name rule",
+      "value": "One distinct Connection Name per protocol (SMTP vs IMAP) — never share one name between them."
+    },
+    {
+      "key": "Connect to Exchange Server ≠ generic",
+      "value": "EWS-only — Exchange/Outlook accounts. Gmail and most other providers must use Connect to Mail Server."
+    },
+    {
+      "key": "Send Mail",
+      "value": "Sends or replies to a message via SMTP."
+    },
+    {
+      "key": "Receive Mail Simple",
+      "value": "Checks for ONE specific, single email."
+    },
+    {
+      "key": "Receive Mail Expert",
+      "value": "Checks for specific emails (plural) with richer matching criteria."
+    },
+    {
+      "key": "Receive protocols",
+      "value": "Exchange server, POP3, or IMAP only — for both Simple and Expert."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 03 - Mail Engine",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+      "duration": "video"
+    },
+    {
+      "title": "Mail Engine 3.0 (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-16.0/en-us/content/engines_3.0/mail/mail_engine.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Connect to Cloud Mail Server (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mail/connect_mail_expert.htm",
+      "duration": "docs"
+    }
+  ]
+}

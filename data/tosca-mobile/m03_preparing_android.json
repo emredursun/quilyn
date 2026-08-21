@@ -1,0 +1,296 @@
+{
+  "moduleId": "TMOB-M03",
+  "moduleTitle": "Lesson 3 - Preparing Android Devices, Emulators & Simulators",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1311/getting-started-with-mobile-test-automation-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Prepare a physical Android device for automation: USB debugging, drivers, and phone-data access.",
+    "Create and use an Android emulator through Android Studio's AVD Manager.",
+    "Recognise and work around common device-side gotchas that look like Tosca problems but are not.",
+    "Retrieve the AppPackage and AppActivity values Tosca needs to open an installed Android app."
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Preparing a physical Android device",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Android prerequisites",
+          "items": [
+            "On the device, allow access to phone data when prompted.",
+            "Enable USB debugging: Settings → Developer options → USB debugging (Developer options itself is usually hidden — enable it first by tapping the Build number field, under Settings → About phone, seven times).",
+            "Ensure the correct USB driver for that device is installed on the computer running TMA.",
+            "Connect the device by USB and accept the 'Allow USB debugging' prompt that appears on the device screen — this prompt only appears the first time a given computer connects."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "USB debugging is the step most often missed. A device can charge normally and even appear as a storage device in the OS, yet remain completely invisible to TMA — the symptom looks like a Tosca problem but is a device configuration one."
+        }
+      ],
+      "bulletPoints": [
+        "Allow phone data access · enable USB debugging · install the USB driver · accept the on-device debugging prompt."
+      ]
+    },
+    {
+      "sectionTitle": "Creating an Android emulator",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Android Studio and the AVD Manager",
+          "description": "Tricentis recommends Android Studio for emulators. Its AVD (Android Virtual Device) Manager creates emulator profiles by pairing a device definition (e.g. Pixel 7) with a system image (a specific Android version and CPU architecture)."
+        },
+        {
+          "type": "steps",
+          "title": "Creating an AVD",
+          "items": [
+            "Install Android Studio and open its SDK Manager to download at least one system image (e.g. a recent Android version, x86_64 or arm64-v8a depending on host CPU).",
+            "Open the Device Manager / AVD Manager and choose Create Virtual Device.",
+            "Pick a device definition, then the system image just downloaded.",
+            "Finish the wizard and launch the emulator — it must fully boot to the home screen before TMA can see it."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "The emulator must run on the same machine as TMA. Tosca cannot reach an emulator running on a different physical or virtual machine than the TMA instance it's talking to."
+        }
+      ],
+      "bulletPoints": [
+        "AVD = device definition + system image, created and run through Android Studio.",
+        "Emulator and TMA must be co-located on the same machine."
+      ]
+    },
+    {
+      "sectionTitle": "Platform-specific gotchas",
+      "elements": [
+        {
+          "type": "warning",
+          "text": "The Android Emulator does not exist for Windows on ARM. Google ships no ARM64 Windows emulator package — the SDK Manager simply never lists an emulator package, and AVD creation fails with 'Dependant package with key emulator not found'. On an ARM Windows machine, the only paths are a physical device, or running the emulator on a different (x86_64 or Apple Silicon) host machine with TMA installed alongside it."
+        },
+        {
+          "type": "list",
+          "title": "Device-side gotchas that look like Tosca problems",
+          "items": [
+            "Samsung Auto Blocker (One UI 6+) greys out the USB debugging toggle entirely. Disable it under Settings → Security and privacy → Auto Blocker (or its USB-specific sub-toggle) before USB debugging can even be enabled.",
+            "The 'Disable permission monitoring' Developer Options toggle referenced in some older training material does not exist on many current Android builds. It is absent from Tricentis' own official Android prerequisites too — safe to skip if not present.",
+            "Installing an APK can fail with INSTALL_PARSE_FAILED_NO_CERTIFICATES on newer Android versions when the APK carries only an old v1-only signature. Re-sign it with the Android SDK's apksigner tool using a debug keystore, then install the re-signed copy."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "No Android Emulator exists for Windows on ARM — use a physical device or a different host for the emulator.",
+        "Auto Blocker (Samsung) and old v1-only APK signatures are the two most common 'looks like Tosca, is actually the device' traps."
+      ]
+    },
+    {
+      "sectionTitle": "Getting AppPackage and AppActivity",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Why these two values matter",
+          "description": "To open an already-installed Android app, Tosca's Open Mobile App Module needs AppPackage (the app's unique identifier, like a reverse-domain name) and AppActivity (the specific screen/entry point to launch). These are Android's own identifiers, unrelated to Tosca — the same values any Android automation tool would need."
+        },
+        {
+          "type": "steps",
+          "title": "Retrieving them via adb",
+          "items": [
+            "Open the target app on the device or emulator so it is the foreground window.",
+            "Run: adb shell dumpsys window | grep mCurrentFocus (on Windows, use findstr instead of grep).",
+            "The output ends with packagename/activityname — the part before the slash is AppPackage, the part after is AppActivity."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "adb ships bundled with TMA — on Windows under C:\\Program Files\\Tricentis\\Mobile Agent\\app\\android-sdk\\platform-tools, and it is also included with any Android Studio install under ~/Library/Android/sdk/platform-tools on macOS or the equivalent Windows path. A separate Android SDK install is not required just to use adb."
+        },
+        {
+          "type": "note",
+          "text": "Leave Application, BundleID, and Application Path empty in the Open Mobile App Module when the app is already installed on the device — those fields are for installing a fresh app from an APK file, not for opening one that's already there."
+        }
+      ],
+      "bulletPoints": [
+        "AppPackage/AppActivity via: adb shell dumpsys window | grep mCurrentFocus, split at the slash.",
+        "adb ships with both TMA and Android Studio — no separate SDK install needed."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Assuming a charging, OS-visible device is automation-ready",
+      "trapDescription": "Connecting a phone by USB, seeing it recognised by the operating system, and concluding it's ready for TMA.",
+      "bestPractice": "USB debugging must be explicitly enabled under Developer options, phone data access allowed, and the correct USB driver installed. A device can be fully visible to the OS while still refusing debugging access."
+    },
+    {
+      "title": "Missing that Auto Blocker hides USB debugging entirely",
+      "trapDescription": "Looking for the USB debugging toggle on a recent Samsung device and finding it greyed out or missing.",
+      "bestPractice": "Samsung's Auto Blocker (One UI 6+) disables USB debugging by default. Turn it off under Settings → Security and privacy → Auto Blocker before USB debugging becomes available."
+    },
+    {
+      "title": "Trying to create an Android emulator on Windows on ARM",
+      "trapDescription": "Installing Android Studio on an ARM64 Windows machine and hunting for the missing emulator SDK package.",
+      "bestPractice": "Google publishes no Android Emulator package for Windows on ARM — it genuinely does not exist for that platform. Use a physical device, or run the emulator on a different (x86_64 or Apple Silicon) machine with TMA installed there."
+    },
+    {
+      "title": "Installing an old training APK on a new Android version",
+      "trapDescription": "Getting INSTALL_PARSE_FAILED_NO_CERTIFICATES when installing an APK that used to work fine.",
+      "bestPractice": "Newer Android versions reject APKs signed only with the old v1 scheme. Re-sign the APK with apksigner and a debug keystore before installing."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "multi-select",
+      "scenario": "Which of the following are genuine prerequisites for a physical Android device before TMA can see it? (three correct answers)",
+      "options": [
+        {
+          "id": "A",
+          "text": "USB debugging enabled under Developer options"
+        },
+        {
+          "id": "B",
+          "text": "Phone data access allowed on the device"
+        },
+        {
+          "id": "C",
+          "text": "The correct USB driver installed on the TMA machine"
+        },
+        {
+          "id": "D",
+          "text": "The device fully charged to 100%"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Battery level has nothing to do with USB debugging visibility.",
+      "rationale": "USB debugging, allowing phone data access, and the right USB driver on the host machine are the genuine prerequisites. A charging or fully-charged device is unrelated — a device can be at 100% and still be invisible to TMA if debugging isn't enabled."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "On a recent Samsung phone, the USB debugging toggle under Developer options is greyed out. What is the most likely cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The phone needs a factory reset."
+        },
+        {
+          "id": "B",
+          "text": "Samsung's Auto Blocker (One UI 6+) is disabling it."
+        },
+        {
+          "id": "C",
+          "text": "USB debugging was removed from Android entirely."
+        },
+        {
+          "id": "D",
+          "text": "TMA must be running before the toggle becomes available."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "A Samsung-specific security feature introduced in One UI 6.",
+      "rationale": "Auto Blocker greys out USB debugging by default on One UI 6+. Disabling it under Settings → Security and privacy → Auto Blocker (or its USB-specific toggle) makes USB debugging available again."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A learner on an ARM64 Windows laptop cannot find an 'emulator' package in the Android Studio SDK Manager, and AVD creation fails. What is happening?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The SDK Manager needs to be reinstalled."
+        },
+        {
+          "id": "B",
+          "text": "Google does not publish an Android Emulator package for Windows on ARM — it does not exist for that platform."
+        },
+        {
+          "id": "C",
+          "text": "The learner needs a paid Android Studio licence."
+        },
+        {
+          "id": "D",
+          "text": "TMA must be installed before the emulator package appears."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Not a bug — the package simply was never built for this platform.",
+      "rationale": "There is no Android Emulator package for Windows on ARM. The fix is not to keep troubleshooting the SDK Manager, but to use a physical device or run the emulator on a different host machine alongside its own TMA install."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "Which command reveals an installed Android app's AppPackage and AppActivity, once the app is in the foreground?",
+      "options": [
+        {
+          "id": "A",
+          "text": "adb devices"
+        },
+        {
+          "id": "B",
+          "text": "adb shell dumpsys window | grep mCurrentFocus"
+        },
+        {
+          "id": "C",
+          "text": "adb install app.apk"
+        },
+        {
+          "id": "D",
+          "text": "adb logcat"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Looks at the currently-focused window.",
+      "rationale": "adb shell dumpsys window | grep mCurrentFocus (findstr on Windows) prints a packagename/activityname string for the foreground app — split at the slash to get AppPackage and AppActivity."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Physical device prep",
+      "value": "Allow phone data access · enable USB debugging · install USB driver · accept the on-device debug prompt."
+    },
+    {
+      "key": "Emulator creation",
+      "value": "Android Studio → AVD Manager → device definition + system image. Must run on the same machine as TMA."
+    },
+    {
+      "key": "Samsung Auto Blocker",
+      "value": "Greys out USB debugging on One UI 6+ — disable under Settings → Security and privacy → Auto Blocker."
+    },
+    {
+      "key": "Missing 'Disable permission monitoring'",
+      "value": "Absent on many current Android builds and from Tricentis' own official prerequisites — safe to skip."
+    },
+    {
+      "key": "APK signature failures",
+      "value": "INSTALL_PARSE_FAILED_NO_CERTIFICATES on old v1-only-signed APKs on newer Android — re-sign with apksigner + debug keystore."
+    },
+    {
+      "key": "No emulator on ARM Windows",
+      "value": "Google ships no Android Emulator package for Windows on ARM — use a physical device or a different host machine."
+    },
+    {
+      "key": "AppPackage / AppActivity",
+      "value": "adb shell dumpsys window | grep mCurrentFocus → package/activity. Leave Application/Path empty for already-installed apps."
+    },
+    {
+      "key": "adb location",
+      "value": "Bundled with TMA (platform-tools folder) and with any Android Studio install — no separate SDK needed."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Get started with mobile test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "duration": "docs"
+    }
+  ]
+}

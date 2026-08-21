@@ -1,0 +1,186 @@
+{
+  "moduleId": "TDS2-M03",
+  "moduleTitle": "Lesson 2 - Create and Register records through TDS",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+  "learningObjectives": [
+    "Use the 'Test Data - Create & provide new record' Standard Module to register new records into a TDS repository.",
+    "Explain what an Alias name is, when it defaults, and when it must be used.",
+    "View newly created records on the Test Data Management page and explain the auto-lock behavior.",
+    "Generate multiple test records at once using the Repetitions setting on an Execution Entry."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Creating records with a TDS Standard Module",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Where the module lives",
+          "description": "TDS Standard Modules are found under Standard Modules → Test Data Management → Test Data Service. To register a new record, add a TestStep and insert the module 'Test Data - Create & provide new record', which writes new entries into the TDS repository's table-like structure."
+        },
+        {
+          "type": "concept",
+          "term": "Using the module",
+          "description": "Expand the module's Data structure Attribute and fill in every required Attribute and value — this is exactly what gets stored under the TDS type you select. The TestStepValue 'Existing or new TDS type*' lets you pick an existing type or create a brand-new one on the fly."
+        }
+      ],
+      "bulletPoints": [
+        "One Standard Module — 'Create & provide new record' — both creates the record and hands its data back for use later in the same TestCase."
+      ]
+    },
+    {
+      "sectionTitle": "Alias name",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "What it's for",
+          "description": "Alias name is an optional field that labels a specific record within a dataset. If left blank, the TDS type itself is used as the alias — e.g. the TDS type 'CustomerDetails' becomes the record's alias by default."
+        },
+        {
+          "type": "concept",
+          "term": "When it actually matters",
+          "description": "Alias name exists to distinguish between different roles that share the same TDS type. For example, a customer could be either the sender or the recipient in a bank transaction — two roles with different tasks in the SUT that need to be tested separately. Without a distinct alias, both would be grouped under the same TDS type, and a TestCase could fail by testing a sender's flow when a recipient's data was actually needed."
+        },
+        {
+          "type": "note",
+          "text": "This course doesn't use Alias names, since the scenario only involves one type of user (the customer)."
+        },
+        {
+          "type": "concept",
+          "term": "Quick self-check",
+          "description": "True or False: (1) If Alias name is left blank, it takes the name of the 'Existing Attribute' — FALSE, it actually takes the name of the TDS type, not any Attribute. (2) Alias name must be used when you have different record types performing different functions in the SUT — TRUE."
+        }
+      ],
+      "bulletPoints": [
+        "Blank Alias name → defaults to the TDS type name, not an Attribute name.",
+        "Use Alias name whenever the same TDS type needs to represent more than one distinct role."
+      ]
+    },
+    {
+      "sectionTitle": "Viewing records and understanding the lock",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Finding your data",
+          "description": "On the Test Data Management page, the landing page shows every configured repository as a tile. Opening one reveals a Types column on the left (types created via Standard Modules appear in blue, each with a small green badge showing its record count). Selecting a type displays all of its records, table-like, on the right."
+        },
+        {
+          "type": "warning",
+          "text": "Once a record is found/retrieved, it is automatically locked — no one else in a distributed team can use it in a TestStep. It only unlocks automatically after the TestCase that retrieved it finishes executing. This is what prevents two testers from colliding on the same record."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Worked example: registering a DemoWebShop customer",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Inputs and initial state",
+          "description": "First name, last name, and email — already captured as Buffers from the registration TestCase — are fed into 'Create & provide new record' as its inputs. The Status Attribute is set to 'New', which flags freshly registered customers so they can be retrieved later specifically in that state. OrderNumber and OrderStatus are left blank at this point — they get filled in progressively as the customer moves through later steps (purchase, payment, etc)."
+        },
+        {
+          "type": "note",
+          "text": "So far this has run from Scratchbook. In a real project, TestCases like this should run from an Execution List, so results are properly reported and visible to the team."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Generating multiple records at once",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Repetitions",
+          "description": "To generate several test records in one go, set a Repetitions value on the relevant Execution Entry. From the Ribbon's Context Menu, choose Repetition, enter the desired count in the 'Replace with' field, and select 'Modify All'. A value of 5, for example, produces 5 test records. The same setting can also be changed directly in the Properties pane for that Execution Entry."
+        }
+      ],
+      "bulletPoints": [
+        "Repetitions on an Execution Entry = the quickest way to bulk-generate records without duplicating TestSteps manually."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-on",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 Exercise 02A-02D (Register Test Records through TDS, View Test Records in Test Data Management, Register a Customer in the Web Shop, Create Multiple Customers) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Assuming a blank Alias name inherits an Attribute's name",
+      "trapDescription": "Believing an empty Alias name field takes on the name of whichever Attribute is being referenced.",
+      "bestPractice": "A blank Alias name defaults to the TDS type's name — not an Attribute name. This is explicitly false in the course's own recap check."
+    },
+    {
+      "title": "Skipping Alias name when one TDS type serves two roles",
+      "trapDescription": "Storing both a bank transaction's sender and recipient under the same 'CustomerDetails' type without an Alias to tell them apart.",
+      "bestPractice": "When the same TDS type must represent multiple distinct roles (sender vs recipient), Alias name is required — otherwise a TestCase can retrieve the wrong role's data and fail."
+    },
+    {
+      "title": "Expecting a retrieved record to stay available to other testers",
+      "trapDescription": "Assuming a colleague can immediately reuse a record you just retrieved, while your TestCase is still running.",
+      "bestPractice": "A record is automatically locked the moment it's found/retrieved and stays locked until the retrieving TestCase finishes executing — this is intentional, to prevent conflicting use in a distributed team."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A tester leaves the Alias name field blank when creating a new record under the TDS type 'CustomerDetails'. What alias will the record actually get?",
+      "options": [
+        { "id": "A", "text": "It takes the name of the first Attribute entered." },
+        { "id": "B", "text": "It takes the name of the TDS type — 'CustomerDetails'." },
+        { "id": "C", "text": "It remains blank permanently." },
+        { "id": "D", "text": "Tosca throws an error and refuses to create the record." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Recall the True/False check from this lesson.",
+      "rationale": "When Alias name is left blank, it defaults to the TDS type's name — in this case 'CustomerDetails' — not an Attribute name."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A bank transaction test needs to store both a sender and a recipient, both under the TDS type 'CustomerDetails'. What should the tester do to avoid a TestCase pulling the wrong role's data?",
+      "options": [
+        { "id": "A", "text": "Nothing — TDS automatically distinguishes roles." },
+        { "id": "B", "text": "Assign distinct Alias names to the sender and recipient records." },
+        { "id": "C", "text": "Create two separate repositories instead." },
+        { "id": "D", "text": "Leave Alias name blank for both." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "This is exactly the sender/recipient example used in the lesson.",
+      "rationale": "Alias name exists precisely for this case — distinguishing multiple roles that share one TDS type, so a TestCase reliably retrieves the correct record for its purpose."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A tester needs to quickly generate 10 test records from the same Execution Entry without duplicating TestSteps. What is the fastest approach?",
+      "options": [
+        { "id": "A", "text": "Manually copy the TestStep 10 times." },
+        { "id": "B", "text": "Set the Repetitions value to 10 on that Execution Entry, via the Ribbon's Repetition context menu or the Properties pane." },
+        { "id": "C", "text": "Set the Alias name to '10'." },
+        { "id": "D", "text": "This isn't possible in Tosca." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "There's a dedicated setting on the Execution Entry for exactly this purpose.",
+      "rationale": "Setting Repetitions to 10 (via the Ribbon's Context Menu → Repetition → 'Replace with' → Modify All, or directly in the Properties pane) generates 10 records without any manual TestStep duplication."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Create module", "value": "TDS Standard Modules → 'Test Data - Create & provide new record'." },
+    { "key": "Existing or new TDS type*", "value": "Selects/creates the type the record is stored under." },
+    { "key": "Alias name default", "value": "Blank → takes the TDS type's name (not an Attribute's)." },
+    { "key": "Alias name required when", "value": "One TDS type represents multiple distinct roles (e.g. sender vs recipient)." },
+    { "key": "Auto-lock", "value": "A found/retrieved record locks automatically; unlocks once the retrieving TestCase finishes." },
+    { "key": "Bulk generation", "value": "Set Repetitions on the Execution Entry (Ribbon context menu, or Properties pane)." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 2 - Create and Register records through TDS (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+      "duration": "video"
+    }
+  ]
+}

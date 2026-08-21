@@ -1,0 +1,164 @@
+{
+  "moduleId": "TDS1-M08",
+  "moduleTitle": "Lesson 8 - Integration of New Attributes",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+  "learningObjectives": [
+    "Integrate a new feature of the system under test into an existing TestSheet.",
+    "Determine when a new Attribute only needs a value added to existing combinations, versus when it needs entirely new combinations.",
+    "Update combinations consistently at every level, from the lowest Attribute up to the TestSheet.",
+    "Remember to manually re-link newly created Instances back to Requirements."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Why this comes up",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The scenario",
+          "description": "Applications evolve — new features get added to the system under test after a TestSheet already exists. When a new feature affects existing test data, the TestSheet needs a new Attribute (and its Instances) integrated into the structure that's already in place, without starting over."
+        },
+        {
+          "type": "concept",
+          "term": "Where to add it",
+          "description": "Create the new Attribute wherever it logically fits in the existing structure — it can be added right alongside Attributes that already have combinations, even if that means the existing combination set now needs to account for it."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Updating combinations at every level",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The core rule",
+          "description": "After adding the new Attribute and its Instances, combinations must be completed at every level, from the lowest Attribute up to the TestSheet. Depending on the case, this can mean two different things."
+        },
+        {
+          "type": "list",
+          "title": "Two possible updates",
+          "items": [
+            "Selecting the new Attribute's Instance value inside combinations that already exist — no new TestCase needed, just a new column of data filled in for existing rows.",
+            "Adding entirely new Instances/combinations, if the combinatorial method in use (e.g. Linear Expansion) requires a dedicated TestCase for the new option — following the same rules used when the TestSheet was first built."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "At every level touched, double-check there are no missing values — this applies to lower Attribute levels and the TestSheet level alike."
+        }
+      ],
+      "bulletPoints": [
+        "Adding a new option to an Attribute doesn't automatically mean a new TestCase — it depends on whether the combinatorial method requires one."
+      ]
+    },
+    {
+      "sectionTitle": "Worked example: adding a Shipping Method",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The change",
+          "description": "A WebShop adds a new 'Shipping Method' choice at checkout, affecting shipping cost. This requires a new 'Shipping Method' Attribute with Instances for each option: Ground Shipping (the default/StraightThrough — 'Standard'), Next Day Air, Second Day Air, and an 'N/A' Instance for cases where shipping doesn't apply (e.g. In-Store Pickup, No Shipping)."
+        },
+        {
+          "type": "concept",
+          "term": "Updating the lower (Checkout) level",
+          "description": "Existing Checkout-level Instances need the new Attribute's value filled in: the existing 'Standard'/StraightThrough Instance gets 'Ground', and the existing In-Store Pickup / No Shipping Instances get 'N/A'. Because Next Day Air and Second Day Air don't correspond to any existing Checkout Instance, two brand-new Checkout-level Instances are created for them — populated with StraightThrough values everywhere except the new Shipping Method field, which takes the respective new value."
+        },
+        {
+          "type": "concept",
+          "term": "Updating the TestSheet level",
+          "description": "The existing 9 TestSheet-level Instances each need the correct Checkout Instance selected for their row. Then, matching the two new Checkout-level Instances, two new TestSheet-level Instances are added — all StraightThrough values, except the Checkout Attribute, where each selects its corresponding new Checkout Instance (Next Day Air / Second Day Air)."
+        }
+      ],
+      "bulletPoints": [
+        "Update the lower level first (fill in existing rows + add new rows for genuinely new options), then propagate up to the TestSheet level the same way."
+      ]
+    },
+    {
+      "sectionTitle": "Don't forget: re-link to Requirements",
+      "elements": [
+        {
+          "type": "note",
+          "text": "Newly created Instances are NOT automatically linked to Requirements. After integrating a new Attribute, manually link the new Instances to the Requirement(s) they test, so the corresponding TestCase-Substitute links are created (see Lesson 7)."
+        },
+        {
+          "type": "note",
+          "text": "📄 Exercise 08 (Integrate New Attribute) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Updating only the TestSheet level",
+      "trapDescription": "Adding new Instances at the TestSheet level but forgetting the lower Attribute level (or vice versa) still has missing values for the new Attribute.",
+      "bestPractice": "Combinations must be completed at every level touched by the new Attribute — both the lower Attribute level and the TestSheet level need to be checked for missing values."
+    },
+    {
+      "title": "Assuming every new option automatically needs a new TestCase",
+      "trapDescription": "Creating a brand-new Instance combination for every new option, even when it just fits into an existing row.",
+      "bestPractice": "If a new option maps cleanly onto an Instance that already exists (e.g. the new Attribute's value for the current StraightThrough row), just fill in that value — a new combination/TestCase is only needed when the combinatorial method requires a dedicated case for that option."
+    },
+    {
+      "title": "Forgetting to re-link new Instances to Requirements",
+      "trapDescription": "Assuming new Instances automatically inherit the Requirement links their TestSheet already had.",
+      "bestPractice": "Requirement links must be created manually for newly added Instances — they don't inherit existing TestCase-Substitute links automatically."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A new Attribute is added to a TestSheet, and its value for the existing StraightThrough row simply needs to be set to the new default option. Is a brand-new TestCase combination required?",
+      "options": [
+        { "id": "A", "text": "Yes, always — any new Attribute automatically requires a new TestCase." },
+        { "id": "B", "text": "No — the value can be filled directly into the existing combination if it maps onto a row that already exists." },
+        { "id": "C", "text": "Only if the Attribute is set to BusinessRelevant = No." },
+        { "id": "D", "text": "Only if the new Attribute has no Instances." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "New Attribute ≠ automatically new TestCase — it depends on whether the value fits an existing row.",
+      "rationale": "If the new Attribute's value for a given case maps onto an Instance combination that already exists, it can simply be filled in — new combinations are only needed for genuinely new options that the combinatorial method requires as their own TestCase."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "After integrating a new 'Shipping Method' Attribute and adding two new Checkout-level Instances for Next Day Air and Second Day Air, what must also happen at the TestSheet level?",
+      "options": [
+        { "id": "A", "text": "Nothing — TestSheet-level Instances update automatically." },
+        { "id": "B", "text": "Two matching new TestSheet-level Instances must be added, selecting the corresponding new Checkout Instance." },
+        { "id": "C", "text": "The TestSheet must be deleted and rebuilt from scratch." },
+        { "id": "D", "text": "The Checkout Attribute must be converted into a Class." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Changes at a lower level need to be propagated up to the TestSheet level manually.",
+      "rationale": "New combinations at a lower (Checkout) level must be reflected at the TestSheet level too — new TestSheet-level Instances are added, all StraightThrough except the Checkout Attribute, which selects the new Checkout Instance."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A tester finishes adding a new Attribute and its Instances, and updates all combinations at every level. What step do they still need to complete before this new coverage shows up on the project dashboard?",
+      "options": [
+        { "id": "A", "text": "Nothing further is needed." },
+        { "id": "B", "text": "Manually link the new Instances to the relevant Requirement(s) to create TestCase-Substitute links." },
+        { "id": "C", "text": "Convert the new Attribute into a Class." },
+        { "id": "D", "text": "Re-run Arrange Instances." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Recall how the Requirements dashboard gets populated — from Lesson 7.",
+      "rationale": "New Instances are not automatically linked to Requirements. They must be manually dragged onto the relevant Requirement(s) to create TestCase-Substitute links, so the new coverage is reflected in the Requirements dashboard."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Where to add a new Attribute", "value": "Wherever it fits logically — even alongside Attributes with existing combinations." },
+    { "key": "Fill vs new combination", "value": "Fill an existing row's value if the option maps to it; create a new Instance/combination only if the method requires a dedicated TestCase." },
+    { "key": "Update order", "value": "Update the lowest affected level first, then propagate the same logic up to the TestSheet level." },
+    { "key": "Don't forget", "value": "Newly created Instances must be manually linked to Requirements — this does not happen automatically." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 08 - Integration of New Attributes (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+      "duration": "video"
+    }
+  ]
+}

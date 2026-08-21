@@ -1,0 +1,259 @@
+{
+  "moduleId": "TMOB-M13",
+  "moduleTitle": "Advanced Use Cases - Image-Based Test Automation (IBTA)",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1459/handling-advanced-mobile-automation-use-cases-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Automate mobile tests using the Image-Based Test Automation method.",
+    "Explain when image-based identification is the correct choice and when it is a trap.",
+    "Describe what an image-based control actually matches on, and what breaks that match.",
+    "Weigh image-based steering against property-based steering for a given control."
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "What this course covers",
+      "elements": [
+        {
+          "type": "note",
+          "text": "Official course description: this course covers advanced mobile automation skills in Tricentis Tosca Mobile, aimed at efficiency, scalability, and reliability. It works through overcoming automation challenges, optimizing test execution, and extending mobile test coverage through steering, configuration, and execution strategies."
+        },
+        {
+          "type": "list",
+          "title": "Official prerequisites",
+          "items": [
+            "Training: Tricentis Tosca Fundamentals - Automating web application testing (AS1).",
+            "Training: Getting started with mobile test automation with Tricentis Tosca Mobile.",
+            "Training: Automating mobile apps on TMA with Tricentis Tosca Mobile.",
+            "Technical: access to and a valid licence for Tricentis Tosca Mobile, the Tricentis Mobile Agent (TMA), and Tosca Cloud."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "This course's material was developed on Tosca 2024.2. Expect minor UI differences against a newer installed version. Note also that Tosca Cloud access is a stated technical prerequisite here, which the earlier two mobile courses did not require."
+        }
+      ],
+      "bulletPoints": [
+        "Third course in the mobile path, after Getting Started and Automating mobile apps on TMA.",
+        "Tosca Cloud licence is a new prerequisite compared with the earlier mobile courses."
+      ]
+    },
+    {
+      "sectionTitle": "Why image-based identification exists",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The gap it fills",
+          "description": "Every identification strategy covered so far depends on the application exposing something addressable: a resource-id, an accessibility identifier, a DOM node. Some controls expose none of that. Canvas-rendered content, custom-drawn widgets, embedded video or map surfaces, chart libraries that paint pixels rather than build a view hierarchy. For those, no amount of scanning discipline produces a usable property set, because the properties genuinely are not there."
+        },
+        {
+          "type": "concept",
+          "term": "What IBTA matches on",
+          "description": "Image-Based Test Automation identifies a control by comparing a stored reference image against what is currently rendered on screen, and acting at the location where it matches. The identity of the control is its appearance. Nothing else about it is being checked."
+        },
+        {
+          "type": "note",
+          "text": "That last point is the whole trade-off in one sentence. Property-based identification asks 'is this the element with id X'. Image-based identification asks 'does this region look like the picture I saved'. Both can be correct. They fail for completely different reasons."
+        }
+      ],
+      "bulletPoints": [
+        "IBTA exists for controls that expose no usable identifying properties at all.",
+        "The control's identity becomes its appearance, and only its appearance."
+      ]
+    },
+    {
+      "sectionTitle": "What breaks an image match",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Things that change pixels without changing the control",
+          "items": [
+            "Screen resolution and pixel density. The same app on a different device renders the same button at a different size.",
+            "Theme. A light/dark switch changes almost every pixel in the reference region.",
+            "Font rendering and anti-aliasing differences between OS versions or devices.",
+            "Localisation. Button text in another language is a different image.",
+            "Minor design updates. A shade change or a 2px corner-radius tweak ships as a normal UI refinement and silently invalidates the reference."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "None of these are failures of the app under test. Each one is a passing build for the product and a broken TestCase for you. That asymmetry is what makes image-based controls expensive to maintain at scale, and it is why they belong on the controls that genuinely have no alternative rather than on whatever was inconvenient to scan."
+        },
+        {
+          "type": "concept",
+          "term": "Matching tolerance",
+          "description": "Image matching is not exact-pixel equality; a similarity threshold decides how close a region must be to count as a match. Loosening it absorbs small rendering differences but raises the chance of matching the wrong region, particularly in a UI with repeated visual elements such as a list of similar cards. Tightening it does the reverse. There is no setting that removes the trade-off, only one that moves it."
+        }
+      ],
+      "bulletPoints": [
+        "Resolution, theme, font rendering, localisation, and routine design tweaks all break image matches without any real defect.",
+        "The similarity threshold trades false negatives against false positives. It does not eliminate either."
+      ]
+    },
+    {
+      "sectionTitle": "Choosing between image-based and property-based",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "A defensible decision order",
+          "items": [
+            "Try to identify the control by its own properties first, through a normal scan.",
+            "If the properties are weak, check whether the scan itself was done correctly before blaming the app. A thin tree is often a scanning problem rather than an identification-impossible problem.",
+            "If the app genuinely exposes nothing usable, consider whether a neighbouring, well-identified control plus a relative action reaches the same target.",
+            "Only when none of that works, reach for an image-based control, and record why so the next person does not have to re-derive it."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "The failure mode worth naming: image-based automation works immediately, which makes it attractive at the exact moment you are frustrated with a scan. The cost does not appear in that session. It appears on the next device, the next theme, or the next design tweak."
+        }
+      ],
+      "bulletPoints": [
+        "Property-based first, relative-to-a-known-control second, image-based last.",
+        "IBTA's speed of success on the day is precisely why it gets used in places it should not be."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Treating image-based controls as a general-purpose fallback",
+      "trapDescription": "Reaching for an image-based control whenever a scan is inconvenient, rather than when the control genuinely exposes no identifying properties.",
+      "bestPractice": "Use IBTA for controls that truly cannot be identified by properties, such as canvas-rendered or custom-drawn surfaces. A thin scan tree is frequently a scanning problem, and fixing that is cheaper than maintaining an image reference."
+    },
+    {
+      "title": "Assuming an image-based TestCase is portable across devices",
+      "trapDescription": "Building image-based steering on one emulator and expecting it to run unchanged on a device with different resolution, density, or theme.",
+      "bestPractice": "Image matches depend on rendered pixels, so resolution, density, theme, and font rendering all affect them. Validate image-based steps on every device profile they are expected to run against, and expect maintenance when any of those change."
+    },
+    {
+      "title": "Loosening the similarity threshold to fix flakiness",
+      "trapDescription": "Repeatedly lowering the match threshold until a step stops failing, without checking what else now matches.",
+      "bestPractice": "A looser threshold trades false negatives for false positives, which is especially dangerous in UIs with repeated visual elements. Investigate why the rendering differs before widening the tolerance."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Which situation is the legitimate use case for Image-Based Test Automation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A control the scan captured correctly, but whose resource-id is long and awkward to read."
+        },
+        {
+          "id": "B",
+          "text": "A canvas-rendered chart surface that exposes no accessibility properties or view hierarchy at all."
+        },
+        {
+          "id": "C",
+          "text": "Any control on a screen where the scan felt slow."
+        },
+        {
+          "id": "D",
+          "text": "A standard button with a clear accessibility identifier."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The question is whether identifying properties exist, not whether they are convenient.",
+      "rationale": "IBTA exists for controls that genuinely expose nothing addressable, such as canvas-rendered or custom-drawn surfaces. Where usable properties exist, property-based identification is more stable and cheaper to maintain."
+    },
+    {
+      "questionId": "Q2",
+      "type": "multi-select",
+      "scenario": "Which of the following can break an image-based control without any defect in the application? (three correct answers)",
+      "options": [
+        {
+          "id": "A",
+          "text": "Running the TestCase on a device with different screen density"
+        },
+        {
+          "id": "B",
+          "text": "The application switching from light theme to dark theme"
+        },
+        {
+          "id": "C",
+          "text": "Running the same build against a different app language"
+        },
+        {
+          "id": "D",
+          "text": "Adding a new TestStep earlier in the TestCase"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "C"
+      ],
+      "hint": "Anything that changes rendered pixels in the reference region is a candidate.",
+      "rationale": "Density, theme, and localisation all change the pixels being matched, so each can break an image reference while the application itself behaves correctly. Adding an unrelated earlier TestStep does not alter how the target control renders."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "An image-based step fails intermittently. A colleague suggests lowering the similarity threshold until it passes consistently. What is the risk?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The TestCase will execute more slowly."
+        },
+        {
+          "id": "B",
+          "text": "A looser threshold raises the chance of matching the wrong region, especially where similar visual elements repeat."
+        },
+        {
+          "id": "C",
+          "text": "The reference image will be deleted automatically."
+        },
+        {
+          "id": "D",
+          "text": "Image-based controls stop working entirely below a certain threshold."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about what else on screen might now clear the bar.",
+      "rationale": "The threshold trades false negatives against false positives. Loosening it absorbs rendering differences but makes matching an unintended region more likely, which is a particular hazard in lists of visually similar cards."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "IBTA purpose",
+      "value": "Identifies a control by comparing a stored reference image against what is rendered, for controls that expose no usable properties."
+    },
+    {
+      "key": "Legitimate use",
+      "value": "Canvas-rendered, custom-drawn, or otherwise property-less surfaces. Not a general fallback for inconvenient scans."
+    },
+    {
+      "key": "What breaks a match",
+      "value": "Resolution and density, theme, font rendering, localisation, routine design tweaks. All are passing builds and broken TestCases."
+    },
+    {
+      "key": "Similarity threshold",
+      "value": "Looser absorbs rendering differences but risks matching the wrong region. Tighter does the reverse. The trade-off cannot be removed."
+    },
+    {
+      "key": "Decision order",
+      "value": "Properties first, verify the scan was done right, relative to a known control next, image-based last."
+    },
+    {
+      "key": "Course prerequisites",
+      "value": "AS1 plus both earlier mobile courses. Technical: Tosca Mobile, TMA, and Tosca Cloud licences. Built on Tosca 2024.2."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Handling advanced mobile automation use cases with Tricentis Tosca Mobile",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1459/handling-advanced-mobile-automation-use-cases-with-tricentis-tosca-mobile",
+      "duration": "video"
+    },
+    {
+      "title": "Mobile Engine 3.0 (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
+      "duration": "docs"
+    }
+  ]
+}

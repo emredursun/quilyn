@@ -1,0 +1,295 @@
+{
+  "moduleId": "TMOB-M07",
+  "moduleTitle": "Lesson 7 - Building Your First Mobile TestCase",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1311/getting-started-with-mobile-test-automation-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Build a mobile TestCase starting with the mandatory Open Mobile App TestStep.",
+    "Use the core gesture Modules — Click, Swipe, and Draw On Screen — for coordinate-based interaction.",
+    "Enter text into mobile controls and control keyboard autohide behaviour.",
+    "Run and observe a mobile TestCase using LiveView."
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Open Mobile App comes first, always",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The mandatory first TestStep",
+          "description": "Drag and drop the Open Mobile App Module onto the TestCase — and note the hard constraint: it must be the first TestStep of the TestCase. Nothing can be steered on the device until the application has been opened through this Module."
+        },
+        {
+          "type": "note",
+          "text": "This mirrors a recurring pattern across Tosca's Engine 3.0 family: engines that attach to an external resource require an explicit open step before anything else in the TestCase — the same shape as TBox Open Excel Workbook for the Excel Engine."
+        },
+        {
+          "type": "concept",
+          "term": "What Open Mobile App actually does",
+          "description": "It's more than a click-through step: Open Mobile App creates the mobile device session (via TMA) for the TestCase, and it can install the app on the device at the start of that session if an install source (a local .apk path, or the equivalent iOS install path) is configured — or, for an app already on the device, open it directly by its identifier: BundleID for iOS, or AppPackage/AppActivity for Android."
+        },
+        {
+          "type": "concept",
+          "term": "Switch Mobile App",
+          "description": "For TestCases that move between apps mid-flow (e.g. testing a deep link handoff, or a share-sheet interaction that opens a different app), Switch Mobile App changes the active app context without needing a second Open Mobile App step."
+        }
+      ],
+      "bulletPoints": [
+        "Open Mobile App = mandatory first TestStep — no exceptions.",
+        "Switch Mobile App changes context mid-TestCase when a flow legitimately spans two apps."
+      ]
+    },
+    {
+      "sectionTitle": "Gestures: when there's no control to click",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Coordinate-based interaction Modules",
+          "items": [
+            "Click On Screen — taps a specific x/y coordinate rather than a scanned control, for spots the scan couldn't identify as a distinct element.",
+            "Swipe On Screen — a directional swipe gesture between two coordinates, used for scrolling lists, dismissing cards, or revealing hidden actions.",
+            "Draw On Screen — a free-form drawing/path gesture, used for things like signature capture or gesture-based unlock patterns."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Coordinate-based gestures are a fallback, not a first choice — they're brittle across different screen sizes and resolutions. Prefer steering a scanned control whenever one exists; reach for On Screen Modules only when no addressable control is available."
+        }
+      ],
+      "bulletPoints": [
+        "Click/Swipe/Draw On Screen = coordinate-based, for when nothing addressable exists at that spot.",
+        "Prefer scanned controls over coordinates wherever possible — coordinates don't adapt to different screen sizes."
+      ]
+    },
+    {
+      "sectionTitle": "Text entry and the keyboard",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Send Text Input To Focused Control",
+          "description": "Enters text into whichever control currently has focus — typically used right after tapping a text field, mirroring how a real user would tap then type."
+        },
+        {
+          "type": "concept",
+          "term": "Set Autohide Keyboard",
+          "description": "Controls whether the on-screen keyboard automatically dismisses after a text-entry step. Leaving the keyboard open when the next TestStep expects to interact with an element it's now covering is a common source of flaky steps — this setting exists specifically to manage that."
+        }
+      ],
+      "bulletPoints": [
+        "Tap the field, then Send Text Input To Focused Control — mirrors real user behaviour.",
+        "An open on-screen keyboard covering the next target element is a classic source of flakiness — manage it with Set Autohide Keyboard."
+      ]
+    },
+    {
+      "sectionTitle": "Running with LiveView",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Watching execution happen",
+          "description": "With the LiveView TCP set to True, executing a mobile TestCase shows the device's screen updating in near-real-time inside Tosca — genuinely useful while a TestCase is still being built and debugged, since a failed TestStep can be visually correlated with exactly what the device was showing at that moment."
+        },
+        {
+          "type": "note",
+          "text": "LiveView adds overhead to execution. It's worth leaving on while authoring and debugging, and worth considering turning off for large batch/CI runs where nobody is watching."
+        }
+      ],
+      "bulletPoints": [
+        "LiveView = True while authoring/debugging, since it lets you see exactly what the device showed at the moment of a failure.",
+        "Consider disabling LiveView for unattended batch runs to reduce overhead."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Placing Open Mobile App anywhere other than first",
+      "trapDescription": "Adding navigation or verification TestSteps before the Open Mobile App Module.",
+      "bestPractice": "Open Mobile App must be the first TestStep of the TestCase. Nothing on the device can be steered before the application has been opened through it."
+    },
+    {
+      "title": "Reaching for On Screen gestures as a default",
+      "trapDescription": "Using Click On Screen with hardcoded coordinates for a control that was actually captured and addressable during scanning.",
+      "bestPractice": "Coordinate-based gestures are a fallback for controls the scan couldn't address — prefer steering the scanned control whenever one exists, since coordinates don't adapt across screen sizes and resolutions."
+    },
+    {
+      "title": "Not accounting for the on-screen keyboard",
+      "trapDescription": "A TestStep intermittently fails to tap an element that's actually being covered by the still-open keyboard from the previous text-entry step.",
+      "bestPractice": "Manage keyboard dismissal explicitly with Set Autohide Keyboard rather than assuming it will close on its own before the next TestStep runs."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Which Module must be the first TestStep of a mobile TestCase?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Connect to Mobile Agent"
+        },
+        {
+          "id": "B",
+          "text": "Open Mobile App"
+        },
+        {
+          "id": "C",
+          "text": "Mobile Scan"
+        },
+        {
+          "id": "D",
+          "text": "Any Module — the order is unconstrained."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The same 'open before you touch anything' pattern as the Excel Engine.",
+      "rationale": "Open Mobile App must be the first TestStep — nothing on the device can be steered until the application has been opened through it."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "When should Click On Screen be used instead of steering a scanned control directly?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Always — it's simpler than dealing with scanned control properties."
+        },
+        {
+          "id": "B",
+          "text": "Only when no addressable control exists at that location, since coordinates don't adapt across screen sizes."
+        },
+        {
+          "id": "C",
+          "text": "Only on iOS, never on Android."
+        },
+        {
+          "id": "D",
+          "text": "Only inside a hybrid app's webview context."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Coordinates are a fallback, not a default choice.",
+      "rationale": "On Screen gestures are coordinate-based and brittle across different screen sizes and resolutions. They should be used only when no scanned, addressable control exists — steering the actual control is always preferred when available."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A TestCase intermittently fails to tap a button that appears right after a text field was filled in. What is the most likely cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The button's resource-id changed between runs."
+        },
+        {
+          "id": "B",
+          "text": "The on-screen keyboard is still open and covering the button."
+        },
+        {
+          "id": "C",
+          "text": "TMA lost connection to the device."
+        },
+        {
+          "id": "D",
+          "text": "The TestCase needs an Open Mobile App step added."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about what's still on screen right after typing.",
+      "rationale": "An open on-screen keyboard covering the intended element is a classic source of intermittent failures right after text entry — manage dismissal explicitly with Set Autohide Keyboard rather than assuming it closes on its own."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What does Switch Mobile App allow a TestCase to do?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Restart the currently open app from scratch."
+        },
+        {
+          "id": "B",
+          "text": "Change the active app context mid-TestCase, for flows that legitimately span two apps."
+        },
+        {
+          "id": "C",
+          "text": "Switch between Local and Remote TMA connections."
+        },
+        {
+          "id": "D",
+          "text": "Toggle LiveView on and off during execution."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "It's about app context, not connection topology.",
+      "rationale": "Switch Mobile App changes the active app context mid-TestCase — for example testing a deep link or a share-sheet handoff — without a second Open Mobile App step."
+    },
+    {
+      "questionId": "Q5",
+      "type": "multi-select",
+      "scenario": "Which statements are true about \"Open Mobile App\" in Tosca Mobile? (three correct answers)",
+      "options": [
+        {
+          "id": "A",
+          "text": "Creates mobile device sessions"
+        },
+        {
+          "id": "B",
+          "text": "Provides options for hybrid application testing"
+        },
+        {
+          "id": "C",
+          "text": "Enables the installation of apps at the start of the test session with Tricentis Mobile Agent"
+        },
+        {
+          "id": "D",
+          "text": "Opens already installed apps by defining bundle IDs for iOS apps or package and activity names for Android apps"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "C",
+        "D"
+      ],
+      "hint": "Hybrid context switching belongs to a different part of the workflow than Open Mobile App itself.",
+      "rationale": "Open Mobile App creates the mobile device session via TMA, can install the app at the start of that session, and opens an already-installed app by BundleID (iOS) or AppPackage/AppActivity (Android). Hybrid application testing options — like switching between native and webview context — belong to the Mobile Scan and steering workflow, not to Open Mobile App itself."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Open Mobile App",
+      "value": "Mandatory first TestStep of any mobile TestCase — nothing can be steered before it. Creates the TMA session, installs the app at session start if configured, and opens an already-installed app by BundleID (iOS) or AppPackage/AppActivity (Android)."
+    },
+    {
+      "key": "Switch Mobile App",
+      "value": "Changes active app context mid-TestCase for flows spanning two apps."
+    },
+    {
+      "key": "On Screen gestures",
+      "value": "Click / Swipe / Draw On Screen — coordinate-based fallback for controls the scan couldn't address. Prefer scanned controls when available."
+    },
+    {
+      "key": "Text entry",
+      "value": "Tap the field, then Send Text Input To Focused Control."
+    },
+    {
+      "key": "Keyboard management",
+      "value": "Set Autohide Keyboard prevents the open keyboard from covering the next TestStep's target."
+    },
+    {
+      "key": "LiveView",
+      "value": "True while authoring/debugging for real-time visual feedback; consider False for unattended batch/CI runs."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Mobile Engine 3.0 (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
+      "duration": "docs"
+    }
+  ]
+}

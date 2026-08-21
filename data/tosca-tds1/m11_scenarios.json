@@ -1,0 +1,172 @@
+{
+  "moduleId": "TDS1-M11",
+  "moduleTitle": "Scenarios - Applied TestSheet Design",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+  "learningObjectives": [
+    "Apply the full TDS1 workflow — Requirements, Attributes, Instances, Combinatorics, Classes, and Linking — to a business scenario from scratch.",
+    "Decide which combinatorial method fits a given scenario and justify the choice.",
+    "Recognize the review scenarios used in the official course capstone and know what each is testing conceptually."
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "About this module",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Capstone review",
+          "description": "The official course closes with three unguided scenarios where you design a TestSheet from a business description alone, without step-by-step instructions: a discount-calculation feature, a configurable-product feature, and an abstract billing-package feature. Each is meant to force you to apply Lessons 1-10 end to end, without being told which Attribute or method to use. This module walks through one original worked example the same way, then reviews what each official scenario is really testing conceptually."
+        },
+        {
+          "type": "note",
+          "text": "📄 Scenario 01-03 (Calculate Discount, Product Configuration, Accelerator Package) — Official Tricentis Academy course material, not redistributed here. Access the full business requirements and complete the exercises inside the official course."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Worked example: a Loyalty Tier discount",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Business context",
+          "description": "A webshop is introducing a Loyalty Tier discount at checkout: Guest checkouts (no loyalty account) get no discount, Bronze members get 5% off the subtotal, Silver members get 10% off, and Gold members get 15% off. An expired loyalty account should be rejected with an error at checkout rather than receiving any discount."
+        },
+        {
+          "type": "concept",
+          "term": "Step 1 — Requirement",
+          "description": "Under Folder 'Webshop' → RequirementSet 'Checkout', create a Requirement 'Apply loyalty discount'. Since pricing-related bugs have high financial impact but this feature isn't used on every order, it's reasonable to weight it with Complex Weighting — a mid Frequency Class and a higher Damage Class."
+        },
+        {
+          "type": "concept",
+          "term": "Step 2 — Attributes",
+          "description": "Create a TestSheet 'Loyalty Discount at Checkout' with the four core Attributes: Administration (No), Precondition (Yes — e.g. an active customer session), Process (Yes — the Loyalty Tier itself), Verification (Result — the expected discount applied)."
+        },
+        {
+          "type": "concept",
+          "term": "Step 3 — Instances",
+          "description": "Under the Process Attribute's 'Loyalty Tier' Attribute, create Instances: Guest (StraightThrough — the most common, lowest-dependency case), Bronze (Valid), Silver (Valid), Gold (Valid), and Expired Account (Invalid — expected to produce a rejection error, not a discount)."
+        },
+        {
+          "type": "concept",
+          "term": "Step 4 — Combinatorial method",
+          "description": "With one Attribute driving four meaningfully different behaviors, Linear Expansion is the natural fit here: the Guest StraightThrough becomes the baseline TestCase, and each remaining Instance (Bronze, Silver, Gold, Expired Account) becomes its own TestCase differing only in Loyalty Tier — giving 5 TestCases total, each with an isolated, easy-to-debug focus. All Combinations would be unnecessary here since there's only one Attribute actually varying."
+        },
+        {
+          "type": "concept",
+          "term": "Step 5 — Reuse and linking",
+          "description": "If 'Loyalty Tier' is likely to be reused in other TestSheets (e.g. a separate Requirement for loyalty point accrual), it's a good candidate to extract into a Class once that second use case appears — not before. Finally, all 5 generated Instances get dragged onto the 'Apply loyalty discount' Requirement, creating TestCase-Substitute links that make this coverage visible on the Requirements dashboard."
+        }
+      ],
+      "bulletPoints": [
+        "This example threads all five prior building blocks together: Requirement → Attributes → Instances → Combinatorics → Link to Requirement.",
+        "The combinatorial method wasn't picked arbitrarily — it followed from how many Attributes were actually varying and why."
+      ]
+    },
+    {
+      "sectionTitle": "What the official scenarios are really testing",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Conceptual focus of each official Scenario",
+          "items": [
+            "Scenario 01 (Discount) — one Attribute drives multiple distinct behaviors (discount type and where it applies); good practice for choosing Instances and a Character/Position strategy without over-complicating the structure.",
+            "Scenario 02 (Product Configuration) — several independent Attributes (component choices) that legitimately need combining together; a good test of picking the right combinatorial method for multiple simultaneously-varying Attributes, and of restructuring once any Attribute has more than 6-8 options.",
+            "Scenario 03 (Accelerator Package) — an abstract, unfamiliar domain with several cost/usage rules and no visual application to explore; tests whether you can build a Requirements + TestSheet structure directly from a written business description alone, the way you'd have to on a real, still-being-built feature."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Each scenario stresses a different skill: Instance/Character design, combinatorial method choice, and working from specification text alone."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Defaulting to All Combinations for every scenario",
+      "trapDescription": "Reaching for All Combinations whenever a scenario has more than one Attribute, without checking whether that's actually justified.",
+      "bestPractice": "Choose the combinatorial method based on the Requirement's risk, regulatory needs, and how many Attributes are genuinely varying together — Linear Expansion is the Tricentis default recommendation where there's no specific reason to need exhaustive coverage."
+    },
+    {
+      "title": "Skipping the Verification Attribute in a capstone TestSheet",
+      "trapDescription": "Building Precondition and Process Attributes but leaving Verification empty or undefined.",
+      "bestPractice": "Every TestSheet Instance needs a clearly defined Verification — without it, there's no way to determine whether the TestCase actually passed."
+    },
+    {
+      "title": "Extracting a Class before there's a second use case",
+      "trapDescription": "Converting an Attribute structure into a Class the moment it's built, in a capstone scenario where it's only used once so far.",
+      "bestPractice": "Per Lesson 9's guidance, only extract a Class once a structure is reused at least twice — a scenario using an Attribute exactly once doesn't need one yet."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "In the Loyalty Tier worked example, why was 'Guest' chosen as the StraightThrough Instance rather than 'Gold'?",
+      "options": [
+        { "id": "A", "text": "Because StraightThrough must always be the option with 0% value." },
+        { "id": "B", "text": "Because Guest is the most frequent, lowest-dependency case — the actual criteria for a StraightThrough." },
+        { "id": "C", "text": "Because Gold cannot be marked as Valid." },
+        { "id": "D", "text": "StraightThrough selection is random." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Recall the StraightThrough criteria from Lesson 3: high-risk if it fails, easy to implement, fewest dependencies.",
+      "rationale": "StraightThrough should be the highest-risk-if-it-fails, easiest, lowest-dependency case — which for a checkout is the plain Guest path, since it happens on effectively every order, not the least common tier."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "In the same worked example, how many TestCases does Linear Expansion produce, given one Attribute (Loyalty Tier) with 1 StraightThrough and 4 other Instances?",
+      "options": [
+        { "id": "A", "text": "4" },
+        { "id": "B", "text": "5" },
+        { "id": "C", "text": "16" },
+        { "id": "D", "text": "1" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Baseline + one TestCase per non-StraightThrough Instance.",
+      "rationale": "Linear Expansion produces the StraightThrough baseline (Guest) plus one TestCase per remaining Instance (Bronze, Silver, Gold, Expired Account) — 1 + 4 = 5 TestCases total."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Which official capstone Scenario most directly tests whether you can build a Requirements and TestSheet structure purely from a written business description, without an existing application to click through?",
+      "options": [
+        { "id": "A", "text": "Scenario 01 - Calculate Discount" },
+        { "id": "B", "text": "Scenario 02 - Product Configuration" },
+        { "id": "C", "text": "Scenario 03 - Accelerator Package" },
+        { "id": "D", "text": "None of them involve working from a written description." }
+      ],
+      "correctOptions": ["C"],
+      "hint": "One scenario is explicitly abstract and not part of the DemoWebShop application.",
+      "rationale": "Scenario 03 (Accelerator Package) is an abstract mobile-billing example that isn't part of the DemoWebShop, so it specifically tests building structure from specification text alone, without a UI to explore."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "An 'Expired Account' Instance is included in the Loyalty Tier Attribute and is expected to cause checkout to reject the discount with an error message. What Character should it have?",
+      "options": [
+        { "id": "A", "text": "Valid" },
+        { "id": "B", "text": "Invalid" },
+        { "id": "C", "text": "StraightThrough" },
+        { "id": "D", "text": "Boundary" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Recall the Character definitions from Lesson 3 — which one is used for cases that are expected to produce an error?",
+      "rationale": "A case that is expected to trigger an error/rejection is marked Invalid — the TestCase then passes if that error correctly occurs, per Lesson 3."
+    }
+  ],
+  "quickRecap": [
+    { "key": "End-to-end flow", "value": "Requirement → Attributes (4 core) → Instances (Character/Position) → Combinatorial method → Link to Requirement." },
+    { "key": "Method selection", "value": "Base it on how many Attributes truly vary together and the Requirement's risk — not a default habit." },
+    { "key": "Scenario 01 focus", "value": "Designing Instances/Character for one Attribute driving several distinct behaviors." },
+    { "key": "Scenario 02 focus", "value": "Combining several independently-varying Attributes; restructuring large option sets." },
+    { "key": "Scenario 03 focus", "value": "Building structure directly from a written specification, with no UI to reference." }
+  ],
+  "topics": [
+    {
+      "title": "Scenarios (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+      "duration": "video"
+    }
+  ]
+}

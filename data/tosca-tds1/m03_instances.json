@@ -1,0 +1,187 @@
+{
+  "moduleId": "TDS1-M03",
+  "moduleTitle": "Lesson 3 - Instances",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+  "learningObjectives": [
+    "Create Instances to represent the concrete variations of an Attribute.",
+    "Apply the Character property (Valid, Invalid, StraightThrough) correctly.",
+    "Apply the Position property (Inner vs Boundary) and explain why boundaries carry higher error risk.",
+    "Use Equivalence Classes to avoid testing every possible inner value individually."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "What is an Instance",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Instance",
+          "description": "A concrete variation/value of an Attribute — for example, if 'Credit Card Type' is the Attribute, then Visa, Mastercard, and Amex are its Instances. Instances are added via the Ribbon, 'Add Instance' in the Mini-Toolbar, or the shortcut Ctrl+N, Ctrl+I."
+        },
+        {
+          "type": "note",
+          "text": "Unlike Attributes, Instances cannot have sub-Instances — they are always a leaf value."
+        }
+      ],
+      "bulletPoints": [
+        "Attribute = the characteristic. Instance = one specific value that characteristic can take."
+      ]
+    },
+    {
+      "sectionTitle": "Character: Valid, Invalid, StraightThrough",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Valid (default)",
+          "description": "A white Instance icon with an 'I', outlined in red. Applying a Valid Instance should NOT produce an error in the process."
+        },
+        {
+          "type": "concept",
+          "term": "Invalid",
+          "description": "Same icon style but with an 'X' instead of an 'I'. Applying an Invalid Instance SHOULD produce an error or error message — this does not mean the TestCase fails; a correctly-appearing error message is a pass for an Invalid TestCase. Example: testing login with an invalid password should verify the user is NOT logged in and the correct error message appears."
+        },
+        {
+          "type": "concept",
+          "term": "StraightThrough",
+          "description": "A special category of Instance chosen according to specific criteria: it should be high-risk if it failed, easy to implement, and have the fewest dependencies (so it can combine with as many Instances from other Attributes as possible). Often called the 'happy path' and typically included in the smoke test."
+        },
+        {
+          "type": "note",
+          "text": "Toggle Character via right-click → 'Toggle Character' (click once for Invalid, twice for StraightThrough) or the shortcut F7."
+        }
+      ],
+      "bulletPoints": [
+        "Valid = no error expected. Invalid = error expected (and verifying that error IS the pass condition). StraightThrough = the low-dependency, high-risk 'happy path' value.",
+        "F7 cycles Character; Invalid icon shows 'X', Valid shows 'I'."
+      ]
+    },
+    {
+      "sectionTitle": "Position: Inner vs Boundary",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Boundary Value",
+          "description": "A value at the edge of a valid range. If an accepted age range is 1-99, the values immediately around each edge (0, 1, 99, 100) are Boundary Values — they carry a high probability of error because off-by-one logic mistakes (e.g. '>1' coded instead of '>=1') tend to surface exactly there."
+        },
+        {
+          "type": "concept",
+          "term": "Why Boundaries are usually one-time tests",
+          "description": "As long as the range doesn't change between releases, a Boundary error is a one-time class of bug — so Boundary Values are typically used in one-time tests rather than every regression run."
+        },
+        {
+          "type": "concept",
+          "term": "Inner Value (default)",
+          "description": "Any value in the range that isn't immediately around a boundary — e.g. 2 through 98 in the age example. These don't need to be tested one by one; instead, group them into a single representative Instance called an Equivalence Class (e.g. one Instance covering 2-98, optionally randomized at execution time using a Tosca RND expression). Equivalence Classes are a good fit for regression tests."
+        },
+        {
+          "type": "note",
+          "text": "Toggle Position via F8, or 'Toggle Position' from the context menu. Boundary Instances show small red dashes around the 'I' in their icon; Inner Values look like a normal Instance icon. Both can be either Valid or Invalid."
+        },
+        {
+          "type": "note",
+          "text": "Equivalence Classes aren't mandatory for every Attribute — if an Attribute only has a small number of specific discrete values rather than a range, just define those specific values directly."
+        }
+      ],
+      "bulletPoints": [
+        "Boundary = edge of a range, high error probability, usually a one-time test.",
+        "Inner = everything else; group into an Equivalence Class rather than testing each value individually."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Treating an Invalid TestCase result as a failure",
+      "trapDescription": "Assuming that if an Invalid Instance produces an error message, the TestCase has failed.",
+      "bestPractice": "An Invalid Instance is expected to trigger an error. The TestCase passes when that error correctly appears — the failure would be if no error (or the wrong behavior) occurred."
+    },
+    {
+      "title": "Picking any 'normal' value as the StraightThrough",
+      "trapDescription": "Choosing an arbitrary Valid Instance as the StraightThrough without checking dependencies.",
+      "bestPractice": "A StraightThrough must be high-risk if it fails, easy to implement, AND have the fewest dependencies on other Attributes — not just any valid value."
+    },
+    {
+      "title": "Testing every value inside a range individually",
+      "trapDescription": "Creating a separate Instance for every Inner Value in a large range, e.g. ages 2 through 98.",
+      "bestPractice": "Group Inner Values into a single Equivalence Class Instance (optionally randomized with an RND expression). This maximizes coverage while minimizing the number of TestCases."
+    },
+    {
+      "title": "Testing only one side of a boundary",
+      "trapDescription": "Testing 99 as the upper boundary but skipping 100, or vice versa.",
+      "bestPractice": "Boundary testing should cover both the last valid value and the first invalid value around each edge (e.g. 99 and 100 for an upper bound of 99), since off-by-one logic errors can occur on either side."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A TestCase uses an Invalid Instance for a password field and the system correctly displays 'Incorrect password' without logging the user in. What is the outcome?",
+      "options": [
+        { "id": "A", "text": "The TestCase fails, because an error occurred." },
+        { "id": "B", "text": "The TestCase passes, because the expected error behavior occurred." },
+        { "id": "C", "text": "The result is inconclusive without further data." },
+        { "id": "D", "text": "Invalid Instances cannot be used for login fields." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "What does 'Invalid' mean for the Character property, and what should happen when it's applied?",
+      "rationale": "An Invalid Instance is expected to produce an error. Seeing the correct error message and confirming the user is not logged in is exactly the expected — and passing — result."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "Which set of criteria correctly describes a StraightThrough Instance?",
+      "options": [
+        { "id": "A", "text": "Any Instance marked as Valid by default." },
+        { "id": "B", "text": "High-risk if it fails, easy to implement, and has the fewest dependencies on other Attributes." },
+        { "id": "C", "text": "The Instance with the most dependencies, to maximize test coverage." },
+        { "id": "D", "text": "Any Boundary Value that is also Invalid." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Think 'happy path' — the value most other Attributes can safely be combined with.",
+      "rationale": "A StraightThrough Instance is chosen because it's high-risk if it were to fail, easy to implement, and has the fewest dependencies — letting it combine cleanly with values from other Attributes. It represents the 'happy path' and is typically part of the smoke test."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "An Attribute accepts ages from 1 to 99. Which four values should be tested as Boundary Values?",
+      "options": [
+        { "id": "A", "text": "1, 25, 50, 99" },
+        { "id": "B", "text": "0, 1, 99, 100" },
+        { "id": "C", "text": "Only 1 and 99" },
+        { "id": "D", "text": "Only 0 and 100" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Boundaries include both the last valid and the first invalid value on each edge of the range.",
+      "rationale": "Boundary testing checks the edges: the value just below the range (0), the first valid value (1), the last valid value (99), and the value just above the range (100) — since off-by-one operator mistakes tend to surface exactly at these points."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "Rather than creating 97 separate Instances for ages 2 through 98, what should a tester do?",
+      "options": [
+        { "id": "A", "text": "Create one Instance representing the Equivalence Class of Inner Values (2-98), optionally randomized with an RND expression." },
+        { "id": "B", "text": "Skip testing Inner Values entirely — only Boundaries matter." },
+        { "id": "C", "text": "Mark all 97 values as StraightThrough." },
+        { "id": "D", "text": "Create exactly 10 Instances chosen at random with no further reasoning." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "The whole point of grouping into a class is to avoid testing every value individually while still covering the range.",
+      "rationale": "Inner Values that don't sit near a boundary can be grouped into a single Equivalence Class Instance, keeping coverage meaningful while minimizing the number of TestCases — a good fit for regression testing."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Instance", "value": "A concrete value of an Attribute; cannot have sub-Instances. Create: Ctrl+N, Ctrl+I." },
+    { "key": "Character: Valid", "value": "Default; no error expected. Icon: white 'I', red outline." },
+    { "key": "Character: Invalid", "value": "Error expected; icon shows 'X'. An appearing error = a pass." },
+    { "key": "Character: StraightThrough", "value": "High-risk, easy, fewest dependencies — the 'happy path' / smoke-test value." },
+    { "key": "Toggle Character / Position", "value": "F7 cycles Character (Valid→Invalid→StraightThrough); F8 toggles Position (Inner↔Boundary)." },
+    { "key": "Boundary Value", "value": "Edge-of-range value, high error probability, usually a one-time test." },
+    { "key": "Equivalence Class", "value": "One Instance representing a whole range of Inner Values, to avoid testing each one individually." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 03 - Instances (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+      "duration": "video"
+    }
+  ]
+}

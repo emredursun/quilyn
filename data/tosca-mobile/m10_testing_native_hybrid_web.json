@@ -1,0 +1,236 @@
+{
+  "moduleId": "TMOB-M10",
+  "moduleTitle": "Automating Mobile Apps on TMA — Part 2: Testing Native, Hybrid & Web Apps",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1408/automating-mobile-apps-on-tma-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Implement advanced techniques to create and execute test scripts on native, hybrid, and web applications within Tricentis Tosca Mobile.",
+    "Build a complete TestCase against a native app, from Open Mobile App through verification.",
+    "Build a TestCase against a hybrid app that steers both native chrome and embedded webview controls in one flow.",
+    "Build a TestCase against a mobile web app running in the device's own browser.",
+    "Recognise which parts of the workflow change between the three app types, and which stay identical."
+  ],
+  "estTime": "35 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "One workflow, three targets",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "What stays the same across all three",
+          "description": "Regardless of app type, every mobile TestCase starts with Open Mobile App, steers scanned Modules with the same TestStepValue/ActionMode mechanics as any other Tosca TestCase, and verifies outcomes with the same Buffer/Verify actions. The Getting Started course covered this shape once (Lesson 7); this part is about applying it three times, deliberately, against each app type's specific quirks."
+        },
+        {
+          "type": "concept",
+          "term": "What actually changes",
+          "description": "Native: control identification relies purely on platform accessibility properties. Hybrid: the TestCase must explicitly manage native/webview context switches mid-flow. Web: steering happens inside the device browser's DOM, closer to an XBrowser TestCase in spirit but running through the Mobile Engine."
+        }
+      ],
+      "bulletPoints": [
+        "Open Mobile App, ActionModes, Buffer/Verify — identical across native, hybrid, and web.",
+        "Context management (webview switching) and DOM-vs-native identification are what actually differs."
+      ]
+    },
+    {
+      "sectionTitle": "Building a native TestCase",
+      "elements": [
+        {
+          "type": "steps",
+          "title": "End-to-end native flow",
+          "items": [
+            "Open Mobile App (first TestStep, app installed or already present).",
+            "Steer each screen's scanned controls in sequence — taps, text entry via Send Text Input To Focused Control, list scrolling via Swipe On Screen where no scrollable control was captured directly.",
+            "Insert Verify TestSteps at meaningful checkpoints (a confirmation screen appearing, a field showing an expected value) rather than only at the very end.",
+            "Close out with an explicit End Appium Session if the device is shared with other TestCases or teammates."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Native is the most predictable of the three to author against, precisely because control identification and steering match what was covered in the Getting Started course's Mobile Scan and TestCase lessons directly — this part is mostly about applying that discipline consistently across a longer, realistic flow rather than a single toy TestStep."
+        }
+      ],
+      "bulletPoints": [
+        "Verify at multiple checkpoints along the flow, not only at the end — isolates exactly where a regression breaks the flow."
+      ]
+    },
+    {
+      "sectionTitle": "Building a hybrid TestCase",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Context switches belong in the TestCase, not just the scan",
+          "description": "A hybrid TestCase needs the same native/webview context switching used during scanning to also happen during execution, at the right points in the TestStep sequence — steer the native shell's tab bar, switch to webview context to steer the embedded content, switch back to native context to steer whatever surrounds it next."
+        },
+        {
+          "type": "warning",
+          "text": "A hybrid TestCase authored entirely in whatever context the scan happened to be in when each control was captured will silently fail on controls captured in the 'wrong' context relative to where the TestCase actually needs to be at that point in the flow. Explicit context-switch TestSteps at each transition avoid this."
+        },
+        {
+          "type": "note",
+          "text": "Timing matters more in hybrid than native: the embedded webview can take noticeably longer to finish loading than the native shell around it. A control steered before the webview has finished rendering behaves like a control that doesn't exist yet — build in a wait or a Verify-for-presence step before steering into freshly-loaded webview content."
+        }
+      ],
+      "bulletPoints": [
+        "Context switches (native ↔ webview) need to be explicit TestSteps at the right points, not assumed.",
+        "Webview content can load slower than native chrome — verify presence before steering into it."
+      ]
+    },
+    {
+      "sectionTitle": "Building a mobile web TestCase",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "DOM steering through the Mobile Engine",
+          "description": "Once scanned through the device's own browser, a mobile web TestCase steers controls the way a DOM-based Module normally would — but every interaction still runs through the same device session and Mobile Engine plumbing as a native or hybrid TestCase, not a separate execution path."
+        },
+        {
+          "type": "list",
+          "title": "Things that differ from a desktop XBrowser TestCase",
+          "items": [
+            "Viewport and layout reflect the real device's mobile browser, not a resized desktop window — elements that reflow at mobile width need controls captured at that width, not assumed identical to desktop.",
+            "Touch-based interaction patterns (tap, swipe) apply, rather than mouse-hover-dependent behaviour a desktop site might rely on.",
+            "Browser chrome (address bar behaviour, mobile-specific prompts) is part of what's on screen and occasionally part of what needs steering."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Mobile web TestCases run through the same Mobile Engine session as native/hybrid — not a separate desktop-style execution path.",
+        "Controls must be captured and steered at actual mobile viewport width — hover-dependent desktop assumptions don't carry over."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Assuming a hybrid TestCase inherits the right context automatically",
+      "trapDescription": "Steering a webview-captured control right after a native-context TestStep without an explicit context switch in between.",
+      "bestPractice": "Insert explicit context-switch TestSteps at every native↔webview transition in the flow — the TestCase's execution context does not follow the control's original capture context automatically."
+    },
+    {
+      "title": "Steering into a webview before it's finished loading",
+      "trapDescription": "A hybrid TestCase intermittently fails on the first control inside freshly-navigated webview content, while later controls in the same webview work fine.",
+      "bestPractice": "Verify for the target control's presence (or build in an appropriate wait) before steering into webview content that just finished navigating — embedded webviews can lag behind the native shell's own load time."
+    },
+    {
+      "title": "Treating mobile web like a resized desktop XBrowser TestCase",
+      "trapDescription": "Assuming controls and layout captured on a desktop-width scan will match what the Mobile Scan captures at real mobile viewport width.",
+      "bestPractice": "Scan and steer mobile web at the device's actual viewport — reflowed layouts at mobile width can present different, or differently-positioned, controls than a desktop capture would."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "multi-select",
+      "scenario": "Which parts of the mobile TestCase workflow stay identical across native, hybrid, and web apps? (three correct answers)",
+      "options": [
+        {
+          "id": "A",
+          "text": "Open Mobile App as the mandatory first TestStep"
+        },
+        {
+          "id": "B",
+          "text": "TestStepValue/ActionMode mechanics for steering a Module"
+        },
+        {
+          "id": "C",
+          "text": "The need for explicit native/webview context switches"
+        },
+        {
+          "id": "D",
+          "text": "Buffer/Verify actions for checking outcomes"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "D"
+      ],
+      "hint": "One of the four options is specific to only one of the three app types.",
+      "rationale": "Open Mobile App, TestStepValue/ActionMode mechanics, and Buffer/Verify are identical across all three app types. Native/webview context switching is specific to hybrid apps — native and web TestCases never need it."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A hybrid TestCase intermittently fails to steer the first control inside a webview right after it navigates, but works fine on subsequent controls in the same webview. What is the most likely cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The control was scanned in the wrong app entirely."
+        },
+        {
+          "id": "B",
+          "text": "The webview hadn't finished loading yet when the TestStep ran — it lags behind the native shell's own load time."
+        },
+        {
+          "id": "C",
+          "text": "TMA does not support hybrid apps."
+        },
+        {
+          "id": "D",
+          "text": "The device needs more storage."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Timing, not identification, is usually the culprit for a flaky first interaction after navigation.",
+      "rationale": "Embedded webviews can take noticeably longer to finish rendering than the native shell around them. Steering into content before it's actually ready behaves like steering a control that doesn't exist yet — a wait or presence-verify before the first interaction avoids this."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Why should mobile web controls be captured at the device's actual mobile viewport, rather than reused from a desktop XBrowser scan?",
+      "options": [
+        {
+          "id": "A",
+          "text": "XBrowser scans cannot capture web controls at all."
+        },
+        {
+          "id": "B",
+          "text": "Layout reflows at mobile width can present different or differently-positioned controls than a desktop capture."
+        },
+        {
+          "id": "C",
+          "text": "Mobile web TestCases run through a completely separate engine from native/hybrid ones."
+        },
+        {
+          "id": "D",
+          "text": "Desktop scans are always faster to execute."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about responsive layout behaviour, not engine architecture.",
+      "rationale": "A responsive site reflows its layout at mobile widths, which can change which controls exist or where they sit. Mobile web TestCases still run through the same Mobile Engine session as native/hybrid — the engine isn't separate, but the layout genuinely is."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Shared across all three",
+      "value": "Open Mobile App first · TestStepValue/ActionMode steering · Buffer/Verify for outcomes."
+    },
+    {
+      "key": "Native-specific",
+      "value": "Predictable identification via platform accessibility properties — apply the discipline consistently across a full flow."
+    },
+    {
+      "key": "Hybrid-specific",
+      "value": "Explicit native↔webview context switches at each transition; webview content can lag behind native shell load time."
+    },
+    {
+      "key": "Web-specific",
+      "value": "DOM steering through the Mobile Engine — capture at real mobile viewport, touch interaction patterns, not resized desktop assumptions."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Part 2 - Automating mobile apps on TMA with Tricentis Tosca Mobile",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1408/automating-mobile-apps-on-tma-with-tricentis-tosca-mobile",
+      "duration": "video"
+    },
+    {
+      "title": "Mobile Engine 3.0 (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
+      "duration": "docs"
+    }
+  ]
+}

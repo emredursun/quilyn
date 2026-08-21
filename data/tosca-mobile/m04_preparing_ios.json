@@ -1,0 +1,267 @@
+{
+  "moduleId": "TMOB-M04",
+  "moduleTitle": "Lesson 4 - Preparing iOS Devices & Simulators",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1311/getting-started-with-mobile-test-automation-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Explain why iOS automation requires a Mac, unlike Android automation.",
+    "Prepare a physical iOS device: Developer Mode, trust settings, and cabling.",
+    "Launch and use the iOS Simulator through Xcode as an automation target.",
+    "Identify a device's UDID and a simulator/app's BundleID, the iOS equivalents of Android's device serial and AppPackage."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Why iOS needs a Mac",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "XCUITest is Xcode-only",
+          "description": "iOS automation runs on XCUITest, Apple's own UI testing framework, which is only accessible through Xcode — and Xcode only installs on macOS. There is no Windows or Linux equivalent, so TMA cannot drive an iOS device or simulator unless it is running on a Mac."
+        },
+        {
+          "type": "note",
+          "text": "This is a hard platform constraint, not a Tricentis limitation. Every iOS automation tool built on Appium's XCUITest driver — not just Tosca — shares this same requirement."
+        }
+      ],
+      "bulletPoints": [
+        "iOS automation = Xcode = macOS, full stop. If Tosca Commander runs on Windows, iOS testing needs a separate Mac running TMA as a Remote (TMA) machine."
+      ]
+    },
+    {
+      "sectionTitle": "Preparing a physical iOS device",
+      "elements": [
+        {
+          "type": "list",
+          "title": "iOS device prerequisites",
+          "items": [
+            "Enable Developer Mode: on iOS 16 and later, this is a dedicated toggle under Settings → Privacy & Security → Developer Mode, which requires a device restart to take effect.",
+            "Connect the device to the Mac via cable and, on first connection, tap 'Trust This Computer' on the device when prompted.",
+            "In Xcode, open Window → Devices and Simulators to confirm the device appears and is recognised.",
+            "A free Apple ID is sufficient for local development-style signing needed to run automation — a paid Apple Developer account is not required just to automate an already-installed app."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Developer Mode is off by default on every iOS 16+ device and is easy to miss because it doesn't appear in Settings at all until Xcode (or an app signed for development) has attempted to run something on the device at least once. If the toggle isn't visible, connect the device to Xcode first and try running/installing something to surface it."
+        }
+      ],
+      "bulletPoints": [
+        "Developer Mode (iOS 16+) must be explicitly enabled and the device restarted — it does not exist in Settings until triggered by a first Xcode interaction.",
+        "'Trust This Computer' must be accepted on the device itself, not just clicked through in Xcode."
+      ]
+    },
+    {
+      "sectionTitle": "Using the iOS Simulator",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Simulator vs physical device",
+          "description": "The iOS Simulator, launched through Xcode, runs an iOS runtime on the Mac itself rather than on real hardware — no cable, no Developer Mode toggle, no Trust prompt. It's the fastest way to get started, but it cannot exercise hardware-dependent behaviour (camera, real biometrics, cellular, certain sensors) the way a physical device can."
+        },
+        {
+          "type": "steps",
+          "title": "Launching a simulator",
+          "items": [
+            "Open Xcode → Settings → Platforms and download at least one iOS Simulator runtime if none is installed.",
+            "Open Xcode → Open Developer Tool → Simulator, or launch a simulator directly from Window → Devices and Simulators.",
+            "Let it fully boot to the Home Screen before starting TMA or attempting a scan."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Simulator = fast to set up, software-only, no hardware-dependent behaviour.",
+        "Physical device = required for camera/biometric/cellular-dependent testing."
+      ]
+    },
+    {
+      "sectionTitle": "Identifiers: UDID and BundleID",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "UDID — identifying the device",
+          "description": "Every physical iOS device and every simulator instance has a UDID (Unique Device Identifier). For a physical device, it's visible in Xcode's Window → Devices and Simulators panel, or via the command line with xcrun xctrace list devices. Simulators are identified the same way, listed alongside physical devices in that same command's output."
+        },
+        {
+          "type": "concept",
+          "term": "BundleID — identifying the app",
+          "description": "iOS apps are identified by a BundleID (a reverse-domain string like com.company.appname) — the iOS equivalent of Android's AppPackage. Unlike Android, iOS has no separate 'activity' concept to also supply; the BundleID alone is enough to tell Open Mobile App which installed app to open."
+        },
+        {
+          "type": "note",
+          "text": "As with Android, leave Application and Application Path empty in the Open Mobile App Module when the app is already installed — supply only the BundleID. Those Application/Path fields exist for installing a fresh .ipa, not for opening an app that's already on the device."
+        }
+      ],
+      "bulletPoints": [
+        "UDID identifies the device/simulator. BundleID identifies the app. iOS has no AppActivity equivalent — BundleID alone is enough."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Trying to run iOS automation from a Windows-only setup",
+      "trapDescription": "Installing TMA on Windows and expecting to scan an iOS device or simulator.",
+      "bestPractice": "iOS automation depends on XCUITest, which only runs through Xcode on macOS. A Mac must be present somewhere in the topology — either running Tosca and TMA together, or as a Remote (TMA) machine a Windows Tosca Commander connects to."
+    },
+    {
+      "title": "Not finding the Developer Mode toggle",
+      "trapDescription": "Searching Settings → Privacy & Security on a fresh iOS 16+ device and not seeing Developer Mode at all.",
+      "bestPractice": "The toggle only appears after Xcode (or a development-signed app) first attempts to run something on the device. Connect the device to Xcode and try to run/install once — the toggle then appears, and enabling it requires a restart."
+    },
+    {
+      "title": "Assuming BundleID needs a paired 'activity' value like Android",
+      "trapDescription": "Looking for an iOS equivalent of AppActivity when configuring Open Mobile App.",
+      "bestPractice": "iOS has no activity concept. BundleID alone identifies which installed app to open — nothing else is required alongside it."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Why does iOS device and simulator automation require a Mac?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Apple licensing forbids automation tools from running on other operating systems."
+        },
+        {
+          "id": "B",
+          "text": "XCUITest, the framework iOS automation relies on, is only accessible through Xcode, which only installs on macOS."
+        },
+        {
+          "id": "C",
+          "text": "TMA has no Windows installer at all."
+        },
+        {
+          "id": "D",
+          "text": "iOS devices can only be charged from a Mac's USB port."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about what tool actually drives the device under the hood.",
+      "rationale": "iOS automation runs on XCUITest, Apple's Xcode-only UI testing framework. Since Xcode is macOS-exclusive, any iOS automation — Tosca included — needs a Mac somewhere in the topology."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A learner cannot find the Developer Mode toggle anywhere in Settings on a freshly set-up iPhone running iOS 17. What is the most likely explanation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Developer Mode was removed in iOS 17."
+        },
+        {
+          "id": "B",
+          "text": "The toggle only appears in Settings after Xcode (or a development-signed app) first attempts to run something on the device."
+        },
+        {
+          "id": "C",
+          "text": "The device needs to be jailbroken first."
+        },
+        {
+          "id": "D",
+          "text": "Developer Mode is only available on iPads, not iPhones."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "It's hidden until something triggers it to appear.",
+      "rationale": "On iOS 16+, Developer Mode does not show up in Settings until Xcode or a development-signed app has first attempted to run on the device. Connecting the device to Xcode and trying to run something surfaces the toggle, which then requires a restart to enable."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "What is the iOS equivalent of Android's AppPackage, used to tell Open Mobile App which installed app to launch?",
+      "options": [
+        {
+          "id": "A",
+          "text": "UDID"
+        },
+        {
+          "id": "B",
+          "text": "BundleID"
+        },
+        {
+          "id": "C",
+          "text": "AppActivity"
+        },
+        {
+          "id": "D",
+          "text": "Provisioning Profile ID"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "A reverse-domain string, like com.company.appname.",
+      "rationale": "BundleID identifies the app, the same role AppPackage plays on Android. Unlike Android, iOS has no separate 'activity' value needed alongside it — BundleID alone is sufficient."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What can a physical iOS device test that the iOS Simulator cannot?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Basic tap and swipe gestures."
+        },
+        {
+          "id": "B",
+          "text": "Hardware-dependent behaviour such as the camera, real biometrics, and cellular connectivity."
+        },
+        {
+          "id": "C",
+          "text": "Text entry into form fields."
+        },
+        {
+          "id": "D",
+          "text": "Navigating between app screens."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The Simulator runs a software-only iOS runtime on the Mac itself.",
+      "rationale": "The Simulator is fast to set up but is software-only — it cannot exercise camera, real biometric, cellular, or other hardware-dependent behaviour the way a physical device can. Basic UI interactions work fine on either."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Hard constraint",
+      "value": "iOS automation requires XCUITest, which only runs via Xcode on macOS — a Mac must be in the topology."
+    },
+    {
+      "key": "Physical device prep",
+      "value": "Enable Developer Mode (Settings → Privacy & Security, iOS 16+, needs a restart) · connect by cable · tap 'Trust This Computer' · confirm in Xcode's Devices and Simulators."
+    },
+    {
+      "key": "Developer Mode visibility",
+      "value": "Hidden until Xcode/a dev-signed app first tries to run on the device — connect to Xcode and attempt a run to surface the toggle."
+    },
+    {
+      "key": "Simulator",
+      "value": "Launched via Xcode, software-only, no cable/Trust/Developer Mode needed — but can't exercise hardware-dependent behaviour."
+    },
+    {
+      "key": "UDID",
+      "value": "Identifies the device or simulator instance — via Xcode's Devices and Simulators panel or xcrun xctrace list devices."
+    },
+    {
+      "key": "BundleID",
+      "value": "Identifies the app (reverse-domain string) — the iOS equivalent of AppPackage. No AppActivity equivalent needed."
+    },
+    {
+      "key": "Already-installed apps",
+      "value": "Leave Application/Application Path empty in Open Mobile App — supply only the BundleID."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Get started with mobile test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "duration": "docs"
+    }
+  ]
+}

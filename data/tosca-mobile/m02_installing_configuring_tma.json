@@ -1,0 +1,299 @@
+{
+  "moduleId": "TMOB-M02",
+  "moduleTitle": "Lesson 2 - Installing and Configuring TMA",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1311/getting-started-with-mobile-test-automation-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Install the Tricentis Mobile Agent on Windows and macOS.",
+    "Start TMA for local use versus starting it for remote use.",
+    "Locate the TMA console and use it to confirm devices are Ready before touching Tosca.",
+    "Understand which port TMA listens on and why that matters for firewalls and remote setups."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Getting TMA installed",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "A separate installer from Tosca Commander",
+          "description": "TMA ships as its own installer, downloaded from the Tricentis Support Hub or Tosca Downloads area, and installed independently of Tosca Commander. It can live on the same machine as Tosca Commander (Local setup) or on a different machine entirely (Remote setup) — the installer itself is identical either way; only where you run it differs."
+        },
+        {
+          "type": "list",
+          "title": "Install locations",
+          "items": [
+            "Windows: installs under C:\\Program Files\\Tricentis\\Mobile Agent by default.",
+            "macOS: installs as an application bundle under /Applications/Tricentis Mobile Agent.app."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "TMA is officially documented as supported on bare-metal hardware, not inside a virtual machine. It can still work inside a VM in practice, but that puts you outside supported territory the moment something misbehaves — worth knowing before troubleshooting a VM-hosted setup."
+        }
+      ],
+      "bulletPoints": [
+        "TMA is its own installer, separate from Tosca Commander — install it on whichever machine will manage the devices.",
+        "Officially bare-metal only; VM installs work unofficially but are unsupported."
+      ]
+    },
+    {
+      "sectionTitle": "Starting TMA: tray launch vs command line",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Tray / Start Menu launch — local use only",
+          "description": "Launching TMA from the system tray icon (or the Start Menu / Applications folder) starts the agent bound to the local machine. This is sufficient whenever Tosca Commander and TMA run on the same machine."
+        },
+        {
+          "type": "concept",
+          "term": "Command-line launch with --rest-address — required for remote use",
+          "description": "When Tosca Commander and TMA run on different machines, TMA must be started from the command line with the --rest-address flag, binding its REST API to a network-reachable address instead of localhost only: tricentis-mobile-agent start --rest-address <IP>:<port>."
+        },
+        {
+          "type": "steps",
+          "title": "Finding and running the executable",
+          "items": [
+            "Windows: the executable lives under C:\\Program Files\\Tricentis\\Mobile Agent.",
+            "macOS: locate it inside the app bundle, e.g. find '/Applications/Tricentis Mobile Agent.app' -name 'tricentis-mobile-agent' -type f.",
+            "Run it with the start subcommand and the --rest-address flag, supplying the host machine's own IP and a port, e.g. --rest-address 192.168.1.50:8585."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "Starting TMA from the tray/GUI does NOT enable remote access, even if the machine is reachable on the network. Only the --rest-address command-line start exposes the REST API beyond localhost. Seeing the TMA console load from another machine's browser is not proof remote mode is active — the console and the automation REST API are not the same thing."
+        }
+      ],
+      "bulletPoints": [
+        "Tray/Start Menu launch = local only.",
+        "--rest-address <IP>:<port> from the command line = required for any remote (cross-machine) setup."
+      ]
+    },
+    {
+      "sectionTitle": "Ports and firewalls",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Default port 8585",
+          "description": "TMA's default REST port is 8585. In a Local setup this rarely matters since traffic never leaves the machine. In a Remote setup, that port (or whichever custom port is chosen) must be reachable from the Tosca Commander machine — meaning any firewall between the two machines needs an explicit allow rule."
+        },
+        {
+          "type": "note",
+          "text": "A REST call to http://<TMA-host>:<port>/api/devices is the fastest way to prove the port is reachable and TMA is responding, independent of anything in Tosca — covered in full in the Connecting Tosca to TMA lesson."
+        }
+      ],
+      "bulletPoints": [
+        "Default port: 8585. Confirm it (or your chosen custom port) is open through any firewall for Remote setups."
+      ]
+    },
+    {
+      "sectionTitle": "The TMA console",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Device Management",
+          "description": "Once TMA is running, its console (reachable at http://<TMA-host>:<port> in a browser) lists every device, emulator, or simulator TMA can currently see, along with a status: Ready, Busy, or Offline. Confirming a device shows Ready here — before opening Tosca at all — isolates device-layer problems from anything Tosca-side."
+        },
+        {
+          "type": "steps",
+          "title": "First-run checklist",
+          "items": [
+            "Install TMA on the machine that will manage devices.",
+            "Start it (tray for local, --rest-address for remote).",
+            "Connect a device via USB, or have an emulator/simulator already running.",
+            "Open the TMA console and confirm the device shows Ready.",
+            "Only then move to Tosca Commander to configure the connection."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Always verify Ready in the TMA console first — it separates 'is the device layer healthy' from 'is Tosca configured correctly'."
+      ]
+    },
+    {
+      "sectionTitle": "Keeping TMA up to date",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Version alignment with Tosca",
+          "description": "TMA and Tosca Commander are versioned and released independently, but a very old TMA against a very new Tosca (or vice versa) can produce session-start failures that look like device problems. When something that used to work stops working after a Tosca upgrade, checking for a matching TMA update is a reasonable early step."
+        }
+      ],
+      "bulletPoints": [
+        "TMA updates independently of Tosca — after a Tosca upgrade, check whether a TMA update is also expected."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Assuming the tray launch enables remote access",
+      "trapDescription": "Starting TMA normally on a second machine, seeing its console load in a browser from the Tosca machine, and concluding remote connection is fully enabled.",
+      "bestPractice": "The console being reachable does not prove the automation REST API is bound for remote use. For cross-machine setups, start TMA with tricentis-mobile-agent start --rest-address <IP>:<port> from the command line."
+    },
+    {
+      "title": "Forgetting the firewall on a Remote setup",
+      "trapDescription": "Configuring --rest-address correctly but still getting connection failures from the Tosca machine.",
+      "bestPractice": "Confirm the chosen port (default 8585) is open through any firewall between the two machines — a REST call to /api/devices from the Tosca-side machine is a fast way to prove reachability."
+    },
+    {
+      "title": "Jumping straight to Tosca without checking the TMA console",
+      "trapDescription": "Configuring the Tosca-side connection immediately after connecting a device, without confirming device status first.",
+      "bestPractice": "Open the TMA console and confirm the device shows Ready before touching Tosca. This isolates whether a later failure is device-side or Tosca-side."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "How must TMA be started for a Remote (TMA) setup, where Tosca Commander runs on a different machine?",
+      "options": [
+        {
+          "id": "A",
+          "text": "From the tray icon or Start Menu, same as any local install."
+        },
+        {
+          "id": "B",
+          "text": "From the command line, using tricentis-mobile-agent start --rest-address <IP>:<port>."
+        },
+        {
+          "id": "C",
+          "text": "TMA cannot be started manually; it must auto-detect remote Tosca instances."
+        },
+        {
+          "id": "D",
+          "text": "Only through the TMA console's web UI, never the command line."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The tray/GUI launch is local-only.",
+      "rationale": "Remote use requires starting TMA from the command line with --rest-address <IP>:<port>, which binds the REST API to a network-reachable address. The tray/Start Menu launch only enables local use."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "What is TMA's default REST port?",
+      "options": [
+        {
+          "id": "A",
+          "text": "80"
+        },
+        {
+          "id": "B",
+          "text": "4444"
+        },
+        {
+          "id": "C",
+          "text": "8585"
+        },
+        {
+          "id": "D",
+          "text": "9515"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Same port that appears throughout the connection-troubleshooting examples.",
+      "rationale": "TMA's default REST port is 8585. In Remote setups this port must be open through any firewall between the TMA machine and the Tosca Commander machine."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Before opening Tosca Commander to configure a mobile connection, what should be confirmed first?",
+      "options": [
+        {
+          "id": "A",
+          "text": "That the Tosca licence file is up to date."
+        },
+        {
+          "id": "B",
+          "text": "That the device shows as Ready in the TMA console."
+        },
+        {
+          "id": "C",
+          "text": "That the Mobile Scan wizard has been run at least once before."
+        },
+        {
+          "id": "D",
+          "text": "That the device is charging."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Isolate device-layer health from Tosca-side configuration before touching Tosca at all.",
+      "rationale": "Checking Ready status in the TMA console first isolates whether the device layer itself is healthy, separate from anything Tosca-side — a diagnostic habit that saves time when something later fails."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "Which of the following statements about Tricentis Mobile Agent is false?",
+      "options": [
+        {
+          "id": "A",
+          "text": "TMA supports both direct and remote connections for devices"
+        },
+        {
+          "id": "B",
+          "text": "TMA requires the installation of Appium and Java components to function"
+        },
+        {
+          "id": "C",
+          "text": "TMA allows testing on both native and hybrid mobile apps"
+        },
+        {
+          "id": "D",
+          "text": "TMA supports connection through CLI for remote devices"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "TMA exists specifically to remove this requirement.",
+      "rationale": "TMA provides simplified setup and configuration precisely so Appium and Java components never need to be installed or configured manually. Local/Remote connections (including CLI-based remote startup with --rest-address) and native/hybrid app support are all genuine TMA capabilities — only this statement misrepresents it."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Install",
+      "value": "Separate installer from Tosca Commander. Windows: C:\\Program Files\\Tricentis\\Mobile Agent. macOS: /Applications/Tricentis Mobile Agent.app."
+    },
+    {
+      "key": "Local start",
+      "value": "Tray icon / Start Menu / Applications folder — local use only."
+    },
+    {
+      "key": "Remote start",
+      "value": "tricentis-mobile-agent start --rest-address <IP>:<port> from the command line — required for cross-machine setups."
+    },
+    {
+      "key": "Default port",
+      "value": "8585 — must be firewall-open for Remote setups."
+    },
+    {
+      "key": "TMA console",
+      "value": "Lists devices/emulators/simulators with status Ready / Busy / Offline — check this before configuring Tosca."
+    },
+    {
+      "key": "Supported hardware",
+      "value": "Officially bare-metal only, not virtual machines (unofficially may still work)."
+    },
+    {
+      "key": "Versioning",
+      "value": "TMA updates independently of Tosca — check for a TMA update after a Tosca upgrade if sessions stop starting."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Get started with mobile test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Configure local or remote test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/configure_mobile_local_remote_tests.htm",
+      "duration": "docs"
+    }
+  ]
+}

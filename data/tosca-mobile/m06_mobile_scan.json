@@ -1,0 +1,494 @@
+{
+  "moduleId": "TMOB-M06",
+  "moduleTitle": "Lesson 6 - Mobile Scan: Native, Hybrid & Web Apps",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1311/getting-started-with-mobile-test-automation-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Run the Mobile Scan wizard end to end: prepare the environment, connect a device, and scan.",
+    "Scan a native app and understand what gets captured as a Module.",
+    "Switch between native context and webview context when scanning a hybrid app.",
+    "Scan a mobile website through the device's own browser.",
+    "Configure Desired Capabilities and reusable Capability Sets in the Mobile Scan wizard."
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "The Mobile Scan wizard",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "One wizard, three app types",
+          "description": "The Mobile Scan handles native, hybrid, and web applications on mobile through the same wizard. The high-level sequence is always: prepare the test environment, start the Mobile Scan and connect to your device, then add the mobile device, emulator, or simulator you want to scan against. From there, scanning produces Modules the same way it does for any other Engine."
+        },
+        {
+          "type": "steps",
+          "title": "Running a scan",
+          "items": [
+            "In Tosca Commander, right-click the target Module folder and choose Mobile Scan (or the equivalent Scan entry point).",
+            "Add a connection — this is where TMAServer, DeviceName, and LiveView get set (or picked up from an existing TCP set).",
+            "Once connected, the target app's current screen appears in the scan window (live, if LiveView is enabled).",
+            "Select controls on screen to capture them into the Module being built, the same click-to-capture interaction used in an XBrowser scan."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "The Add connection dialog in this wizard is more forgiving about the TMAServer value than execution is — it will connect even without the trailing slash the TCP itself requires. Don't take a successful scan connection as proof the TCP value is correctly formatted for execution."
+        }
+      ],
+      "bulletPoints": [
+        "Prepare environment → start Mobile Scan → connect device → capture controls — one flow, all three app types.",
+        "A working scan connection is not proof the TMAServer TCP is correctly formatted for TestCase execution."
+      ]
+    },
+    {
+      "sectionTitle": "Configuring Capabilities",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The wizard's three panes",
+          "description": "The Mobile Scan dialog is organised into three panes that get filled in top to bottom: Select connection (Add connection, or a saved Local/Remote connection), Select device (filterable by Platform and OS Version, showing tiles for each device/simulator TMA currently sees), and Select application (Add app, or pick an app already scanned before, like a Tricentis-provided sample app)."
+        },
+        {
+          "type": "concept",
+          "term": "Desired Capabilities",
+          "description": "Below device/app selection, Set capabilities opens a Capabilities dialog where individual Appium Desired Capabilities can be added — each is an appium:-prefixed key and a value, the same capability mechanism any Appium-based automation session configures, just exposed through Tosca's UI instead of code."
+        },
+        {
+          "type": "concept",
+          "term": "Capability Sets — reusable, named bundles",
+          "description": "Rather than re-entering the same capabilities on every scan, Add capability set saves a named group of Desired Capabilities (e.g. 'Close Permissions/Alerts') that can later be reapplied in one click via Select Capability Set — while Add capability still adds one-off, ungrouped entries to the current session."
+        },
+        {
+          "type": "note",
+          "text": "A typical example: a Capability Set named 'Close Permissions/Alerts' bundling appium:autoGrantPermissions = true (auto-grants Android runtime permission prompts, e.g. camera/contacts/location access) and appium:autoAcceptAlerts = true (auto-accepts native alert/popup dialogs). Applying it before Connect means the scan or TestCase run isn't interrupted by an OS-level permission or alert dialog the automation never expected to see."
+        },
+        {
+          "type": "list",
+          "title": "Wizard controls alongside Connect",
+          "items": [
+            "Run Live View — same LiveView behaviour as the TCP: shows the device's screen updating during the scan.",
+            "Reset application — clears the app's state (e.g. logs it out, clears cached data) before this scan/run starts, useful for reproducible starting conditions.",
+            "Set capabilities — applies whatever Desired Capabilities/Capability Set is currently configured before the connection is established."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Capabilities dialog: Add capability = one-off entry. Add capability set = named, reusable bundle applied via Select Capability Set.",
+        "'Close Permissions/Alerts' is a common bundle: appium:autoGrantPermissions + appium:autoAcceptAlerts, so OS permission/alert popups don't interrupt automation.",
+        "Run Live View and Reset application sit alongside Connect at the bottom of the wizard, independent of the Capabilities dialog."
+      ]
+    },
+    {
+      "sectionTitle": "Scanning a native app",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "What gets captured",
+          "description": "For a native app, each captured control is identified by native accessibility properties — resource-id (Android) or accessibility identifier (iOS), class/type, text/label, and position — the same properties a native Appium-based tool would report. Screens are typically organised into separate Modules mirroring the app's own screen structure."
+        },
+        {
+          "type": "note",
+          "text": "Control identification quality depends heavily on how well the app under test exposes accessibility metadata. A poorly-labelled app (generic resource-ids, no accessibility labels) produces weaker, less stable identification — the mobile equivalent of a web page with no useful CSS selectors or test-ids."
+        }
+      ],
+      "bulletPoints": [
+        "Native scan properties: resource-id/accessibility id, class/type, text/label, position.",
+        "Weakly-labelled apps produce weaker automatic identification — the same failure mode as a poorly-instrumented web page."
+      ]
+    },
+    {
+      "sectionTitle": "Scanning a hybrid app",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Native shell, embedded webview",
+          "description": "A hybrid app wraps one or more web views inside a native shell. From the outside it looks and behaves like a native app, but part or all of its content is actually rendered as HTML/CSS/JS inside an embedded browser engine."
+        },
+        {
+          "type": "concept",
+          "term": "Context switching during scan",
+          "description": "The Mobile Scan needs to know whether it's currently looking at native chrome (the shell's own tab bar, native buttons) or webview content (the embedded HTML). Switching context during scanning is what lets the same scan capture both native controls surrounding the webview and the DOM-based controls inside it, using the appropriate identification strategy for each."
+        },
+        {
+          "type": "warning",
+          "text": "Forgetting to switch context is the most common hybrid-scanning mistake: controls inside the webview simply don't appear to be scanned (because the scan is still in native context), which looks like a broken scan rather than a context problem."
+        }
+      ],
+      "bulletPoints": [
+        "Hybrid = native shell + embedded webview. Switch context explicitly to capture controls on each side correctly.",
+        "'Nothing is scanning inside the webview' almost always means the scan is still in native context."
+      ]
+    },
+    {
+      "sectionTitle": "Scanning mobile web",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The device's own browser, scanned in its device context",
+          "description": "For mobile web, the Mobile Scan opens the target site inside the device's own mobile browser rather than a desktop XBrowser session. This captures the page with the actual mobile viewport, mobile-specific rendering, and touch-driven interaction model — closer to how a real user on that device experiences the site than a desktop browser scan resized to a phone width would be."
+        },
+        {
+          "type": "note",
+          "text": "Scanning mobile web through the Mobile Scan, instead of a resized desktop XBrowser scan, is the recommended approach specifically because it reflects genuine mobile browser behaviour rather than an approximation of it."
+        }
+      ],
+      "bulletPoints": [
+        "Mobile web scan = the site rendered inside the real device browser, not a resized desktop browser."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Reaching for XBrowser to test a web app inside a mobile browser",
+      "trapDescription": "Testing a mobile website with a desktop XBrowser scan resized to a phone viewport.",
+      "bestPractice": "The Mobile Scan supports native, hybrid, and web applications directly — scanning a mobile site through it captures genuine mobile browser behaviour that a resized desktop scan cannot."
+    },
+    {
+      "title": "Not switching context when scanning a hybrid app",
+      "trapDescription": "Trying to scan controls inside a hybrid app's embedded webview while the scan is still in native context, and seeing nothing get captured.",
+      "bestPractice": "Explicitly switch to webview context to capture DOM-based controls inside a hybrid app's embedded content, and back to native context for the surrounding shell chrome."
+    },
+    {
+      "title": "Trusting a successful scan connection as proof the TCP is correct",
+      "trapDescription": "Seeing the Mobile Scan's Add connection dialog connect fine, and assuming the same TMAServer value will work for execution too.",
+      "bestPractice": "The Add connection dialog tolerates a missing trailing slash on TMAServer that execution does not. A successful scan connection does not validate the TCP for execution — check the documented format directly."
+    },
+    {
+      "title": "Skipping the permissions/alerts capabilities and getting stuck on a popup",
+      "trapDescription": "Connecting without setting appium:autoGrantPermissions or appium:autoAcceptAlerts, then watching a scan or TestCase run stall on an Android runtime permission prompt or a native alert dialog it never expected.",
+      "bestPractice": "Apply a Capability Set like 'Close Permissions/Alerts' (autoGrantPermissions + autoAcceptAlerts, both true) before Connect on apps known to prompt for permissions or show alerts on launch — it's cheaper to set once and reuse than to debug a 'stuck' scan that's actually just waiting behind an OS dialog."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What is the correct high-level sequence for running a Mobile Scan?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Write the TestCase first, then scan to fill in the Modules it references."
+        },
+        {
+          "id": "B",
+          "text": "Prepare the test environment, start the Mobile Scan and connect to the device, then add the target device/emulator/simulator and capture controls."
+        },
+        {
+          "id": "C",
+          "text": "Install the app under test through adb, then skip straight to execution."
+        },
+        {
+          "id": "D",
+          "text": "Configure biometrics before any other setup."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Environment and connection come before any control capture.",
+      "rationale": "The Mobile Scan flow is: prepare the test environment, start the scan and connect, add the device/emulator/simulator, then capture controls into Modules — the same general shape as scanning any other Engine, with mobile-specific connection setup first."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "During a scan of a hybrid app, controls visibly present inside the app's embedded content are not being captured. What is the most likely cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The app is actually a native app, not hybrid."
+        },
+        {
+          "id": "B",
+          "text": "The scan is still in native context and needs to be switched to webview context."
+        },
+        {
+          "id": "C",
+          "text": "The device needs to be rebooted."
+        },
+        {
+          "id": "D",
+          "text": "TMA does not support hybrid apps at all."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Native chrome and embedded webview content need different identification strategies.",
+      "rationale": "Hybrid apps mix native shell chrome with an embedded webview. The scan must be explicitly switched to webview context to capture DOM-based controls inside the embedded content — staying in native context means those controls are invisible to the scan."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Why is scanning a mobile website through the Mobile Scan preferred over a desktop XBrowser scan resized to a phone width?",
+      "options": [
+        {
+          "id": "A",
+          "text": "XBrowser cannot render CSS at all."
+        },
+        {
+          "id": "B",
+          "text": "The Mobile Scan renders the site inside the device's actual mobile browser, reflecting genuine mobile viewport and touch behaviour rather than an approximation."
+        },
+        {
+          "id": "C",
+          "text": "Resizing a desktop browser is not technically possible in Tosca."
+        },
+        {
+          "id": "D",
+          "text": "Mobile web can only be scanned on iOS, never Android."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about what's genuinely different between a real mobile browser and a resized desktop one.",
+      "rationale": "The Mobile Scan captures the page as it actually renders in the device's own mobile browser — real mobile viewport, rendering engine, and touch interaction model — which a resized desktop browser only approximates."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A native app's controls are proving difficult to identify reliably during scanning — resource-ids look generic and there are no accessibility labels. What is the likely underlying cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Mobile Engine 3.0 does not support native apps well."
+        },
+        {
+          "id": "B",
+          "text": "The app itself exposes weak accessibility metadata, the mobile equivalent of a web page with no useful CSS selectors or test-ids."
+        },
+        {
+          "id": "C",
+          "text": "The device needs a factory reset."
+        },
+        {
+          "id": "D",
+          "text": "TMA is running an outdated version."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Compare this to identifying a badly-instrumented web page.",
+      "rationale": "Control identification quality depends on the accessibility metadata the app itself exposes — resource-id/accessibility id, class, label. A poorly-labelled app produces weaker automatic identification, mirroring how a web page with no test-ids or meaningful selectors is harder to identify reliably too."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "Which feature in Tosca confirms that mobile testing capabilities are integrated?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Mobile option in Module Scanners"
+        },
+        {
+          "id": "B",
+          "text": "Tricentis Mobile License"
+        },
+        {
+          "id": "C",
+          "text": "CLI connection settings"
+        },
+        {
+          "id": "D",
+          "text": "Scratchbook feature"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Look at where you'd actually trigger a scan from inside Tosca Commander.",
+      "rationale": "The Mobile option appearing among Tosca's Module Scanners — alongside XScan and the other Engine-specific scanners — is what confirms mobile testing capability is present and integrated into Tosca Commander itself. A licence enables the capability but isn't a UI feature you'd point to as confirmation; CLI connection settings and the Scratchbook feature are unrelated to confirming mobile integration."
+    },
+    {
+      "questionId": "Q6",
+      "type": "multi-select",
+      "scenario": "A Capability Set named 'Close Permissions/Alerts' bundles appium:autoGrantPermissions = true and appium:autoAcceptAlerts = true. What does applying this Capability Set achieve? (two correct answers)",
+      "options": [
+        {
+          "id": "A",
+          "text": "Android runtime permission prompts (e.g. camera, location) are automatically granted"
+        },
+        {
+          "id": "B",
+          "text": "Native alert/popup dialogs are automatically accepted"
+        },
+        {
+          "id": "C",
+          "text": "The app under test is automatically reinstalled before every scan"
+        },
+        {
+          "id": "D",
+          "text": "TMAServer is automatically corrected to include a trailing slash"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "hint": "Match each Desired Capability in the bundle to what it literally does.",
+      "rationale": "appium:autoGrantPermissions auto-grants Android runtime permission prompts, and appium:autoAcceptAlerts auto-accepts native alert dialogs — together they stop a scan or TestCase run from stalling on an OS-level popup it wasn't built to handle. Neither capability touches app reinstallation or the TMAServer TCP value."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "In the Mobile Scan wizard's Capabilities dialog, what is the difference between Add capability and Add capability set?",
+      "options": [
+        {
+          "id": "A",
+          "text": "There is no difference — both do the same thing."
+        },
+        {
+          "id": "B",
+          "text": "Add capability adds a single one-off entry for this session; Add capability set saves a named, reusable bundle that can be reapplied later via Select Capability Set."
+        },
+        {
+          "id": "C",
+          "text": "Add capability set only works with Remote (TMA) connections."
+        },
+        {
+          "id": "D",
+          "text": "Add capability is for Android; Add capability set is for iOS."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "One is a single entry, the other is a saved, named group.",
+      "rationale": "Add capability adds one Desired Capability to the current session only. Add capability set groups multiple capabilities under a name (like 'Close Permissions/Alerts') that can be reapplied in one click via Select Capability Set on a future scan or connection, instead of re-entering each capability every time."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "In the capabilities section, what does the \"Auto Accept Alerts\" feature do?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Grants permission to apps automatically"
+        },
+        {
+          "id": "B",
+          "text": "Allows manual interaction with alerts"
+        },
+        {
+          "id": "C",
+          "text": "Automates handling of pop-ups and alerts"
+        },
+        {
+          "id": "D",
+          "text": "Connects devices to the Tosca interface"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "It's the alert-handling capability, not the permissions one — those are two separate settings.",
+      "rationale": "Auto Accept Alerts (appium:autoAcceptAlerts) automates handling of native pop-ups and alert dialogs so they don't block execution. Granting app permissions automatically is the separate autoGrantPermissions capability; neither one is about manual interaction or device connection."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "Which of the following best describes the role of additional Appium capabilities in mobile test automation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "They provide additional security layers for mobile testing"
+        },
+        {
+          "id": "B",
+          "text": "They are used only for real device automation, not emulators"
+        },
+        {
+          "id": "C",
+          "text": "They define key-value pairs to customize and control the test environment"
+        },
+        {
+          "id": "D",
+          "text": "They function only within iOS automation workflows"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Look at the shape of a capability entry itself, not at what any single one happens to do.",
+      "rationale": "A Desired Capability is a key-value pair handed to the Appium session at creation time to shape how that session behaves — autoGrantPermissions, autoAcceptAlerts, platformVersion, printPageSourceOnFindFailure, and so on. Nothing about the mechanism is security-specific, platform-specific, or restricted to real devices: the same capabilities apply to emulators and simulators, on Android and iOS alike."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "In the Mobile Scan configuration window of Tricentis Tosca Mobile, where can additional Appium capabilities be added?",
+      "options": [
+        {
+          "id": "A",
+          "text": "In the Set Capabilities section"
+        },
+        {
+          "id": "B",
+          "text": "In the Test Execution tab"
+        },
+        {
+          "id": "C",
+          "text": "In the Connection Preferences menu"
+        },
+        {
+          "id": "D",
+          "text": "In the TestStep Properties panel"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "It sits in the scan wizard itself, below device and app selection — before you hit Connect.",
+      "rationale": "Set capabilities in the Mobile Scan configuration window opens the Capabilities dialog, where individual capabilities are added and Capability Sets are saved or reapplied. It has to happen there because capabilities are handed to the Appium session at creation time — that is, before Connect. The other three either don't exist as named places in the scan window or belong to a different part of Tosca entirely."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Scan flow",
+      "value": "Prepare environment → start Mobile Scan → connect device → capture controls into Modules."
+    },
+    {
+      "key": "Native scan properties",
+      "value": "resource-id / accessibility id, class/type, text/label, position."
+    },
+    {
+      "key": "Hybrid apps",
+      "value": "Native shell + embedded webview — switch context explicitly to capture controls on each side."
+    },
+    {
+      "key": "Hybrid gotcha",
+      "value": "'Nothing scans inside the webview' almost always means the scan is still in native context."
+    },
+    {
+      "key": "Mobile web",
+      "value": "Scanned inside the device's real mobile browser — reflects genuine mobile viewport/touch behaviour, unlike a resized desktop scan."
+    },
+    {
+      "key": "Add connection dialog",
+      "value": "More forgiving than execution about the TMAServer trailing slash — a successful scan connection doesn't validate the TCP for execution."
+    },
+    {
+      "key": "Capabilities dialog",
+      "value": "Add capability = one-off entry. Add capability set = named, reusable bundle, reapplied via Select Capability Set."
+    },
+    {
+      "key": "Close Permissions/Alerts example",
+      "value": "appium:autoGrantPermissions + appium:autoAcceptAlerts (both true) — stops OS permission/alert popups from interrupting a scan or run."
+    },
+    {
+      "key": "Other wizard controls",
+      "value": "Run Live View (live screen feed) · Reset application (clears app state before this run) · Set capabilities (applies configured capabilities before Connect)."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Mobile Engine 3.0 (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Get started with mobile test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "duration": "docs"
+    }
+  ]
+}

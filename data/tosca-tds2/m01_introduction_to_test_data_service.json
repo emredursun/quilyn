@@ -1,0 +1,168 @@
+{
+  "moduleId": "TDS2-M01",
+  "moduleTitle": "Theory Lesson - Introduction to Test Data Service",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+  "learningObjectives": [
+    "Define the core TDS terms: repository, TDS type, test record, and Status column.",
+    "Describe how Tosca Commander and TDS communicate once connected.",
+    "Trace a multi-step TestCase flow through TDS using a worked example.",
+    "Preview the DemoWebShop order-process scenario used throughout the rest of this course."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Core TDS terminology",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Test Data Service (TDS)",
+          "description": "A server-based application with a web-based portal that displays test data in a table-like structure. This web page is called the Test Data Management page, or the Test Data Object Viewer, and can be reached from any browser by typing the right endpoint request."
+        },
+        {
+          "type": "list",
+          "title": "Repository → Type → Record → Status",
+          "items": [
+            "TDS repository — the name given to the database itself.",
+            "TDS type — clicking into a repository shows its types: the categories that group records, e.g. CustomerDetails or SampleOfOrders.",
+            "Test record — an individual row / data entry within a TDS type.",
+            "Status column — shows what state a given record is in after a TestCase has touched it."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Repository = the database. Type = a table/category inside it. Record = one row. Status = that row's current state."
+      ]
+    },
+    {
+      "sectionTitle": "How Tosca Commander and TDS talk to each other",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The connection",
+          "description": "Before any of this works, a connection must be established between Tosca Commander and Test Data Service through installation and configuration (covered in Lesson 1). Once set up, TestCases in Tosca are built to specify what should happen to the test data — the common functions being create, find, update, and delete. TDS Standard Modules exist specifically to perform these functions quickly."
+        },
+        {
+          "type": "concept",
+          "term": "The request/response flow",
+          "description": "When a TestCase runs, Tosca Commander instructs the SUT what to do, and simultaneously exchanges a series of endpoint requests with TDS — creating, finding, updating, or deleting records as needed. Every change is reflected back in the TDS repository's table-like view."
+        },
+        {
+          "type": "concept",
+          "term": "Worked example: profile → file → upload",
+          "description": "A 3-step process — create a user profile, create a file, upload the file — becomes 3 separate TestCases: (1) create a new user account, which shows up as a new entry in the TDS repository; (2) find/retrieve that account's data from TDS, log into the website with it, and create the file — the record is then updated to a new state in TDS; (3) retrieve the newly created file's data and use it to upload the file — the record is updated again to reflect that."
+        },
+        {
+          "type": "concept",
+          "term": "An analogy for the three roles",
+          "description": "Tosca works like the project Manager, sending requests for what needs to be done. TDS plays two roles: the Reporter, giving a clear overview of project status, and the Document Controller, storing all the relevant documents (test records) under the right categories (types)."
+        },
+        {
+          "type": "note",
+          "text": "These steps are interlinked and can't be tested independently — you can't upload a file before the user profile and the file itself exist. In a distributed environment, TDS lets you lock data (like a newly created file) for exclusive use in your TestCase, so no one else can grab it mid-flow. Locking is covered in depth in Lesson 2."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "This course's scenario: the DemoWebShop order process",
+      "elements": [
+        {
+          "type": "list",
+          "title": "The customer journey we'll build TestCases around",
+          "items": [
+            "1. Registering a new customer",
+            "2. Adding an address",
+            "3. Adding items into the shopping cart",
+            "4. Purchasing those items",
+            "5. Processing the payment",
+            "6. Processing the purchase order"
+          ]
+        },
+        {
+          "type": "note",
+          "text": "We'll also test cancelling an order and deleting its data record. TDS Standard Modules drive every step, and each TestCase's results are reflected in the TDS repository as it runs."
+        },
+        {
+          "type": "concept",
+          "term": "How the repository evolves through the process",
+          "description": "1) Adding an address moves a customer's Status from New to Active. 2) Adding items to the cart populates an 'items' column with the count. 3) Purchasing items creates an OrderNumber column and sets OrderStatus to Pending. 4) The payment is processed through non-UI commands, moving the backend status from Pending to Processing. 5) That change is then reflected in the TDS repository's OrderStatus field, Pending → Processing. 6) Once the order is fully completed, its Test Records are moved into a new TDS type called 'Used'."
+        }
+      ],
+      "bulletPoints": [
+        "This lesson has no exercises — it's the conceptual map for every hands-on lesson that follows.",
+        "Watch for the same pattern throughout the course: an action happens → a Status or column updates → eventually the record moves to a new type once fully consumed."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Mixing up TDS type and test record",
+      "trapDescription": "Referring to an individual row of data as a 'TDS type', or a category like CustomerDetails as a 'record'.",
+      "bestPractice": "TDS type is the category/table (e.g. CustomerDetails). A test record is a single row within that type. Keep the hierarchy straight: repository → type → record."
+    },
+    {
+      "title": "Assuming steps in a chained scenario can be tested independently",
+      "trapDescription": "Trying to test 'upload a file' on its own, without first creating the user profile and the file it depends on.",
+      "bestPractice": "Interlinked, stateful steps must be tested in their dependency order — later steps rely on data created by earlier ones being available (and not yet consumed by someone else)."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "In TDS terminology, what does a 'TDS type' represent?",
+      "options": [
+        { "id": "A", "text": "An individual row of test data." },
+        { "id": "B", "text": "A category of test records within a repository, e.g. CustomerDetails or SampleOfOrders." },
+        { "id": "C", "text": "The name of the entire database." },
+        { "id": "D", "text": "The current state of one record, such as New or Active." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Think of the repository as the database, and the type as a table inside it.",
+      "rationale": "A TDS type groups test records into categories (like CustomerDetails). A repository is the database itself; a record is one row within a type; Status describes a record's current state."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "Using the analogy from this lesson, which role does Test Data Service play alongside Tosca acting as the 'Manager'?",
+      "options": [
+        { "id": "A", "text": "The Developer, writing the application code." },
+        { "id": "B", "text": "The Reporter and Document Controller — giving status visibility and storing records under the right categories." },
+        { "id": "C", "text": "The End User, consuming the finished application." },
+        { "id": "D", "text": "TDS plays no distinct role in this analogy." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "TDS gives an overview of project status AND organizes documents (records) by category.",
+      "rationale": "Tosca sends requests like a Manager; TDS plays the Reporter (status overview) and Document Controller (storing records/documents under the correct categories/types) roles."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "After a DemoWebShop customer purchases items in this course's scenario, what happens in the TDS repository?",
+      "options": [
+        { "id": "A", "text": "The customer's Status changes from New to Active." },
+        { "id": "B", "text": "An OrderNumber column is created and OrderStatus is set to Pending." },
+        { "id": "C", "text": "The record is immediately moved to the 'Used' TDS type." },
+        { "id": "D", "text": "Nothing changes until the order is fully completed." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "This happens right after purchasing, before payment is processed.",
+      "rationale": "Purchasing items creates an OrderNumber column and sets OrderStatus to Pending. Status New→Active happens earlier (address step); the move to 'Used' happens only once the whole order is completed."
+    }
+  ],
+  "quickRecap": [
+    { "key": "TDS repository", "value": "The database itself." },
+    { "key": "TDS type", "value": "A category of records within a repository (e.g. CustomerDetails)." },
+    { "key": "Test record", "value": "One row/data entry within a TDS type." },
+    { "key": "Status column", "value": "The current state of a record after a TestCase touches it." },
+    { "key": "Roles analogy", "value": "Tosca = Manager (sends requests). TDS = Reporter + Document Controller (status + storage)." },
+    { "key": "Course scenario", "value": "DemoWebShop order process: register → address → cart → purchase → payment → process order (+ cancel/delete)." },
+    { "key": "Final state", "value": "Once an order fully completes, its records move to a new TDS type ('Used')." }
+  ],
+  "topics": [
+    {
+      "title": "Theory Lesson - Introduction to Test Data Service (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+      "duration": "video"
+    }
+  ]
+}

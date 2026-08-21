@@ -1,0 +1,444 @@
+{
+  "moduleId": "AE1-M10",
+  "moduleTitle": "Lesson 9 - Mobile Engine",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+  "learningObjectives": [
+    "Explain what the Tricentis Mobile Agent provides and what setup burden it removes.",
+    "Distinguish Local (TMA) from Remote (TMA) connections.",
+    "Prepare an Android device for test automation.",
+    "Scan a mobile application and build a TestCase, starting with the mandatory Open Mobile App TestStep.",
+    "Configure a remote TMA correctly — including the TMAServer trailing slash and the --rest-address startup flag.",
+    "Diagnose mobile setup failures by separating device-side problems from Tosca-side ones."
+  ],
+  "estTime": "40 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "The Tricentis Mobile Agent",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "What TMA does for you",
+          "description": "Mobile automation traditionally means assembling a toolchain — Appium, Java components, environment variables, device drivers — before a single test can run. The Tricentis Mobile Agent (TMA) provides simplified setup and configuration of iOS and Android devices so that none of that is your problem: you do not need to install Appium, Java components, or configure environment variables yourself."
+        },
+        {
+          "type": "concept",
+          "term": "Mobile Engine 3.0",
+          "description": "The Engine that steers mobile applications, working through the Mobile Agent. As with every Engine 3.0, once Modules exist the TestCase-building workflow is the familiar one — the mobile-specific work is all in the connection and scanning setup."
+        }
+      ],
+      "bulletPoints": [
+        "TMA = the setup layer. Mobile Engine 3.0 = the steering layer.",
+        "No manual Appium / Java / environment-variable configuration required."
+      ]
+    },
+    {
+      "sectionTitle": "Local vs Remote connections",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Local (TMA)",
+          "description": "Connects a device to the workstation running Tricentis Tosca — via USB cable, or to a simulator or emulator running on that same machine. This is the typical setup while developing tests, and what the course exercises use."
+        },
+        {
+          "type": "concept",
+          "term": "Remote (TMA)",
+          "description": "A remotely installed Tricentis Mobile Agent connects to a remote device, emulator, or simulator. This is what you use when the device farm lives elsewhere — a shared lab, a CI environment, or cloud-hosted devices."
+        },
+        {
+          "type": "note",
+          "text": "The choice is a configuration matter, not a different way of writing tests. The same TestCase can run against a locally attached phone or a remote one; only the connection configuration changes."
+        }
+      ],
+      "bulletPoints": [
+        "Local (TMA) = device/emulator on the Tosca workstation, USB or local simulator.",
+        "Remote (TMA) = remotely installed agent reaching a remote device."
+      ]
+    },
+    {
+      "sectionTitle": "Preparing an Android device",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Android prerequisites",
+          "items": [
+            "On the device, allow access to phone data when prompted.",
+            "Enable USB debugging: Settings → Developer options → USB debugging.",
+            "Ensure the USB driver for that device is installed on the computer."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "USB debugging is the step most often missed. Without it the device may charge and appear in Windows, yet remain invisible to the Mobile Agent — the symptom looks like a Tosca problem but is a device configuration one."
+        }
+      ],
+      "bulletPoints": [
+        "Allow data access · enable USB debugging · install the USB driver."
+      ]
+    },
+    {
+      "sectionTitle": "Scanning and building the TestCase",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Mobile Scan",
+          "description": "The Mobile Scan handles native, hybrid, and web applications on mobile. The sequence is: prepare the test environment, start the Mobile Scan and connect to your device, then add the mobile device, emulator, or simulator you want to scan against. From there, scanning produces Modules the same way it does for any other technology."
+        },
+        {
+          "type": "concept",
+          "term": "Configuring the connection with TCPs",
+          "description": "The connection to a device, emulator, or simulator is established through test configuration parameters. This is the same TCP mechanism used elsewhere in Tosca — for the TestDataService endpoint, for SelfHealing — so the scoping rules you already know apply."
+        },
+        {
+          "type": "concept",
+          "term": "Open Mobile App must come first",
+          "description": "Drag and drop the Open Mobile App Module onto the TestCase — and note the constraint: it must be the first TestStep of the TestCase. Nothing can be steered on the device until the application has been opened through this Module."
+        },
+        {
+          "type": "note",
+          "text": "This mirrors the Excel lesson's mandatory TBox Open Excel Workbook first step. A recurring pattern across AE1: engines that attach to an external resource require an explicit open step before anything else in the TestCase."
+        },
+        {
+          "type": "list",
+          "title": "The Mobile Modules in the AE1 workspace (Standard modules → TBox XEngines → Mobile)",
+          "items": [
+            "Open Mobile App — mandatory first TestStep. Switch Mobile App moves between apps mid-test.",
+            "Set Desired Capabilities — configures the Appium capabilities for the session.",
+            "Click On Screen · Swipe On Screen · Draw On Screen — coordinate-based gestures for when no control is addressable.",
+            "Send Text Input To Focused Control · Set Autohide Keyboard — text entry and keyboard behaviour.",
+            "ME3.0 Hardware Button Operations · ME3.0 Set Device Orientation — physical buttons and rotating the device.",
+            "Upload File to Mobile Device · Download File from Mobile Device — moving files on and off the device.",
+            "Get Appium Session Id · End Appium Session — session lifecycle control.",
+            "Android Snackbar — steers the Android transient message component.",
+            "Biometrics: Use Android fingerprint authentication · Use iOS biometric authentication · Set iOS biometrics enrollment · Use Perfecto biometrics authentication · Handle Perfecto Image Injection."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "📄 Official Tricentis Academy exercise material for this lesson is not redistributed here — complete the exercises inside the official course. This lesson requires a physical device, emulator, or simulator, so check that prerequisite first."
+        }
+      ],
+      "bulletPoints": [
+        "Mobile Scan covers native, hybrid AND web mobile applications.",
+        "Connection is configured through TCPs.",
+        "Open Mobile App = mandatory first TestStep."
+      ]
+    },
+    {
+      "sectionTitle": "Real-world setup notes: running TMA on a separate machine",
+      "elements": [
+        {
+          "type": "warning",
+          "text": "The TMAServer TCP value MUST end with a trailing slash: http://<ip>:8585/ — not http://<ip>:8585. Without it, execution fails with the misleading message 'Could not create TMA session: Ensure that the requested device is connected.' The cause is that TMA's REST base path is /api and Tosca appends onto the TMAServer value, so a missing slash produces a broken URL and the request never leaves Tosca."
+        },
+        {
+          "type": "note",
+          "text": "What makes this trap so confusing: the Mobile Scan wizard's Add connection dialog tolerates the missing slash, so scanning works perfectly while TestCase execution fails. Seeing Scan succeed naturally leads you to rule out the connection — and look everywhere except the one value that is wrong."
+        },
+        {
+          "type": "concept",
+          "term": "Remote TMA must be started with --rest-address",
+          "description": "Launching TMA from the tray icon or Start Menu starts it for LOCAL use only. When Tosca and TMA run on different machines, start the agent from the command line with the --rest-address flag: tricentis-mobile-agent start --rest-address <IP>:<port>. On Windows the executable lives under C:\\Program Files\\Tricentis\\Mobile Agent; on macOS inside /Applications/Tricentis Mobile Agent.app."
+        },
+        {
+          "type": "concept",
+          "term": "Diagnosing device-side vs Tosca-side problems",
+          "description": "TMA exposes a REST endpoint you can query directly: http://<ip>:<port>/api/devices returns JSON with each device's udid, name, connected, busy and statusReady fields. If that shows connected:true and busy:false, the device side is healthy and the fault is on Tosca's side — which saves you from chasing firewall, proxy, and network theories."
+        },
+        {
+          "type": "steps",
+          "title": "Getting AppPackage and AppActivity for an installed Android app",
+          "items": [
+            "Open the app on the device or emulator so it is the foreground window.",
+            "Run: adb shell dumpsys window | grep mCurrentFocus (use findstr instead of grep on Windows).",
+            "The output ends with packagename/activityname — put the part before the slash in AppPackage and the part after it in AppActivity.",
+            "Leave Application, BundleID, and Application Path empty when the app is already installed; those are for installing from an APK file."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Where is adb? It ships with TMA — on Windows under C:\\Program Files\\Tricentis\\Mobile Agent\\app\\android-sdk\\platform-tools, and with Android Studio under ~/Library/Android/sdk/platform-tools on macOS. You do not need a separate Android SDK install just for adb."
+        },
+        {
+          "type": "concept",
+          "term": "Emulators must run on the same machine as TMA",
+          "description": "Tricentis recommends Android Studio for emulators, and the emulator has to run on the machine running TMA. That constraint drives the whole topology: if Tosca Commander runs in a VM but the emulator runs on the host, then TMA belongs on the host alongside the emulator, and Tosca connects to it remotely."
+        },
+        {
+          "type": "warning",
+          "text": "The Android Emulator does not exist for Windows on ARM. Google publishes no ARM64 Windows emulator package, so the SDK Manager never lists it and AVD creation fails with 'Dependant package with key emulator not found'. On an ARM Windows VM the only paths are a physical device, or running the emulator on the host machine with TMA beside it."
+        },
+        {
+          "type": "list",
+          "title": "Device-side gotchas that look like Tosca problems",
+          "items": [
+            "Samsung Auto Blocker (One UI 6+) greys out USB debugging. Turn it off under Settings → Security and privacy → Auto Blocker.",
+            "The exercise step 'Disable permission monitoring' no longer exists in Developer options on many current Android builds — it is absent from Tricentis' own Android prerequisites too, so it is safe to skip.",
+            "Installing an APK can fail with INSTALL_PARSE_FAILED_NO_CERTIFICATES on newer Android versions when the APK carries only an old v1 signature. Re-sign it with the SDK's apksigner using a debug keystore, then install the signed copy.",
+            "TMA is documented as supported on bare-metal hardware only, not virtual machines. It may still work in a VM, but you are outside supported territory when it misbehaves."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "TMAServer needs the trailing slash — Scan tolerates its absence, execution does not.",
+        "Remote TMA: start with --rest-address, not from the tray.",
+        "GET /api/devices proves whether the device side is healthy.",
+        "No Android Emulator exists for Windows on ARM."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Placing Open Mobile App anywhere other than first",
+      "trapDescription": "Adding navigation or verification TestSteps before the Open Mobile App Module.",
+      "bestPractice": "Open Mobile App must be the first TestStep of the TestCase. Nothing on the device can be steered before the application has been opened through it — the same pattern as TBox Open Excel Workbook in the Excel lesson."
+    },
+    {
+      "title": "Assuming Appium must be installed and configured manually",
+      "trapDescription": "Setting up Appium, Java components, and environment variables before starting mobile automation in Tosca.",
+      "bestPractice": "The Tricentis Mobile Agent exists precisely to remove that work — it provides simplified setup and configuration of iOS and Android devices without requiring you to install Appium or Java components or configure environment variables."
+    },
+    {
+      "title": "Forgetting to enable USB debugging on the Android device",
+      "trapDescription": "Connecting the phone by USB, seeing it recognised by Windows, and concluding the device is ready.",
+      "bestPractice": "The device must have USB debugging enabled under Settings → Developer options, must allow access to phone data, and the USB driver must be installed on the computer. Without USB debugging the Mobile Agent cannot reach the device."
+    },
+    {
+      "title": "Thinking Remote (TMA) requires different TestCases",
+      "trapDescription": "Rebuilding TestCases when moving from a locally attached device to a remote device farm.",
+      "bestPractice": "Local and Remote (TMA) differ in connection configuration only. The same TestCase runs against either; only the configuration pointing at the agent and device changes."
+    },
+    {
+      "title": "Assuming Mobile Scan only handles native apps",
+      "trapDescription": "Reaching for the XBrowser Engine to test a web application running in a mobile browser.",
+      "bestPractice": "The Mobile Scan supports native, hybrid, and web applications on mobile. Scanning a mobile web app through the Mobile Scan gives you the device context that a desktop browser scan cannot."
+    },
+    {
+      "title": "Omitting the trailing slash from the TMAServer TCP",
+      "trapDescription": "Entering http://<ip>:8585 as the TMAServer value, watching the Mobile Scan connect perfectly, then getting 'Could not create TMA session: Ensure that the requested device is connected' on every execution — and concluding the device or the network is at fault.",
+      "bestPractice": "TMAServer must end with a trailing slash: http://<ip>:8585/. Tosca appends onto that value to reach TMA's /api base path. Verify a connection value against the documented format before investigating firewall, proxy, or device theories — the Add connection dialog accepts a value that execution will reject."
+    },
+    {
+      "title": "Starting a remote Mobile Agent from the tray icon",
+      "trapDescription": "Launching TMA normally on a second machine, seeing its console load in the browser from the Tosca machine, and assuming remote connection is fully enabled.",
+      "bestPractice": "For Tosca and TMA on different machines, start the agent with tricentis-mobile-agent start --rest-address <IP>:<port>. The console being reachable is not proof that the agent is running in remote mode."
+    },
+    {
+      "title": "Trying to run an Android emulator inside a Windows-on-ARM VM",
+      "trapDescription": "Installing Android Studio in an ARM Windows VM and hunting for the missing 'Android Emulator' SDK package after AVD creation fails.",
+      "bestPractice": "Google ships no Android Emulator for Windows on ARM — the package genuinely does not exist for that platform. Run the emulator on the host machine with TMA installed alongside it, and connect Tosca to that agent remotely."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Which Module must be the first TestStep of a mobile TestCase?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Connect to Mobile Agent"
+        },
+        {
+          "id": "B",
+          "text": "Open Mobile App"
+        },
+        {
+          "id": "C",
+          "text": "Mobile Scan"
+        },
+        {
+          "id": "D",
+          "text": "Any Module — the order is unconstrained."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The same 'open before you touch anything' pattern as the Excel lesson.",
+      "rationale": "You drag and drop the Open Mobile App Module onto the TestCase, and it must be the first TestStep. Nothing on the device can be steered until the application has been opened."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "What does the Tricentis Mobile Agent remove the need to do?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Writing TestCases — TMA generates them automatically."
+        },
+        {
+          "id": "B",
+          "text": "Installing Appium and Java components, and configuring environment variables."
+        },
+        {
+          "id": "C",
+          "text": "Enabling USB debugging on the device."
+        },
+        {
+          "id": "D",
+          "text": "Scanning the mobile application."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "It removes toolchain setup, not device setup or test authoring.",
+      "rationale": "TMA provides simplified setup and configuration of iOS and Android devices so you do not need to install Appium or Java components or configure environment variables. Device-side steps like USB debugging, and the scanning and authoring work, still apply."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "An Android phone is connected by USB and is visible in Windows, but the Mobile Agent cannot see it. What is the most likely cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "USB debugging has not been enabled under Settings → Developer options."
+        },
+        {
+          "id": "B",
+          "text": "The phone needs a Tosca licence."
+        },
+        {
+          "id": "C",
+          "text": "Only iOS devices are supported."
+        },
+        {
+          "id": "D",
+          "text": "Remote (TMA) must be used for all physical devices."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Windows recognising the device is not the same as the device permitting automation.",
+      "rationale": "Android preparation requires allowing access to phone data, enabling USB debugging under Settings → Developer options, and having the USB driver installed. A device can charge and be recognised by Windows while still refusing debugging access."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What is the difference between Local (TMA) and Remote (TMA)?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Local supports Android only; Remote supports iOS only."
+        },
+        {
+          "id": "B",
+          "text": "Local connects a device, emulator or simulator to the workstation running Tosca; Remote uses a remotely installed Mobile Agent to reach a remote device."
+        },
+        {
+          "id": "C",
+          "text": "Local is for scanning, Remote is for execution."
+        },
+        {
+          "id": "D",
+          "text": "Remote TestCases must be written differently from Local ones."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The distinction is where the agent and the device live, not what they support.",
+      "rationale": "Local (TMA) connects a device via USB, or a simulator/emulator, to the workstation running Tosca. Remote (TMA) uses a remotely installed Mobile Agent to connect to a remote device, emulator or simulator. It is a configuration difference — the TestCases themselves are unchanged."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "Which application types can the Mobile Scan handle?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Native applications only."
+        },
+        {
+          "id": "B",
+          "text": "Native and hybrid applications only."
+        },
+        {
+          "id": "C",
+          "text": "Native, hybrid, and web applications."
+        },
+        {
+          "id": "D",
+          "text": "Web applications only — native apps require a custom control."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "It covers the full range of what runs on a phone.",
+      "rationale": "The Mobile Scan supports scanning native, hybrid, and web applications, after the test environment has been prepared and the device, emulator or simulator has been connected."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Tricentis Mobile Agent (TMA)",
+      "value": "Simplified iOS/Android setup — no manual Appium, Java components, or environment variables."
+    },
+    {
+      "key": "Local (TMA)",
+      "value": "Device via USB, or simulator/emulator, on the Tosca workstation."
+    },
+    {
+      "key": "Remote (TMA)",
+      "value": "Remotely installed agent connecting to a remote device/emulator/simulator."
+    },
+    {
+      "key": "Android prep",
+      "value": "Allow phone data access · Settings → Developer options → USB debugging · USB driver installed."
+    },
+    {
+      "key": "Mobile Scan",
+      "value": "Handles native, hybrid, and web mobile applications; prepare environment → start scan → connect device."
+    },
+    {
+      "key": "Connection config",
+      "value": "Established through test configuration parameters (TCPs)."
+    },
+    {
+      "key": "Open Mobile App",
+      "value": "MUST be the first TestStep of the TestCase."
+    },
+    {
+      "key": "TMAServer TCP format",
+      "value": "http://<ip>:<port>/ — the TRAILING SLASH is required. Without it, Scan works but execution fails."
+    },
+    {
+      "key": "Remote agent startup",
+      "value": "tricentis-mobile-agent start --rest-address <IP>:<port> — the tray launch is local-only."
+    },
+    {
+      "key": "Device health check",
+      "value": "GET http://<ip>:<port>/api/devices → JSON with udid, name, connected, busy, statusReady."
+    },
+    {
+      "key": "AppPackage / AppActivity",
+      "value": "adb shell dumpsys window | grep mCurrentFocus → package/activity. Leave Application and Path empty for installed apps."
+    },
+    {
+      "key": "Emulator placement",
+      "value": "Must run on the same machine as TMA. No Android Emulator exists for Windows on ARM."
+    },
+    {
+      "key": "Android device gotchas",
+      "value": "Samsung Auto Blocker greys out USB debugging · 'Disable permission monitoring' often absent and not required · old v1-signed APKs need re-signing with apksigner."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 09 - Mobile Engine",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+      "duration": "video"
+    },
+    {
+      "title": "Get started with mobile test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2024.2/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Configure local or remote test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/configure_mobile_local_remote_tests.htm",
+      "duration": "docs"
+    }
+  ]
+}

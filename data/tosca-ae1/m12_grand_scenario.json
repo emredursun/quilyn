@@ -1,0 +1,268 @@
+{
+  "moduleId": "AE1-M12",
+  "moduleTitle": "Grand Scenario - Demo Web Shop",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+  "learningObjectives": [
+    "Structure an end-to-end scenario using the Precondition / Process / Post condition pattern.",
+    "Extract shared steps into a TestStepLibrary as a reusable TestStep block.",
+    "Buffer a value produced at runtime and consume it in a later TestStep.",
+    "Combine web automation with the PDF Engine in a single business flow."
+  ],
+  "estTime": "40 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "What the Grand Scenario is for",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "From isolated lessons to one business process",
+          "description": "Each preceding lesson exercised one engine on its own. The Grand Scenario is the capstone that puts them together: a complete Demo Web shop purchase, from logging in through ordering a book and paying on delivery, to downloading the PDF invoice and logging out. It is the exercise that shows why the engines matter — a real process crosses technologies, and the test has to cross them too."
+        },
+        {
+          "type": "note",
+          "text": "The Modules for this scenario arrive pre-scanned in the base subset, under Modules → Grand Scenario - Demo web shop, grouped as Login, Navigation elements, Products, and Checkout process. You are building TestCases, not scanning the shop from scratch."
+        }
+      ],
+      "bulletPoints": [
+        "The capstone: one business flow, several engines, structured properly."
+      ]
+    },
+    {
+      "sectionTitle": "Precondition / Process / Post condition",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Why the scenario is split into three",
+          "description": "The TestCases folder for the Grand Scenario is organised into Precondition, Process, and Post condition. This separation is a test-design discipline, not a Tosca requirement: the Precondition establishes the state the real test needs, the Process is the behaviour actually under test, and the Post condition returns the system to a clean state so the next run starts from the same place."
+        },
+        {
+          "type": "list",
+          "title": "The three TestCases",
+          "items": [
+            "Precondition — 'Login to web shop': gets a logged-in session, then verifies the login succeeded.",
+            "Process — 'Order fiction book and pay on delivery': the business flow being tested.",
+            "Post condition — 'Logout from the web shop': logs out, verifies the logout, and closes the browser instance."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Note the Post condition does three things, not one: log out, verify the logout worked, and close the browser instance. Leaving the browser open is the classic omission that makes the next run behave unpredictably."
+        }
+      ],
+      "bulletPoints": [
+        "Precondition = get to the starting state. Process = what is under test. Post condition = clean up and verify the cleanup."
+      ]
+    },
+    {
+      "sectionTitle": "Reuse: the TestStepLibrary",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The 'Login to web shop' reusable block",
+          "description": "Logging in is needed by the Precondition and would be needed by any other scenario against the same shop. Rather than duplicating those steps, the scenario keeps a TestStepLibrary containing a reusable TestStep block named 'Login to web shop', made up of three steps: Open demo web shop, Click on log in link, and Provide log in details."
+        },
+        {
+          "type": "concept",
+          "term": "Why this matters beyond tidiness",
+          "description": "A reusable block is maintained in one place. When the shop changes its login page, one block is updated and every TestCase referencing it is fixed at once — the same centralised-maintenance argument behind Classes in TDS1 and Libraries in the TestCase section. The Precondition TestCase then consists of the reused block plus its own 'Verify successful login' step."
+        },
+        {
+          "type": "note",
+          "text": "Observe the division of labour: the reusable block performs the actions; the TestCase that uses it owns the verification. Keeping the assertion outside the shared block lets different callers verify different things."
+        }
+      ],
+      "bulletPoints": [
+        "TestStepLibrary → reusable TestStep block 'Login to web shop' (open · click log in · provide details).",
+        "The block acts; the calling TestCase verifies."
+      ]
+    },
+    {
+      "sectionTitle": "The Process TestCase, step by step",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Three TestStep folders",
+          "description": "'Order fiction book and pay on delivery' is itself divided into three TestStep folders, which keeps a long flow readable and makes a failure immediately locatable to a phase of the process."
+        },
+        {
+          "type": "steps",
+          "title": "Navigation to product",
+          "items": [
+            "Navigate to books section",
+            "Click on show details for fiction",
+            "Add fiction book to cart",
+            "Navigate to shopping cart"
+          ]
+        },
+        {
+          "type": "steps",
+          "title": "Check out process",
+          "items": [
+            "Accept terms of service and proceed to checkout",
+            "Add billing address",
+            "Update shipping address",
+            "Select shipping method",
+            "Select payment method",
+            "Confirm payment information",
+            "Confirm payment method"
+          ]
+        },
+        {
+          "type": "steps",
+          "title": "Verification of order creation",
+          "items": [
+            "Verify order and buffer order no",
+            "Navigate to order details page",
+            "Download PDF Invoice"
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Grouping TestSteps into folders turns a 14-step flow into three readable phases."
+      ]
+    },
+    {
+      "sectionTitle": "The two techniques that make it work",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Buffering the order number",
+          "description": "The step 'Verify order and buffer order no' does two jobs at once: it verifies the order was created, and it buffers the order number the shop generated. That number cannot be known in advance — it only exists at runtime — so it is captured into a buffer and then used by the following steps to navigate to the correct order details page. This is the standard Tosca answer to 'the application generated a value and I need it later'."
+        },
+        {
+          "type": "concept",
+          "term": "Crossing into the PDF Engine",
+          "description": "'Download PDF Invoice' is where the scenario leaves the browser. The invoice produced by the checkout is a PDF, and verifying it is exactly the PDF Engine work from Lesson 2 — scanning the document, using anchors to locate values that shift with content, and comparing against a reference while excluding the volatile parts such as the order number and date."
+        },
+        {
+          "type": "note",
+          "text": "This is the moment the course's argument lands. The order number is dynamic, so it must be buffered rather than hard-coded; the invoice is a PDF, so the browser engine alone cannot verify it; and the whole thing is one TestCase because TBox lets engines mix freely. Every lesson in AE1 exists to make this single flow testable."
+        },
+        {
+          "type": "note",
+          "text": "📄 Official Tricentis Academy exercise material for this scenario is not redistributed here — build it inside the official course using the pre-scanned Modules supplied in the base subset."
+        }
+      ],
+      "bulletPoints": [
+        "Runtime-generated values → buffer them, never hard-code.",
+        "The PDF invoice step is where web automation hands over to the PDF Engine."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Putting login steps inside the Process TestCase",
+      "trapDescription": "Building one long TestCase that logs in, orders, and logs out, because it mirrors what a user does.",
+      "bestPractice": "The scenario separates Precondition, Process, and Post condition deliberately. Login is setup, not the behaviour under test — mixing them makes a login failure look like an ordering defect and prevents the login steps from being reused."
+    },
+    {
+      "title": "Hard-coding the order number",
+      "trapDescription": "Reading an order number from a manual run and typing it into the 'navigate to order details' step.",
+      "bestPractice": "The order number is generated at runtime and differs on every execution. It must be captured with a buffer in the 'Verify order and buffer order no' step and referenced from the buffer afterwards."
+    },
+    {
+      "title": "Forgetting to close the browser instance in the Post condition",
+      "trapDescription": "Logging out and considering the cleanup complete.",
+      "bestPractice": "The Post condition performs three steps: log out, verify the logout succeeded, and close the demo web shop browser instance. An orphaned browser affects the next execution."
+    },
+    {
+      "title": "Duplicating the login steps instead of reusing the library block",
+      "trapDescription": "Copying the three login TestSteps into each TestCase that needs a logged-in session.",
+      "bestPractice": "The scenario keeps 'Login to web shop' as a reusable TestStep block in a TestStepLibrary. Referencing it means a single point of maintenance when the login page changes — the same reasoning behind Classes and Libraries elsewhere in Tosca."
+    },
+    {
+      "title": "Treating the PDF invoice as out of scope",
+      "trapDescription": "Ending the verification at the order confirmation page because the invoice is 'just a document'.",
+      "bestPractice": "Downloading and verifying the PDF invoice is part of the scenario, and it is where the PDF Engine from Lesson 2 applies — including excluding volatile regions such as the order number and date from any comparison."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "How is the Grand Scenario's TestCases folder organised?",
+      "options": [
+        { "id": "A", "text": "As a single TestCase covering the whole flow." },
+        { "id": "B", "text": "Into Precondition, Process, and Post condition." },
+        { "id": "C", "text": "By engine — one TestCase per technology." },
+        { "id": "D", "text": "Into Smoke, Regression, and One-time tests." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Setup, the thing under test, and cleanup.",
+      "rationale": "The scenario separates Precondition (log in), Process (order the book and pay on delivery), and Post condition (log out, verify, close the browser). This keeps setup and cleanup distinct from the behaviour actually being tested."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "The step 'Verify order and buffer order no' captures the order number into a buffer. Why is this necessary?",
+      "options": [
+        { "id": "A", "text": "To make the TestCase run faster." },
+        { "id": "B", "text": "Because the order number is generated at runtime and differs on every execution, so it cannot be hard-coded but is needed by later steps." },
+        { "id": "C", "text": "Because buffers are required in every Tosca TestCase." },
+        { "id": "D", "text": "To satisfy the PDF Engine's anchor requirements." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The value does not exist until the application creates it.",
+      "rationale": "The order number only exists once the shop has created the order. Buffering it captures the runtime value so the following steps can navigate to the correct order details page — hard-coding a number from a previous run would break on the next execution."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Where do the login steps live, and why?",
+      "options": [
+        { "id": "A", "text": "Duplicated in each TestCase that needs them, for independence." },
+        { "id": "B", "text": "In a TestStepLibrary as a reusable TestStep block named 'Login to web shop', so there is a single point of maintenance." },
+        { "id": "C", "text": "In the Post condition, so they run last." },
+        { "id": "D", "text": "In a Module, since Modules are the reuse mechanism for TestSteps." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The same centralised-maintenance argument behind Classes and Libraries.",
+      "rationale": "The scenario keeps a TestStepLibrary containing the reusable block 'Login to web shop' (Open demo web shop, Click on log in link, Provide log in details). When the login page changes, one block is updated rather than every copy."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "Which engine takes over at the 'Download PDF Invoice' step, and what technique from that lesson applies?",
+      "options": [
+        { "id": "A", "text": "The Excel Engine, using TBox Excel 1:1 File Compare." },
+        { "id": "B", "text": "The PDF Engine — scanning the invoice and using anchors, while excluding volatile regions like the order number from any comparison." },
+        { "id": "C", "text": "The Mail Engine, since invoices are emailed." },
+        { "id": "D", "text": "No engine change is needed; XBrowser handles the PDF." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The document is a PDF, and its content varies per order.",
+      "rationale": "Verifying the downloaded invoice is PDF Engine work: scan the document, use anchors so values are located relative to stable landmarks, and exclude regions that legitimately change each run — such as the order number and date — from the comparison."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "What three steps make up the Post condition TestCase?",
+      "options": [
+        { "id": "A", "text": "Log out from web shop, verify successful logout, close the demo web shop browser instance." },
+        { "id": "B", "text": "Log out and nothing further — the browser closes automatically." },
+        { "id": "C", "text": "Delete the order, log out, clear the cart." },
+        { "id": "D", "text": "Verify the invoice, log out, archive the PDF." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "Cleanup includes verifying that the cleanup itself worked.",
+      "rationale": "The Post condition logs out, verifies the logout succeeded, and closes the demo web shop browser instance. Verifying the cleanup and releasing the browser both matter — an orphaned browser instance affects the next execution."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Purpose", "value": "Capstone tying the AE1 engines together in one Demo Web shop purchase flow." },
+    { "key": "Structure", "value": "Precondition (login) → Process (order fiction book, pay on delivery) → Post condition (logout)." },
+    { "key": "Reuse", "value": "TestStepLibrary holds the reusable block 'Login to web shop'; the calling TestCase owns the verification." },
+    { "key": "Process phases", "value": "Navigation to product → Check out process → Verification of order creation." },
+    { "key": "Buffering", "value": "'Verify order and buffer order no' captures the runtime order number for the later navigation step." },
+    { "key": "Cross-engine moment", "value": "'Download PDF Invoice' hands over from web automation to the PDF Engine." },
+    { "key": "Post condition", "value": "Log out · verify the logout · close the browser instance — all three." },
+    { "key": "Modules supplied", "value": "Pre-scanned under Modules → Grand Scenario - Demo web shop (Login, Navigation elements, Products, Checkout process)." }
+  ],
+  "topics": [
+    {
+      "title": "Grand Scenario - Demo Web Shop",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+      "duration": "exercise"
+    }
+  ]
+}

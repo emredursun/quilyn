@@ -1,0 +1,199 @@
+{
+  "moduleId": "TDS2-M06",
+  "moduleTitle": "Additional Lesson - Managing TDS repositories using Tosca API",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+  "learningObjectives": [
+    "Create a TDS repository via a REST API call built in the Tosca API Scan.",
+    "Retrieve, update, and delete a repository using GET, POST, and DELETE requests against the repository endpoint.",
+    "Recognize the standard JSON message format and required Content-Type header for these calls.",
+    "Save the resulting API messages as a reusable .tsu subset."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Why manage TDS via API",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Beyond the web portal and Standard Modules",
+          "description": "Everything so far — creating, retrieving, updating, deleting — has gone through TDS Standard Modules or the Test Data Management web page. This lesson demonstrates doing the same repository-level operations directly through Tosca's API Scan, calling REST endpoints instead."
+        },
+        {
+          "type": "note",
+          "text": "This lesson operates one level up from the earlier lessons — it manages the REPOSITORIES themselves (creating/updating/deleting a whole TDS repository), not individual records inside one."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Setting up the API Scan",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Getting started",
+          "description": "In the API Testing tab, click API Scan. Rename the default folder to 'Manage Repositories' — every message in this lesson lives inside it."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Create Repository — POST",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Building the message",
+          "description": "Rename the default 'Create Message' to 'Create Repository'. Set the Method to POST, and the Endpoint to the repository path. Paste the standard message format onto the Payload tab, filled in with the new repository's values."
+        },
+        {
+          "type": "list",
+          "title": "Standard JSON message format",
+          "items": [
+            "description — a text description of the repository",
+            "location — full path to where the .db file should be saved",
+            "name — the repository's name",
+            "type — Sqlite (or another supported repository type)"
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Under Headers, add Name = 'Content-Type' with Value = 'application/json' — required for every one of these calls, not just Create."
+        },
+        {
+          "type": "concept",
+          "term": "Verifying it worked",
+          "description": "Run the message, then open (or refresh) the Test Data Management page on the Tosca Server — the new repository appears there as a tile."
+        }
+      ],
+      "bulletPoints": [
+        "POST + repository-path Endpoint + the 4-field JSON body (description/location/name/type) creates a repository.",
+        "Content-Type: application/json is required on every request in this lesson."
+      ]
+    },
+    {
+      "sectionTitle": "Retrieve Repository — GET",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Reading repository details",
+          "description": "Right-click 'Manage Repositories' → Create Message, rename it 'Retrieve Repository', and set Method to GET with the same repository path in the Endpoint used during creation. Running it returns the repository's details in the Payload tab — no message body is needed for a GET."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Update Repository — POST",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Changing existing values",
+          "description": "Create another message, rename it 'Update Repository', set Method to POST, and reuse the same Endpoint (repository path + the specific repository name to update). Paste the same standard JSON format onto the Payload tab, this time editing the values you want to change. The Content-Type header is required again."
+        },
+        {
+          "type": "concept",
+          "term": "Verifying it worked",
+          "description": "Run the message, then refresh the Tosca Server landing page — the updated repository details are now reflected there."
+        }
+      ],
+      "bulletPoints": [
+        "Update reuses POST and the same JSON body shape as Create — the difference is that the Endpoint/name targets an EXISTING repository."
+      ]
+    },
+    {
+      "sectionTitle": "Delete Repository — DELETE",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Removing a repository",
+          "description": "Create a message named 'Delete Repository', set Method to DELETE, and set the Endpoint to the same repository path used for creation, followed by the name of the repository to delete. Running it removes that specific repository."
+        },
+        {
+          "type": "concept",
+          "term": "Verifying it worked",
+          "description": "Refresh the Test Data Management page — the deleted repository (e.g. 'DemoWebShop') no longer appears among the tiles."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Saving your work",
+      "elements": [
+        {
+          "type": "note",
+          "text": "Use 'Save As' from the menu bar to save these API artifacts in .tsu format — the same subset format used throughout the course — so they can be re-imported into any Tosca workspace later."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Forgetting the Content-Type header",
+      "trapDescription": "Sending a Create or Update repository message without setting Content-Type to application/json.",
+      "bestPractice": "Every repository-management call in this lesson (Create, Update — anything with a JSON body) requires the Content-Type header set to application/json, or the request won't be interpreted correctly."
+    },
+    {
+      "title": "Using GET or DELETE with a JSON body",
+      "trapDescription": "Pasting the standard message format onto the Payload tab for a Retrieve (GET) or Delete (DELETE) request.",
+      "bestPractice": "Only Create and Update need the JSON body on the Payload tab. Retrieve (GET) and Delete (DELETE) work off the Endpoint path alone — no body is required."
+    },
+    {
+      "title": "Confusing repository-level API management with record-level TDS Standard Modules",
+      "trapDescription": "Expecting these API calls to create/update individual test records the way 'TestData - Create & provide new record' does.",
+      "bestPractice": "This lesson's API calls operate on whole REPOSITORIES (create/retrieve/update/delete the database itself). Individual test RECORDS inside a repository are still managed via the TDS Standard Modules covered in Lessons 2-4."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Which HTTP Method and Endpoint combination correctly retrieves an existing TDS repository's details via the API?",
+      "options": [
+        { "id": "A", "text": "POST with a JSON body describing the repository." },
+        { "id": "B", "text": "GET, using the repository path as the Endpoint, with no message body needed." },
+        { "id": "C", "text": "DELETE with the repository name appended." },
+        { "id": "D", "text": "PUT with Content-Type set to text/plain." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Reading data doesn't require sending a body.",
+      "rationale": "Retrieving repository details uses a GET request against the repository path — no JSON body is needed, unlike Create/Update."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A tester sends a Create Repository POST request but forgets to set any headers. What is the most likely consequence?",
+      "options": [
+        { "id": "A", "text": "The request works exactly the same regardless of headers." },
+        { "id": "B", "text": "Without Content-Type: application/json, the JSON payload may not be interpreted correctly by the server." },
+        { "id": "C", "text": "The repository is created but immediately locked." },
+        { "id": "D", "text": "Headers are only required for DELETE requests." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The lesson explicitly calls out one required header for these JSON-bodied requests.",
+      "rationale": "Content-Type must be set to application/json for the server to correctly interpret the JSON body sent with Create/Update requests."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "What is the scope of the API operations covered in this Additional Lesson?",
+      "options": [
+        { "id": "A", "text": "Managing individual test records, the same as the TDS Standard Modules." },
+        { "id": "B", "text": "Managing whole TDS repositories themselves — creating, retrieving, updating, and deleting the repository." },
+        { "id": "C", "text": "Managing Tosca Commander license keys." },
+        { "id": "D", "text": "Managing Requirements and RequirementSets." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "This lesson operates one level above individual test records.",
+      "rationale": "This lesson's API calls create, retrieve, update, and delete entire TDS repositories — a different scope from the TDS Standard Modules, which manage individual records inside a repository."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Create Repository", "value": "POST + repository-path Endpoint + JSON body (description/location/name/type)." },
+    { "key": "Retrieve Repository", "value": "GET + repository-path Endpoint, no body needed." },
+    { "key": "Update Repository", "value": "POST + Endpoint targeting the existing repo + edited JSON body." },
+    { "key": "Delete Repository", "value": "DELETE + Endpoint targeting the repo to remove." },
+    { "key": "Required header", "value": "Content-Type: application/json on Create/Update." },
+    { "key": "Saving artifacts", "value": "Save As → .tsu, re-importable as a subset later." }
+  ],
+  "topics": [
+    {
+      "title": "Additional Lesson - Managing TDS repositories using Tosca API (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+      "duration": "video"
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "moduleId": "TDS2-M05",
+  "moduleTitle": "Lesson 4 - Introduction to the Standard TestData - Expert Module",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+  "learningObjectives": [
+    "Explain how the TestData - Expert Module consolidates Create, Find, Update, and more into a single module.",
+    "List the seven Test data task options and what each one does.",
+    "Explain why ReadOnly is the one function that does NOT lock its record, and when that matters.",
+    "Trace a multi-step order/cancel scenario built entirely with the Expert Module."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "One module, every function",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "TestData - Expert Module",
+          "description": "Rather than assembling a TestCase from several separate Standard Modules (Create, Find, Update...), the Expert Module performs all of those functions itself, plus extra ones the standalone modules don't offer — ReadOnly, deleting individual records, and deleting entire types. It's included in the Standard.tsu subset, under Standard modules → Test Data Management → Test Data Service."
+        },
+        {
+          "type": "concept",
+          "term": "Test data task*",
+          "description": "The Expert Module's key TestStepValue is a dropdown listing every supported function: Create, ReadOnly, Find, Update, DeleteType, DeleteRecord, DeleteAll. Whichever is selected tells Tosca exactly what to do with the data in that TestStep."
+        }
+      ]
+    },
+    {
+      "sectionTitle": "The seven Test data task options",
+      "elements": [
+        {
+          "type": "list",
+          "title": "What each function does",
+          "items": [
+            "Create — creates a new TDS type, or adds values to an existing one.",
+            "ReadOnly — reads the record and unlocks it (does NOT lock).",
+            "Find — searches for the FIRST existing record matching the given criteria.",
+            "Update — edits a single record's values.",
+            "DeleteRecord — deletes one record from a TDS type.",
+            "DeleteType — deletes the entire TDS type from the repository.",
+            "DeleteAll — deletes everything in the repository."
+          ]
+        },
+        {
+          "type": "warning",
+          "text": "DeleteType removes one type and its records. DeleteAll wipes the whole repository — every type, every record. Don't reach for DeleteAll when only one type needs clearing."
+        }
+      ],
+      "bulletPoints": [
+        "Find returns the FIRST match only — if precision matters, narrow the search criteria rather than expecting multiple results."
+      ]
+    },
+    {
+      "sectionTitle": "ReadOnly: the one function that doesn't lock",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "What makes it different",
+          "description": "Every other Test data task locks the record it touches by default. ReadOnly is the exception: it reads the data without modifying it, and explicitly does NOT lock the record — leaving it free for others to use."
+        },
+        {
+          "type": "concept",
+          "term": "When to reach for it",
+          "description": "ReadOnly fits data meant to be reused across many TestCases at once — contract data, user ID numbers, reference data, or credit card numbers. For example, a bank transaction test might just need 'any' valid Visa card number, with no requirement that it be unique to that test. In a distributed environment, several testers on different workspaces need to be able to borrow that same reference record simultaneously."
+        },
+        {
+          "type": "warning",
+          "text": "If reusable reference data like this were locked by default, concurrent TestCases could fail simply because they collided over the same record — ReadOnly exists specifically to avoid that."
+        }
+      ],
+      "bulletPoints": [
+        "Every task locks by default EXCEPT ReadOnly.",
+        "Use ReadOnly for shared, non-unique reference data — not for data a TestCase is meant to consume exclusively."
+      ]
+    },
+    {
+      "sectionTitle": "Worked example: order Hoodies, then cancel",
+      "elements": [
+        {
+          "type": "list",
+          "title": "The full TestStep flow",
+          "items": [
+            "1. Create Multiple Orders",
+            "2. Read the Created Order",
+            "3. Find and Update the First Order to Cancelled State",
+            "4. Find and Update the Subsequent Orders to Cancelled State",
+            "5. Find and Delete the Cancelled Order",
+            "6. Delete the Entire TDS type"
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Step 1 — Create",
+          "description": "Add the Expert Module, select 'Create' as the Test data task*, name the TDS type 'SampleOrders', and set the Alias name (record) to 'order'. Entering the data structure Attributes — OrderID, Product name, quantity, Price, Order Status, Year of Manufacture — creates those as separate columns in the TDS repository."
+        },
+        {
+          "type": "concept",
+          "term": "Step 2 — ReadOnly",
+          "description": "Add another Expert Module, this time selecting 'ReadOnly', to read the order just created. This automatically unlocks that record — meaning, in a real project, the order number could then be picked up and reused by anyone else who needs it, rather than staying locked to this one TestCase."
+        }
+      ],
+      "bulletPoints": [
+        "The same Expert Module object is reused throughout — only its Test data task* dropdown value changes at each step."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-on",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 Exercise 04A-04B (Introduction to the TestData - Expert Module, parts 1 & 2) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Assuming ReadOnly locks its record like every other task",
+      "trapDescription": "Using ReadOnly to read a record and expecting it to be protected from concurrent access, the way Create/Find/Update are.",
+      "bestPractice": "ReadOnly is the one Test data task that does NOT lock its record by design — it's meant for shared, reusable reference data, not exclusive consumption."
+    },
+    {
+      "title": "Confusing DeleteType with DeleteAll",
+      "trapDescription": "Selecting DeleteAll when the intent was only to remove one TDS type.",
+      "bestPractice": "DeleteType removes a single named type and its records. DeleteAll clears the entire repository — every type. Pick DeleteType for targeted cleanup."
+    },
+    {
+      "title": "Expecting Find to return every matching record",
+      "trapDescription": "Assuming the Expert Module's Find task returns all records matching the criteria.",
+      "bestPractice": "Find returns only the FIRST matching record. If more precise targeting is needed, tighten the search criteria rather than expecting multiple results back."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Which Test data task is the ONLY one that does not lock the record it operates on?",
+      "options": [
+        { "id": "A", "text": "Create" },
+        { "id": "B", "text": "Find" },
+        { "id": "C", "text": "ReadOnly" },
+        { "id": "D", "text": "Update" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "This one is designed for data meant to be shared, not consumed exclusively.",
+      "rationale": "ReadOnly reads the record without locking it — every other task (Create, Find, Update, DeleteRecord, DeleteType, DeleteAll) locks by default."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A bank-transaction TestCase needs 'any' valid credit card number, and several testers should be able to use the same reference record at once across different workstations. Which Test data task fits this need?",
+      "options": [
+        { "id": "A", "text": "DeleteRecord" },
+        { "id": "B", "text": "Update" },
+        { "id": "C", "text": "ReadOnly" },
+        { "id": "D", "text": "DeleteAll" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "The record needs to stay available to multiple testers at the same time.",
+      "rationale": "ReadOnly is exactly for this scenario — reusable reference data (like a generic credit card number) that shouldn't lock, so multiple testers can borrow it simultaneously in a distributed environment."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A tester wants to remove only the 'SampleOrders' TDS type and its records, leaving the rest of the repository untouched. Which Test data task should they use?",
+      "options": [
+        { "id": "A", "text": "DeleteAll" },
+        { "id": "B", "text": "DeleteType" },
+        { "id": "C", "text": "DeleteRecord" },
+        { "id": "D", "text": "ReadOnly" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "One option wipes everything; another targets a single record; only one removes a whole type without touching the rest.",
+      "rationale": "DeleteType removes the specified TDS type and its records only. DeleteAll would clear the entire repository, and DeleteRecord only removes a single record within a type."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Expert Module", "value": "Combines Create/Find/Update/etc. into one module, plus ReadOnly, DeleteRecord, DeleteType, DeleteAll." },
+    { "key": "Test data task* options", "value": "Create, ReadOnly, Find, Update, DeleteType, DeleteRecord, DeleteAll." },
+    { "key": "Find", "value": "Returns only the FIRST matching record." },
+    { "key": "ReadOnly", "value": "Reads without locking — the only non-locking task. Best for shared reference data." },
+    { "key": "DeleteType vs DeleteAll", "value": "DeleteType = one type. DeleteAll = the whole repository." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 4 - Introduction to the Standard TestData - Expert Module (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
+      "duration": "video"
+    }
+  ]
+}

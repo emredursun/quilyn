@@ -1,0 +1,264 @@
+{
+  "moduleId": "AE1-M06",
+  "moduleTitle": "Lesson 5 - Self Healing",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+  "learningObjectives": [
+    "Enable Self-healing Mode using the SelfHealing test configuration parameter and its three possible values.",
+    "Explain what Self-Healing Properties are, where they live, and how they get there.",
+    "Describe what happens at execution when a control cannot be found, and what the TestCase result is.",
+    "Find self-healed objects in the ExecutionLog and persist the healed properties back to the Module.",
+    "State which engines support self-healing and what its cost is."
+  ],
+  "estTime": "35 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "The problem self-healing addresses",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Controls change; tests break",
+          "description": "An application under active development changes its controls constantly — an id gets renamed, a class is restructured, a button moves into a different container. Nothing about the business behaviour changed, but the automation can no longer find the control and the TestCase fails. Investigating and repairing these false failures is one of the biggest ongoing maintenance costs in test automation."
+        },
+        {
+          "type": "concept",
+          "term": "Self-healing Mode",
+          "description": "With Self-healing Mode enabled, a TestCase does not fail just because a control changed. When Tosca cannot find the control during execution, it looks for a similar control in the system under test; if it finds a suitable one, it uses that control instead and execution continues. The result is more stable test runs, less manual repair work, and a record of which controls have actually changed."
+        },
+        {
+          "type": "note",
+          "text": "Important: when self-healing succeeds, the TestCase passes normally. It is not a warning-level result — execution simply continues on the replacement control."
+        }
+      ],
+      "bulletPoints": [
+        "Self-healing turns 'control moved' from a failure into a continued run plus a flag.",
+        "A successful heal means a normal pass, not a partial result."
+      ]
+    },
+    {
+      "sectionTitle": "Turning it on: the SelfHealing TCP",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "A test configuration parameter, not a checkbox",
+          "description": "Self-healing is activated by creating a test configuration parameter named SelfHealing. Because it is a TCP, it inherits the usual scoping rules — set it high in the folder structure to apply broadly, or on a specific TestCase to limit it."
+        },
+        {
+          "type": "list",
+          "title": "The three values",
+          "items": [
+            "Weighted — an algorithm assigns weights to all self-healing properties and uses them to identify the most unique control. Tosca calculates these weights automatically when Modules are created with XScan, Salesforce Scan, or Rescan.",
+            "Combination — creates all possible property combinations to locate a suitable control.",
+            "False (or leaving the field empty) — self-healing is disabled."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "SelfHealingWeightThreshold",
+          "description": "An optional companion TCP used with the Weighted mode. It defaults to 0.75 and filters out property combinations that score below that threshold — a way to stop the algorithm from accepting weak matches. Raise it to be stricter about what counts as 'the same control'; lower it to tolerate more change."
+        }
+      ],
+      "bulletPoints": [
+        "TCP name: SelfHealing. Values: Weighted · Combination · False/empty.",
+        "SelfHealingWeightThreshold defaults to 0.75 and only applies to Weighted mode."
+      ]
+    },
+    {
+      "sectionTitle": "Self-Healing Properties",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Where the technical data lives",
+          "description": "Self-Healing Properties are the technical attributes of a control that give Tosca something to match against when the primary identification fails. They sit on the Self-Healing Properties tab of the ModuleAttribute — one level deeper than the identification you normally work with."
+        },
+        {
+          "type": "concept",
+          "term": "They are created for you",
+          "description": "Tosca adds these properties automatically when a Module is created through XScan, Tosca Rescan, Salesforce Scan, or the Tricentis Automation Recording Assistant. You do not have to author them by hand — though you can edit, delete, or add properties manually after scanning if the automatic set is not right."
+        },
+        {
+          "type": "note",
+          "text": "This is why the scanning tool matters. A Module built by a route that does not populate Self-Healing Properties has nothing for the algorithm to work with, and self-healing will not help it."
+        }
+      ],
+      "bulletPoints": [
+        "Location: Self-Healing Properties tab of the ModuleAttribute.",
+        "Populated automatically by XScan, Rescan, Salesforce Scan, and the Automation Recording Assistant — editable afterwards."
+      ]
+    },
+    {
+      "sectionTitle": "Seeing and keeping the results",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Spotting a self-healed run",
+          "description": "After execution, a self-healing icon appears on the affected ExecutionEntries, and the ExecutionLog's Detail column explains which objects were self-healed. This is how you distinguish 'passed cleanly' from 'passed, but a control had changed' — the pass alone does not tell you."
+        },
+        {
+          "type": "concept",
+          "term": "Apply Self-Healing properties",
+          "description": "Healing is per-execution unless you persist it. Right-click the log and select 'Apply Self-Healing properties' from the context menu to write the healed identification back into the Module. Without this step, the same control has to be re-healed on every subsequent run."
+        },
+        {
+          "type": "warning",
+          "text": "Self-healing may negatively impact performance. Every failed identification triggers a search for a similar control, and in Combination mode that means evaluating property combinations. Enabling it project-wide and never applying the healed properties means paying that cost on every run, forever."
+        }
+      ],
+      "bulletPoints": [
+        "Self-healing icon on the ExecutionEntry + Detail column in the ExecutionLog = something was healed.",
+        "Right-click the log → Apply Self-Healing properties, to make the fix permanent.",
+        "Treat repeated healing of the same control as a signal to update the Module, not as a steady state."
+      ]
+    },
+    {
+      "sectionTitle": "Which engines support it",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Supported engines",
+          "items": [
+            "DotNet",
+            "Java",
+            "Oracle",
+            "UIA",
+            "XBrowser",
+            "Salesforce (Engines 3.0)"
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Worth noticing in the context of this course: of the AE1 engines, UIA is on the list — so the Windows desktop automation from Lesson 4 benefits from self-healing. The Excel, PDF and Mail engines are not on it, which is consistent with how they work: they address cells, document regions and mailboxes rather than identifying UI controls that can drift."
+        },
+        {
+          "type": "note",
+          "text": "📄 Official Tricentis Academy exercise material for this lesson is not redistributed here — complete the exercises inside the official course."
+        }
+      ],
+      "bulletPoints": [
+        "Self-healing is a control-identification feature, so it applies to the engines that identify UI controls."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Looking for a Self-healing checkbox in settings",
+      "trapDescription": "Searching the project or engine settings for an option to switch self-healing on.",
+      "bestPractice": "Self-healing is enabled by creating a test configuration parameter named SelfHealing, set to Weighted or Combination. Setting it to False or leaving it empty disables the feature."
+    },
+    {
+      "title": "Assuming a self-healed TestCase reports as failed or partially passed",
+      "trapDescription": "Expecting a warning-level result when a control had to be healed.",
+      "bestPractice": "If Tosca finds a suitable replacement control, it uses it and execution continues — the TestCase passes normally. The only indication is the self-healing icon on the ExecutionEntry and the ExecutionLog Detail column."
+    },
+    {
+      "title": "Never applying the healed properties",
+      "trapDescription": "Leaving self-healing permanently enabled and treating repeated heals as a solved problem.",
+      "bestPractice": "Healing is per-execution unless persisted. Right-click the log and choose 'Apply Self-Healing properties' to write the change back to the Module — otherwise the same control is re-healed on every run, and self-healing may negatively impact performance."
+    },
+    {
+      "title": "Confusing Weighted with Combination",
+      "trapDescription": "Assuming both modes work the same way and the choice is arbitrary.",
+      "bestPractice": "Weighted assigns weights to the self-healing properties to find the most unique control, with weights calculated automatically by XScan/Salesforce Scan/Rescan and an optional SelfHealingWeightThreshold (default 0.75). Combination instead builds all possible property combinations to find a suitable control."
+    },
+    {
+      "title": "Expecting self-healing to rescue every engine",
+      "trapDescription": "Enabling the SelfHealing TCP and assuming Excel, PDF or Mail steps are now resilient too.",
+      "bestPractice": "Self-healing is supported for DotNet, Java, Oracle, UIA, XBrowser and Salesforce (Engines 3.0). It is a control-identification feature and does not extend to engines that do not identify drifting UI controls."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "How is Self-healing Mode enabled in Tosca?",
+      "options": [
+        { "id": "A", "text": "By ticking a checkbox in Project Settings." },
+        { "id": "B", "text": "By creating a test configuration parameter named SelfHealing set to Weighted or Combination." },
+        { "id": "C", "text": "By rescanning the application with self-healing selected." },
+        { "id": "D", "text": "It is always on and cannot be configured." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It is configured the same way other execution-time behaviours are scoped in Tosca.",
+      "rationale": "Self-healing is switched on with a TCP called SelfHealing. Its values are Weighted, Combination, or False (empty also disables it). Being a TCP means it inherits normal scoping, so it can be applied broadly or to a single TestCase."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "During execution Tosca cannot find a control, searches, and finds a suitable replacement. What is the TestCase result?",
+      "options": [
+        { "id": "A", "text": "It fails, but with a self-healing note." },
+        { "id": "B", "text": "It is marked as partially passed." },
+        { "id": "C", "text": "It passes normally; a self-healing icon appears on the ExecutionEntry and the ExecutionLog Detail column explains what was healed." },
+        { "id": "D", "text": "Execution stops and waits for manual confirmation." }
+      ],
+      "correctOptions": ["C"],
+      "hint": "The point of the feature is that the run is not interrupted.",
+      "rationale": "When a suitable control is found, Tosca executes the action on it and the run continues uninterrupted — the TestCase passes. The self-healing icon and the ExecutionLog Detail column are what tell you a heal occurred."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Where do Self-Healing Properties live, and how do they get created?",
+      "options": [
+        { "id": "A", "text": "On the Self-Healing Properties tab of the ModuleAttribute, added automatically by XScan, Tosca Rescan, Salesforce Scan, or the Automation Recording Assistant." },
+        { "id": "B", "text": "In a separate SelfHealing folder in the project root, written by hand." },
+        { "id": "C", "text": "In the ExecutionList, generated after the first failed run." },
+        { "id": "D", "text": "They are not stored; they are recalculated from scratch each execution." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "They sit one level deeper than the identification you normally edit.",
+      "rationale": "Self-Healing Properties store the technical data of the control on the ModuleAttribute's Self-Healing Properties tab. Tosca adds them automatically during scanning, and they can be edited, deleted, or added manually afterwards."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What is the default value of the SelfHealingWeightThreshold TCP, and which mode does it apply to?",
+      "options": [
+        { "id": "A", "text": "0.5, applied to Combination mode." },
+        { "id": "B", "text": "0.75, applied to Weighted mode." },
+        { "id": "C", "text": "1.0, applied to both modes." },
+        { "id": "D", "text": "There is no such parameter." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It exists to filter out weak matches produced by the weighting algorithm.",
+      "rationale": "SelfHealingWeightThreshold is an optional TCP used with Weighted mode. It defaults to 0.75 and filters out property combinations scoring below that value, preventing the algorithm from accepting weak matches."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A control is self-healed successfully on every nightly run, and the team leaves it that way. What is the problem?",
+      "options": [
+        { "id": "A", "text": "Nothing — this is the intended long-term use of self-healing." },
+        { "id": "B", "text": "The heal is per-execution unless persisted, so the search cost is paid every run and self-healing may negatively impact performance." },
+        { "id": "C", "text": "The TestCase will eventually start failing after a fixed number of heals." },
+        { "id": "D", "text": "Self-healing automatically disables itself after repeated use." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "There is a context-menu action specifically for making the fix permanent.",
+      "rationale": "Unless you right-click the log and choose 'Apply Self-Healing properties' to write the change back to the Module, the control is re-healed on every run. Since self-healing may negatively impact performance, repeated healing of the same control should prompt a Module update rather than being accepted as normal."
+    }
+  ],
+  "quickRecap": [
+    { "key": "What it does", "value": "When a control isn't found, Tosca looks for a similar one and continues — the TestCase passes." },
+    { "key": "How to enable", "value": "TCP named SelfHealing = Weighted | Combination | False (empty also disables)." },
+    { "key": "Weighted", "value": "Weights all self-healing properties to find the most unique control; weights auto-calculated by XScan / Salesforce Scan / Rescan." },
+    { "key": "Combination", "value": "Builds all possible property combinations to find a suitable control." },
+    { "key": "SelfHealingWeightThreshold", "value": "Optional, Weighted mode only, default 0.75 — filters out weak combinations." },
+    { "key": "Self-Healing Properties", "value": "On the ModuleAttribute's Self-Healing Properties tab; added automatically during scanning, editable by hand." },
+    { "key": "Seeing results", "value": "Self-healing icon on the ExecutionEntry + ExecutionLog Detail column." },
+    { "key": "Making it permanent", "value": "Right-click the log → Apply Self-Healing properties." },
+    { "key": "Supported engines", "value": "DotNet, Java, Oracle, UIA, XBrowser, Salesforce (Engines 3.0)." },
+    { "key": "Cost", "value": "May negatively impact performance — don't leave controls permanently in a healed state." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 05 - Self Healing",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+      "duration": "video"
+    },
+    {
+      "title": "Self-healing TestCases (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/tbox/selfhealing.htm",
+      "duration": "docs"
+    }
+  ]
+}

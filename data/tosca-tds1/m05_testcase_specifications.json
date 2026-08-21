@@ -1,0 +1,184 @@
+{
+  "moduleId": "TDS1-M05",
+  "moduleTitle": "Lesson 5 - TestCase Specifications",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+  "learningObjectives": [
+    "Populate the remaining physical values on a TestSheet after combinatorics are defined.",
+    "Use 'Fill Empty Values' and the Filter Column to fill data efficiently without repeating manual entry.",
+    "Use Value Attributes to add data without creating full Instance structures.",
+    "Apply the rule that Value Attribute data must be entered at the lowest level where its Values were combined."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "From combinations to physical values",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Why more filling-in is needed",
+          "description": "The previous lesson combined the business-relevant Process data needed to determine how many TestCases exist. Now the TestSheet still needs its non-business-relevant and Result Attributes populated (typically Administration and Verification) — these are the actual values that will later be linked to TestStepValues when the physical TestCase Template is built in the blue TestCase section."
+        },
+        {
+          "type": "note",
+          "text": "Adding new Attributes or Instances that are not business relevant (or are Result) does not change the number of combinations already generated — only BusinessRelevant = Yes Attributes drive combinatorics."
+        }
+      ],
+      "bulletPoints": [
+        "Populate Administration/Verification after Process combinations are locked in — it won't change your TestCase count."
+      ]
+    },
+    {
+      "sectionTitle": "Fill Empty Values",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Fill Empty Values → Specific",
+          "description": "Right-click an Attribute and choose 'Fill Empty Values' → 'Specific' to populate every empty cell in that Attribute's row with one chosen value in a single action — for example, setting 'Test Designer' to the same name across every TestCase column at once. If Instances already exist for that Attribute, simply pick the desired Instance from the dropdown and every empty cell is populated."
+        }
+      ],
+      "bulletPoints": [
+        "Fill Empty Values = fast way to set the same value across an entire row, instead of clicking cell by cell."
+      ]
+    },
+    {
+      "sectionTitle": "Filtering before filling",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "When one value per row isn't enough",
+          "description": "Sometimes different TestCases in the same row need different values — e.g. the StraightThrough should be tagged as a smoke test, Inner Valid Instances as regression tests, and Boundaries as one-time tests. Filling the whole row at once won't work here; filtering first does."
+        },
+        {
+          "type": "concept",
+          "term": "Using the Filter Column",
+          "description": "Make the Filter Column visible via the Column Chooser. On the level you want to filter (e.g. the TestSheet level, to filter its Instances), a dropdown lets you deselect 'ALL' and choose specific Instances, or filter by Character/Position (Inner, Valid, Boundary, etc). With the filter active, only the matching columns are visible/editable, so you can enter values just for that subset."
+        },
+        {
+          "type": "note",
+          "text": "A filtered row — and the TestSheet itself — turns blue. This is a deliberate visual warning so you notice if a filter was left active on a lower level and forgot about it. Reset by re-selecting 'ALL' in the filter dropdown, or right-click → 'Reset Instances Filter'."
+        }
+      ],
+      "bulletPoints": [
+        "Filter Column lets you fill different values for different subsets of Instances (by name, Character, or Position) instead of one value for the whole row.",
+        "Blue = a filter is currently active somewhere. Always reset it when done."
+      ]
+    },
+    {
+      "sectionTitle": "Value Attributes",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "What a Value Attribute is",
+          "description": "A Value Attribute is simply an Attribute with no Instances and no sub-Attributes defined. Instead of adding Instances and selecting them, you type the actual value directly into the cell on the TestSheet — for example, typing a real email address rather than creating an 'Email' Attribute with Instance values."
+        },
+        {
+          "type": "concept",
+          "term": "The critical rule: enter at the lowest combined level",
+          "description": "A Value Attribute's data must be entered at the lowest level on which its related Values were already combined — not necessarily the TestSheet level. For example, if an email address is tied to the 'Registered' Instance of a 'Type of User' Attribute, the email must be typed in at the 'Type of User' level. Entering it at the TestSheet level instead makes Tosca think you're defining a brand-new, different 'type of user' variation — which breaks the existing combinations rather than attaching data to the one that already exists."
+        }
+      ],
+      "bulletPoints": [
+        "Value Attribute = Attribute with no Instances/sub-Attributes; type the value straight into the TestSheet cell.",
+        "Always enter Value Attribute data at the SAME level where the related combination was created — never higher, or Tosca treats it as a new, separate variation."
+      ]
+    },
+    {
+      "sectionTitle": "Hands-on",
+      "elements": [
+        {
+          "type": "note",
+          "text": "📄 Exercise 05 (Values) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Using Fill Empty Values when different subsets need different values",
+      "trapDescription": "Trying to use 'Fill Empty Values → Specific' to set the Test Stage Attribute to 'smoke', 'regression', and 'one-time' all at once.",
+      "bestPractice": "Fill Empty Values sets ONE value for the whole row. When different Instances/Characters need different values, filter first (Filter Column) and fill each filtered subset separately."
+    },
+    {
+      "title": "Forgetting an active Instances Filter",
+      "trapDescription": "Leaving a filter set after filling values, then being confused why other columns appear hidden/unaffected later.",
+      "bestPractice": "A blue TestSheet/row means a filter is active somewhere below it. Reset it via 'ALL' in the filter dropdown or right-click → 'Reset Instances Filter' once you're done."
+    },
+    {
+      "title": "Entering a Value Attribute's data at the TestSheet level instead of the combined level",
+      "trapDescription": "Typing a value tied to a specific lower-level Instance directly into the TestSheet-level cell.",
+      "bestPractice": "Value Attribute data must be entered at the lowest level where its related Values were combined. Entering it higher up (e.g. TestSheet level) makes Tosca treat it as an entirely new combination variant, corrupting the existing structure."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "A tester wants every TestCase column to show 'Max Methodology' as the Test Designer in the Administration Attribute. What is the fastest way to do this?",
+      "options": [
+        { "id": "A", "text": "Click each cell individually and type the name." },
+        { "id": "B", "text": "Right-click the Administration Attribute → Fill Empty Values → Specific, and select/enter the value once." },
+        { "id": "C", "text": "Use the Filter Column, since one value is needed for the whole row." },
+        { "id": "D", "text": "Convert Administration into a Value Attribute." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "One value, applied to every empty cell in the row, in one action.",
+      "rationale": "Fill Empty Values → Specific populates every empty cell in that Attribute's row with a single chosen value in one step — exactly the case of one value across the whole row."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A tester needs the Test Stage Attribute to read 'smoke' for the StraightThrough TestCase but 'regression' for the Inner Valid TestCases. What should they do?",
+      "options": [
+        { "id": "A", "text": "Use Fill Empty Values → Specific twice, once for each value." },
+        { "id": "B", "text": "Enable the Filter Column, filter to the relevant Instances/Character each time, and fill values for just that filtered subset." },
+        { "id": "C", "text": "This cannot be done — every cell in a row must share one value." },
+        { "id": "D", "text": "Delete and recreate the Attribute for each subset." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Different values for different subsets means filtering before filling.",
+      "rationale": "The Filter Column lets you narrow the visible/editable columns to a specific Instance or Character/Position subset (e.g. just the StraightThrough, or just Inner Valid), so you can fill each subset with its own value."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "What does it mean when a row — and the TestSheet itself — is highlighted blue?",
+      "options": [
+        { "id": "A", "text": "The row contains an error." },
+        { "id": "B", "text": "A filter is currently active on that row or a level below it." },
+        { "id": "C", "text": "The row is a Value Attribute." },
+        { "id": "D", "text": "The row has unsaved changes." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "This color is a deliberate visual reminder, tied to the Filter Column feature covered earlier in this lesson.",
+      "rationale": "Blue highlighting flags an active Instances Filter somewhere in that row or below it, so a forgotten filter doesn't silently hide data from view."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "An email address should always apply to the 'Registered' Instance of the 'Type of User' Attribute, three levels below the TestSheet. Where should this Value Attribute data be entered?",
+      "options": [
+        { "id": "A", "text": "At the TestSheet level, since Value Attributes always live at the top." },
+        { "id": "B", "text": "At the 'Type of User' level — the lowest level where the related Value was combined." },
+        { "id": "C", "text": "It doesn't matter which level, Tosca resolves it automatically." },
+        { "id": "D", "text": "Value Attributes cannot be tied to a specific Instance." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Entering it any higher makes Tosca think you're defining a brand-new variation.",
+      "rationale": "Value Attribute data must be entered at the lowest level where the related combination was created. Entering it at the TestSheet level instead would make Tosca treat it as a new 'type of user' variant rather than data attached to the existing Registered-user combination."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Fill Empty Values → Specific", "value": "Sets one value across every empty cell in an Attribute's row, in one action." },
+    { "key": "Filter Column", "value": "Narrows visible columns to a specific Instance, or by Character/Position, so different subsets can get different values." },
+    { "key": "Blue highlighting", "value": "Indicates an active Instances Filter on that row or below — reset via 'ALL' or 'Reset Instances Filter'." },
+    { "key": "Value Attribute", "value": "An Attribute with no Instances/sub-Attributes — type the value directly into the TestSheet cell." },
+    { "key": "Golden rule", "value": "Enter Value Attribute data at the lowest level where its related Values were combined — never higher." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 05 - TestCase Specifications (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+      "duration": "video"
+    }
+  ]
+}

@@ -1,0 +1,211 @@
+{
+  "moduleId": "TMOB-M14",
+  "moduleTitle": "Advanced Use Cases - Mobile-Specific TCPs for Execution Tuning",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1459/handling-advanced-mobile-automation-use-cases-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Describe mobile-specific test configuration parameters that help optimize test execution.",
+    "Separate the TCPs that establish a connection from the ones that tune how a run behaves.",
+    "Choose LiveView and reset settings deliberately for authoring versus unattended execution.",
+    "Explain why TCP scoping matters once the same TestCases run in more than one environment."
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Two jobs, one mechanism",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Connection TCPs versus tuning TCPs",
+          "description": "The earlier courses used TCPs to answer a single question: which agent and which device. TMAServer, DeviceName, Type. Those are connection parameters, and a wrong value there means nothing runs at all. This course adds a second category: parameters that assume the connection already works and instead shape how the run behaves. A wrong value there does not stop the run. It makes it slower, less stable, or less informative, which is considerably harder to notice."
+        },
+        {
+          "type": "note",
+          "text": "That difference in failure mode is worth holding onto. Connection TCPs fail loudly and immediately. Tuning TCPs fail quietly and gradually, usually showing up as flakiness that gets blamed on the application."
+        }
+      ],
+      "bulletPoints": [
+        "Connection TCPs decide whether a run happens. Tuning TCPs decide how well it happens.",
+        "Misconfigured tuning parameters surface as flakiness, not as errors."
+      ]
+    },
+    {
+      "sectionTitle": "Parameters that shape a run",
+      "elements": [
+        {
+          "type": "list",
+          "title": "The levers worth knowing",
+          "items": [
+            "LiveView. A live visual feed of the device during scanning and execution. Genuinely useful while authoring, because a failed TestStep can be correlated with what the screen actually showed. It costs throughput, and nobody is watching an unattended nightly run.",
+            "Reset application. Clears application state before the run starts, so each execution begins from a known baseline rather than inheriting whatever the previous run left behind.",
+            "OSVersion. Constrains which device version a run targets, which matters as soon as the device pool holds more than one.",
+            "Device type and platform filters. Narrow which devices a dynamic selection is allowed to resolve to."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Reset application and test independence",
+          "description": "Skipping the reset is tempting because it makes a run start faster, and it works fine while you are executing one TestCase at a time by hand. It stops working the moment TestCases run in sequence or in parallel, because each one inherits state from whatever ran before it. The symptom is a TestCase that passes alone and fails in a suite, which is one of the most time-consuming failure patterns to diagnose."
+        }
+      ],
+      "bulletPoints": [
+        "LiveView on while authoring, off for unattended runs.",
+        "Reset application is what keeps a TestCase from depending on the one that ran before it."
+      ]
+    },
+    {
+      "sectionTitle": "Scoping, and why it starts mattering here",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The same TestCase, several environments",
+          "description": "TCPs follow Tosca's normal scoping rules, so a value set at Project level can be overridden by a Configuration and again per environment. While everything runs on one local emulator, this is invisible. It becomes the central mechanism the moment the same TestCases have to run against a local emulator during development and a shared device pool in CI, because only the configuration should differ between those two, never the TestCases."
+        },
+        {
+          "type": "warning",
+          "text": "The anti-pattern to avoid: duplicating a TestCase so one copy points at the local emulator and another at the shared pool. Two copies drift. Keep one TestCase and let the configuration carry the difference, which is exactly what the TCP scoping hierarchy exists for."
+        }
+      ],
+      "bulletPoints": [
+        "One TestCase, several configurations. Never several copies of the TestCase.",
+        "Scoping is invisible on a single local device and becomes essential as soon as there are two environments."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Leaving LiveView enabled for unattended runs",
+      "trapDescription": "Authoring with LiveView on, then shipping the same configuration into a nightly or CI run where nobody is watching the feed.",
+      "bestPractice": "LiveView earns its cost while authoring and debugging, where correlating a failure with the actual screen saves time. For unattended execution it adds overhead with no observer, so turn it off through configuration rather than editing TestCases."
+    },
+    {
+      "title": "Skipping Reset application and then debugging suite-only failures",
+      "trapDescription": "A TestCase that passes reliably on its own and fails when run as part of a larger ExecutionList.",
+      "bestPractice": "Without a reset, each TestCase inherits application state from whatever ran before it. Establishing a known baseline through Reset application removes an entire class of order-dependent failures."
+    },
+    {
+      "title": "Duplicating TestCases per environment instead of scoping TCPs",
+      "trapDescription": "Keeping one copy of a TestCase pointed at a local emulator and another pointed at a shared device pool.",
+      "bestPractice": "Keep a single TestCase and express the environment difference through TCP scoping. Duplicated TestCases drift apart, and the drift is usually discovered through a failure that only reproduces in one environment."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "How does a misconfigured tuning TCP typically differ from a misconfigured connection TCP such as TMAServer?",
+      "options": [
+        {
+          "id": "A",
+          "text": "There is no practical difference; both stop the run immediately."
+        },
+        {
+          "id": "B",
+          "text": "A connection TCP fails loudly and immediately, while a tuning TCP tends to surface later as flakiness or reduced information."
+        },
+        {
+          "id": "C",
+          "text": "Tuning TCPs can only be set at Project level."
+        },
+        {
+          "id": "D",
+          "text": "Connection TCPs apply to Android only."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Consider which one produces an error and which one produces a slow drift toward unreliability.",
+      "rationale": "Connection parameters decide whether a session starts at all, so mistakes there are immediate and visible. Tuning parameters assume a working connection and shape run quality, so mistakes there show up as instability that often gets misattributed to the application."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A TestCase passes consistently when executed on its own but fails when run inside a larger ExecutionList. Which configuration choice most likely explains it?",
+      "options": [
+        {
+          "id": "A",
+          "text": "LiveView is disabled."
+        },
+        {
+          "id": "B",
+          "text": "Reset application is not being applied, so the TestCase inherits state from the previous run."
+        },
+        {
+          "id": "C",
+          "text": "TMAServer is missing its trailing slash."
+        },
+        {
+          "id": "D",
+          "text": "OSVersion is set to a specific value."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The distinguishing factor is that something ran before it.",
+      "rationale": "Without a reset, application state carries over between executions, which produces failures that only appear when TestCases run in sequence. A missing trailing slash on TMAServer would prevent the run entirely, not just in a suite."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "The same mobile TestCases need to run against a local emulator during development and a shared device pool in CI. What is the intended approach?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Maintain two copies of each TestCase, one per environment."
+        },
+        {
+          "id": "B",
+          "text": "Keep one set of TestCases and express the difference through TCP scoping across configurations."
+        },
+        {
+          "id": "C",
+          "text": "Re-scan the application separately for each environment."
+        },
+        {
+          "id": "D",
+          "text": "Use image-based controls so the environment stops mattering."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Only the configuration should differ between the two environments.",
+      "rationale": "TCP scoping exists so environment differences live in configuration rather than in the TestCases. Duplicating TestCases creates copies that drift apart and produce environment-specific failures."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Two categories",
+      "value": "Connection TCPs (TMAServer, DeviceName, Type) decide whether a run happens. Tuning TCPs decide how it behaves."
+    },
+    {
+      "key": "Failure modes",
+      "value": "Connection mistakes fail loudly and immediately. Tuning mistakes surface later as flakiness."
+    },
+    {
+      "key": "LiveView",
+      "value": "On while authoring and debugging. Off for unattended runs, where it costs throughput with nobody watching."
+    },
+    {
+      "key": "Reset application",
+      "value": "Establishes a known baseline. Removes order-dependent failures where a TestCase passes alone and fails in a suite."
+    },
+    {
+      "key": "Scoping",
+      "value": "One set of TestCases, several configurations. Duplicating TestCases per environment causes drift."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Handling advanced mobile automation use cases with Tricentis Tosca Mobile",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1459/handling-advanced-mobile-automation-use-cases-with-tricentis-tosca-mobile",
+      "duration": "video"
+    },
+    {
+      "title": "Configure local or remote test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/configure_mobile_local_remote_tests.htm",
+      "duration": "docs"
+    }
+  ]
+}

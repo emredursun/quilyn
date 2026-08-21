@@ -67,7 +67,7 @@
     }
     resultsEl.innerHTML = found.map(function (item) {
       var href = '#' + item.track.trackId + '/' + item.module.id;
-      var trackLabel = item.track.trackId === 'PSA' ? 'System Architect' : 'Business Architect';
+      var trackLabel = item.track.trackName;
       return '<a class="pa-srch-item" href="' + href + '">' +
         '<span class="pa-srch-badge">' + esc(item.track.trackId) + '</span>' +
         '<span class="pa-srch-name">' + highlight(item.module.name, query) + '</span>' +

@@ -1,0 +1,242 @@
+{
+  "moduleId": "TDS1-M01",
+  "moduleTitle": "Lesson 1 - Requirements",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+  "learningObjectives": [
+    "Build a Requirements structure using Folders, RequirementSets, and layered Requirements.",
+    "Apply Basic Weighting to indicate the relative importance of a Requirement.",
+    "Apply Complex Weighting using Frequency Class and Damage Class, and explain how the exponential formula spreads Requirements apart.",
+    "Read the Contribution (%) and Relative Weight (%) columns to use Requirements as a risk dashboard.",
+    "Explain the difference in auto-update behavior for Requirements before and after Tosca 10.3."
+  ],
+  "estTime": "30 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Building the Requirements structure",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Requirement",
+          "description": "A criterion the system under test is expected to fulfil — functional (e.g. 'a customer can pay with a Visa card') or non-functional (e.g. system security). Requirements are gathered from workshops with stakeholders, or from existing specs/BA documents."
+        },
+        {
+          "type": "list",
+          "title": "Structural hierarchy, top to bottom",
+          "items": [
+            "Folder — organizes the Requirements section, usually mirroring the system or process structure; can be nested.",
+            "RequirementSet — sits inside a Folder; groups Requirements representing one aspect of the application (frontend, backend, non-functional) or one process view (a sprint, a regression cycle).",
+            "Requirement — created inside a RequirementSet; can contain sub-Requirements, forming layers.",
+            "Leaf Requirement — the lowest level; should be modeled down to about the size of a use case or user story, not more granular than that."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Structuring principle",
+          "description": "Start from the highest-level functionality (e.g. Customer, Products, Order Process) and expand downward into sub-Requirements. Keep the tree shallow, non-redundant, and easy to read — depth for its own sake makes the structure harder to navigate, not more precise."
+        },
+        {
+          "type": "note",
+          "text": "Requirement / Sub-Requirement is created via 'Create Object' in the Ribbon, 'Create Requirement' in the Mini-Toolbar, or the shortcut Ctrl+N, Ctrl+R. 'Create Requirement (after this)' (Ctrl+,) instead adds a sibling at the same level as the currently selected Requirement."
+        }
+      ],
+      "bulletPoints": [
+        "Same structure order every time: Folder → RequirementSet → Requirement → (optional) sub-Requirements.",
+        "In Agile projects, RequirementSets can map to sprints, and Requirements can be named/numbered after user stories."
+      ]
+    },
+    {
+      "sectionTitle": "Basic Weighting",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Weight column",
+          "description": "Every Requirement defaults to a Weight of 1 (equal importance). Basic Weighting lets you assign any value from 0-10 per Requirement; Tricentis' recommended best practice is to keep it simple and use a 1-5 scale."
+        },
+        {
+          "type": "concept",
+          "term": "Top-down entry order",
+          "description": "Collapse all sub-Requirements first and weight the highest level — this tells you which broad area to start testing in. Then expand each Requirement and weight its Leaf Requirements — this tells you exactly which specific item to focus on inside that area."
+        }
+      ],
+      "bulletPoints": [
+        "0-10 range, but stick to 1-5 in practice for readability.",
+        "Weight top level first, then drill down — not the other way around."
+      ]
+    },
+    {
+      "sectionTitle": "Complex Weighting",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Why complex weighting exists",
+          "description": "A single linear scale often can't distinguish importance clearly enough (is this a 3 or a 4?). Complex Weighting instead asks two separate business questions per Requirement and lets Tosca calculate the Weight for you."
+        },
+        {
+          "type": "list",
+          "title": "The two input values",
+          "items": [
+            "Frequency Class — 'How often is this functionality used?'",
+            "Damage Class — 'How much financial damage would we incur if this functionality failed?'"
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "The formula",
+          "description": "Weight = 2^(Frequency Class) × 2^(Damage Class). Both inputs are entered on a 0-10 scale (best practice: 1-5), and Tosca calculates the resulting Weight automatically — though it can be overridden manually. Because the formula is exponential (base 2 by default, adjustable on the RequirementSet's Properties tab), Requirements spread out more distinctly than a simple additive or linear scale would allow, which makes prioritization decisions clearer."
+        },
+        {
+          "type": "note",
+          "text": "As with Basic Weighting, weight the highest-level Requirements first, then expand and weight the Leaf Requirements."
+        }
+      ],
+      "bulletPoints": [
+        "Frequency Class × Damage Class, combined exponentially — not added together.",
+        "Both values are estimates for comparison purposes, not precise financial figures."
+      ]
+    },
+    {
+      "sectionTitle": "Using Requirements as a dashboard",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Contribution (%)",
+          "description": "Shows a Requirement's share of risk coverage across the whole RequirementSet. Values are multiplied by their parent's weight going up the tree, so Contribution (%) reflects how much this Requirement matters to the project as a whole — not just to its immediate siblings."
+        },
+        {
+          "type": "concept",
+          "term": "Relative Weight (%)",
+          "description": "Shows a Requirement's weight compared only to its siblings on the same level. Relative Weight values for elements on the same level always sum to 100%."
+        },
+        {
+          "type": "concept",
+          "term": "Downstream links",
+          "description": "Once weighted, Requirements link outward: TestSheets (TestCase Design) link to Requirements, TestCases link to Requirements, and ExecutionLists link to whole RequirementSets. The ExecutionState column then reflects executed-TestCase results weighted by risk — a risk-based coverage statement, usable as a management report."
+        }
+      ],
+      "bulletPoints": [
+        "Contribution (%) = weighted against the whole set (parent-adjusted). Relative Weight (%) = weighted against siblings only, always sums to 100% per level."
+      ]
+    },
+    {
+      "sectionTitle": "Keeping Requirements up to date",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Auto-update behavior differs by Tosca version",
+          "description": "In Tosca 10.2 and earlier, Requirements recalculate automatically the instant a linked object changes. In Tosca 10.3 and later, auto-update is OFF by default — recalculating on every change can be slow in large repositories with many users and objects."
+        },
+        {
+          "type": "concept",
+          "term": "Manual refresh",
+          "description": "When a Requirement's data is stale, an exclamation mark appears next to the affected RequirementSet. Select it and press F6, or click 'Update Outdated Values' in the Ribbon, to recalculate."
+        },
+        {
+          "type": "note",
+          "text": "To switch auto-update back on in 10.3+: Project >> Settings >> Commander >> General >> Advanced >> 'AutoCalculateRequirements' = On. Worth enabling on smaller projects where recalculation cost isn't a concern."
+        },
+        {
+          "type": "note",
+          "text": "📄 Exercises 01a-01f (Create a Basic Structure, Basic Weighting, Expand the Structure, Weighting with Frequency & Damage, Structure Sprint #1, Weighting Sprint #1) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+        }
+      ],
+      "bulletPoints": [
+        "Pre-10.3: always live. 10.3+: manual by default (F6 / Update Outdated Values), toggleable via AutoCalculateRequirements."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Treating Complex Weighting as additive",
+      "trapDescription": "Assuming Weight = Frequency Class + Damage Class.",
+      "bestPractice": "The formula is exponential: Weight = 2^(Frequency Class) × 2^(Damage Class). This is what gives Complex Weighting its wider, clearer spread compared to a linear scale."
+    },
+    {
+      "title": "Mixing up Contribution (%) and Relative Weight (%)",
+      "trapDescription": "Assuming both columns always sum to 100%, or that they measure the same thing.",
+      "bestPractice": "Relative Weight (%) always sums to 100% among Requirements on the same level. Contribution (%) is parent-weighted and reflects a Requirement's share of the entire RequirementSet, so it does not sum to 100% at every level."
+    },
+    {
+      "title": "Expecting real-time Requirement updates in Tosca 10.3+",
+      "trapDescription": "Making a change elsewhere in the project and expecting the Requirements dashboard to reflect it immediately, then reporting stale numbers.",
+      "bestPractice": "Since Tosca 10.3, auto-update is OFF by default for performance reasons. Watch for the exclamation mark on the RequirementSet, and press F6 or 'Update Outdated Values' to refresh — or turn AutoCalculateRequirements back on for smaller projects."
+    },
+    {
+      "title": "Weighting Leaf Requirements before the top level",
+      "trapDescription": "Expanding the whole tree immediately and assigning weights bottom-up.",
+      "bestPractice": "Best practice is to weight top-down: collapse sub-Requirements, weight the highest level first to identify the risky area, then expand and weight the Leaf Requirements to pinpoint the exact item."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What is the correct structural order when building a Requirements tree in Tosca, from top to bottom?",
+      "options": [
+        { "id": "A", "text": "RequirementSet → Folder → Requirement" },
+        { "id": "B", "text": "Folder → RequirementSet → Requirement (→ sub-Requirements)" },
+        { "id": "C", "text": "Requirement → Folder → RequirementSet" },
+        { "id": "D", "text": "Folder → Requirement → RequirementSet" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Folders organize the section; RequirementSets group Requirements by aspect or process view; Requirements can then be layered.",
+      "rationale": "The structure is always Folder → RequirementSet → Requirement, with Requirements optionally containing sub-Requirements down to Leaf Requirements."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A Requirement has a Frequency Class of 3 and a Damage Class of 2. Using the default base value of 2, how is its Complex Weight calculated?",
+      "options": [
+        { "id": "A", "text": "3 + 2 = 5" },
+        { "id": "B", "text": "2^3 × 2^2 = 32" },
+        { "id": "C", "text": "3 × 2 = 6" },
+        { "id": "D", "text": "2^(3+2) / 2 = 16" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Complex Weighting is exponential, not additive — each class is raised to the power of the base value.",
+      "rationale": "The formula is Weight = 2^(Frequency Class) × 2^(Damage Class), so 2^3 × 2^2 = 8 × 4 = 32. The exponential nature spreads Requirements apart more clearly than a simple sum would."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Which statement correctly distinguishes Contribution (%) from Relative Weight (%) in the Requirements section?",
+      "options": [
+        { "id": "A", "text": "Relative Weight (%) sums to 100% among siblings on the same level; Contribution (%) is parent-weighted and reflects share of the whole RequirementSet." },
+        { "id": "B", "text": "Both always sum to 100% across the entire RequirementSet." },
+        { "id": "C", "text": "Contribution (%) sums to 100% among siblings; Relative Weight (%) reflects the whole set." },
+        { "id": "D", "text": "They are two different names for the same calculated value." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "One column compares a Requirement only to its siblings; the other multiplies through parent weights.",
+      "rationale": "Relative Weight (%) always sums to 100% for Requirements on the same level. Contribution (%) multiplies a Requirement's weight by its parents' weights, showing its true share of risk coverage across the entire RequirementSet."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A tester on Tosca 10.4 links a new TestCase to a Requirement but the Requirements section doesn't reflect the change. What is the most likely explanation and fix?",
+      "options": [
+        { "id": "A", "text": "Requirements never update automatically in any Tosca version; a full project reload is required." },
+        { "id": "B", "text": "Since Tosca 10.3, auto-update is off by default; select the RequirementSet and press F6 (or click 'Update Outdated Values') to refresh, or enable AutoCalculateRequirements." },
+        { "id": "C", "text": "TestCases cannot be linked to Requirements at all." },
+        { "id": "D", "text": "The Weight formula needs to be recalculated manually every time." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Look for the exclamation mark next to the RequirementSet — that's the tell.",
+      "rationale": "From Tosca 10.3 onward, AutoCalculateRequirements defaults to off for performance in large repositories. An exclamation mark flags stale RequirementSets; F6 or 'Update Outdated Values' recalculates them, or the setting can be switched back on under Project >> Settings >> Commander >> General >> Advanced."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Structure order", "value": "Folder → RequirementSet → Requirement → (optional) sub-Requirements, down to Leaf Requirements." },
+    { "key": "Basic Weighting", "value": "Single Weight column, 0-10 scale, best practice 1-5. Default weight is 1." },
+    { "key": "Complex Weighting formula", "value": "Weight = 2^(Frequency Class) × 2^(Damage Class) — exponential, base adjustable on the RequirementSet Properties tab." },
+    { "key": "Contribution (%)", "value": "Parent-weighted — a Requirement's true share of the whole RequirementSet." },
+    { "key": "Relative Weight (%)", "value": "Sibling-only comparison — always sums to 100% per level." },
+    { "key": "Auto-update", "value": "Always-on before 10.3; off by default from 10.3+ (toggle: AutoCalculateRequirements; manual refresh: F6 / Update Outdated Values)." }
+  ],
+  "topics": [
+    {
+      "title": "Lesson 01 - Requirements (video)",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
+      "duration": "video"
+    }
+  ]
+}

@@ -1,0 +1,290 @@
+{
+  "moduleId": "TMOB-M11",
+  "moduleTitle": "Automating Mobile Apps on TMA — Part 3: Dynamic Device Allocation",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1408/automating-mobile-apps-on-tma-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Configure capabilities for dynamic device allocation in TMA and verify successful execution.",
+    "Configure a wildcard DeviceName that matches by criteria instead of one fixed identifier.",
+    "Choose sensible matching criteria (Platform, OS Version) for a dynamic pool.",
+    "Explain how TMA resolves a dynamic match to an actual device at runtime.",
+    "Recognise the specific ways dynamic allocation can fail that static allocation can't."
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "From the concept to the configuration",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Where this picks up",
+          "description": "The Getting Started course introduced Static vs Dynamic device allocation as a concept — pin one device, or let TMA hand out any matching one. This part is about actually configuring the dynamic side: the wildcard syntax, the criteria that matter, and what changes operationally once a TestCase no longer targets one specific device."
+        }
+      ],
+      "bulletPoints": [
+        "Static vs Dynamic is the concept; this part is the configuration and its operational consequences."
+      ]
+    },
+    {
+      "sectionTitle": "Configuring the wildcard",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "DeviceName as a criterion, not an identifier",
+          "description": "Instead of a specific udid or emulator-#### value, the DeviceName TCP is set to the literal wildcard TOSCA_DYNAMIC_DEVICE_SELECTION. TMA resolves that wildcard against its currently-known device pool at connection time — handing out whichever Ready, non-Busy device satisfies the remaining criteria (Platform, OS Version, device type)."
+        },
+        {
+          "type": "list",
+          "title": "Criteria worth filtering on",
+          "items": [
+            "Platform — Android or iOS, when a pool contains both and a TestCase is platform-specific.",
+            "OS Version — pinning a minimum or specific OS version when a flow depends on version-specific behaviour.",
+            "Device model/type — when only certain form factors (tablet vs phone) are acceptable for the flow under test."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "A wildcard that's too broad (matching every device in a mixed Android/iOS pool, for instance) risks a TestCase landing on a platform it was never actually written for. Scope the criteria as tightly as the TestCase's real requirements — broad only where the TestCase is genuinely platform/version-agnostic."
+        }
+      ],
+      "bulletPoints": [
+        "Wildcard = criteria, resolved against the live device pool at connection time, not a fixed target.",
+        "Scope criteria to what the TestCase actually needs — overly broad wildcards risk a mismatched device."
+      ]
+    },
+    {
+      "sectionTitle": "How TMA resolves a dynamic match",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Resolution at connection time",
+          "description": "When a TestCase with a dynamic DeviceName connects, TMA evaluates the pool of devices it currently sees, filters to those matching the criteria, and hands out one that's Ready and not Busy. Which specific device gets picked is not something a TestCase controls or should assume — the same TestCase run twice in a row can legitimately land on two different physical devices."
+        },
+        {
+          "type": "warning",
+          "text": "Because the specific device is not guaranteed, any assumption baked into a TestCase about a particular device's exact screen resolution, installed apps, or prior state will not hold reliably under dynamic allocation. Dynamic allocation trades device-specific certainty for pool availability — TestCases relying on device-specific quirks belong on static allocation instead."
+        }
+      ],
+      "bulletPoints": [
+        "TMA resolves the match at connection time against whichever devices are currently Ready and free.",
+        "The exact device is not guaranteed to repeat across runs — don't bake device-specific assumptions into a dynamically-allocated TestCase."
+      ]
+    },
+    {
+      "sectionTitle": "Failure modes specific to dynamic allocation",
+      "elements": [
+        {
+          "type": "list",
+          "title": "What can go wrong that static allocation doesn't risk",
+          "items": [
+            "No device currently matches the criteria — every device in the pool is Busy, Offline, or doesn't satisfy the filter, so the connection has nothing to resolve to.",
+            "A device resolves and connects, but doesn't actually meet an assumption the TestCase silently depends on (e.g. a specific screen size the flow wasn't built to handle).",
+            "Two TestCases running in parallel both match overlapping criteria and effectively compete for the same limited pool, increasing the chance either one times out waiting for a free device."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Ensuring 'successful test execution' with dynamic allocation is less about any single TCP value and more about pool sizing and criteria discipline: enough matching devices in the pool for expected parallel load, and criteria narrow enough that a resolved device genuinely satisfies what the TestCase needs."
+        }
+      ],
+      "bulletPoints": [
+        "Dynamic-specific failures: no match available, a matched device violating an unstated assumption, or pool contention under parallel runs.",
+        "Reliability here comes from pool sizing + criteria discipline, not a single configuration value."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Assuming the same device resolves on every run",
+      "trapDescription": "A TestCase built and validated once against a dynamically-allocated device, with assumptions baked in about that specific device's screen size or pre-installed state.",
+      "bestPractice": "Dynamic allocation does not guarantee the same device across runs. Assumptions about a specific device's characteristics belong on a statically-allocated TestCase, not a dynamic one."
+    },
+    {
+      "title": "Writing an overly broad wildcard",
+      "trapDescription": "A dynamic DeviceName matching any device in a pool that mixes Android and iOS, applied to a TestCase that was only ever written and validated for Android.",
+      "bestPractice": "Scope the wildcard's criteria (Platform, OS Version, device type) to what the TestCase genuinely needs — broaden only for TestCases that are truly platform/version-agnostic."
+    },
+    {
+      "title": "Blaming a single TCP for intermittent dynamic-allocation failures",
+      "trapDescription": "Chasing a specific configuration value when TestCases intermittently fail to find a device, when the real issue is pool size vs parallel demand.",
+      "bestPractice": "Treat 'ensuring successful test execution' under dynamic allocation as a pool-sizing and criteria-discipline problem first — check whether enough matching devices exist for the expected parallel load before assuming a single TCP is misconfigured."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What does a dynamic DeviceName TCP value actually represent?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A fixed udid pinned to one physical device."
+        },
+        {
+          "id": "B",
+          "text": "A criterion/wildcard that TMA resolves against its currently-available device pool at connection time."
+        },
+        {
+          "id": "C",
+          "text": "The IP address of the TMA server."
+        },
+        {
+          "id": "D",
+          "text": "A licence key scoped to a specific device."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "It's evaluated against the live pool, not fixed in advance.",
+      "rationale": "A dynamic DeviceName carries matching criteria, resolved by TMA against whichever Ready, non-Busy devices currently satisfy it — not a fixed identifier like a static DeviceName."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A TestCase built with hardcoded assumptions about a specific device's screen resolution is run under dynamic allocation and intermittently fails. What is the most likely explanation?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Dynamic allocation is fundamentally broken and should never be used."
+        },
+        {
+          "id": "B",
+          "text": "The TestCase's device-specific assumptions don't hold on every device dynamic allocation might resolve to."
+        },
+        {
+          "id": "C",
+          "text": "TMA has run out of licences."
+        },
+        {
+          "id": "D",
+          "text": "The AVD needs to be recreated."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Dynamic allocation doesn't guarantee the same device twice.",
+      "rationale": "Dynamic allocation can resolve to different devices across runs. A TestCase depending on one specific device's characteristics should use static allocation instead — the failure is a mismatch between the TestCase's assumptions and dynamic allocation's actual guarantee (a matching device, not a specific one)."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Several TestCases intermittently time out waiting for a device under dynamic allocation, even though the wildcard criteria are correctly scoped. What should be checked first?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Whether the pool has enough matching devices for the expected parallel load."
+        },
+        {
+          "id": "B",
+          "text": "Whether the TMAServer TCP has a trailing slash."
+        },
+        {
+          "id": "C",
+          "text": "Whether the app under test needs to be reinstalled."
+        },
+        {
+          "id": "D",
+          "text": "Whether LiveView is enabled."
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Correct criteria don't help if there simply aren't enough matching devices to go around.",
+      "rationale": "With criteria already correctly scoped, intermittent timeouts under parallel load point to pool sizing — not enough matching, available devices for the number of TestCases competing for them at once."
+    },
+    {
+      "questionId": "Q4",
+      "type": "multi-select",
+      "scenario": "What are the benefits of dynamic device allocation? (three correct answers)",
+      "options": [
+        {
+          "id": "A",
+          "text": "Flexibility in testing across devices"
+        },
+        {
+          "id": "B",
+          "text": "Increased resource optimization"
+        },
+        {
+          "id": "C",
+          "text": "Reduced need for pre-installed apps"
+        },
+        {
+          "id": "D",
+          "text": "Easier scalability for larger test setups"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "D"
+      ],
+      "hint": "Three of these follow from *which* device a TestCase lands on; one is about what's installed on it.",
+      "rationale": "Dynamic allocation lets one TestCase run on any matching device (flexibility), keeps the whole pool usable instead of leaving pinned devices idle while others queue (resource optimization), and lets a pool grow without editing DeviceName TCPs per TestCase (scalability). App installation is unrelated — the app still has to be present or installed via Open Mobile App regardless of how the device was allocated."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "What wildcard is used for dynamic device allocation in TMA?",
+      "options": [
+        {
+          "id": "A",
+          "text": "TOSCA_STATIC_DEVICE_SELECTION"
+        },
+        {
+          "id": "B",
+          "text": "DYNAMIC_DEVICE_TARGETING"
+        },
+        {
+          "id": "C",
+          "text": "TOSCA_DYNAMIC_DEVICE_SELECTION"
+        },
+        {
+          "id": "D",
+          "text": "DEVICE_TARGET_DYNAMIC"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "It's a TOSCA_-prefixed literal, and it names the dynamic counterpart of pinning one device.",
+      "rationale": "TOSCA_DYNAMIC_DEVICE_SELECTION is the literal value put in the DeviceName TCP to switch that TestCase from a fixed udid to dynamic allocation. The other three are plausible-sounding inventions — A even inverts the meaning, since static allocation is expressed by a real device identifier, not by a wildcard."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Dynamic DeviceName",
+      "value": "DeviceName = TOSCA_DYNAMIC_DEVICE_SELECTION — the wildcard literal, resolved against the live device pool at connection time using the remaining criteria (Platform, OS Version, device type)."
+    },
+    {
+      "key": "Resolution guarantee",
+      "value": "A matching device — not the same specific device across runs."
+    },
+    {
+      "key": "Criteria discipline",
+      "value": "Scope wildcards to what the TestCase actually needs; overly broad criteria risk a mismatched device."
+    },
+    {
+      "key": "Dynamic-specific failure modes",
+      "value": "No matching device available · a resolved device violating an unstated assumption · pool contention under parallel runs."
+    },
+    {
+      "key": "Reliability lever",
+      "value": "Pool sizing + criteria discipline — not a single TCP value."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Part 3 - Automating mobile apps on TMA with Tricentis Tosca Mobile",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1408/automating-mobile-apps-on-tma-with-tricentis-tosca-mobile",
+      "duration": "video"
+    },
+    {
+      "title": "Configure local or remote test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/configure_mobile_local_remote_tests.htm",
+      "duration": "docs"
+    }
+  ]
+}

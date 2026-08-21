@@ -1,0 +1,233 @@
+{
+  "moduleId": "TMOB-M16",
+  "moduleTitle": "Advanced Use Cases - Additional Appium Capabilities",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1459/handling-advanced-mobile-automation-use-cases-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Interpret how to use additional Appium capabilities to extend mobile automation functionality.",
+    "Group capabilities by what they actually control: session lifecycle, app state, input, and dialog handling.",
+    "Recognise the visibility cost that dialog-suppressing capabilities carry.",
+    "Decide which capabilities belong in a reusable Capability Set and which belong to one TestCase."
+  ],
+  "estTime": "25 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "What a capability actually is",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Session-level configuration, not TestCase logic",
+          "description": "Desired Capabilities are passed when the automation session is created, so they configure the session rather than any individual step. Two consequences follow. A capability applies to everything in that session, and changing one means the session has to be recreated. This is why capabilities belong in configuration rather than being toggled mid-flow, and why a Capability Set is a sensible unit to name and reuse."
+        },
+        {
+          "type": "note",
+          "text": "Tosca exposes these through the Capabilities dialog rather than in code, but they are the standard Appium capabilities underneath, which is why the appium: prefix appears and why Appium's own documentation is the reference when a capability behaves unexpectedly."
+        }
+      ],
+      "bulletPoints": [
+        "Capabilities configure the session at creation, so they apply to everything in it.",
+        "Changing one requires a new session, which is why they live in configuration."
+      ]
+    },
+    {
+      "sectionTitle": "Grouping them by what they control",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Four practical groups",
+          "items": [
+            "Dialog and permission handling. autoGrantPermissions removes Android runtime permission prompts, autoAcceptAlerts deals with native alerts. These keep the OS from interrupting a run.",
+            "App state between sessions. Capabilities in the reset family decide whether the app starts fresh, keeps its data, or is reinstalled outright. This is the session-level counterpart to the Reset application setting.",
+            "Session lifetime. Timeout-style capabilities govern how long a session tolerates inactivity before it is torn down, which matters when a step legitimately waits a long time.",
+            "Input handling. Keyboard-related capabilities affect how text is entered and whether the on-screen keyboard behaves predictably, which is a recurring source of flaky text-entry steps."
+          ]
+        },
+        {
+          "type": "concept",
+          "term": "Why grouping helps",
+          "description": "Capability lists are long and mostly irrelevant to any given project, so memorising them is wasted effort. Knowing which group a problem falls into is what makes the list navigable: a run interrupted by a popup, a TestCase polluted by leftover state, a session dying during a long wait, and text landing in the wrong place are four different categories, and each has its own small set of candidates."
+        }
+      ],
+      "bulletPoints": [
+        "Four groups: dialogs and permissions, app state, session lifetime, input handling.",
+        "Diagnose which group the symptom belongs to, then look at that group's few candidates."
+      ]
+    },
+    {
+      "sectionTitle": "The cost nobody mentions",
+      "elements": [
+        {
+          "type": "warning",
+          "text": "Every capability that suppresses something also removes it from view. Auto-accepting alerts stabilises a run and simultaneously means the run can no longer report whether an alert appeared, what it said, or whether a new one showed up after a build. Auto-granting permissions has the same shape: the permission flow stops being exercised at all, so a regression in it cannot be caught by any test using that capability."
+        },
+        {
+          "type": "concept",
+          "term": "Suppress broadly, verify deliberately",
+          "description": "The workable position is not to avoid these capabilities, because runs that stall on OS dialogs are worse. It is to accept that suppression is the default for the bulk of the suite while keeping at least one TestCase that deliberately does not suppress, so the dialog behaviour itself stays under test somewhere."
+        },
+        {
+          "type": "note",
+          "text": "This is the same reasoning as the earlier point about realistic interaction. A configuration that makes tests pass more often is only an improvement if the passes still mean what you think they mean."
+        }
+      ],
+      "bulletPoints": [
+        "Suppressed dialogs are also unobserved dialogs. Stability bought with visibility.",
+        "Keep at least one TestCase that does not suppress, so the behaviour stays covered."
+      ]
+    },
+    {
+      "sectionTitle": "Capability Sets versus one-off entries",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Naming a bundle you will reuse",
+          "description": "A Capability Set groups several capabilities under a name, such as a Close Permissions/Alerts set holding autoGrantPermissions and autoAcceptAlerts, and applies them in one action. A single Add capability entry configures one value for the session at hand. The distinction is reuse: anything the whole suite needs belongs in a named set, while something genuinely specific to one scenario does not."
+        },
+        {
+          "type": "warning",
+          "text": "Watch for one-off capability entries that quietly become load-bearing. A value added to make a single TestCase work, then copied into the next one and the one after, is a Capability Set that never got named. The copies then drift, and the resulting differences are invisible because nothing displays them side by side."
+        }
+      ],
+      "bulletPoints": [
+        "Named set for anything reused. One-off entry only for genuinely scenario-specific values.",
+        "Copied one-off capabilities are an unnamed set waiting to drift."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Enabling dialog suppression suite-wide with no exception",
+      "trapDescription": "Applying autoGrantPermissions and autoAcceptAlerts everywhere, leaving no TestCase that exercises the permission or alert flow.",
+      "bestPractice": "Suppression is the right default for most of a suite, but keep at least one TestCase without it so a regression in the dialog behaviour is still detectable somewhere."
+    },
+    {
+      "title": "Toggling capabilities mid-TestCase",
+      "trapDescription": "Expecting a capability change to take effect partway through a running session.",
+      "bestPractice": "Capabilities are passed at session creation, so changing one requires a new session. Configure them up front through a Capability Set rather than treating them as runtime switches."
+    },
+    {
+      "title": "Copying one-off capabilities between TestCases",
+      "trapDescription": "Adding the same capability entry by hand to each TestCase that needs it, instead of naming a Capability Set.",
+      "bestPractice": "Anything more than one TestCase needs belongs in a named Capability Set. Hand-copied entries drift apart, and nothing in the UI surfaces the difference."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "At what point are Desired Capabilities applied?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Before each individual TestStep."
+        },
+        {
+          "id": "B",
+          "text": "When the automation session is created, so they apply to everything in that session."
+        },
+        {
+          "id": "C",
+          "text": "Only when the application is installed."
+        },
+        {
+          "id": "D",
+          "text": "After the TestCase completes, during teardown."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Think about why changing one requires a fresh session.",
+      "rationale": "Capabilities are passed at session creation and configure the whole session, which is why they cannot be toggled mid-flow and why changing one means the session has to be recreated."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A suite runs with appium:autoAcceptAlerts set to true everywhere. What coverage is silently lost?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Nothing; alerts are irrelevant to functional coverage."
+        },
+        {
+          "id": "B",
+          "text": "No test can report whether an alert appeared, what it said, or whether a new one was introduced."
+        },
+        {
+          "id": "C",
+          "text": "Text entry stops being verified."
+        },
+        {
+          "id": "D",
+          "text": "The application can no longer be installed by TMA."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "A suppressed dialog is also an unobserved one.",
+      "rationale": "Auto-accepting alerts removes them as an interruption and as an observation at the same time. If every TestCase suppresses them, a regression in alert behaviour has nowhere left to be caught."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Text entry steps behave inconsistently across runs, with characters occasionally landing in the wrong place. Which capability group is the right place to look first?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Session lifetime and timeouts."
+        },
+        {
+          "id": "B",
+          "text": "App state and reset behaviour."
+        },
+        {
+          "id": "C",
+          "text": "Input and keyboard handling."
+        },
+        {
+          "id": "D",
+          "text": "Dialog and permission handling."
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "Match the symptom to the group that governs it.",
+      "rationale": "Inconsistent text entry falls in the input handling group, where keyboard-related capabilities govern how text is delivered. Grouping capabilities by what they control is what makes a long list navigable."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "When applied",
+      "value": "At session creation. They configure the whole session, so changing one requires a new session."
+    },
+    {
+      "key": "Four groups",
+      "value": "Dialogs and permissions, app state between sessions, session lifetime and timeouts, input and keyboard handling."
+    },
+    {
+      "key": "Suppression cost",
+      "value": "Anything suppressed is also unobserved. Keep at least one TestCase that does not suppress dialogs."
+    },
+    {
+      "key": "Capability Set",
+      "value": "Named, reusable bundle applied in one action. Use it for anything more than one TestCase needs."
+    },
+    {
+      "key": "Drift warning",
+      "value": "Hand-copied one-off capabilities are an unnamed set, and the copies diverge without anything surfacing the difference."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Handling advanced mobile automation use cases with Tricentis Tosca Mobile",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1459/handling-advanced-mobile-automation-use-cases-with-tricentis-tosca-mobile",
+      "duration": "video"
+    },
+    {
+      "title": "Appium Desired Capabilities (official Appium docs)",
+      "url": "https://appium.io/docs/en/latest/guides/caps/",
+      "duration": "docs"
+    }
+  ]
+}

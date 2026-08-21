@@ -1,0 +1,498 @@
+{
+  "moduleId": "TMOB-M05",
+  "moduleTitle": "Lesson 5 - Connecting Tosca to TMA: TCPs, Local vs Remote",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1311/getting-started-with-mobile-test-automation-with-tricentis-tosca-mobile",
+  "learningObjectives": [
+    "Configure the test configuration parameters (TCPs) that connect Tosca to a TMA instance.",
+    "Explain the single most common mobile connection mistake in Tosca and why it is so hard to spot.",
+    "Set up a genuine Local vs Remote topology, including the correct TMA startup flag for Remote.",
+    "Use TMA's REST API directly to prove whether a connection failure is device-side or Tosca-side."
+  ],
+  "estTime": "30 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Test configuration parameters (TCPs)",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The same TCP mechanism used elsewhere in Tosca",
+          "description": "The connection to a device, emulator, or simulator is established through test configuration parameters — the identical mechanism used for the TestDataService endpoint, for SelfHealing, and elsewhere in Tosca. The same scoping rules (Project → Configuration → environment overrides) apply here too."
+        },
+        {
+          "type": "list",
+          "title": "Key TCP values",
+          "items": [
+            "TMAServer — the URL where TMA's REST API can be reached.",
+            "DeviceName — the target device's identifier: the udid for Android/iOS physical devices, or emulator-5554-style for an Android emulator. Supports both a static, pinned value and a dynamic, criteria-based wildcard.",
+            "LiveView — True or False; enables a live visual feed of the device during scanning/execution.",
+            "Browser — specifies browser/webview settings for hybrid apps, on both Android and iOS (e.g. ChromeAndroid for an Android hybrid app's embedded webview context).",
+            "AppiumServer — a generic, provider-agnostic TCP for pointing at any Appium-compatible server or cloud grid (BrowserStack, Sauce Labs, Perfecto, a custom grid, etc.) — not tied to one specific provider.",
+            "ScreenFlow / ScreenFlowPath — ScreenFlow set to True makes Tosca automatically save a screenshot of every TestStepValue with ActionMode Input; ScreenFlowPath says where they go. Per Tricentis docs, adding either one means you must add the other."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Connection configuration = TCPs, exactly like TestDataService and SelfHealing elsewhere in Tosca.",
+        "AppiumServer is generic by design — it isn't scoped to any single cloud provider.",
+        "TCPs cover more than connectivity — ScreenFlow/ScreenFlowPath turn on automatic screenshot capture during execution."
+      ]
+    },
+    {
+      "sectionTitle": "Static vs Dynamic device allocation",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Static allocation",
+          "description": "The DeviceName TCP is pinned to one specific device's identifier (a udid, or a specific emulator id). Every run always targets that exact device — the right choice whenever a test needs to run consistently on a specific device, e.g. verifying a bug that only reproduces on one particular phone model or OS version."
+        },
+        {
+          "type": "concept",
+          "term": "Dynamic allocation",
+          "description": "DeviceName carries a wildcard rather than one fixed identifier, matching against criteria (e.g. any Android device meeting a Platform/OS filter) instead of a specific udid. TMA hands out whichever matching device is currently free. This favours throughput and parallelization across a device pool over consistency on one exact device."
+        },
+        {
+          "type": "note",
+          "text": "Static vs Dynamic is a choice, not a fixed rule — pick Static when the test's whole point is a specific device, and Dynamic when the point is coverage/parallel execution across whichever devices are available."
+        }
+      ],
+      "bulletPoints": [
+        "Static allocation = pinned DeviceName, same exact device every run — best for consistent testing on a specific device.",
+        "Dynamic allocation = any matching free device — best for throughput/parallel runs across a device pool, not device-specific reproduction."
+      ]
+    },
+    {
+      "sectionTitle": "The trailing-slash trap",
+      "elements": [
+        {
+          "type": "warning",
+          "text": "The TMAServer TCP value MUST end with a trailing slash — http://<ip>:8585/ works, http://<ip>:8585 fails. Without the slash, execution fails with the misleading message 'Could not create TMA session: Ensure that the requested device is connected.' The cause: TMA's REST base path is /api, and Tosca concatenates that onto the TMAServer value — a missing slash produces a broken URL, and the request never even leaves Tosca."
+        },
+        {
+          "type": "note",
+          "text": "What makes this trap so confusing: the Mobile Scan wizard's Add connection dialog tolerates the missing slash, so scanning works perfectly while TestCase execution fails on the exact same value. Seeing Scan succeed naturally leads you to rule out the connection string — and go looking everywhere except the one value that's actually wrong."
+        }
+      ],
+      "bulletPoints": [
+        "TMAServer needs the trailing slash: http://<ip>:<port>/ — Scan tolerates its absence, execution does not.",
+        "The error message ('...ensure the requested device is connected') actively misleads toward a device problem when the real fault is a malformed URL."
+      ]
+    },
+    {
+      "sectionTitle": "Local vs Remote, set up for real",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Local (TMA)",
+          "description": "Device/emulator/simulator on the same machine as TMA, and TMA on the same machine as Tosca Commander. TMAServer typically points at http://localhost:8585/ or http://127.0.0.1:8585/."
+        },
+        {
+          "type": "concept",
+          "term": "Remote (TMA)",
+          "description": "TMA runs on a different machine than Tosca Commander — commonly used when Tosca Commander runs in a VM or on Windows but the device/emulator needs to be on a different physical machine (a Mac, for iOS; a native host, for an emulator a VM can't run)."
+        },
+        {
+          "type": "warning",
+          "text": "Remote TMA must be started with the --rest-address flag: tricentis-mobile-agent start --rest-address <hostIP>:<port>. The tray/GUI launch does NOT enable it, even on a machine that's otherwise network-reachable."
+        },
+        {
+          "type": "steps",
+          "title": "Example: Mac running TMA, Windows running Tosca Commander",
+          "items": [
+            "On the Mac: find '/Applications/Tricentis Mobile Agent.app' -name 'tricentis-mobile-agent' -type f | head -1, then run it with start --rest-address <MacIP>:8585.",
+            "On Windows, in the relevant TCP set: TMAServer = http://<MacIP>:8585/ (trailing slash required), DeviceName = the udid or emulator id TMA reports, LiveView = True or False.",
+            "Confirm from the Mac itself first: curl -s http://<MacIP>:8585/api/devices | python3 -m json.tool — this proves the device side works before touching Tosca."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Remote TMA always needs --rest-address at startup — the tray launch is local-only, regardless of network reachability.",
+        "This exact topology (Mac + emulator/device, Windows + Tosca Commander) is common when Tosca runs inside a VM that itself cannot host an emulator."
+      ]
+    },
+    {
+      "sectionTitle": "Diagnosing device-side vs Tosca-side",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Query TMA's REST API directly",
+          "description": "A GET request to http://<TMA-host>:<port>/api/devices returns JSON describing every device TMA currently sees — udid, name, connected, busy, and statusReady fields. If that call shows connected:true and busy:false, the device side is proven healthy and the fault must be on Tosca's side — saving time that would otherwise go into chasing proxy, firewall, or network theories that don't apply."
+        },
+        {
+          "type": "steps",
+          "title": "A systematic diagnostic order",
+          "items": [
+            "Check the TMA console shows the device as Ready.",
+            "Query GET /api/devices directly and confirm connected/busy/statusReady values.",
+            "Verify the TCP values against the documented format — TMAServer trailing slash, correct DeviceName.",
+            "Only after all of the above, investigate network/firewall/proxy causes."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "GET /api/devices is the fastest way to separate 'the device is fine' from 'something in Tosca's configuration is wrong'.",
+        "Verify a documented configuration value's exact format before investigating network-layer causes."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Omitting the trailing slash from TMAServer",
+      "trapDescription": "Entering http://<ip>:8585 as TMAServer, watching the Mobile Scan connect perfectly, then getting 'Could not create TMA session: Ensure that the requested device is connected' on every execution — and concluding the device or network is at fault.",
+      "bestPractice": "TMAServer must end with a trailing slash: http://<ip>:8585/. Verify a connection value against the documented format first, before investigating device or network causes — the Add connection dialog accepts a value that execution will reject."
+    },
+    {
+      "title": "Starting Remote TMA from the tray icon",
+      "trapDescription": "Launching TMA normally on a second machine, confirming its console is reachable in a browser from the Tosca machine, and assuming remote mode is active.",
+      "bestPractice": "The console being reachable is not proof that the REST API is bound for remote automation. Start TMA with tricentis-mobile-agent start --rest-address <IP>:<port> for any cross-machine setup."
+    },
+    {
+      "title": "Jumping straight to network troubleshooting on a connection failure",
+      "trapDescription": "Assuming a firewall or proxy issue the moment a TMA session fails to start, without first checking the TCP values.",
+      "bestPractice": "Check the documented TCP format (especially the TMAServer trailing slash) and query GET /api/devices directly before investigating network-layer causes — most connection failures trace back to a malformed TCP value, not the network."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "TMAServer is set to http://192.168.1.50:8585 (no trailing slash). The Mobile Scan's Add connection dialog connects successfully, but every TestCase execution fails with 'Could not create TMA session: Ensure that the requested device is connected.' What is the actual cause?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The device has disconnected since the scan was performed."
+        },
+        {
+          "id": "B",
+          "text": "The missing trailing slash produces a malformed URL when Tosca appends TMA's /api base path, so the request never reaches TMA."
+        },
+        {
+          "id": "C",
+          "text": "TMA needs to be restarted before every execution."
+        },
+        {
+          "id": "D",
+          "text": "The DeviceName value has expired."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Scan and execution use the TMAServer value differently.",
+      "rationale": "TMA's REST base path is /api, and Tosca appends it onto the TMAServer value. Without the trailing slash the resulting URL is malformed and the request never leaves Tosca — even though the Add connection dialog in the Scan wizard tolerates the same missing slash."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "What is the correct way to start TMA for a Remote (TMA) setup?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Double-click the tray icon on the remote machine."
+        },
+        {
+          "id": "B",
+          "text": "Run tricentis-mobile-agent start --rest-address <IP>:<port> from the command line on the machine hosting TMA."
+        },
+        {
+          "id": "C",
+          "text": "Open the TMA console in a browser from the Tosca machine."
+        },
+        {
+          "id": "D",
+          "text": "No special startup is needed — TMA is remote-capable by default."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "The tray/GUI path only ever enables local use.",
+      "rationale": "Remote use requires the command-line start with --rest-address <IP>:<port>, binding TMA's REST API to a network-reachable address. The tray icon launch is local-only, regardless of network reachability."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A GET request to http://<TMA-host>:<port>/api/devices returns the target device with connected:true and busy:false, yet Tosca still cannot start a session. Where should troubleshooting focus next?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The device — it must be reconnected."
+        },
+        {
+          "id": "B",
+          "text": "Tosca's side of the connection, since the device is already proven healthy."
+        },
+        {
+          "id": "C",
+          "text": "The device's mobile carrier network."
+        },
+        {
+          "id": "D",
+          "text": "The physical USB cable."
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "connected:true and busy:false already rules out the device.",
+      "rationale": "A healthy /api/devices response proves the device side is fine, which shifts the search to Tosca's own configuration — most often the TCP values, starting with the TMAServer trailing slash."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "Which TCP value tells Tosca which specific device, emulator, or simulator to target?",
+      "options": [
+        {
+          "id": "A",
+          "text": "TMAServer"
+        },
+        {
+          "id": "B",
+          "text": "LiveView"
+        },
+        {
+          "id": "C",
+          "text": "DeviceName"
+        },
+        {
+          "id": "D",
+          "text": "AppPackage"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "TMAServer points at the agent; this one points at the specific target.",
+      "rationale": "DeviceName identifies the specific device/emulator/simulator (its udid, or an id like emulator-5554). TMAServer points at the agent itself, and LiveView only toggles the live visual feed."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "Which component is essential for connecting Tosca Mobile to a local device?",
+      "options": [
+        {
+          "id": "A",
+          "text": "BrowserStack"
+        },
+        {
+          "id": "B",
+          "text": "Appium"
+        },
+        {
+          "id": "C",
+          "text": "Tricentis Mobile Agent (TMA)"
+        },
+        {
+          "id": "D",
+          "text": "Perfecto"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "hint": "BrowserStack and Perfecto are cloud device-farm providers, not the local connection layer.",
+      "rationale": "TMA is the component Tosca actually connects to for both Local and Remote setups — it manages the device/emulator/simulator and exposes the REST API Tosca talks to. BrowserStack and Perfecto are third-party cloud device-farm providers, and Appium is the underlying driver technology TMA manages behind the scenes, not something configured directly."
+    },
+    {
+      "questionId": "Q6",
+      "type": "multi-select",
+      "scenario": "What benefits do local devices provide for automated testing? (three correct answers)",
+      "options": [
+        {
+          "id": "A",
+          "text": "Secure testing in a controlled environment"
+        },
+        {
+          "id": "B",
+          "text": "Access to rare or hard-to-find devices"
+        },
+        {
+          "id": "C",
+          "text": "Immediate availability of physical hardware"
+        },
+        {
+          "id": "D",
+          "text": "No need for Appium connections"
+        },
+        {
+          "id": "E",
+          "text": "Faster testing with in-house devices"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "C",
+        "E"
+      ],
+      "hint": "Two of the five options actually describe a cloud/remote device farm's strengths, not a local device's.",
+      "rationale": "Local devices offer a controlled, secure testing environment, are immediately available without booking a shared slot, and are faster to test against since there's no network hop to a remote farm. 'Access to rare or hard-to-find devices' is the opposite — that's the actual selling point of cloud device farms like Perfecto or BrowserStack, which stock devices you don't own. And Appium is used underneath both local and remote connections via TMA — 'no need for Appium connections' isn't a real distinction between the two."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "Which device allocation approach is best for consistent testing on a specific device?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Dynamic allocation"
+        },
+        {
+          "id": "B",
+          "text": "Static allocation"
+        },
+        {
+          "id": "C",
+          "text": "Virtual allocation"
+        },
+        {
+          "id": "D",
+          "text": "Shared allocation"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Which approach pins DeviceName to one exact device, run after run?",
+      "rationale": "Static allocation pins DeviceName to one specific device's identifier, so every run targets that exact same device — the right choice when a test's whole point is a specific device (e.g. reproducing a bug that only shows up on one phone model). Dynamic allocation hands out whichever matching device is free, which favours throughput across a pool over consistency on one device."
+    },
+    {
+      "questionId": "Q8",
+      "type": "multi-select",
+      "scenario": "Which of the following statements about Test Configuration Parameters (TCPs) in Tosca Mobile are true? (three correct answers)",
+      "options": [
+        {
+          "id": "A",
+          "text": "The DeviceName TCP supports both static and dynamic configurations"
+        },
+        {
+          "id": "B",
+          "text": "The Browser TCP specifies browser settings for hybrid apps on Android and iOS"
+        },
+        {
+          "id": "C",
+          "text": "The generic AppiumServer TCP is used only for BrowserStack configurations"
+        },
+        {
+          "id": "D",
+          "text": "A wildcard in the DeviceName TCP allows targeting any Android device with specific criteria"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B",
+        "D"
+      ],
+      "hint": "One option claims a 'generic' TCP is locked to a single specific provider — that's a contradiction in terms.",
+      "rationale": "DeviceName supports both a static, pinned value and a dynamic, wildcard/criteria-based value (matching D too); Browser specifies webview/browser settings for hybrid apps on either platform. AppiumServer is explicitly generic and provider-agnostic — it can point at BrowserStack, but also Sauce Labs, Perfecto, or any other Appium-compatible grid, so 'used only for BrowserStack' is false."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "What is the primary purpose of TCPs in Tosca Mobile?",
+      "options": [
+        {
+          "id": "A",
+          "text": "To define and customize mobile test execution settings"
+        },
+        {
+          "id": "B",
+          "text": "To store test execution results in external databases"
+        },
+        {
+          "id": "C",
+          "text": "To replace test cases with predefined test scripts"
+        },
+        {
+          "id": "D",
+          "text": "To limit the number of test cases that can be executed"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "hint": "Think about what TMAServer, DeviceName, LiveView and ScreenFlow have in common.",
+      "rationale": "TCPs are how a mobile execution is configured: which agent to talk to (TMAServer), which device to run on (DeviceName), whether to stream the device (LiveView), whether to capture screenshots (ScreenFlow). They configure execution — they don't store results, replace TestCases, or cap how many run."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "Which TCP enables Tosca Mobile to capture and store screenshots automatically during test execution?",
+      "options": [
+        {
+          "id": "A",
+          "text": "ScreenFlowPath"
+        },
+        {
+          "id": "B",
+          "text": "ScreenFlow"
+        },
+        {
+          "id": "C",
+          "text": "LiveView"
+        },
+        {
+          "id": "D",
+          "text": "ScrollToVisible"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "hint": "Two of these are a pair — one switches the feature on, the other only says where the files land.",
+      "rationale": "ScreenFlow set to True is the switch: it makes Tosca automatically save screenshots of TestStepValues with ActionMode Input. ScreenFlowPath is its companion and only specifies the storage location, so it can't enable anything on its own — though the docs require you to add both together. LiveView streams the device live without storing anything, and ScrollToVisible is about bringing a control into view, not screenshots."
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Connection mechanism",
+      "value": "Test configuration parameters (TCPs) — same mechanism as TestDataService and SelfHealing."
+    },
+    {
+      "key": "Key TCPs",
+      "value": "TMAServer (agent URL) · DeviceName (udid / emulator id) · LiveView (True/False)."
+    },
+    {
+      "key": "Device allocation",
+      "value": "Static (pinned DeviceName, same exact device every run) vs Dynamic (wildcard/criteria-based DeviceName, any matching free device) — Static wins for consistent testing on a specific device."
+    },
+    {
+      "key": "Browser TCP",
+      "value": "Browser/webview settings for hybrid apps, on Android and iOS (e.g. ChromeAndroid)."
+    },
+    {
+      "key": "AppiumServer TCP",
+      "value": "Generic, provider-agnostic — points at any Appium-compatible server/grid (BrowserStack, Sauce Labs, Perfecto, custom grids), not locked to one provider."
+    },
+    {
+      "key": "The #1 trap",
+      "value": "TMAServer MUST end with a trailing slash. Scan tolerates the missing slash; execution does not, and fails with a misleading 'device not connected' message."
+    },
+    {
+      "key": "Remote startup",
+      "value": "tricentis-mobile-agent start --rest-address <IP>:<port> — the tray launch is local-only."
+    },
+    {
+      "key": "Health check",
+      "value": "GET http://<host>:<port>/api/devices → udid, name, connected, busy, statusReady — proves device-side health independent of Tosca."
+    },
+    {
+      "key": "Diagnostic order",
+      "value": "TMA console Ready → /api/devices health check → verify TCP format against docs → only then investigate network/firewall."
+    },
+    {
+      "key": "ScreenFlow / ScreenFlowPath",
+      "value": "ScreenFlow = True switches on automatic screenshots of ActionMode Input TestStepValues; ScreenFlowPath sets the storage location. Configure both — the docs require the pair."
+    }
+  ],
+  "topics": [
+    {
+      "title": "Configure local or remote test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/configure_mobile_local_remote_tests.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Get started with mobile test automation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "duration": "docs"
+    }
+  ]
+}
