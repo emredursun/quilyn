@@ -75,7 +75,7 @@
     currentMode = 'lms';
     setLmsChrome(true);
     setNavActive('lms');
-    document.title = "Quilyn — Free Certification Exam Prep (Pega & Tricentis Tosca)";
+    document.title = "Quilyn — Free Certification Exam Prep (Pega, Tricentis Tosca & Testim)";
     /* Engine already re-rendered sidebar + content; nothing else to do */
   }
 

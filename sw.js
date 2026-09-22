@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quilyn-v22';
+const CACHE_NAME = 'quilyn-v23';
 const STATIC_ASSETS = [
   './',
   './index.html',
