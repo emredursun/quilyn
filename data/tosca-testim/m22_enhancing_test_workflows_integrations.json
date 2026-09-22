@@ -1,0 +1,154 @@
+{
+  "moduleId": "TESTIM-M22",
+  "moduleTitle": "Enhancing test workflows with integrations in Tricentis Testim",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/enhancing-test-workflows-with-integrations-in-tricentis-testim",
+  "learningObjectives": [
+    "Explain how to integrate tests with CI using Testim CLI and how to connect it to major CIs using a simple shell command.",
+    "Summarize the steps to set up and integrate Testim with Azure DevOps.",
+    "Discuss the process of linking a test in Testim to a test case in TTM for Jira and interpreting test results."
+  ],
+  "estTime": "20 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "CI integration recap: the CLI is the universal connector",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "One CLI, every major CI",
+          "description": "Testim CLI is installed with `npm i -g @testim/testim-cli` and, because it's a simple shell command, it can be wired into any CI platform capable of running one — Jenkins, GitHub Actions, GitLab CI, Azure DevOps, and more — without needing a bespoke plugin per platform."
+        },
+        {
+          "type": "note",
+          "text": "This is the same underlying mechanism covered for Jenkins earlier in this path — Azure DevOps integration (next section) uses the identical CLI, just wired into Azure Pipelines' own YAML syntax instead of a Jenkinsfile/build step."
+        }
+      ],
+      "bulletPoints": [
+        "Same CLI, same install command, across every major CI platform.",
+        "No platform-specific plugin required — just a shell command any CI runner can execute."
+      ]
+    },
+    {
+      "sectionTitle": "Setting up Azure DevOps integration",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Azure Pipelines setup",
+          "description": "Testim provides a ready-to-use YAML code snippet for Azure Pipelines that installs Node.js and the Testim CLI, then runs the same kind of `testim --token ... --project ...` command used for any other CI — added as a step (or a full pipeline stage) in the Azure DevOps pipeline definition."
+        },
+        {
+          "type": "note",
+          "text": "Azure DevOps integration here is specifically about triggering Testim runs from an Azure Pipeline — it is a CI trigger mechanism, not the same thing as linking individual test cases to Azure DevOps work items (that kind of test-management-level linking is what the TTM for Jira integration provides, for Jira specifically — not Azure DevOps)."
+        }
+      ],
+      "bulletPoints": [
+        "Azure DevOps setup = a YAML code snippet (install Node.js + Testim CLI, then run the CLI) added to the pipeline.",
+        "This is a CI trigger integration — it doesn't provide Azure DevOps work-item linking; that capability belongs to the Jira-specific TTM integration."
+      ]
+    },
+    {
+      "sectionTitle": "Linking a test to TTM for Jira and viewing results",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Finding the integration",
+          "description": "Testim's integrations live under the Integration settings, where a Test Management section lists modules including TTM for Jira and Xray. Within TTM for Jira's module, you provide the required Jira API token and Jira domain information to connect the two systems."
+        },
+        {
+          "type": "concept",
+          "term": "Linking a test to a TTM for Jira test case",
+          "description": "Once connected, an existing Testim test can be linked (one-to-many) to a TTM for Jira test case — and a bulk create-and-map option lets you select multiple Testim tests and create their corresponding TTM for Jira test cases in one action, instead of mapping them individually."
+        },
+        {
+          "type": "concept",
+          "term": "Viewing results in TTM for Jira",
+          "description": "After running a mapped test in Testim using a Remote Grid (not a local editor run), the result is automatically pushed to TTM for Jira and appears under that project's Test Execution tab — giving a single place to see both Testim's own results and TTM for Jira's execution history. The name and pass/fail status are the details pushed from Testim to TTM for Jira."
+        },
+        {
+          "type": "note",
+          "text": "The Remote Grid requirement matters: a test run directly from the local editor will NOT be reflected in TTM for Jira's Test Execution tab — only remote/grid-based runs (the same 'counted runs' distinction covered in the results-management module) sync back."
+        }
+      ],
+      "bulletPoints": [
+        "Integration setup: Integration settings → Test Management section → TTM for Jira → Jira API token + domain.",
+        "Linking: one Testim test → one TTM for Jira test case (one-to-many overall); bulk create-and-map for efficiency.",
+        "Viewing results: only Remote Grid runs sync to TTM for Jira's Test Execution tab — local editor runs don't."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Expecting Azure DevOps integration to link test cases to work items like TTM for Jira does",
+      "trapDescription": "Assuming the Azure DevOps integration automatically updates test results and links test cases to Azure DevOps work items, the way TTM for Jira links to Jira test cases.",
+      "bestPractice": "Azure DevOps integration is a CI trigger mechanism (a YAML snippet running the Testim CLI) — it does not provide automatic work-item linking. That deeper test-case-linking capability is specific to the TTM for Jira integration."
+    },
+    {
+      "title": "Running a mapped test from the local editor and expecting it in TTM for Jira",
+      "trapDescription": "Running a test linked to a TTM for Jira test case from the Testim Visual Editor, then checking TTM for Jira's Test Execution tab and finding nothing.",
+      "bestPractice": "Only Remote Grid runs sync results to TTM for Jira — a local editor run won't appear there, the same way local editor runs are excluded from Testim's own counted Test Runs."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "Testim enables users to automatically update test results and link test cases to work items in Azure DevOps.",
+      "options": [
+        { "id": "A", "text": "True" },
+        { "id": "B", "text": "False" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "That capability belongs to a different, Jira-specific integration.",
+      "rationale": "This is False. Automatic test-result updates and test-case linking to work items is what the TTM for Jira integration provides for Jira — the Azure DevOps integration is a CI trigger mechanism (a YAML snippet running the Testim CLI), not a work-item-linking feature."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "To set up the Jira Integration, navigate to ___ > ___ page in Testim, where you can provide the required API token and Jira domain information.",
+      "options": [
+        { "id": "A", "text": "Test Management > Test Plans" },
+        { "id": "B", "text": "Test Management > Integrations" },
+        { "id": "C", "text": "Integration > Test Management Reports" },
+        { "id": "D", "text": "Integrations > Test Management" }
+      ],
+      "correctOptions": ["D"],
+      "hint": "The top-level settings tab is 'Integration' — Test Management is a section inside it.",
+      "rationale": "The Integration settings tab contains a Test Management section listing modules like TTM for Jira and Xray — so the path is Integrations > Test Management, not the reverse, and not 'Test Plans' or 'Reports' which are unrelated pages."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Testim CLI is easily installed using NPM, and can help integrate it to all the major CI's out there that can run a simple shell command.",
+      "options": [
+        { "id": "A", "text": "True" },
+        { "id": "B", "text": "False" }
+      ],
+      "correctOptions": ["A"],
+      "hint": "This is the core reason the CLI works the same way across Jenkins, Azure DevOps, GitHub Actions, etc.",
+      "rationale": "This is True. The Testim CLI is installed via npm (`npm i -g @testim/testim-cli`) and, being a simple shell command, integrates with any major CI platform capable of running one — no platform-specific plugin required."
+    }
+  ],
+  "quickRecap": [
+    { "key": "CI + CLI", "value": "Same npm-installed CLI works across every major CI that can run a shell command." },
+    { "key": "Azure DevOps", "value": "YAML snippet (Node.js + Testim CLI) added to the pipeline — a CI trigger, not work-item linking." },
+    { "key": "Integration settings path", "value": "Integrations > Test Management → TTM for Jira / Xray modules." },
+    { "key": "TTM for Jira linking", "value": "One Testim test → one TTM for Jira test case; bulk create-and-map available." },
+    { "key": "Viewing results in TTM for Jira", "value": "Only Remote Grid runs sync — local editor runs don't appear in the Test Execution tab." }
+  ],
+  "topics": [
+    {
+      "title": "Azure Pipelines Integration (Tricentis docs)",
+      "url": "https://help.testim.io/docs/azure-devops-build-pipeline-integrations",
+      "duration": "docs"
+    },
+    {
+      "title": "TTM for Jira Integration (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/integrations/test-management-integrations/ttm-for-jira-integration.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Xray Integration (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/integrations/test-management-integrations/xray-integration.htm",
+      "duration": "docs"
+    }
+  ]
+}

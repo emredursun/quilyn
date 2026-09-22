@@ -1,0 +1,184 @@
+{
+  "moduleId": "TESTIM-M10",
+  "moduleTitle": "Extracting SMS messages using email service in Tricentis Testim",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/extracting-sms-messages-using-email-service-in-tricentis-testim",
+  "learningObjectives": [
+    "Describe what Testim's email service is.",
+    "Articulate when to use Testim's email service.",
+    "Explain the process of extracting SMS messages in a test using Testim's email service."
+  ],
+  "estTime": "5 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "What Testim's email service is",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Testim's own email service",
+          "description": "Testim generates email addresses exclusively through its own built-in email service — there's no option to plug in a third-party email provider for this. Two address types are available: a permanent address, created once from Settings → Email Service → Generate Email Address; and a temporary address, generated fresh on every run via a Generate email address step in the test itself (shown as 'Temporary' in its title)."
+        },
+        {
+          "type": "concept",
+          "term": "Validate email and Extract Value together",
+          "description": "Validate email fetches the content of a Testim inbox (for a permanent or temporary address) as an array of all messages in that mailbox — confirming a message arrived. Extract Value then pulls just the specific, stable content needed out of that message (a code, a link) into a variable for later steps to use."
+        }
+      ],
+      "bulletPoints": [
+        "Testim's email service is self-contained — addresses come only from Testim, not a third-party provider.",
+        "Permanent address: Settings → Email Service → Generate Email Address (one-time, reusable).",
+        "Temporary address: a Generate email address step in the test (fresh per run, labeled 'Temporary').",
+        "Validate email fetches inbox content; Extract Value pulls out the specific value needed."
+      ]
+    },
+    {
+      "sectionTitle": "When to use Testim's email service",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Direct email flows",
+          "description": "The obvious case: any flow where the AUT itself sends an email — signup confirmation, password reset, order confirmation — and the test needs to receive and act on that email's content."
+        },
+        {
+          "type": "concept",
+          "term": "SMS content routed through email",
+          "description": "The less obvious, but exactly what this module is about: many applications and SMS/OTP providers can be configured to forward SMS content (like a one-time verification code) to an email address instead of, or in addition to, a phone number. When the AUT or its SMS provider is set up that way, Testim doesn't need any separate SMS API integration — the SMS content simply arrives as a message in a Testim email inbox, and it's read and extracted using the exact same Validate email / Extract Value mechanism as a normal email."
+        },
+        {
+          "type": "note",
+          "text": "This is the core idea behind the module's title: it's not that Testim has a dedicated SMS-reading feature — it's that routing SMS through email lets the email service double as the SMS-reading mechanism, avoiding the need for a separate SMS testing integration."
+        }
+      ],
+      "bulletPoints": [
+        "Use Testim's email service directly whenever the AUT sends real emails that need to be validated or acted on.",
+        "Use it for SMS too, when the AUT/SMS provider can forward SMS content to an email address — same extraction mechanism, no separate SMS API needed."
+      ]
+    },
+    {
+      "sectionTitle": "Extracting an SMS-forwarded value from a test",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "The extraction pattern",
+          "description": "Rather than asserting on an entire forwarded-SMS message body, the recommended pattern is to extract only the specific, stable value needed — an OTP code, a verification link, a short confirmation phrase — and save it to a Testim variable so a later step (entering the code into the AUT, for example) can use it directly."
+        },
+        {
+          "type": "concept",
+          "term": "Choosing permanent vs. temporary for this scenario",
+          "description": "A permanent address suits a recurring flow you test repeatedly (e.g. re-verifying the same test account's phone number). A temporary, freshly-generated address suits a scenario that needs a brand-new, never-before-used contact point on every run — such as testing that a new-user SMS-verification flow works for a genuinely new signup each time."
+        }
+      ],
+      "bulletPoints": [
+        "Extract only the specific stable value (the OTP/code) from the forwarded SMS-as-email message — not the whole body.",
+        "Permanent address = recurring/reusable scenarios; temporary address = a fresh contact point needed every run."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Assuming SMS testing requires a separate SMS/telephony API integration",
+      "trapDescription": "Reaching for a third-party SMS gateway API integration to read a verification code, when the AUT/provider can simply forward the SMS to an email address instead.",
+      "bestPractice": "When SMS content can be routed to email, Testim's existing email service (Validate email + Extract Value) reads it — no separate SMS API integration needed."
+    },
+    {
+      "title": "Asserting on an entire forwarded-SMS email body instead of extracting the needed value",
+      "trapDescription": "Writing a validation that checks the full forwarded message text matches exactly, which breaks the moment any unrelated part of the forwarding template changes.",
+      "bestPractice": "Extract only the specific, stable value you actually need (the OTP code) into a variable, rather than validating the entire message body."
+    },
+    {
+      "title": "Using a permanent address for a scenario that needs a brand-new contact point every run",
+      "trapDescription": "Reusing the same permanent Testim email address to repeatedly test a new-signup SMS-verification flow that specifically needs an unused contact point.",
+      "bestPractice": "Use a temporary, freshly generated address (via the Generate email address step) when the scenario needs a fresh, never-before-seen address on each run — reserve the permanent address for recurring, repeat-use flows."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What is Testim's email service?",
+      "options": [
+        { "id": "A", "text": "A third-party email provider Testim connects to for generating test addresses." },
+        { "id": "B", "text": "Testim's own built-in mechanism for generating and reading email addresses/messages — permanent (via Settings) or temporary (via a test step)." },
+        { "id": "C", "text": "A paid add-on unrelated to test steps." },
+        { "id": "D", "text": "A feature that only works with Gmail accounts." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It's fully self-contained — no external provider involved.",
+      "rationale": "Testim generates email addresses exclusively through its own built-in email service, with permanent addresses created via Settings → Email Service and temporary addresses generated per run via a Generate email address step — not a third-party provider, a Gmail-only feature, or something disconnected from test steps."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "How is a permanent Testim email address created?",
+      "options": [
+        { "id": "A", "text": "Settings → Email Service → Generate Email Address." },
+        { "id": "B", "text": "By adding a Generate email address step inside the test." },
+        { "id": "C", "text": "Permanent addresses aren't supported — every address is temporary." },
+        { "id": "D", "text": "By connecting an external email provider's API key." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "It's a one-time setup action, not a per-run test step.",
+      "rationale": "A permanent email address is created once, from Settings → Email Service → Generate Email Address. A Generate email address STEP inside a test instead produces a fresh, temporary address on every run — the two are distinct mechanisms."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Why would a tester use Testim's email service to extract an SMS-based verification code, rather than integrating a separate SMS API?",
+      "options": [
+        { "id": "A", "text": "Because Testim cannot handle SMS in any form." },
+        { "id": "B", "text": "Because when the AUT/SMS provider can forward SMS content to an email address, Testim's existing email service can read it using the same Validate email / Extract Value mechanism — no separate SMS integration needed." },
+        { "id": "C", "text": "Because SMS messages are always identical to emails technically." },
+        { "id": "D", "text": "Because Testim's email service physically sends SMS messages." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The trick is routing SMS through email, not a special SMS feature.",
+      "rationale": "When SMS content is routed to email, the SMS effectively becomes a message in a Testim inbox — readable and extractable with the same Validate email / Extract Value pattern used for any email, avoiding the need for a dedicated SMS API integration."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "A test needs to repeatedly verify a new signup's SMS-based phone verification, where each signup must use a brand-new, never-before-used contact point. Which type of Testim email address fits?",
+      "options": [
+        { "id": "A", "text": "A permanent address, reused every run." },
+        { "id": "B", "text": "A temporary address, freshly generated on each run via a Generate email address step." },
+        { "id": "C", "text": "Either works identically for this scenario." },
+        { "id": "D", "text": "Neither — this scenario isn't supported by Testim's email service." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The scenario explicitly needs a fresh, unused contact point each time.",
+      "rationale": "A temporary address, generated fresh via a Generate email address step, gives a brand-new contact point on every run — exactly what a 'must be never-before-used' signup/verification scenario needs. A permanent address would reuse the same address every time, the opposite of what's required."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "Why is it recommended to extract only the OTP code from a forwarded SMS-as-email message rather than validating the entire message body?",
+      "options": [
+        { "id": "A", "text": "Extracting values is not actually supported for forwarded messages." },
+        { "id": "B", "text": "Extracting only the stable value needed avoids breaking the test when unrelated parts of the forwarding/email template change." },
+        { "id": "C", "text": "Whole-message validation runs faster than value extraction." },
+        { "id": "D", "text": "It has no effect on test stability either way." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Think about maintainability when the message template changes.",
+      "rationale": "Extracting only the specific, stable value needed (the OTP code) keeps the test focused on what actually matters, so it doesn't break every time an unrelated part of the forwarding/email template is redesigned."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Testim's email service", "value": "Self-contained — no third-party provider; permanent (Settings) or temporary (test step) addresses." },
+    { "key": "Permanent address", "value": "Settings → Email Service → Generate Email Address — one-time, reusable." },
+    { "key": "Temporary address", "value": "Generate email address step — fresh per run, labeled 'Temporary'." },
+    { "key": "SMS via email", "value": "If SMS can be forwarded to an email address, Testim's email service reads it — no separate SMS API needed." },
+    { "key": "Extraction pattern", "value": "Pull only the specific stable value (OTP, link) into a variable, not the whole body." }
+  ],
+  "topics": [
+    {
+      "title": "Validate email (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/email-validation.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Extract Value Step (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/extract-text.htm",
+      "duration": "docs"
+    }
+  ]
+}

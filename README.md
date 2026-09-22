@@ -1,6 +1,6 @@
 # Quilyn — Free Certification Exam Prep
 
-A free, offline-capable study app for IT certification exams — **Pega** (PCBA, PCSA) and **Tricentis Tosca** (AS1, AS2, API testing, TDS1, TDS2, AE1, and mobile test automation). Structured study guides, practice questions, mock exams, and spaced-repetition review. No account required, no tracking, works offline.
+A free, offline-capable study app for IT certification exams — **Pega** (PCBA, PCSA), **Tricentis Tosca** (AS1, AS2, API testing, TDS1, TDS2, AE1, and mobile test automation), and **Tricentis Testim** (Product Consultant). Structured study guides, practice questions, mock exams, and spaced-repetition review. No account required, no tracking, works offline.
 
 **[Live App →](https://emredursun.github.io/quilyn/)**
 
@@ -21,6 +21,7 @@ A free, offline-capable study app for IT certification exams — **Pega** (PCBA,
 | Tricentis Tosca Test Design Specialist Level 2 (TDS2) | 7 sections | practice + reference |
 | Tricentis Tosca Automation Engineer Level 1 (AE1) | 13 sections | practice + reference |
 | Tricentis Tosca Mobile (Getting Started + Automating Mobile Apps on TMA + Advanced Use Cases) | 18 sections | practice + reference |
+| Tricentis Testim Product Consultant | 32 sections | practice + reference |
 
 ### Per-module features
 - **Study Guide** — Core Concept cards, analogies, and worked examples
@@ -31,7 +32,7 @@ A free, offline-capable study app for IT certification exams — **Pega** (PCBA,
 ### App-level features
 - **Mock Exams** — Full timed exams (90 min, 65% pass mark) with domain breakdown
 - **Smart Review / SRS** — Spaced-repetition flashcards (Leitner 5-box) with confidence calibration
-- **Global Search** — `Ctrl/⌘ K` searches across all 153 modules instantly
+- **Global Search** — `Ctrl/⌘ K` searches across all 185 modules instantly
 - **Progress Backup/Restore** — Export your scores & SRS progress as JSON; import on any device
 - **Study Activity Heatmap** — Calendar view of your study history
 - **Keyboard Shortcuts** — `A B C D` select options · `Enter` checks answer · `H` toggles hint
@@ -87,7 +88,8 @@ quilyn/
     ├── tosca-tds1/               Tricentis Tosca TDS1 (Test Design Specialist L1) section JSON files
     ├── tosca-tds2/               Tricentis Tosca TDS2 (Test Design Specialist L2) section JSON files
     ├── tosca-ae1/                Tricentis Tosca AE1 (Automation Engineer L1) section JSON files
-    └── tosca-mobile/             Tricentis Tosca Mobile (Getting Started with Mobile Test Automation) section JSON files
+    ├── tosca-mobile/             Tricentis Tosca Mobile (Getting Started with Mobile Test Automation) section JSON files
+    └── tosca-testim/             Tricentis Testim Product Consultant section JSON files
 ```
 
 All content is authored as original study notes (concept cards, summaries, practice questions). Official third-party course materials — Tricentis exercise workbooks, transcripts, and Tosca subset (`.tsu`) files — are **not** included in this repository; the relevant modules link to the official Tricentis Academy courses instead.

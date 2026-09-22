@@ -1,0 +1,299 @@
+{
+  "moduleId": "TESTIM-M05",
+  "moduleTitle": "Optimizing Test Execution in Tricentis Testim",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/optimizing-test-execution-in-tricentis-testim",
+  "learningObjectives": [
+    "List the benefits of running multiple tests locally, using the Scheduler, and running tests in Incognito mode with Testim IO.",
+    "Use a configuration file with the Testim CLI, and interpret test results, test duration, run configuration, and test parameters.",
+    "Describe the Execution Run view and Test Runs view to analyze statistics of past tests run by local suite, CI, or Scheduler."
+  ],
+  "estTime": "40 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Running multiple tests locally and on a schedule",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Run multiple tests locally",
+          "description": "From Test List > Tests, selecting several tests and running them takes control of your mouse and runs the selected tests sequentially in your local Chrome browser (local runs are Chrome-only). Because Testim is actively driving the browser, you should not use your mouse or computer while the tests run. Locally-run tests are tracked and viewable afterward under Runs > Executions, tagged 'local-suite'."
+        },
+        {
+          "type": "note",
+          "text": "Local runs are sequential and single-browser: each test in the batch expects the browser to be in a clean state before it starts. If the browser from the previous test doesn't close properly, the next test case in the batch is liable to fail to run, since it can't reliably take over an already-open, unexpected browser state."
+        },
+        {
+          "type": "concept",
+          "term": "Scheduler",
+          "description": "Lets you schedule tests to run on a predefined schedule (the test must carry a Label or belong to a Test Suite), with options for Where to run (which grid) and Branch. A schedule can be cloned, modified, and saved as a new schedule — reducing the effort and risk of manually recreating a similar configuration. The Scheduler is especially valuable for teams that don't have CI/CD tooling in place: it provides built-in, manually-defined scheduled execution without needing a Jenkins/GitHub Actions/Azure DevOps pipeline to trigger runs."
+        }
+      ],
+      "bulletPoints": [
+        "Local multi-test runs are sequential, Chrome-only, and take over your mouse — don't interact with the machine while they run.",
+        "An unclosed browser from a prior local test risks the next test case in the batch failing to run.",
+        "Scheduler runs on a defined schedule (test needs a Label or Test Suite); schedules can be cloned/modified.",
+        "Scheduler is the right fit for teams without CI/CD tooling who still want automated, scheduled execution."
+      ]
+    },
+    {
+      "sectionTitle": "Incognito mode and the Configuration File",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Incognito mode (Testim IO)",
+          "description": "Running tests in Incognito mode starts each execution from a fresh browser state — no cookies, no local storage, nothing remembered from a prior run. This is the primary benefit: a clean, predictable starting point every time, rather than saved login states or stored cookies leaking between runs and masking real issues (like whether a login flow genuinely still works)."
+        },
+        {
+          "type": "concept",
+          "term": "Configuration File with the CLI",
+          "description": "A Configuration File passed to the CLI is the main mechanism for keeping sensitive values (credentials, tokens) out of the test itself. Rather than hardcoding a password into a step, hidden parameters and encrypted credentials can be supplied through the Configuration File (or a JSON Parameters File) at run time — Testim explicitly recommends against exposing sensitive information in plain text or version history, pointing instead to the Configuration File, Hidden Parameters, and the Secrets Manager."
+        }
+      ],
+      "bulletPoints": [
+        "Incognito mode's core benefit: every execution starts from a fresh state, with no saved logins or stored cookies carried over.",
+        "The Configuration File's main use case: keep the test itself free of sensitive data, supplying it instead via hidden parameters/encrypted credentials at run time."
+      ]
+    },
+    {
+      "sectionTitle": "Timeouts and retries",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Test timeout",
+          "description": "A timeout period (in milliseconds) aborts a test run if it's exceeded. The default is 10 minutes, with a maximum of 3 hours — long enough for legitimately slow flows, but still a hard ceiling against a genuinely hung run."
+        },
+        {
+          "type": "concept",
+          "term": "Timeout retry",
+          "description": "By default, when a test fails specifically due to 'test reached timeout', Testim automatically re-executes it — up to 3 times — before marking it failed. This default can be disabled with the --disable-timeout-retry CLI flag when you want a timeout to fail immediately and be investigated rather than retried."
+        },
+        {
+          "type": "concept",
+          "term": "Failed-test retries",
+          "description": "Separately, failed-test retries can be configured to re-run any failed test repeatedly until it either passes or the max retry count is reached — a broader mechanism than the timeout-specific retry, aimed at absorbing general flakiness rather than one specific failure cause."
+        }
+      ],
+      "bulletPoints": [
+        "Timeout: default 10 min, max 3 hr, aborts a hung run.",
+        "Timeout retry: up to 3 automatic re-runs specifically for 'reached timeout' failures; disable with --disable-timeout-retry.",
+        "Failed-test retries: a broader retry-until-pass-or-max mechanism for any failure, not just timeouts."
+      ]
+    },
+    {
+      "sectionTitle": "Diagnosing a failure and reading the Execution Runs view",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Diagnosing why a test failed",
+          "description": "Beyond just an error message, comparing the run's baseline (expected) screenshot against its result (actual) screenshot is one of the most direct ways to see exactly what went wrong visually — a layout shift, an unexpected error banner, a missing element — rather than immediately re-running blind or reading console logs in isolation."
+        },
+        {
+          "type": "concept",
+          "term": "Execution Runs view",
+          "description": "The runs graph gives an overview of the number of executions and tests per execution over time, plotting duration on one axis against time, and showing Concurrency (how many executions ran at the same time as a given one). Hovering an entry surfaces further details: Extension Version, Source (local vs. remote), CLI Version, Grid Name, and the Test Data (parameters) used for that run."
+        }
+      ],
+      "bulletPoints": [
+        "Compare baseline vs. result screenshots as a direct way to evaluate why a test failed, rather than guessing or blindly re-running.",
+        "Execution Runs shows duration, concurrency, and per-execution test counts, plus hover details like Source, CLI Version, Grid Name, and Test Data."
+      ]
+    },
+    {
+      "sectionTitle": "The Test Runs view: statistics across past runs",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Test Runs / Test statistics",
+          "description": "The Test Runs screen shows statistics on past runs — aggregated across all selected tests, and per-test (e.g. how many times a specific test passed/failed and its average test duration) — under the Test statistics section. Filters (status, time, execution/label) narrow what's shown, and clicking a specific run opens it in the Test Editor to drill into per-step screenshots and durations."
+        },
+        {
+          "type": "concept",
+          "term": "Counted runs vs. Local Editor Runs",
+          "description": "Remote execution runs — suite runs, plan runs, scheduled runs, and label-triggered runs — are the 'counted' runs shown in the main Test Runs view. Tests run directly from the editor are tracked separately, in their own 'Local Editor Runs' tab, and are explicitly excluded from (not counted toward) the subscription-quota-relevant Test Runs statistics."
+        }
+      ],
+      "bulletPoints": [
+        "Average test duration and pass/fail counts live in the Test Runs screen's Test statistics.",
+        "Test Runs (counted runs) = CLI, CI, and Scheduled/label-triggered executions.",
+        "Runs triggered directly from the editor are excluded — tracked separately under 'Local Editor Runs'."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Confusing timeout retry with failed-test retry",
+      "trapDescription": "Assuming the automatic timeout retry (up to 3x, timeout-specific) is the same mechanism as general failed-test retries.",
+      "bestPractice": "Timeout retry only fires for 'test reached timeout' failures and is capped at 3 automatic attempts (disable via --disable-timeout-retry). Failed-test retries are a separate, more general configuration for retrying any failure until it passes or hits a max count."
+    },
+    {
+      "title": "Setting timeout so low it fails legitimately slow flows",
+      "trapDescription": "Leaving or setting an aggressive timeout on a test that includes a genuinely slow operation (large file processing, a heavy report generation), causing false failures.",
+      "bestPractice": "The timeout can be extended up to 3 hours for scenarios that need it — extend it deliberately for known-slow flows rather than treating every timeout failure as a flaky test."
+    },
+    {
+      "title": "Touching the mouse/keyboard during a local multi-test run",
+      "trapDescription": "Interacting with the machine while Testim is driving the local browser through a batch of tests from the Test List.",
+      "bestPractice": "Testim takes control of the mouse during a local multi-test run — leave the mouse and keyboard alone until the run finishes, or risk interfering with the automation and causing spurious failures."
+    },
+    {
+      "title": "Hardcoding a password into a step instead of using the Configuration File",
+      "trapDescription": "Typing a real credential directly into a step's value field, where it's stored in plain text and shows up in version history.",
+      "bestPractice": "Supply sensitive values via hidden parameters/encrypted credentials through the Configuration File (or a JSON Parameters File) at run time — keeping the test itself free of plain-text secrets, per Testim's Secrets Manager guidance."
+    },
+    {
+      "title": "Assuming editor runs count toward the same Test Runs statistics as CI/Scheduler runs",
+      "trapDescription": "Expecting a quick ad-hoc run from the editor to show up in the main Test Runs (counted runs) numbers alongside CI/CLI/Scheduler executions.",
+      "bestPractice": "Editor runs are tracked separately under 'Local Editor Runs' and are excluded from the counted Test Runs statistics — remote runs (CLI, CI, Scheduler, label-triggered) are what populate the main view."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What would happen if the browser did not close after the first test case finished running locally when executing multiple test cases simultaneously in Testim?",
+      "options": [
+        { "id": "A", "text": "The test suite would still execute the next test case" },
+        { "id": "B", "text": "The next test case would fail to run" },
+        { "id": "C", "text": "The CLI would handle the transition" },
+        { "id": "D", "text": "The system would pause and wait for a manual trigger" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Local runs are sequential and single-browser — each test expects a clean starting state.",
+      "rationale": "Local multi-test runs execute sequentially in a single local Chrome browser instance. If that browser doesn't close cleanly after one test finishes, the next test case can't reliably take over the unexpected browser state and fails to run — there's no CLI involvement in a local run, and it doesn't simply pause for a manual trigger."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "When is it most appropriate to use the scheduler feature in Testim for running tests?",
+      "options": [
+        { "id": "A", "text": "When your team utilizes CI tools such as Jenkins, Bamboo, or similar" },
+        { "id": "B", "text": "When your team needs to execute tests immediately without any scheduling" },
+        { "id": "C", "text": "When your team lacks CI tools and needs to manually schedule test executions" },
+        { "id": "D", "text": "When you need to run tests without any labels" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "It's built-in scheduling that doesn't require a CI/CD pipeline.",
+      "rationale": "The Scheduler provides built-in, manually-defined scheduled execution without requiring CI/CD integration — making it the right fit specifically for teams that don't already have CI tooling like Jenkins driving their runs. Scheduling a test also requires it to carry a Label or belong to a Test Suite, the opposite of option D."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "What is the primary benefit of running tests in Incognito mode in Testim?",
+      "options": [
+        { "id": "A", "text": "Tests start from a fresh state on each execution" },
+        { "id": "B", "text": "Tests can save log-in states" },
+        { "id": "C", "text": "Tests can access stored cookies" },
+        { "id": "D", "text": "Tests run faster on execution" }
+      ],
+      "correctOptions": ["A"],
+      "hint": "It's about a clean starting point, not speed or persistence.",
+      "rationale": "Incognito mode's core benefit is that every run starts from a fresh browser state — no cookies, no local storage, nothing remembered. That's the opposite of saving login states or accessing stored cookies, and it isn't primarily a speed optimization."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What is the main use case of the Configuration File while using Testim CLA for testing?",
+      "options": [
+        { "id": "A", "text": "It allows users to create and maintain tests without including any sensitive data in the test itself" },
+        { "id": "B", "text": "It locates the test data is available on the local system" },
+        { "id": "C", "text": "It provides test scripts for any web application" },
+        { "id": "D", "text": "It allows users to log out automatically after the test run is finished." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "Think hidden parameters, encrypted credentials, and the Secrets Manager.",
+      "rationale": "The Configuration File is the main mechanism for supplying sensitive values (hidden parameters, encrypted credentials) at run time instead of hardcoding them into the test — keeping the test itself free of plain-text secrets. It doesn't locate local test data files, generate test scripts, or handle logout automation."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "When encountering a failed test in Testim, what would be the best approach to evaluate the failure cause?",
+      "options": [
+        { "id": "A", "text": "Immediately re-run the test without changing anything" },
+        { "id": "B", "text": "Ignore the error message and check only the console logs" },
+        { "id": "C", "text": "Compare the baseline screenshot with the result screenshot" },
+        { "id": "D", "text": "Change the test resolution and run it on a different browser" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "Visual comparison is one of the most direct ways to see what actually happened.",
+      "rationale": "Comparing the baseline (expected) screenshot against the result (actual) screenshot directly shows what changed visually — a layout shift, a missing element, an unexpected message — rather than guessing via a blind re-run, ignoring the error message, or changing the environment before understanding the cause."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "What details can be observed for each Execution Run in the Execution Runs view?",
+      "options": [
+        { "id": "A", "text": "Duration, concurrency, number of passed and failed tests" },
+        { "id": "B", "text": "Browser used, duration, concurrency, and URL" },
+        { "id": "C", "text": "Suite label, duration, total tests, and start time" },
+        { "id": "D", "text": "Scheduler, CLI version, logs, and test results" }
+      ],
+      "correctOptions": ["A"],
+      "hint": "The runs graph explicitly plots duration and concurrency, alongside how many tests ran.",
+      "rationale": "The Execution Runs graph shows duration and concurrency across time, along with the number of tests (and their pass/fail outcome) per execution — plus further hover details like Source, CLI Version, and Grid Name, which don't fully match any of the other listed combinations."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "Where would you check the average duration of test runs in Testim?",
+      "options": [
+        { "id": "A", "text": "Test statistics" },
+        { "id": "B", "text": "Run Graph" },
+        { "id": "C", "text": "Filters Panel" },
+        { "id": "D", "text": "Test retries section" }
+      ],
+      "correctOptions": ["A"],
+      "hint": "It's the same section that shows pass/fail counts per test.",
+      "rationale": "The Test Runs screen's Test statistics section displays aggregated and per-test statistics — including the number of times a test passed/failed and its average test duration. The Filters panel narrows what's shown but doesn't itself display duration, and there's no dedicated 'test retries section' for this."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "Which of the following is excluded from Test Runs in Testim?",
+      "options": [
+        { "id": "A", "text": "Tests run by CLI" },
+        { "id": "B", "text": "Tests run by CI tools" },
+        { "id": "C", "text": "Tests run by Scheduled Runs" },
+        { "id": "D", "text": "Tests run directly from the editor" }
+      ],
+      "correctOptions": ["D"],
+      "hint": "It's tracked in its own separate tab instead.",
+      "rationale": "Remote execution runs — CLI, CI, and Scheduled/label-triggered runs — are the 'counted' runs that populate the main Test Runs view. Tests run directly from the editor are tracked separately under 'Local Editor Runs' and are excluded from that counted view."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Run multiple tests locally", "value": "Sequential, Chrome-only, takes over your mouse; an unclosed browser risks the next test failing." },
+    { "key": "Scheduler", "value": "Predefined schedule (needs a Label or Test Suite); ideal for teams without CI/CD tooling." },
+    { "key": "Incognito mode", "value": "Every run starts from a fresh state — no saved logins, no stored cookies." },
+    { "key": "Configuration File", "value": "Keeps sensitive data out of the test itself via hidden parameters/encrypted credentials." },
+    { "key": "Timeout / retries", "value": "10 min default, 3 hr max; timeout retry ≤3x; failed-test retry is a broader, separate mechanism." },
+    { "key": "Diagnosing failures", "value": "Compare baseline vs. result screenshots for a direct visual read on what went wrong." },
+    { "key": "Execution Runs view", "value": "Duration, concurrency, tests per execution; hover for Source, CLI Version, Grid Name, Test Data." },
+    { "key": "Test Runs / Test statistics", "value": "Pass/fail counts and average duration per test — counted runs only, editor runs excluded." }
+  ],
+  "topics": [
+    {
+      "title": "Run multiple tests locally (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/run-multiple-tests-locally.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Scheduler - Web (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/scheduler.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Secrets Manager (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/administration/secrets.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Execution Runs Screen (Tricentis docs)",
+      "url": "https://help.testim.io/docs/execution-runs-screen",
+      "duration": "docs"
+    },
+    {
+      "title": "Test runs (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/results/test-runs.htm",
+      "duration": "docs"
+    }
+  ]
+}

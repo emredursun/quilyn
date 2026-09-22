@@ -1,0 +1,186 @@
+{
+  "moduleId": "TESTIM-M14",
+  "moduleTitle": "Performing API testing in Tricentis Testim",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/performing-api-testing-in-tricentis-testim",
+  "learningObjectives": [
+    "Describe the various API steps that can be performed in testing.",
+    "Review the steps to perform an API call in an individual test or in the context of an existing test.",
+    "Add an API validation step and configure its HTTP request method and endpoint.",
+    "Decide when to send an API request via the web page versus outside the browser context."
+  ],
+  "estTime": "7 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Two types of API steps: Add API Action vs. Validate API",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Add API Action",
+          "description": "Used to get data returned from an API call — the data it retrieves can simply be used to check that something was returned (or extracted and used later), rather than asserting a specific value on the spot."
+        },
+        {
+          "type": "concept",
+          "term": "Validate API",
+          "description": "Used to validate data returned from an API call — usually validating data directly against the backend, asserting the response matches an expected value rather than just retrieving it."
+        },
+        {
+          "type": "note",
+          "text": "Although the two can be used interchangeably in many cases, Add API Action is the recommended default because it allows passing parameters when performing the API call — something that matters as soon as the call needs to vary per test run rather than always hitting the exact same fixed request."
+        }
+      ],
+      "bulletPoints": [
+        "Add API Action: get/retrieve data from an API call (can extract or just confirm something was returned).",
+        "Validate API: validate/assert data returned from an API call against the backend.",
+        "Recommended default: Add API Action, since it supports passing parameters into the API call."
+      ]
+    },
+    {
+      "sectionTitle": "Configuring an API step",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Adding an API validation step",
+          "description": "Hover over the arrow where the step should go, click the predefined-steps icon ('M'), then choose Validations to add an API validation step to a test."
+        },
+        {
+          "type": "concept",
+          "term": "URL and request method",
+          "description": "In the URL field, you select the desired HTTP request method and enter the root endpoint and path, then configure what should happen on failure — for example, throwing an error message following a failed validation."
+        },
+        {
+          "type": "concept",
+          "term": "Validating API responses against the UI",
+          "description": "The Validate API feature lets you validate API response values against what's shown in the UI — cross-checking backend data against rendered content, not just asserting the response in isolation. You can also configure whether to retry the request if it fails, or run the step's validations even when the status code itself is an error."
+        }
+      ],
+      "bulletPoints": [
+        "Add an API step via the 'M' predefined-steps menu → Validations.",
+        "Configure HTTP method, root endpoint, and path in the URL field.",
+        "Validate API can cross-check a response value against the UI, not just the response alone."
+      ]
+    },
+    {
+      "sectionTitle": "Send via web page",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Send via web page (checked = default)",
+          "description": "Keep this checked when the API call should also carry browser information such as cookies — they're sent automatically, useful for endpoints that require the same session as the UI."
+        },
+        {
+          "type": "concept",
+          "term": "Send via web page (unchecked)",
+          "description": "Deselect it to send the API call outside the browser context, so browser restrictions don't apply — for example, when the target API doesn't support CORS and would otherwise reject an in-browser request."
+        }
+      ],
+      "bulletPoints": [
+        "Checked (default): API call rides along in the browser context, cookies included automatically.",
+        "Unchecked: API call goes out outside the browser, bypassing browser restrictions like CORS."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Leaving 'Send via web page' checked against a non-CORS API",
+      "trapDescription": "An API validation step fails, not because the data is wrong, but because the target endpoint doesn't support CORS and the browser blocks the in-context request.",
+      "bestPractice": "Uncheck Send via web page to send the API call outside the browser context, avoiding CORS restrictions that only apply to in-browser requests."
+    },
+    {
+      "title": "Only validating the raw API response, never cross-checking the UI",
+      "trapDescription": "Confirming an API response looks correct in isolation, without confirming the same data is actually rendered correctly on the page.",
+      "bestPractice": "Use Validate API to cross-check the API response value against what's displayed in the UI when the goal is confirming end-to-end correctness, not just backend correctness."
+    },
+    {
+      "title": "Defaulting to Validate API when the call needs to vary per run",
+      "trapDescription": "Using Validate API for an API call that needs different parameter values depending on the test/data set, without realizing parameter passing isn't as directly supported there.",
+      "bestPractice": "Prefer Add API Action as the default step, since it explicitly supports passing parameters into the API call — reserve Validate API for straightforward backend-data assertions where parameterization isn't the concern."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "How is an API validation step added to a test?",
+      "options": [
+        { "id": "A", "text": "Hover the arrow where it should go, click the 'M' predefined-steps icon, then choose Validations." },
+        { "id": "B", "text": "It can only be created through a custom JavaScript step." },
+        { "id": "C", "text": "By editing the project's base URL." },
+        { "id": "D", "text": "API steps are not supported in Testim." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "It's added the same way as other predefined validation steps.",
+      "rationale": "To add an API validation step, hover over the arrow where you want to add it, click the 'M' (Testim predefined steps) icon, and then click Validations."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "An API validation step keeps failing against an endpoint that doesn't support CORS, even though the data itself looks correct. What's the likely fix?",
+      "options": [
+        { "id": "A", "text": "Check 'Send via web page' so cookies are sent automatically." },
+        { "id": "B", "text": "Uncheck 'Send via web page' so the request goes out outside the browser context, avoiding CORS restrictions." },
+        { "id": "C", "text": "Switch the step to a custom validation with no other changes." },
+        { "id": "D", "text": "Increase the test's overall timeout." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "CORS restrictions only apply to requests made from inside the browser.",
+      "rationale": "Unchecking Send via web page sends the API call outside the browser context, so browser restrictions like CORS don't apply — exactly the fix for an API that doesn't support CORS."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "What can the Validate API feature do that a plain response-only check cannot?",
+      "options": [
+        { "id": "A", "text": "Cross-check API response values against elements shown in the UI." },
+        { "id": "B", "text": "Automatically generate new API endpoints." },
+        { "id": "C", "text": "Run the test on a different browser." },
+        { "id": "D", "text": "Skip authentication entirely." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "It bridges backend response data and what's rendered on the page.",
+      "rationale": "The Validate API feature allows validating API response values against elements in the UI, letting a test confirm the backend data and what's actually displayed to the user are consistent — not just checking the response in isolation."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What is the main difference between the Add API Action and Validate API steps in Testim?",
+      "options": [
+        { "id": "A", "text": "Add API Action gets data returned from an API call, while Validate API is used to validate that returned data (usually against the backend)." },
+        { "id": "B", "text": "Add API Action only works with GET requests, while Validate API only works with POST requests." },
+        { "id": "C", "text": "There is no functional difference — they are identical in every respect." },
+        { "id": "D", "text": "Validate API can only be used outside of a test, never inside one." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "One retrieves, the other asserts.",
+      "rationale": "Add API Action is used to get data returned from an API call (which can simply be used to confirm something was returned), while Validate API is used to validate that returned data, typically against the backend — they aren't tied to specific HTTP methods, and they're both usable inside a test."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "Although Add API Action and Validate API can often be used interchangeably, which is recommended as the default, and why?",
+      "options": [
+        { "id": "A", "text": "Validate API, because it runs faster." },
+        { "id": "B", "text": "Add API Action, because it allows passing parameters when performing the API call." },
+        { "id": "C", "text": "Neither is recommended over the other in any situation." },
+        { "id": "D", "text": "Validate API, because it doesn't require an endpoint URL." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Think about which one supports varying the call per test run.",
+      "rationale": "Add API Action is the recommended default specifically because it allows passing parameters when performing the API call, which matters whenever the call needs to vary per test run rather than always hitting a fixed request."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Add API Action", "value": "Gets data from an API call (retrieve/confirm returned data) — recommended default, supports parameters." },
+    { "key": "Validate API", "value": "Validates data returned from an API call, usually against the backend." },
+    { "key": "Adding the step", "value": "'M' predefined-steps icon → Validations." },
+    { "key": "URL field", "value": "HTTP method + root endpoint + path." },
+    { "key": "Validate API", "value": "Can cross-check response values against the UI, not just the response alone." },
+    { "key": "Send via web page", "value": "Checked = cookies sent automatically; unchecked = bypasses browser restrictions like CORS." }
+  ],
+  "topics": [
+    {
+      "title": "API testing (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/api-testing.htm",
+      "duration": "docs"
+    }
+  ]
+}

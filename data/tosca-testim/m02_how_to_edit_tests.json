@@ -1,0 +1,477 @@
+{
+  "moduleId": "TESTIM-M02",
+  "moduleTitle": "How to edit tests in Tricentis Testim",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/1294/how-to-edit-tests-in-tricentis-testim",
+  "learningObjectives": [
+    "Edit a recorded test's step properties, including the target element, to enhance test debugging and stability.",
+    "Recall the functionality of the Target Element options (Highlight, Reassign, Improve, View locators) and choose the right one for a given scenario.",
+    "Recognize the specialized properties available on steps like Generate random value, Generate date, Extract value, and Click — and what each one controls.",
+    "Explore the benefits of grouping steps and reusing them across tests with the Shared Steps feature."
+  ],
+  "estTime": "30 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "The target element and its Properties panel",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Target element",
+          "description": "The target element is the element that was selected in the AUT (Application Under Test) browser as the main element for a step. It is shown as a thumbnail image in the step's Properties panel, and it is fully editable after the step has been recorded."
+        },
+        {
+          "type": "concept",
+          "term": "Opening the Properties panel",
+          "description": "Hovering over any step in the test and clicking Show Properties opens the Properties panel on the right-hand side. From there, hovering over the target element thumbnail reveals four options: Highlight, Reassign, Improve, and View locators."
+        },
+        {
+          "type": "note",
+          "text": "Editing step properties (not just the target element) is also how you rename a step, edit the value a step enters, or adjust timing/behavior settings — all part of what 'editing tests' covers beyond re-recording from scratch."
+        }
+      ],
+      "bulletPoints": [
+        "Target element = the AUT element a step interacts with; it appears as a thumbnail in the step's Properties panel.",
+        "Show Properties → hover the thumbnail → Highlight / Reassign / Improve / View locators."
+      ]
+    },
+    {
+      "sectionTitle": "The four Target Element options",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Highlight",
+          "description": "Opens the AUT browser with the target element momentarily highlighted in pink. It changes nothing — it exists purely so you can visually confirm, during editing, that the correct element is targeted for a step."
+        },
+        {
+          "type": "concept",
+          "term": "Reassign",
+          "description": "Replaces the target element with a completely different element from the AUT: the system removes and overrides all existing locators for that step. Use it when the original element no longer exists at all — for example, a blue 'Login' button was removed and replaced by an entirely different control."
+        },
+        {
+          "type": "concept",
+          "term": "Improve",
+          "description": "Used when the SAME target element still exists but the DOM around it changed. Testim compares the existing locators to newly collected ones and updates (merges into) them rather than overriding them — examining which selectors changed, which stayed the same, and which disappeared. Example: the 'Login' button is still the same button, but its text changed from 'login' to 'LOG-IN' and its color changed. Improve — not Reassign — is the correct choice here, because it is the same element, not a different one."
+        },
+        {
+          "type": "concept",
+          "term": "View locators",
+          "description": "Opens the Locators panel, showing exactly how Testim's Smart Locators identify the target element and its parent elements. Testim's algorithm inspects potentially hundreds of attributes on an element, assigns each a weight, and uses the highest-weighted ones to find the element on future runs — so if some attributes change, the Smart Locator can still find the element using the others."
+        },
+        {
+          "type": "list",
+          "title": "Reassign vs. Improve — the deciding question",
+          "items": [
+            "Is it a different element now? → Reassign (locators are overridden).",
+            "Is it the same element, just changed? → Improve (locators are merged/updated, not replaced)."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Highlight = visual confirmation only, no changes made.",
+        "Reassign = point the step at a brand-new element, locators fully overridden.",
+        "Improve = same element, refreshed locators, existing data merged rather than discarded.",
+        "View locators = inspect the weighted attributes Smart Locators use to find the element."
+      ]
+    },
+    {
+      "sectionTitle": "Specialized step properties",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Expected value",
+          "description": "The value Testim checks for when the step runs (used by Validate element text, Validate CSS property, Validate HTML attribute, Wait for element text). It's editable after the step is created, and — importantly — it isn't limited to a literal string: Parameters, regular expressions, and JavaScript expressions can all be used in the Expected value field."
+        },
+        {
+          "type": "concept",
+          "term": "Expected status (checkboxes / radio buttons)",
+          "description": "Used by Validate checkbox and Validate radio button to set whether the step expects Checked (the default) or Unchecked. These validations only work on native checkbox/radio input elements — a custom checkbox implementation that doesn't use an underlying native input isn't supported."
+        },
+        {
+          "type": "concept",
+          "term": "Add Prefix / Add Suffix / String type / Length",
+          "description": "Properties of a Generate random value step. Add Prefix/Suffix attach a fixed string to every generated value (e.g. prefix 'User' → User47, User65, User32). String type controls whether the generated value uses letters only, numbers only, or both. Length sets how long the generated value is."
+        },
+        {
+          "type": "concept",
+          "term": "Date format / Time difference / Use UTC",
+          "description": "Properties of a Generate date step. The default date format is 'YYYY-MM-DD', but it can be changed to any JS date format. Time difference offsets the generated date/time before or after the current browser time (or UTC). Use UTC switches the reference time zone from the browser's local time to UTC."
+        },
+        {
+          "type": "concept",
+          "term": "Extract Mode",
+          "description": "On an Add extract value step, Extract Mode controls what data type is pulled from the matched text — by default the entire string, but it can be narrowed to a number, a date, or a regular-expression match for just part of the text. Even when extracting a Number/Date/Regular-Exp, the resulting extracted value is still stored as a string."
+        },
+        {
+          "type": "concept",
+          "term": "Variable name and Variable scope",
+          "description": "Add extract value step, Get cookie, Generate random value, and Generate date steps all store their result in a variable — Variable name sets what that variable is called (subject to JavaScript naming rules: no spaces or special characters). Variable scope controls where it can be referenced: Local (within the same group, or the same test if declared at test level), Test (the default — across steps and groups in the same test), or Suite (across tests in the same test suite)."
+        },
+        {
+          "type": "concept",
+          "term": "Native events (Click step)",
+          "description": "A Click step can be configured, at the project level, to fire as a Native event (the browser's real, built-in click-handling pipeline — what happens on an actual mouse click or tap) or a Non-Native event (a synthetic/programmatic click dispatched via JavaScript, simulating the interaction). If a Click step reports as passed but the click visibly didn't do anything in the AUT, toggling the Native events checkbox is a standard troubleshooting step."
+        },
+        {
+          "type": "concept",
+          "term": "Pre-step delay (ms)",
+          "description": "Available on Validate element not visible and Wait for element not visible. By default there's no delay, but you can set one (in milliseconds) to first wait before checking that an element is absent — useful when you want to make sure an element doesn't suddenly appear a moment later, not just that it's absent right now."
+        },
+        {
+          "type": "concept",
+          "term": "Sleep duration",
+          "description": "The property of a Sleep step — how long (in ms) the test pauses before the next step. The default is 1 second (1,000 ms), and it's directly editable."
+        },
+        {
+          "type": "concept",
+          "term": "+PARAMS",
+          "description": "Available on custom/API/network steps (Add custom action, Add API action, Add custom validation, Validate API, Add network validation, Add custom wait for). Clicking the + next to PARAMS lets you define HTML and JS parameters for the step, so it can be reused to test different scenarios without hardcoding the values in advance."
+        },
+        {
+          "type": "concept",
+          "term": "Auto complete",
+          "description": "While recording a test, Testim watches for a match against your existing Shared Groups and suggests them as the next steps — a pop-up labeled 'Auto record your steps' appears above the steps counter listing the matching suggestions. Clicking a suggestion has Testim automatically perform and save those steps in the test being recorded, instead of you re-recording a sequence you've already built elsewhere. If the matched group has parameters, you're prompted to name them and supply values before the steps are added. This feature is available on the professional plan."
+        },
+        {
+          "type": "concept",
+          "term": "Replace with a clone / See old revisions",
+          "description": "Replace with a clone detaches a step from a Shared Step so an edit affects only this one test, instead of every test using that shared step. See old revisions opens the list of automatically-saved prior versions of the test (change message, user, date) whenever a change is saved — including changes to a shared step — letting you inspect or revert to an earlier revision."
+        }
+      ],
+      "bulletPoints": [
+        "Expected value accepts literal text, Parameters, Regex, or JS expressions — not just a plain string.",
+        "Checkbox/radio validations only work on native input elements, not custom non-input implementations.",
+        "Variable scope: Local (group/test) < Test (default, whole test) < Suite (across tests in a suite).",
+        "Native events toggle explains 'the click step passed but nothing happened' failures.",
+        "Auto complete suggests matching Shared Groups while recording — pick one instead of re-recording it.",
+        "Replace with a clone edits just one test's copy; a normal edit to a shared step changes every test using it."
+      ]
+    },
+    {
+      "sectionTitle": "Reusable editing: groups and Shared Steps",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Groups",
+          "description": "Steps can be grouped together, and groups can be nested inside other groups. A group is identified in the test by a folder icon in its upper-left corner."
+        },
+        {
+          "type": "concept",
+          "term": "Shared Steps / Shared Group",
+          "description": "Selecting the Shared Group checkbox on a group makes it callable from other tests in the project — not just copy-pasted, but referenced, so a single edit to the shared group propagates to every test that uses it. This is the core mechanism for reusable, maintainable test authoring (e.g. a login sequence built once and reused everywhere)."
+        },
+        {
+          "type": "note",
+          "text": "Groups can take parameters (variables). When a group is shared across multiple tests, those parameters stay available in every test that calls it — each caller just supplies its own values instead of duplicating the underlying steps."
+        },
+        {
+          "type": "concept",
+          "term": "Shared Steps Library",
+          "description": "A dedicated library view listing every shared step, group, and folder in the project, with four columns: Name, Date Modified, Kind (shared step / group / folder, plus the underlying step type), and Used by (a clickable count of how many tests reference that item — clicking it navigates to the Test Library filtered to just those tests). The library can be filtered by category: Groups, Actions, Validations, and Wait for."
+        },
+        {
+          "type": "concept",
+          "term": "Labels",
+          "description": "A lightweight organizational tool applied to tests in the Test Library, letting you categorize and quickly find tests without moving them between folders. A test can carry multiple labels at once (e.g. 'smoke', 'checkout'), and the library can be filtered or searched by label — useful once a project's test count grows past what folders alone can keep navigable. (Covered in more depth, alongside folders and dependencies, in the 'Advanced test management' module.)"
+        }
+      ],
+      "bulletPoints": [
+        "Group steps with the folder icon; nest groups inside groups when useful.",
+        "Check 'Shared Group' to make a group callable from other tests — edit once, every caller updates.",
+        "Parameters on a shared group let each calling test supply its own values without duplicating steps.",
+        "Shared Steps Library filters by Groups / Actions / Validations / Wait for; its 'Used by' column counts referencing tests and links to them.",
+        "Labels organize the Test Library by tag, not location — a test can carry several at once."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Using Reassign when Improve was the right call",
+      "trapDescription": "Reassigning a step whose target element still exists but merely changed appearance or DOM position — this discards Testim's existing locator history instead of refining it.",
+      "bestPractice": "If it is still the SAME element (just changed), use Improve so Testim merges the new locators with the old ones. Save Reassign for when the element has genuinely been replaced by a different one."
+    },
+    {
+      "title": "Treating Highlight as an editing action",
+      "trapDescription": "Assuming Highlight modifies the step's locators or properties in some way.",
+      "bestPractice": "Highlight is read-only — it only opens the AUT browser and flashes the element in pink so you can visually confirm the target. It makes no changes to the step."
+    },
+    {
+      "title": "Copy-pasting login steps into every test instead of sharing them",
+      "trapDescription": "Duplicating the same sequence of steps (e.g. a login flow) across many tests, so a UI change means editing every single test individually.",
+      "bestPractice": "Group the steps once and mark the group as a Shared Group. Every test that calls it inherits future edits automatically, which is the entire point of Shared Steps for maintainability."
+    },
+    {
+      "title": "Editing a shared step and assuming it only affects the current test",
+      "trapDescription": "Changing a Shared Step's properties directly, not realizing every test that references that shared step just changed too.",
+      "bestPractice": "If the change should apply everywhere, editing the shared step directly is correct. If it should apply to only this one test, use Replace with a clone first to detach a private copy before editing."
+    },
+    {
+      "title": "Trying to validate a custom (non-native) checkbox widget",
+      "trapDescription": "Adding a Validate checkbox / Validate radio button step against a div-based custom control styled to look like a checkbox.",
+      "bestPractice": "Checkbox and radio button validations only work on native checkbox/radio input elements. A custom implementation without an underlying native input isn't supported by these validation types."
+    },
+    {
+      "title": "Assuming a property edit is applied the moment it's typed",
+      "trapDescription": "Editing a field in the Properties panel, navigating away, and assuming the change was saved automatically.",
+      "bestPractice": "A property change is only applied to the test after clicking the Save button on the header bar — not the instant you finish editing the field."
+    },
+    {
+      "title": "Re-recording a login (or other) sequence that Auto complete already offered",
+      "trapDescription": "Manually re-recording a step sequence from scratch while ignoring the 'Auto record your steps' suggestion pop-up that matched it to an existing Shared Group.",
+      "bestPractice": "When Auto complete suggests a matching Shared Group while recording, use it — Testim performs and saves those steps automatically (prompting for any group parameters), which is faster and keeps the test referencing the shared, reusable group instead of a fresh duplicate."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What is a Target Element in Tricentis Testim?",
+      "options": [
+        { "id": "A", "text": "A configuration file that contains environment-specific data." },
+        { "id": "B", "text": "A user profile used to simulate different types of users in testing scenarios." },
+        { "id": "C", "text": "The UI components you want your automated tests to interact with." },
+        { "id": "D", "text": "A pre-defined test script that automates testing tasks." }
+      ],
+      "correctOptions": ["C"],
+      "hint": "It's the thing selected in the AUT browser as the main element for a step.",
+      "rationale": "The target element is the element selected in the AUT browser as the main element for a step — the UI component the step interacts with. It has nothing to do with environment config, user profiles, or being a script itself."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "What is the functionality of the \"Highlight\" Target Element option?",
+      "options": [
+        { "id": "A", "text": "It highlights the entire test case script to identify any potential errors in the test steps." },
+        { "id": "B", "text": "It visually highlights the selected element on the web page during the test run to confirm that the correct element is being targeted for interaction." },
+        { "id": "C", "text": "It highlights all elements on the web page that match a certain criterion, such as class name or tag, to help with test script creation." },
+        { "id": "D", "text": "It highlights the differences between two test runs to help identify changes in the application's user interface." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It opens the AUT browser and flashes the element in a color — nothing else happens.",
+      "rationale": "Highlight opens the AUT browser with the target element momentarily highlighted in pink, letting you visually confirm which element is currently targeted. It's a read-only confirmation, not a script-wide check, a selector search, or a run-comparison tool."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A step's target element — a blue 'Login' button — was completely removed from the page and replaced by an unrelated 'Sign in with SSO' link elsewhere on the page. Which Target Element option should you use?",
+      "options": [
+        { "id": "A", "text": "Highlight" },
+        { "id": "B", "text": "Reassign" },
+        { "id": "C", "text": "Improve" },
+        { "id": "D", "text": "View locators" }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The original element is gone entirely — you need to point the step at a genuinely different element.",
+      "rationale": "Reassign replaces the target element with a different element from the AUT, removing and overriding all existing locators. It's the right choice when the original element no longer exists, as opposed to Improve, which is for the same element that has merely changed."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "The same 'Login' button is still on the page, but it now reads 'LOG-IN' in green instead of 'login' in blue. Which option keeps the step's existing locator history while updating it for the change?",
+      "options": [
+        { "id": "A", "text": "Reassign, since the button's appearance changed." },
+        { "id": "B", "text": "Improve, since it is still the same underlying element." },
+        { "id": "C", "text": "Highlight, since it will automatically fix the locators." },
+        { "id": "D", "text": "View locators, since it edits the selectors directly." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Reassign overrides; Improve merges.",
+      "rationale": "Improve compares the existing locators to the newly collected ones and updates (merges) them instead of overriding them — exactly suited to a same element, changed DOM scenario. Reassign would needlessly discard the step's existing locator history."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "What must you do to make a group of steps callable from other tests in the project, instead of just existing inside the one test where it was created?",
+      "options": [
+        { "id": "A", "text": "Rename the group to start with 'Shared'." },
+        { "id": "B", "text": "Select the Shared Group checkbox on the group." },
+        { "id": "C", "text": "Export the group as a CSV file and re-import it into each test." },
+        { "id": "D", "text": "Nothing — all groups are automatically shared across the project." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It's a checkbox setting on the group itself, not a naming convention.",
+      "rationale": "Selecting the Shared Group checkbox is what makes a group available to be called from other tests in the project. A naming convention has no functional effect, and groups are not shared by default."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "What does the 'View locators' option show you about a target element?",
+      "options": [
+        { "id": "A", "text": "A video recording of every past test run against that element." },
+        { "id": "B", "text": "The weighted attributes (Smart Locators) Testim's AI uses to uniquely identify the element and its parent elements." },
+        { "id": "C", "text": "A list of every test in the project that references the element." },
+        { "id": "D", "text": "The raw HTML source code of the entire page." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It's about how the element is found, not who else uses it or what happened in the past.",
+      "rationale": "View locators opens the Locators panel, showing how Testim's Smart Locators identify the target element and its parent elements — the attributes Testim's algorithm weighted highest during analysis. It's not a run history, a cross-project usage list, or raw page source."
+    },
+    {
+      "questionId": "Q7",
+      "type": "single-select",
+      "scenario": "True or False: Changes made to a property are applied only after the save button is clicked on the header bar.",
+      "options": [
+        { "id": "A", "text": "True" },
+        { "id": "B", "text": "False" }
+      ],
+      "correctOptions": ["A"],
+      "hint": "Editing a field in the Properties panel doesn't commit the change by itself.",
+      "rationale": "Editing a property's value in the Properties panel only stages the change — it is applied to the test once the Save button on the header bar is clicked, not the moment you finish typing."
+    },
+    {
+      "questionId": "Q8",
+      "type": "single-select",
+      "scenario": "How does one change the properties of a step?",
+      "options": [
+        { "id": "A", "text": "By clicking on the Show Properties icon." },
+        { "id": "B", "text": "By making a copy of the step." },
+        { "id": "C", "text": "By manually creating a new step with the desired properties." },
+        { "id": "D", "text": "By using an earlier version of the test." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "This is the same icon used to open the panel that shows the target element thumbnail.",
+      "rationale": "Clicking the Show Properties icon on a step opens its Properties panel, where every editable property — target element, expected value, variable name/scope, and the rest — is changed directly. Copying, recreating, or reverting to an old revision are unrelated to routine property editing."
+    },
+    {
+      "questionId": "Q9",
+      "type": "single-select",
+      "scenario": "What is the benefit of marking a group as \"shared\" in Testim?",
+      "options": [
+        { "id": "A", "text": "It is automatically exported to external tools." },
+        { "id": "B", "text": "It is available for use in any other test case in the suite." },
+        { "id": "C", "text": "It is saved locally and not shared with the cloud." },
+        { "id": "D", "text": "It enables version control for the test case." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It's about cross-test reuse, not export, storage location, or versioning.",
+      "rationale": "Selecting the Shared Group checkbox makes the group available to be called from other tests in the project — not an export mechanism, a local-only storage choice, or a versioning feature."
+    },
+    {
+      "questionId": "Q10",
+      "type": "single-select",
+      "scenario": "What is the advantage of parameterizing a group in Testim?",
+      "options": [
+        { "id": "A", "text": "It allows you to change test steps dynamically during runtime." },
+        { "id": "B", "text": "It allows the test to run faster." },
+        { "id": "C", "text": "It enables the reuse of the group with different values." },
+        { "id": "D", "text": "It automatically generates reports based on the group." }
+      ],
+      "correctOptions": ["C"],
+      "hint": "It's about supplying different data to the same steps, not runtime step changes or speed.",
+      "rationale": "Parameters on a group let it be reused with different values supplied by each calling test, rather than duplicating the underlying steps — it doesn't alter step logic at runtime, speed up execution, or generate reports."
+    },
+    {
+      "questionId": "Q11",
+      "type": "single-select",
+      "scenario": "In Testim, when is it beneficial to use a shared step in your test cases?",
+      "options": [
+        { "id": "A", "text": "When performing an action that is only used in one specific test case." },
+        { "id": "B", "text": "When needing to apply the same sequence of actions, like logging in or logging out, across multiple test cases." },
+        { "id": "C", "text": "When running a test that only needs to be executed once." },
+        { "id": "D", "text": "When you want to record a completely unique step for every test case." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Shared steps pay off when the same sequence recurs across tests, like login/logout.",
+      "rationale": "Shared steps are most valuable exactly when the same action sequence — like logging in or out — needs to be applied across multiple test cases, so a future change is made once instead of in every test."
+    },
+    {
+      "questionId": "Q12",
+      "type": "single-select",
+      "scenario": "In Testim, how can you reuse a group within the same test and also apply it to other tests?",
+      "options": [
+        { "id": "A", "text": "By creating a shared group, which can be used across multiple tests." },
+        { "id": "B", "text": "By duplicating the steps each time you need them in a new test." },
+        { "id": "C", "text": "By recording the group separately in each test." },
+        { "id": "D", "text": "By creating a one-time group that only works in the test it was created in." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "One mechanism covers both within-test and cross-test reuse.",
+      "rationale": "A shared group can be called from within the same test repeatedly and from other tests in the project — duplicating, re-recording, or a one-time group would all defeat the purpose of reuse."
+    },
+    {
+      "questionId": "Q13",
+      "type": "single-select",
+      "scenario": "How does Testim's Auto Complete feature work?",
+      "options": [
+        { "id": "A", "text": "When Testim detects a testing pattern, it suggests existing groups that can be added to the test." },
+        { "id": "B", "text": "When manually entering a test script, Testim will offer suggestions to enhance the code." },
+        { "id": "C", "text": "When Testim is recovering an earlier version of a test, it will automatically make changes to revert the latest version." },
+        { "id": "D", "text": "When a test is underway, Auto Complete will ensure the test is not interrupted." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "It works during recording, matching against your existing Shared Groups.",
+      "rationale": "While recording, Testim watches for a match against your existing Shared Groups and suggests them as next steps via an 'Auto record your steps' pop-up — it isn't a code-enhancement tool, a revision-recovery mechanism, or an uninterruptible-test guarantee."
+    },
+    {
+      "questionId": "Q14",
+      "type": "single-select",
+      "scenario": "Which of the following statements is True with respect to Testim's Auto Complete feature?",
+      "options": [
+        { "id": "A", "text": "Auto Complete will identify reusable groups and suggest them in recording future tests." },
+        { "id": "B", "text": "When adding steps with Auto Complete, the step parameters are not editable." },
+        { "id": "C", "text": "Specialized Steps can not be added using Auto Complete feature." },
+        { "id": "D", "text": "Auto Complete requires a minimum of 10 tests to be recorded by Testim before it can offer suggestions." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "The other three all describe a limitation Auto Complete doesn't actually have.",
+      "rationale": "Auto Complete identifies matching, reusable Shared Groups and suggests them while recording future tests. If the matched group has parameters, you're prompted to name and set them — they ARE editable, not locked — and there's no 10-test minimum or restriction against specialized steps."
+    },
+    {
+      "questionId": "Q15",
+      "type": "single-select",
+      "scenario": "When filtering Shared Steps, what categories can you filter by?",
+      "options": [
+        { "id": "A", "text": "Groups, Actions, Validations, and Wait for." },
+        { "id": "B", "text": "Test case, Validations, and Actions." },
+        { "id": "C", "text": "Project name, Step type, and Users." },
+        { "id": "D", "text": "Folder name, Test case, and Actions." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "It's the four kinds of reusable step the library organizes.",
+      "rationale": "The Shared Steps Library supports filtering by step category: Groups, Actions, Validations, and Wait for — not by project/user metadata or test/folder names."
+    },
+    {
+      "questionId": "Q16",
+      "type": "single-select",
+      "scenario": "What does the \"# of Tests Used\" (Used by) column indicate in the Shared Steps Library in Testim?",
+      "options": [
+        { "id": "A", "text": "The last date the shared step was modified." },
+        { "id": "B", "text": "The number of tests using the Shared Step." },
+        { "id": "C", "text": "The type of validation used in the Shared Step." },
+        { "id": "D", "text": "The folder containing the Shared Step." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It's a usage count, clickable to see which tests reference it.",
+      "rationale": "The 'Used by' column displays the number of tests using the shared step, and clicking it navigates to the Test Library filtered to those specific tests. Modification date, validation type, and folder are each covered by the library's other columns (Date Modified, Kind, Name), not this one."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Target element", "value": "The AUT element a step interacts with — shown as a thumbnail in the step's Properties panel, fully editable." },
+    { "key": "Highlight", "value": "Read-only visual confirmation — flashes the element pink in the AUT browser, changes nothing." },
+    { "key": "Reassign", "value": "Different element now → overrides all locators for the step." },
+    { "key": "Improve", "value": "Same element, changed DOM → merges new locators with existing ones instead of overriding." },
+    { "key": "View locators", "value": "Shows the weighted Smart Locator attributes Testim uses to (re)identify the element." },
+    { "key": "Expected value", "value": "Accepts literal text, Parameters, Regex, or JS expressions — not just a plain string." },
+    { "key": "Variable scope", "value": "Local (group/test) < Test (default) < Suite — how far a captured variable can be referenced." },
+    { "key": "Native events", "value": "Toggle on Click steps between real browser clicks and synthetic/programmatic clicks." },
+    { "key": "Auto complete", "value": "Suggests matching Shared Groups while recording ('Auto record your steps'); professional plan only." },
+    { "key": "Replace with a clone", "value": "Detaches a shared step so an edit affects only this one test, not every caller." },
+    { "key": "Save button", "value": "Property edits only take effect once Save is clicked on the header bar." },
+    { "key": "Shared Steps", "value": "Group steps, check 'Shared Group' → callable from other tests; one edit updates every caller." }
+  ],
+  "topics": [
+    {
+      "title": "Editing Target Element Properties (Tricentis docs)",
+      "url": "https://help.testim.io/docs/editing-target-element-properties",
+      "duration": "docs"
+    },
+    {
+      "title": "Shared Steps (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/shareable-steps.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Steps (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/steps.htm",
+      "duration": "docs"
+    }
+  ]
+}

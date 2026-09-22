@@ -1,0 +1,126 @@
+{
+  "moduleId": "TESTIM-M30",
+  "moduleTitle": "Best practices for automating logins in Tricentis Testim",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/best-practices-for-automating-logins-in-tricentis-testim",
+  "learningObjectives": [
+    "Build a reusable, parameterized login group instead of duplicating login steps across tests.",
+    "Use incognito mode and conditional execution to make a login flow robust to already-logged-in state."
+  ],
+  "estTime": "6 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Reusable, parameterized login groups",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Grouping login steps",
+          "description": "Grouping login steps allows reuse of those steps across other tests — give the group a meaningful name so its purpose is clear to anyone browsing the project's groups later."
+        },
+        {
+          "type": "concept",
+          "term": "Parameterizing credentials",
+          "description": "To make the group generic across different accounts, add JavaScript parameters for username and password in the group's properties panel. Every time the group is used, different credentials can be supplied without duplicating the underlying steps."
+        },
+        {
+          "type": "concept",
+          "term": "Cleaning up recorded noise",
+          "description": "Steps recorded as a manual user — like pressing Tab to move between fields — often aren't relevant to the automated test and can simply be deleted, keeping the login group lean and focused on what actually matters."
+        }
+      ],
+      "bulletPoints": [
+        "Group login steps once, name it meaningfully, reuse it everywhere.",
+        "Add JS parameters for username/password so the same group serves every account.",
+        "Delete manual-user noise (like Tab presses) that doesn't matter to the automated flow."
+      ]
+    },
+    {
+      "sectionTitle": "Handling browser/session state around login",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Incognito mode",
+          "description": "Running in incognito mode is useful specifically while building the login process: each run starts with a clean browser — no cookies, no local storage, nothing remembered — so the test reliably exercises the actual login flow instead of skipping it because a previous session is still active."
+        },
+        {
+          "type": "concept",
+          "term": "Conditional login execution",
+          "description": "Adding a condition that checks, at runtime, whether login is actually needed (e.g. an element condition on whether a login button is visible) lets the same test work whether the session starts logged in or logged out — rather than assuming one state and breaking under the other."
+        }
+      ],
+      "bulletPoints": [
+        "Incognito mode = a clean slate for reliably testing the login flow itself.",
+        "A runtime condition (e.g. is the login button visible?) makes a test resilient to both already-logged-in and logged-out starting states."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Hardcoding one set of credentials into every test that needs to log in",
+      "trapDescription": "Duplicating the exact same recorded login steps, with the same hardcoded username/password, across many tests.",
+      "bestPractice": "Group the login steps once, add JS parameters for username/password, and let each calling test supply its own credentials — avoiding both duplication and hardcoded values."
+    },
+    {
+      "title": "Assuming a test always starts from a logged-out state",
+      "trapDescription": "A login test fails intermittently because a prior run's session persisted, so the login button it expects isn't there.",
+      "bestPractice": "Use a runtime condition (e.g. checking if the login button is visible) so the test handles both already-logged-in and logged-out starting states, and/or use incognito mode to guarantee a clean starting session."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "How can a single login group be reused across tests that each need different credentials?",
+      "options": [
+        { "id": "A", "text": "By hardcoding one shared username/password that every test must use." },
+        { "id": "B", "text": "By adding JavaScript parameters for username and password in the group's properties panel." },
+        { "id": "C", "text": "By recording a separate login group for every account." },
+        { "id": "D", "text": "Credentials cannot be parameterized in Testim." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Parameters let one group serve many accounts.",
+      "rationale": "Adding JavaScript parameters for username and password in the group properties panel makes the group generic — each use of the group can then supply different credentials without duplicating steps."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "Why is incognito mode particularly useful while building a login test?",
+      "options": [
+        { "id": "A", "text": "It makes the test run faster than any other mode." },
+        { "id": "B", "text": "It guarantees a clean browser with no cookies or local storage, so the login flow is reliably exercised rather than skipped due to a remembered session." },
+        { "id": "C", "text": "It automatically fills in the username and password." },
+        { "id": "D", "text": "It disables all validations." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It's about starting from a known, clean state.",
+      "rationale": "Running in incognito mode starts with a clean browser every time — no cookies, no local storage — so the test doesn't accidentally skip the login flow because the browser 'remembers' a prior session."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A login test sometimes fails because a previous run's session is still active and no login button appears. What is the recommended fix?",
+      "options": [
+        { "id": "A", "text": "Delete the test entirely." },
+        { "id": "B", "text": "Add a condition that checks at runtime whether login is actually needed (e.g. is the login button visible), so the test handles both starting states." },
+        { "id": "C", "text": "Ignore the failure — it's expected and unavoidable." },
+        { "id": "D", "text": "Hardcode the test to always assume the user is logged out." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Make the test work in either starting state instead of assuming one.",
+      "rationale": "Adding a condition that determines at runtime whether the login step should execute — such as checking if the login button is visible — lets the test work whether the session starts logged in or logged out."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Grouped, named login steps", "value": "Reusable across every test that needs to log in." },
+    { "key": "JS parameters", "value": "Username/password parameterized on the group — one group, many accounts." },
+    { "key": "Cleanup", "value": "Delete manual-only noise (e.g. Tab presses) that don't matter to automation." },
+    { "key": "Incognito mode", "value": "Clean browser state for reliably building/testing the login flow." },
+    { "key": "Conditional login", "value": "Runtime check (e.g. login button visible?) handles both logged-in and logged-out starts." }
+  ],
+  "topics": [
+    {
+      "title": "Best practices for handling logins (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/guides/best-practices-for-handling-logins.htm",
+      "duration": "docs"
+    }
+  ]
+}

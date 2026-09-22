@@ -1,0 +1,180 @@
+{
+  "moduleId": "TESTIM-M01",
+  "moduleTitle": "Tricentis Testim Fundamentals − Creating Automated Tests",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/927/tricentis-testim-fundamentals-creating-automated-tests",
+  "learningObjectives": [
+    "Navigate the Testim visual editor and Test List to create, organize, and run tests.",
+    "Understand the role of the base URL and the AUT browser when recording and running a test.",
+    "Add basic validations to a recorded test so it checks outcomes, not just performs actions.",
+    "Run tests locally from the editor and from the Test List, and interpret the resulting pass/fail output."
+  ],
+  "estTime": "2h 00m",
+  "studyGuide": [
+    {
+      "sectionTitle": "The Testim visual editor",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Visual, codeless-first editing",
+          "description": "Testim's visual test editor has features built directly into the UI so that customizing a test — reordering steps, editing properties, adding validations — does not require writing code, while still allowing custom JavaScript steps for advanced cases (covered later in this learning path)."
+        },
+        {
+          "type": "concept",
+          "term": "Base URL",
+          "description": "Each project/test has a base URL — the starting address the AUT browser opens before a recording or run begins. Getting the base URL right (and open) is a prerequisite for actions like Reassign and Improve on a target element, which need the AUT browser open at that URL to let you re-select an element."
+        }
+      ],
+      "bulletPoints": [
+        "The editor is codeless-first: most editing is done through the UI, not code.",
+        "The base URL is where the AUT browser starts for both recording and running."
+      ]
+    },
+    {
+      "sectionTitle": "Running tests: editor vs. Test List",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Running from the editor",
+          "description": "Clicking Play in the editor's toolbar opens a new browser and runs the currently open test's actions against the AUT. This is the fastest feedback loop while actively building or editing a single test."
+        },
+        {
+          "type": "concept",
+          "term": "Running from the Test List",
+          "description": "One or more tests can be selected in the Test List (Ctrl/Cmd-click for multiple) and run together with the Play button. Tests run this way execute locally, which is useful for quickly re-checking a batch of related tests without leaving the Test List view."
+        },
+        {
+          "type": "note",
+          "text": "Local runs are limited to the Chrome browser. Running on other browsers (Firefox, Safari, Edge) or in parallel requires the CLI or Scheduler rather than a plain editor/Test List run — this becomes important later in the 'Executing tests across multiple browsers' module."
+        }
+      ],
+      "bulletPoints": [
+        "Editor Play = fastest loop for the single test you're currently editing.",
+        "Test List Play = run a selected batch of tests locally in one go.",
+        "Local runs are Chrome-only; other browsers need the CLI/Scheduler."
+      ]
+    },
+    {
+      "sectionTitle": "From actions to assertions: basic validations",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Why validations matter",
+          "description": "A recording by itself only proves the AUT can be clicked through without crashing — it does not verify the application behaved correctly. Validation steps turn a recording into a real test by asserting specific, expected outcomes."
+        },
+        {
+          "type": "concept",
+          "term": "Core validation types",
+          "description": "Validate element visible checks that an expected element is present on the page. Validate element text checks that a specific text value appears in a specified element (Testim supports Regex in the Expected Value field). Validate element not visible checks the opposite — that an element has disappeared, e.g. after closing a modal."
+        },
+        {
+          "type": "list",
+          "title": "Adding a validation step",
+          "items": [
+            "Hover over the arrow where you want to insert the step.",
+            "Click the predefined-steps icon ('M') and choose Validations.",
+            "Pick the validation type and target the element/text to check."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "A recording without validations only proves 'nothing crashed', not 'the app behaved correctly'.",
+        "Validate element visible / not visible / text are the three foundational validation steps.",
+        "Element Text validation supports Regex for flexible expected-value matching."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Shipping a test with no validation steps",
+      "trapDescription": "Recording a click-through flow and calling it 'done' because it runs without errors.",
+      "bestPractice": "A test without validations only confirms the recording replays — it doesn't confirm the application produced the correct result. Add Validate element visible/text/not visible steps at the points that actually matter."
+    },
+    {
+      "title": "Expecting a Test List run to cover cross-browser coverage",
+      "trapDescription": "Assuming that running tests from the Test List exercises multiple browsers automatically.",
+      "bestPractice": "Local runs (editor and Test List) are Chrome-only. Cross-browser execution requires the CLI or Scheduler, which is covered in its own module later in this path."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What is the purpose of a project's base URL in Testim?",
+      "options": [
+        { "id": "A", "text": "It is only used for licensing and has no effect on test recording or running." },
+        { "id": "B", "text": "It is the starting address the AUT browser opens before recording or running a test." },
+        { "id": "C", "text": "It is the URL of the Testim editor itself." },
+        { "id": "D", "text": "It is a placeholder that must always be left blank." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Think about what the AUT browser needs before it can record or run anything.",
+      "rationale": "The base URL is the address the AUT browser opens before recording or running begins — it's a prerequisite for actions like Reassign/Improve on a target element too, since those need the AUT open at that URL."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "A recorded test clicks through a checkout flow without throwing any errors, but does not confirm the order confirmation message actually appeared. What is missing?",
+      "options": [
+        { "id": "A", "text": "Nothing — a test that runs without errors is complete." },
+        { "id": "B", "text": "A validation step, such as Validate element text, asserting the confirmation message's content." },
+        { "id": "C", "text": "A Reassign on the checkout button." },
+        { "id": "D", "text": "A CLI configuration file." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Not crashing is not the same as being correct.",
+      "rationale": "A recording without validations only proves the flow replays without crashing. A Validate element text (or element visible) step is needed to actually assert that the expected outcome — the confirmation message — appeared."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "Which browser(s) can a test run on when triggered locally from the Test List?",
+      "options": [
+        { "id": "A", "text": "Any browser installed on the machine, selected at run time." },
+        { "id": "B", "text": "Chrome only." },
+        { "id": "C", "text": "Firefox and Safari only." },
+        { "id": "D", "text": "Whichever browser was used during recording." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Cross-browser runs need a different mechanism entirely.",
+      "rationale": "Local runs — whether from the editor or the Test List — are limited to Chrome. Running on other browsers requires the CLI or Scheduler, not a local Test List run."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What does the 'Validate element text' step let you check that 'Validate element visible' does not?",
+      "options": [
+        { "id": "A", "text": "Whether the element exists in the DOM at all." },
+        { "id": "B", "text": "That a specific text value appears within the specified element, optionally matched with Regex." },
+        { "id": "C", "text": "Whether the element has disappeared from the page." },
+        { "id": "D", "text": "The element's CSS class name." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Visible checks presence; Text checks presence AND content.",
+      "rationale": "Validate element text is like Validate element visible but additionally checks that a specific text value appears in the element, and Testim supports Regex in the Expected Value field for flexible matching."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Base URL", "value": "Where the AUT browser starts for recording and running — a prerequisite for Reassign/Improve too." },
+    { "key": "Editor Play", "value": "Fastest feedback loop for the single test currently open." },
+    { "key": "Test List Play", "value": "Run a selected batch of tests locally in one go (Ctrl/Cmd-click to multi-select)." },
+    { "key": "Local run limitation", "value": "Chrome only — cross-browser needs CLI or Scheduler." },
+    { "key": "Core validations", "value": "Validate element visible / not visible / text — turn a recording into an actual assertion-based test." }
+  ],
+  "topics": [
+    {
+      "title": "Testim overview (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/overview/testim-overview/index.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Running Tests Overview (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/running-tests-overview.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Validation (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/index.htm",
+      "duration": "docs"
+    }
+  ]
+}

@@ -206,8 +206,9 @@
     var completed = (tp && tp.completedModules) ? tp.completedModules : [];
     var quizRecs  = (tp && tp.quizRecords) ? tp.quizRecords : {};
 
-    /* Count total ready modules from registry if available — fallback to 48 for PSA, 19 for PBA */
-    var total = trackId === 'PSA' ? 48 : (trackId === 'PBA' ? 19 : Math.max(Object.keys(quizRecs).length, completed.length, 1));
+    /* Total = the module links actually rendered for this track; fall back to progress counts */
+    var renderedCount = document.querySelectorAll('#paModList a').length;
+    var total = renderedCount || Math.max(Object.keys(quizRecs).length, completed.length, 1);
     var done  = completed.length;
     var pct   = total ? Math.min(100, Math.round(done / total * 100)) : 0;
 

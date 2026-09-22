@@ -1,0 +1,154 @@
+{
+  "moduleId": "TESTIM-M15",
+  "moduleTitle": "How to use Hooks in Tricentis Testim",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/how-to-use-hooks-in-tricentis-testim",
+  "learningObjectives": [
+    "Recognize when hooks can be used in a test case.",
+    "Explain what a Hook is and how it runs relative to a step or a whole test.",
+    "Distinguish editor-level Hooks from Configuration File run hooks."
+  ],
+  "estTime": "4 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Hooks: running a shared step/group before or after something",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Hook",
+          "description": "An object that runs an existing Shared Step or Shared Group before/after each step, or before/after an entire test. Once a hook is created, tests run as usual — the hook simply executes automatically as any other step would, at the point it's attached to."
+        },
+        {
+          "type": "concept",
+          "term": "Before each step / After each step",
+          "description": "A 'before each step' handler runs before every single step in the test; an 'after each step' handler runs after every single step — this is what gives the effect of running something 'between' steps throughout the whole test, not just once at the start or end."
+        },
+        {
+          "type": "concept",
+          "term": "Configuration File run hooks",
+          "description": "A separate, CLI/config-level mechanism: the Configuration File can define run hooks used to set up the application backend and define parameters before/after a single test or before/after all tests in a run — useful for environment-level setup/teardown that isn't tied to any one specific step."
+        },
+        {
+          "type": "note",
+          "text": "Editor-level Hooks operate at the step/test granularity inside the visual editor; Configuration File hooks operate at the run/suite granularity from the CLI config — both exist so setup/teardown logic doesn't have to be manually duplicated at the start/end of every test."
+        }
+      ],
+      "bulletPoints": [
+        "Hook = runs a Shared Step/Group before/after a step, or before/after a test.",
+        "'Before/after each step' handlers fire on EVERY step, producing a between-steps effect across the whole test.",
+        "Configuration File run hooks = backend setup/params before/after a single test, or before/after all tests in a run.",
+        "Hooks run automatically once created — no per-test manual wiring needed afterward."
+      ]
+    },
+    {
+      "sectionTitle": "When to recognize a hook is the right tool",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Common scenarios calling for a hook",
+          "items": [
+            "Setting up the test — initializing variables used throughout, or preparing the test environment (e.g. a database connection, required directories, starting a server) via a 'before test' hook.",
+            "Repairing/refreshing test data mid-run — a 'before/after each step' hook that resets or corrects a piece of data so subsequent steps aren't left working with stale state.",
+            "Cleaning up after execution — an 'after test' hook that tears down what the 'before test' hook set up, so the environment doesn't leak state into the next run."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "The common thread: a hook is the right tool whenever the same setup/repair/cleanup logic would otherwise need to be manually copied into the start or end of many tests — exactly the kind of duplication Shared Steps and Hooks exist to eliminate."
+        }
+      ],
+      "bulletPoints": [
+        "Setup: before-test hook for variable init / environment prep.",
+        "Repair: before/after-each-step hook to keep data correct as the test progresses.",
+        "Cleanup: after-test hook to tear down what setup created."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Confusing an editor Hook with a Configuration File run hook",
+      "trapDescription": "Assuming both mechanisms operate at the same level of granularity, or configuring one when the other was needed.",
+      "bestPractice": "Editor Hooks attach a Shared Step/Group before/after a specific step or test inside the visual editor. Configuration File run hooks operate at the CLI/run level, for backend setup and parameters before/after a single test or the whole run."
+    },
+    {
+      "title": "Manually copying setup/cleanup logic into every test",
+      "trapDescription": "Re-adding the same 'prepare the environment' steps at the start, and the same 'tear it down' steps at the end, of many separate tests.",
+      "bestPractice": "Recognize this as a hook scenario: a before-test hook for setup and an after-test hook for cleanup eliminate the need to duplicate that logic across every test."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What is a Hook in Testim?",
+      "options": [
+        { "id": "A", "text": "A validation step that only checks API responses." },
+        { "id": "B", "text": "An object that runs an existing Shared Step or Shared Group before/after each step, or before/after a test." },
+        { "id": "C", "text": "A tag applied to failed tests for later filtering." },
+        { "id": "D", "text": "A browser extension used to capture bugs." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It's specifically about running something before/after — using existing shared steps.",
+      "rationale": "A Hook runs an existing Shared Step or Shared Group before/after each step, or before/after a test — not a validation type, a label/tag, or a browser extension."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "What is the purpose of Configuration File run hooks, as distinct from editor-level Hooks?",
+      "options": [
+        { "id": "A", "text": "They are exactly identical to editor Hooks with a different name." },
+        { "id": "B", "text": "They set up the application backend and define parameters before/after a single test or before/after all tests in a run, from the CLI config." },
+        { "id": "C", "text": "They only apply to mobile tests." },
+        { "id": "D", "text": "They replace the need for any Shared Steps." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Think CLI/run-level setup, not step-level.",
+      "rationale": "Configuration File run hooks operate from the CLI config to set up the application backend and define parameters before/after a single test or before/after all tests in a run — a different granularity than editor-level Hooks attached to a specific step or test."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "A team keeps manually re-initializing the same set of variables and preparing the same test environment (e.g. a database connection) at the start of dozens of tests. What should they recognize this as?",
+      "options": [
+        { "id": "A", "text": "A scenario for a before-test hook, to run that setup logic once per test automatically instead of duplicating it." },
+        { "id": "B", "text": "A scenario that has no solution in Testim." },
+        { "id": "C", "text": "A reason to disable all hooks in the project." },
+        { "id": "D", "text": "A scenario only solvable by rewriting every test as a custom action." }
+      ],
+      "correctOptions": ["A"],
+      "hint": "Variable initialization and environment prep are named use cases for one specific hook type.",
+      "rationale": "A before-test hook is used for exactly this: initializing variables used throughout the test, and preparing the test environment (database connection, directories, starting a server) — eliminating the need to manually duplicate that setup in every test."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What is the effect of an 'after each step' hook across a test?",
+      "options": [
+        { "id": "A", "text": "It runs only once, after the very last step in the test." },
+        { "id": "B", "text": "It runs after every single step in the test, producing a between-steps effect throughout the run." },
+        { "id": "C", "text": "It runs only if the test fails." },
+        { "id": "D", "text": "It has the same effect as a Configuration File's afterSuite hook." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It's 'each' step, not just the last one.",
+      "rationale": "An 'after each step' handler runs after every single step in the test — not just once at the end — which is what produces the effect of something running 'between' steps throughout the whole run. It isn't failure-conditional, and it's a different mechanism from the Configuration File's afterSuite hook, which operates at the run/suite level."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Hook", "value": "Runs a Shared Step/Group before/after a step, or before/after a test — inside the editor." },
+    { "key": "Before/after each step", "value": "Fires on every step — the 'between steps' effect across the whole test." },
+    { "key": "Recognize the scenario", "value": "Setup (variables/environment) → before-test hook; data repair → before/after-each-step hook; cleanup → after-test hook." },
+    { "key": "Config File run hooks", "value": "Backend setup/params before/after a single test, or before/after the whole run — from the CLI." }
+  ],
+  "topics": [
+    {
+      "title": "Hooks (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/hooks.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Configuration File - Hooks (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/configuration-file-run-hooks/index.htm",
+      "duration": "docs"
+    }
+  ]
+}

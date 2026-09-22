@@ -311,7 +311,7 @@
   function renderModule(meta, data) {
     var c = document.getElementById("paContent");
     var moduleTitle = data.moduleTitle || meta.name;
-    var academyLabel = (data.moduleId && /^(TAS|TAPI|TDS|AE|TMOB)/.test(data.moduleId)) ? "Tosca Academy" : "Pega Academy";
+    var academyLabel = (data.moduleId && /^(TAS|TAPI|TDS|AE|TMOB|TESTIM)/.test(data.moduleId)) ? "Tricentis Academy" : "Pega Academy";
     var moduleTitleHtml = data.moduleUrl
       ? '<h2 class="pa-h2">' + esc(moduleTitle) +
         ' <a class="pa-module-ext" href="' + esc(data.moduleUrl) + '" target="_blank" rel="noopener" title="View on ' + academyLabel + '">' + academyLabel + ' ↗</a></h2>'
@@ -397,7 +397,7 @@
   function buildObjectives(data) {
     var obj = data.learningObjectives || [];
     if (!obj.length) return "";
-    var topicsAcademyLabel = (data.moduleId && /^(TAS|TAPI|TDS|AE|TMOB)/.test(data.moduleId)) ? "Tosca Academy" : "Pega Academy";
+    var topicsAcademyLabel = (data.moduleId && /^(TAS|TAPI|TDS|AE|TMOB|TESTIM)/.test(data.moduleId)) ? "Tricentis Academy" : "Pega Academy";
     var topicsHtml = "";
     if (data.topics && data.topics.length) {
       topicsHtml =

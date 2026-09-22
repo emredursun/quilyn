@@ -1,0 +1,204 @@
+{
+  "moduleId": "TESTIM-M09",
+  "moduleTitle": "Using loops for multiple validations in Tricentis Testim",
+  "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/using-loops-for-multiple-validations-in-tricentis-testim",
+  "learningObjectives": [
+    "Articulate how to use loops to test multiple validations in a single test.",
+    "Choose the right loop type — Don't repeat, While element, While element text is, For each item, Loop for, or Custom — for a given scenario."
+  ],
+  "estTime": "4 min",
+  "studyGuide": [
+    {
+      "sectionTitle": "Loops in Testim: six repeat-group types",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Where a loop lives",
+          "description": "A loop is a setting on a group step (folder icon) — the group's contained steps are what gets repeated. The loop type is chosen from a radio-button list on that group, and the default is Don't repeat: the group's steps run exactly once, with no repetition at all."
+        },
+        {
+          "type": "list",
+          "title": "The six loop types",
+          "items": [
+            "Don't repeat — the default; the group runs once, with no loop.",
+            "While element — repeats depending on whether a target element is Visible (or Not visible).",
+            "While element text is — repeats while a target element's text matches an Expected value (supports regex/JS).",
+            "For each item — runs the group once per repeating element (e.g. every row in a table), with an item limit (default 99).",
+            "Loop for — runs the group a specified number of times, from a literal number or a parameter holding a number (max 99).",
+            "Custom — runs the group based on a JavaScript condition you write yourself, with optional parameters and its own timeout override."
+          ]
+        }
+      ],
+      "bulletPoints": [
+        "Loop type is a setting on a group step; Don't repeat is the default (no looping).",
+        "While element / While element text is: condition-based, tied to an element's visibility or text.",
+        "For each item: one iteration per matching/repeating element (default limit 99).",
+        "Loop for: a fixed count — literal number or a numeric parameter (max 99).",
+        "Custom: your own JavaScript condition decides whether the loop continues."
+      ]
+    },
+    {
+      "sectionTitle": "For each item, in depth",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "'For each item' loop",
+          "description": "Runs the same set of actions/validations against similar, repeating elements — the canonical use case being a table with multiple rows where every row needs the same check applied. Rather than writing one validation step per row, a single group of steps is looped. Configure it by selecting 'For each item', clicking the first repeating element, and optionally adjusting the item limit (default 99)."
+        },
+        {
+          "type": "concept",
+          "term": "TESTIM_ITERATOR",
+          "description": "An out-of-the-box parameter that tracks the current loop iteration's value. Each time the loop runs, TESTIM_ITERATOR increases by one, letting steps inside the loop reference 'which iteration am I on' — for example, to build a row-specific selector or to log progress. This applies across loop types, not just For each item."
+        }
+      ],
+      "bulletPoints": [
+        "'For each item' = one group of steps, looped once per matching element (e.g. every table row), up to a default limit of 99.",
+        "TESTIM_ITERATOR auto-increments each iteration, giving steps inside the loop access to the current index."
+      ]
+    },
+    {
+      "sectionTitle": "Condition-based and fixed-count loops",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "While element / While element text is",
+          "description": "While element repeats the group only as long as a chosen element is (or isn't) present — set via the Visible/Not visible condition. While element text is is the same idea, but the condition is a text match against the element (Expected value field, with regex/JS support) rather than plain visibility. Both are configured by selecting the loop type, clicking the target element, then setting the condition."
+        },
+        {
+          "type": "concept",
+          "term": "Loop for",
+          "description": "Runs the group a fixed number of times — either a literal number typed in directly, or a parameter holding a number, capped at a maximum of 99. Unlike For each item, this doesn't depend on matching elements on the page at all; it's a pure iteration count."
+        },
+        {
+          "type": "concept",
+          "term": "Custom",
+          "description": "For loop conditions that don't fit any of the built-in types, Custom lets you define the condition as a JavaScript function — with optional JS/HTML parameters passed in, and its own timeout override separate from the test's general settings."
+        }
+      ],
+      "bulletPoints": [
+        "While element / While element text is: condition tied to an element's presence or its text content.",
+        "Loop for: a fixed iteration count (number or numeric parameter), max 99 — not tied to page elements.",
+        "Custom: your own JavaScript condition, for logic none of the built-in loop types can express."
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Hand-writing one validation step per table row",
+      "trapDescription": "Manually duplicating a validation step for every row in a data table, breaking whenever the row count changes.",
+      "bestPractice": "Wrap the validation in a group and use a 'For each item' loop so the same steps run once per row automatically, regardless of how many rows exist."
+    },
+    {
+      "title": "Using 'For each item' when the real need is a fixed repeat count",
+      "trapDescription": "Reaching for 'For each item' to repeat a group exactly 5 times, when there's no actual repeating element on the page to iterate over.",
+      "bestPractice": "Use Loop for when the goal is a fixed number of repetitions (literal or parameter-driven) — 'For each item' specifically needs a repeating element to iterate against."
+    },
+    {
+      "title": "Confusing While element with While element text is",
+      "trapDescription": "Picking While element when the actual requirement is about the element's text content, not just whether it's visible.",
+      "bestPractice": "Use While element for a pure visibility condition (Visible/Not visible); use While element text is when the loop should continue based on matching a specific text value in the Expected value field."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "Q1",
+      "type": "single-select",
+      "scenario": "What is the primary use case for a 'For each item' loop in Testim?",
+      "options": [
+        { "id": "A", "text": "Running the entire test suite multiple times." },
+        { "id": "B", "text": "Running the same set of actions/validations against a list of similar, repeating elements, like table rows." },
+        { "id": "C", "text": "Retrying a failed step until it passes." },
+        { "id": "D", "text": "Switching between different browsers during a single run." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "Think tables with an unknown or variable number of rows.",
+      "rationale": "A 'For each item' loop runs the same actions/validations against similar, repeating elements — such as every row in a table — without hand-duplicating a step per row. It's not about suite-level repetition, retries, or browser switching."
+    },
+    {
+      "questionId": "Q2",
+      "type": "single-select",
+      "scenario": "What does the TESTIM_ITERATOR parameter provide inside a loop?",
+      "options": [
+        { "id": "A", "text": "The total number of tests in the project." },
+        { "id": "B", "text": "The current loop iteration's value, incrementing by one each time the loop runs." },
+        { "id": "C", "text": "The name of the browser currently running the test." },
+        { "id": "D", "text": "A random number for test data generation." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It's specifically about tracking where you are inside the loop.",
+      "rationale": "TESTIM_ITERATOR is an out-of-the-box parameter that tracks the current loop iteration; its value increases by one each time the loop runs, letting steps inside reference which iteration they're on."
+    },
+    {
+      "questionId": "Q3",
+      "type": "single-select",
+      "scenario": "What must a loop's target be configured as?",
+      "options": [
+        { "id": "A", "text": "A single, standalone step." },
+        { "id": "B", "text": "A group step, identifiable by its folder icon, containing the steps to repeat." },
+        { "id": "C", "text": "An entire separate test." },
+        { "id": "D", "text": "A Shared Configuration." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "It has to bundle the steps that will be repeated together.",
+      "rationale": "A loop is configured on a group step — identifiable by the folder icon in its upper-left corner — which contains the steps to include in the loop."
+    },
+    {
+      "questionId": "Q4",
+      "type": "single-select",
+      "scenario": "What is the default loop type for a group step in Testim, before any other option is selected?",
+      "options": [
+        { "id": "A", "text": "For each item, with an unlimited item count." },
+        { "id": "B", "text": "Don't repeat — the group runs once, with no loop." },
+        { "id": "C", "text": "Custom, requiring a JavaScript condition immediately." },
+        { "id": "D", "text": "Loop for, defaulting to 99 iterations." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "The default is explicitly the 'no looping' option.",
+      "rationale": "Don't repeat is the default option — it means the group's steps run exactly once, with no repetition. Every other loop type must be explicitly selected."
+    },
+    {
+      "questionId": "Q5",
+      "type": "single-select",
+      "scenario": "A test needs to repeat a group of steps exactly 5 times, with no element on the page to iterate over. Which loop type fits?",
+      "options": [
+        { "id": "A", "text": "For each item" },
+        { "id": "B", "text": "While element" },
+        { "id": "C", "text": "Loop for" },
+        { "id": "D", "text": "While element text is" }
+      ],
+      "correctOptions": ["C"],
+      "hint": "It's a fixed count, not tied to elements on the page.",
+      "rationale": "Loop for runs a group a specified number of times (a literal number or a numeric parameter, max 99) — it doesn't depend on repeating page elements, unlike For each item, and it isn't condition-based like the two While loop types."
+    },
+    {
+      "questionId": "Q6",
+      "type": "single-select",
+      "scenario": "What is the difference between While element and While element text is?",
+      "options": [
+        { "id": "A", "text": "There is no difference — they are the same loop type." },
+        { "id": "B", "text": "While element checks visibility/presence; While element text is checks that the element's text matches an expected value." },
+        { "id": "C", "text": "While element text is can only run once; While element can run indefinitely." },
+        { "id": "D", "text": "While element requires JavaScript; While element text is never does." }
+      ],
+      "correctOptions": ["B"],
+      "hint": "One is a presence check, the other is a content check.",
+      "rationale": "While element continues the loop based on whether the target element is Visible or Not visible; While element text is continues it based on the element's text matching an Expected value (with regex/JS support) — a content check, not just a presence check."
+    }
+  ],
+  "quickRecap": [
+    { "key": "Don't repeat", "value": "Default — group runs once, no loop." },
+    { "key": "While element", "value": "Loops based on target element Visible/Not visible." },
+    { "key": "While element text is", "value": "Loops based on the element's text matching an Expected value." },
+    { "key": "For each item", "value": "One iteration per repeating element (default limit 99)." },
+    { "key": "Loop for", "value": "Fixed iteration count — literal or numeric parameter (max 99)." },
+    { "key": "Custom", "value": "Your own JavaScript condition, with optional params and its own timeout." },
+    { "key": "TESTIM_ITERATOR", "value": "Auto-incrementing parameter tracking the current loop iteration." }
+  ],
+  "topics": [
+    {
+      "title": "Repeat Group Loops (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/loops.htm",
+      "duration": "docs"
+    }
+  ]
+}
