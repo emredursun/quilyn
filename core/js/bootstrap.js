@@ -18,7 +18,7 @@
       function setStickyVars() {
         var t = document.querySelector('.pa-topbar');
         var tabs = document.querySelector('.pa-tabs');
-        if (t) document.documentElement.style.setProperty('--pa-topbar-h', t.offsetHeight + 'px');
+        if (t) document.documentElement.style.setProperty('--pa-topbar-h', (getComputedStyle(t).position === 'sticky' ? t.offsetHeight : 0) + 'px');
         if (tabs) document.documentElement.style.setProperty('--pa-tabs-h', tabs.offsetHeight + 'px');
       }
       window.addEventListener('load', setStickyVars);

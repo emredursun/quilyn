@@ -106,7 +106,9 @@
       Object.keys(TAB_ICONS).forEach(function(label) {
         if (txt.indexOf(label) >= 0) {
           btn.setAttribute('data-enh', '1');
-          btn.innerHTML = icon(TAB_ICONS[label]) + ' ' + label;
+          var short = {'Study Guide':'Study','Exam Pitfalls':'Pitfalls','Practice Quiz':'Quiz','Quick Recap':'Recap'}[label];
+          btn.setAttribute('aria-label',label);
+          btn.innerHTML = icon(TAB_ICONS[label]) + '<span class="tab-label-full">' + label + '</span><span class="tab-label-short" aria-hidden="true">' + short + '</span>';
         }
       });
     });

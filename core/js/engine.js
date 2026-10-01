@@ -358,14 +358,15 @@
       '<button data-v="pitfalls">⚠️ Exam Pitfalls</button>' +
       '<button data-v="quiz">🧠 Practice Quiz</button>' +
       '<button data-v="recap">⚡ Quick Recap</button>' +
+      "</div>" +
+      '<section class="pa-view active" id="v-guide">' + buildStudyGuide(data) + "</section>" +
+      '<section class="pa-view" id="v-pitfalls">' + buildPitfalls(data) + "</section>" +
+      '<section class="pa-view" id="v-quiz">' +
       '<span class="pa-quiz-pill" hidden>' +
       '<span class="pqp-track"><span class="pqp-fill"></span></span>' +
       '<b class="pqp-g">0</b>/<span class="pqp-t">?</span> ✓<b class="pqp-s">0</b>' +
       '</span>' +
-      "</div>" +
-      '<section class="pa-view active" id="v-guide">' + buildStudyGuide(data) + "</section>" +
-      '<section class="pa-view" id="v-pitfalls">' + buildPitfalls(data) + "</section>" +
-      '<section class="pa-view" id="v-quiz"><div id="paQuizMount"></div></section>' +
+      '<div id="paQuizMount"></div></section>' +
       '<section class="pa-view" id="v-recap">' + buildRecap(data) + "</section>";
 
     // Hydrate sandboxed interactive iframes (srcdoc set via JS to avoid attribute escaping).

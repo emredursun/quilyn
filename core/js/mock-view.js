@@ -13,8 +13,15 @@
     TIME_MIN = spec.timeMinutes || 90;
   }
   var EXAMS = {};
+  var dismissActions = null;
+  function closeActions() {
+    var toggle = q('actionToggle');
+    if (!toggle) return;
+    toggle.setAttribute('aria-expanded','false');
+    q('examBar').classList.remove('actions-open');
+  }
 
-  /* ── Engine state ───────────────────────────────────────────────────── */
+  /* Engine state */
   var timerId = null;
   var current = null;
   var answers = [];   // array of arrays — selected option indices per question
@@ -51,7 +58,7 @@
     }
   }
 
-  /* ── LocalStorage persistence ───────────────────────────────────────── */
+  /* LocalStorage persistence */
   function stateKey(name) {
     return 'pegaMock_' + getTrack() + '_' + (name || current);
   }
@@ -81,7 +88,7 @@
     if (_root) _root.scrollIntoView({ behavior: 'instant', block: 'start' });
   }
 
-  /* ── Home screen ────────────────────────────────────────────────────── */
+  /* Home screen */
   function renderHome() {
     var scores = loadScores();
     var grid = q('examGrid'); if (!grid) return;
@@ -141,7 +148,7 @@
     return '<table class="dtable"><thead><tr><th>Domain</th><th>Exam %</th><th>Questions</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
-  /* ── Exam flow ──────────────────────────────────────────────────────── */
+  /* Exam flow */
   function isMulti(qu) { return qu.t === 'multi' || qu.t === 'multiple'; }
 
   /* Normalise a source URL so duplicates collapse to one entry */
@@ -151,23 +158,7 @@
     return url;
   }
 
-  /* Map a (normalised) URL to a human-readable label */
-  function srcLabel(url) {
-    var rules = [
-      [/processexam\.com/,           'ProcessExam.com — CPSA Sample Questions'],
-      [/proprofs\.com.*pega-7-csa/,  'ProProfs — Pega CSA Mock Exam'],
-      [/proprofs\.com.*prpc-csa-72/, 'ProProfs — PRPC CSA 72 Exam'],
-      [/open-exam-prep\.com/,        'Open Exam Prep — 100+ Free CPSA Questions'],
-      [/pass4success\.com/,          'Pass4Success — PEGACPSA23V1 Exam Questions'],
-      [/exact2pass\.com/,            'Exact2Pass — PEGACPSA23V1 Real Exam Questions'],
-    ];
-    for (var i = 0; i < rules.length; i++) {
-      if (rules[i][0].test(url)) return rules[i][1];
-    }
-    try { return new URL(url).hostname; } catch(e) { return url; }
-  }
-
-  /* ── Pause / Resume ─────────────────────────────────────────────────── */
+  /* Pause / Resume */
   function pauseExam() {
     if (paused) return;
     syncRemaining();
@@ -177,7 +168,7 @@
     deadline = 0;
     saveState();
 
-    var pb = q('pauseBtn'); if (pb) pb.textContent = '▶ Resume';
+    var pb = q('pauseBtn'); if (pb) pb.textContent = 'Resume';
 
     var layer = document.createElement('div');
     layer.id = 'mv-pauseLayer';
@@ -186,7 +177,7 @@
       '<div style="font-size:3.5rem;line-height:1">⏸</div>' +
       '<h2 style="margin:0;color:var(--pa-ink,#eef1fb)">Exam Paused</h2>' +
       '<p style="margin:0;color:var(--pa-ink-soft,#939bbd);font-size:14px">Questions are hidden. Your progress is saved.</p>' +
-      '<button class="v-btn v-primary" style="margin-top:8px;padding:10px 32px;font-size:15px" id="mv-resumeLayer">▶ Resume</button>';
+      '<button class="v-btn v-primary" style="margin-top:8px;padding:10px 32px;font-size:15px" id="mv-resumeLayer">Resume</button>';
     document.body.appendChild(layer);
     global.QuilynRuntime.dialog(layer, resumeExam, 'Exam paused');
     document.getElementById('mv-resumeLayer').onclick = resumeExam;
@@ -197,12 +188,13 @@
     paused = false;
     var layer = document.getElementById('mv-pauseLayer');
     if (layer) layer.remove();
-    var pb = q('pauseBtn'); if (pb) pb.textContent = '⏸ Pause';
+    var pb = q('pauseBtn'); if (pb) pb.textContent = 'Pause';
     startTimer();
   }
 
-  /* ── Start exam (checks for saved state first) ──────────────────────── */
+  /* Start exam (checks for saved state first) */
   function startExam(name) {
+    closeActions();
     var saved = loadState(name);
     /* Only offer resume if the saved state matches the current question count */
     if (saved && saved.answers && saved.answers.length === EXAMS[name].length &&
@@ -274,18 +266,17 @@
       qs.forEach(function(qu) {
         if (qu.src) {
           var norm = srcNorm(qu.src);
-          if (!srcMap[norm]) srcMap[norm] = srcLabel(norm);
+          if (!srcMap[norm]) srcMap[norm] = true;
         }
       });
       var keys = Object.keys(srcMap);
       if (keys.length > 0) {
         srcEl.innerHTML =
-          '<div class="exam-sources">' +
-            '<span class="exam-sources-label">Sources:</span>' +
+          '<details class="exam-sources"><summary>Sources (' + keys.length + ')</summary><div class="exam-source-links">' +
             keys.map(function(url) {
-              return '<a href="' + url + '" target="_blank" rel="noopener">' + esc(srcMap[url]) + '</a>';
+              return '<a href="' + esc(url) + '" target="_blank" rel="noopener">' + esc(url) + '</a>';
             }).join('') +
-          '</div>';
+          '</div></details>';
       } else {
         srcEl.innerHTML = '';
       }
@@ -332,7 +323,7 @@
     if (sb) sb.classList.remove('v-hide');
     if (sb2) sb2.classList.remove('v-hide');
     if (qb) qb.textContent = 'Quit';
-    if (pb) { pb.textContent = '⏸ Pause'; pb.disabled = false; }
+    if (pb) { pb.textContent = 'Pause'; pb.disabled = false; }
 
     updateBar(); startTimer();
     show('exam');
@@ -462,7 +453,7 @@
     return a.slice().sort().join('|') === b.slice().sort().join('|');
   }
 
-  /* ── Submit & Results ───────────────────────────────────────────────── */
+  /* Submit & Results */
   function submitExam(auto) {
     syncRemaining();
     if (!auto) {
@@ -478,7 +469,7 @@
     doSubmit(auto);
   }
 
-  function showConfirm(msg, onOk) {
+  function showConfirm(msg, onOk, label) {
     var overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9999;display:flex;align-items:center;justify-content:center';
     overlay.innerHTML =
@@ -486,7 +477,7 @@
         '<p style="margin:0 0 20px;font-size:15px;color:var(--pa-ink)">' + esc(msg) + '</p>' +
         '<div style="display:flex;gap:10px;justify-content:center">' +
           '<button class="v-btn" id="mv-confirmCancel">Cancel</button>' +
-          '<button class="v-btn v-primary" id="mv-confirmOk">Submit</button>' +
+          '<button class="v-btn v-primary" id="mv-confirmOk">' + esc(label || 'Submit') + '</button>' +
         '</div>' +
       '</div>';
     overlay.setAttribute('data-quilyn-view','mock');
@@ -551,7 +542,7 @@
     show('results');
   }
 
-  /* ── Review (post-submit full walkthrough) ──────────────────────────── */
+  /* Review (post-submit full walkthrough) */
   function reviewExam() {
     var qs = EXAMS[current];
     qs.forEach(function(qu, i) {
@@ -594,10 +585,10 @@
     if (_root) _root.scrollIntoView({ behavior:'instant', block:'start' });
   }
 
-  /* ── View HTML ──────────────────────────────────────────────────────── */
+  /* View HTML */
   function getHTML() {
     return '<div class="pa-view pa-view--mock">' +
-      /* ── Home ── */
+      /* Home */
       '<section id="mv-home">' +
         '<div class="v-card">' +
           '<h2>Choose a mock exam</h2>' +
@@ -610,14 +601,15 @@
           '<div id="mv-domTable"></div>' +
         '</div>' +
       '</section>' +
-      /* ── Exam ── */
+      /* Exam */
       '<section id="mv-exam" class="v-hide">' +
-        '<div class="exambar">' +
+        '<div class="exambar" id="mv-examBar">' +
           '<span class="timer" id="mv-timer">' + TIME_MIN + ':00</span>' +
-          '<button class="v-btn pause-btn" id="mv-pauseBtn">⏸ Pause</button>' +
+          '<button class="v-btn pause-btn" id="mv-pauseBtn">Pause</button>' +
           '<div class="prog"><i id="mv-prog"></i></div>' +
-          '<span class="ac">Answered <b id="mv-ansCount">0</b>/<span id="mv-ansTotal">0</span></span>' +
-          '<div class="v-row" style="margin-left:auto">' +
+          '<span class="ac"><span class="ac-label">Answered </span><b id="mv-ansCount">0</b>/<span id="mv-ansTotal">0</span></span>' +
+          '<button class="v-btn exam-action-toggle" id="mv-actionToggle" aria-label="Exam actions" aria-expanded="false" aria-controls="mv-actions">More</button>' +
+          '<div class="v-row" id="mv-actions" style="margin-left:auto">' +
             '<button class="v-btn" id="mv-quitBtn">Quit</button>' +
             '<button class="v-btn v-primary" id="mv-submitBtn">Submit Exam</button>' +
           '</div>' +
@@ -629,7 +621,7 @@
           '<button class="v-btn v-primary" id="mv-submitBtn2">Submit Exam</button>' +
         '</div>' +
       '</section>' +
-      /* ── Results ── */
+      /* Results */
       '<section id="mv-results" class="v-hide">' +
         '<div class="v-card result">' +
           '<div class="v-muted res-exam-name" id="mv-resTitle"></div>' +
@@ -663,7 +655,7 @@
     }).join('');
   }
 
-  /* ── Public API ─────────────────────────────────────────────────────── */
+  /* Public API */
   function mount(contentEl, sidebarEl) {
     clearInterval(timerId); timerId = null; current = null; paused = false;
     answers = []; checked = []; _root = null;
@@ -672,6 +664,19 @@
     document.getElementById("paContent").focus({preventScroll:true});
     contentEl.innerHTML = getHTML();
     _root = contentEl.querySelector('.pa-view--mock');
+    q('actionToggle').addEventListener('click', function() {
+      var open = this.getAttribute('aria-expanded') !== 'true';
+      this.setAttribute('aria-expanded',String(open));
+      q('examBar').classList.toggle('actions-open',open);
+    });
+    dismissActions = function(e) { if (_root && !q('examBar').contains(e.target)) closeActions(); };
+    document.addEventListener('pointerdown',dismissActions);
+    q('examBar').addEventListener('keydown',function(e) {
+      if (e.key === 'Escape' && this.classList.contains('actions-open')) {
+        closeActions(); q('actionToggle').focus(); e.preventDefault();
+      }
+    });
+    q('actions').addEventListener('click',function(e) { if (e.target.closest('button')) closeActions(); });
 
     if (sidebarEl) {
       sidebarEl.innerHTML = getSidebarHTML();
@@ -702,7 +707,7 @@
         clearState();
         examFinished = true;
         renderHome();
-      });
+      }, 'Quit');
     });
 
     renderHome();
@@ -716,6 +721,8 @@
   }
 
   function unmount(skipSave) {
+    if (dismissActions) document.removeEventListener('pointerdown',dismissActions);
+    dismissActions = null;
     syncRemaining();
     if (!skipSave && current && !examFinished) saveState();
     clearInterval(timerId); timerId = null; current = null; paused = false; _root = null; mountedTrack = null;
