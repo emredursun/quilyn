@@ -169,7 +169,7 @@
         '<div class="verdict" id="rv-verdict"></div>'+
         '<div class="rationale" id="rv-rationale"><b>Rationale:</b> '+esc(q.rationale)+'</div>'+
         '<div class="btn-row" style="margin-top:13px">'+
-          '<button class="v-btn v-primary v-hide" id="rv-btn-next">'+(idx+1<session.length?'Next →':'📊 Results')+'</button>'+
+          '<button class="v-btn v-primary v-hide" id="rv-btn-next">'+(idx+1<session.length?'Next →':'Results')+'</button>'+
         '</div>'+
       '</div>';
 
@@ -264,7 +264,7 @@
       '<div class="stat-box"><div class="num">'+stats.newCards+'</div><div class="lbl">New Cards</div></div>'+
       '<div class="stat-box"><div class="num ok">'+stats.mastered+'</div><div class="lbl">Mastered</div></div>'+
       '<div class="stat-box"><div class="num">'+stats.total+'</div><div class="lbl">Total Cards</div></div>'+
-      '<div class="stat-box"><div class="num warn">'+(srs.streak||0)+' 🔥</div><div class="lbl">Day Streak</div></div>';
+      '<div class="stat-box"><div class="num warn">'+(srs.streak||0)+'</div><div class="lbl">Day Streak</div></div>';
     var btnStart=r('btn-start');
     if(btnStart){if(stats.due===0){btnStart.textContent='✓ All caught up today!';btnStart.disabled=true;}else{btnStart.textContent='▶ Review '+Math.min(stats.due,SESSION_SIZE)+' Cards';btnStart.disabled=false;}}
     var dg=r('domain-grid');
@@ -298,7 +298,7 @@
       '<li><div class="rv-sidebar-stat"><span>New Cards</span><b>'+stats.newCards+'</b></div></li>'+
       '<li><div class="rv-sidebar-stat"><span>Mastered</span><b style="color:var(--pa-ok,#34d399)">'+stats.mastered+'</b></div></li>'+
       '<li><div class="rv-sidebar-stat"><span>Total</span><b>'+stats.total+'</b></div></li>'+
-      '<li><div class="rv-sidebar-stat"><span>Streak</span><b style="color:var(--pa-warn,#fbbf24)">'+(srs.streak||0)+' 🔥</b></div></li>'+
+      '<li><div class="rv-sidebar-stat"><span>Streak</span><b style="color:var(--pa-warn,#fbbf24)">'+(srs.streak||0)+'</b></div></li>'+
       '<li style="margin-top:12px">'+
         '<a href="javascript:void(0)" id="rv-sb-start" class="pa-shell-sidebar-item">▶ Start Session</a>'+
       '</li>';
@@ -338,7 +338,7 @@
       /* dashboard */
       '<section id="rv-dashboard" class="v-hide">'+
         '<div class="v-card">'+
-          '<h2>📊 Overview</h2>'+
+          '<h2>Overview</h2>'+
           '<div class="stats-row" id="rv-stats-row"></div>'+
           '<div class="v-row" style="margin-top:14px">'+
             '<button class="v-btn v-primary" id="rv-btn-start">▶ Start Review Session</button>'+
@@ -384,7 +384,7 @@
           '</div>'+
           '<div class="v-row" style="justify-content:center;margin-top:14px">'+
             '<button class="v-btn v-primary" id="rv-btn-newsess">▶ New Session</button>'+
-            '<button class="v-btn" id="rv-btn-todash">📊 Dashboard</button>'+
+            '<button class="v-btn" id="rv-btn-todash">Dashboard</button>'+
           '</div>'+
         '</div>'+
       '</section>'+

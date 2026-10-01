@@ -1,11 +1,13 @@
-const CACHE_NAME = 'quilyn-v39';
+const CACHE_NAME = 'quilyn-v43';
 const STATIC_ASSETS = [
-  './', './index.html', './manifest.json', './icon.svg',
+  './', './index.html', './manifest.json', './icon.svg', './favicon.ico',
+  './assets/brand/icon-192.png', './assets/brand/icon-512.png',
+  './assets/brand/icon-maskable-512.png', './assets/brand/apple-touch-icon.png', './assets/brand/favicon-32.png',
   './core/css/tokens.css', './core/css/learning.css', './core/css/components.css',
   './core/js/bootstrap.js', './core/css/theme.css', './core/css/views.css',
   './core/js/progress.js', './core/js/runtime.js', './core/js/offline.js',
   './core/js/store.js', './core/js/quiz-engine.js',
-  './core/js/engine.js', './core/js/enhancement.js',
+  './core/js/engine.js', './core/js/mobile-nav.js', './core/js/enhancement.js',
   './core/js/mock-view.js', './core/js/review-view.js',
   './core/js/app-shell.js', './core/js/search.js',
   './core/js/settings.js', './core/js/track-switcher.js',
@@ -64,36 +66,23 @@ self.addEventListener('fetch', event => {
   const key = sameOrigin ? cacheKey(request) : request;
   const isData = sameOrigin && url.pathname.endsWith('.json');
 
-  if (sameOrigin && request.mode === 'navigate') {
-    event.respondWith(
-      fetch(request).then(response => {
-        if (response.ok) {
-          event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(key, response.clone())));
-        }
-        return response;
-      }).catch(() => cachedResponse(key))
-    );
-    return;
-  }
-
-  if (isData) {
-    event.respondWith(
-      fetch(request).then(response => {
-        if (response.ok) {
-          event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(key, response.clone())));
-        }
-        return response;
-      }).catch(() => cachedResponse(key))
-    );
-    return;
-  }
-
-  event.respondWith(
-    cachedResponse(key).then(cached => cached.ok ? cached : fetch(request).then(response => {
-      if (response.ok) {
-        event.waitUntil(caches.open(CACHE_NAME).then(cache => cache.put(key, response.clone())));
-      }
-      return response;
-    }))
-  );
+  // Clone before returning the response to the page. Cloning inside a delayed
+  // caches.open callback races the page's consumption of the response body.
+  let cacheWrite = Promise.resolve();
+  const network = () => fetch(request).then(response => {
+    if (response.ok) {
+      const copy = response.clone();
+      cacheWrite = caches.open(CACHE_NAME).then(cache => cache.put(key, copy));
+    }
+    return response;
+  });
+  const response = (sameOrigin && request.mode === 'navigate') || isData
+    ? network().catch(() => cachedResponse(key))
+    : cachedResponse(key).then(cached => cached.ok ? cached : network());
+  event.respondWith(response);
+  // Register the lifetime extension synchronously; cache/quota failures must
+  // not turn successful network responses into failures for the user.
+  event.waitUntil(response.then(() => cacheWrite).catch(error => {
+    console.warn('Quilyn: cache update failed', error);
+  }));
 });

@@ -454,7 +454,7 @@
     if (data.topics && data.topics.length) {
       topicsHtml =
         '<div class="pa-topics">' +
-        '<div class="pa-topics-head">📚 ' + topicsAcademyLabel + ' Topics</div>' +
+        '<div class="pa-topics-head"><svg class="i" aria-hidden="true"><use href="#i-book"/></svg> ' + topicsAcademyLabel + ' Topics</div>' +
         '<div class="pa-topics-links">' +
         data.topics.map(function (t) {
           if (!t.url) return '<span class="pa-topic-link">' + esc(t.title) + ' · HTTPS source unavailable</span>';
@@ -469,7 +469,7 @@
         "</div></div>";
     }
     return (
-      '<div class="pa-objectives"><div class="pa-obj-head">🎯 By the end of this module, you can:</div>' +
+      '<div class="pa-objectives"><div class="pa-obj-head"><svg class="i" aria-hidden="true"><use href="#i-target"/></svg> By the end of this module, you can:</div>' +
       "<ul>" + obj.map(function (o) { return "<li>" + esc(o) + "</li>"; }).join("") + "</ul>" +
       (data.estTime ? '<div class="pa-obj-meta">⏱ ' + esc(data.estTime) + "</div>" : "") +
       topicsHtml +
@@ -695,17 +695,7 @@
     window._paCrumbObs.observe(h2);
   }
   function closeSidebarMobile() {
-    document.getElementById("paSidebar").classList.remove("open");
-    syncSidebar();
-  }
-  function syncSidebar() {
-    var sidebar = document.getElementById('paSidebar');
-    var mobile = window.matchMedia('(max-width: 860px)').matches;
-    var open = sidebar.classList.contains('open');
-    sidebar.inert = mobile && !open;
-    document.querySelector('.pa-main').inert = mobile && open;
-    document.getElementById('paMenuToggle').setAttribute('aria-expanded',String(open && mobile));
-    document.getElementById('paMenuToggle').setAttribute('aria-controls','paSidebar');
+    window.QuilynMobileNav.close();
   }
 
   /* ============ Boot ============ */
@@ -714,24 +704,7 @@
       activeTrackId = e.detail;
       route();
     });
-    document.getElementById("paMenuToggle").addEventListener("click", function () {
-      document.getElementById("paSidebar").classList.toggle("open");
-      syncSidebar();
-      if (document.getElementById('paSidebar').classList.contains('open')) document.getElementById('quilyn-sidebar-close').focus();
-    });
-    var close = document.createElement('button'); close.id='quilyn-sidebar-close'; close.className='pa-btn quilyn-sidebar-close'; close.textContent='Close menu';
-    document.getElementById('paSidebar').prepend(close);
-    close.onclick=function(){closeSidebarMobile();document.getElementById('paMenuToggle').focus();};
-    document.getElementById('paSidebar').addEventListener('keydown',function(e) {
-      if (!window.matchMedia('(max-width: 860px)').matches || !this.classList.contains('open')) return;
-      if(e.key==='Escape'){e.preventDefault();close.click();}
-      if(e.key==='Tab') {
-        var items=Array.from(this.querySelectorAll('button,a[href],pega-track-switcher')).filter(function(el){return el.getClientRects().length;});
-        if(e.shiftKey && document.activeElement===items[0]){e.preventDefault();items[items.length-1].focus();}
-        else if(!e.shiftKey && document.activeElement===items[items.length-1]){e.preventDefault();items[0].focus();}
-      }
-    });
-    window.addEventListener('resize',syncSidebar); syncSidebar();
+    window.QuilynMobileNav.init();
     window.addEventListener("hashchange", route);
     watchThemeForInteractives();
 
