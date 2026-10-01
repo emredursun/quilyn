@@ -12,7 +12,7 @@
   function loadState() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
-      var parsed = raw ? JSON.parse(raw) : null;
+      var parsed = global.QuilynProgress ? global.QuilynProgress.read(STORAGE_KEY, null) : (raw ? JSON.parse(raw) : null);
       if (parsed && !parsed.tracks) {
         // Migration or fresh start: Ensure the new structure exists
         parsed.tracks = {};
@@ -41,6 +41,7 @@
   }
 
   function saveState(state) {
+    if (global.QuilynProgress) return global.QuilynProgress.write(STORAGE_KEY, state);
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {}
   }
 
@@ -61,7 +62,7 @@
   function flush() {
     flushScheduled = false;
     saveState(rawState);
-    listeners.forEach(function(fn) { fn(rawState); });
+    listeners.slice().forEach(function(fn) { try { fn(proxyState); } catch (e) { console.error(e); } });
   }
 
   function scheduleFlush() {
@@ -78,15 +79,14 @@
     if (document.visibilityState === 'hidden') flushIfPending();
   });
 
-  /* NOTE: the `get` trap returns a NEW Proxy per object read, so reference
-     identity does not hold (state.x !== state.x). Writes always land on the
-     shared underlying `rawState`, so persistence is correct — but never rely
-     on `===` / Object.is between two reads of the same nested object. */
+  /* Nested proxy identity is stable until an object is replaced. */
+  var proxies = new WeakMap();
   var handler = {
     get: function(target, prop, receiver) {
       var value = Reflect.get(target, prop, receiver);
       if (typeof value === 'object' && value !== null) {
-        return new Proxy(value, handler);
+        if (!proxies.has(value)) proxies.set(value, new Proxy(value, handler));
+        return proxies.get(value);
       }
       return value;
     },
@@ -106,10 +106,12 @@
 
   global.PegaStore = {
     state: proxyState,
+    flush: flushIfPending,
     watch: function(callback) {
       listeners.push(callback);
       // Immediately invoke with current state
       callback(proxyState);
+      return function() { listeners = listeners.filter(function(fn) { return fn !== callback; }); };
     }
   };
 })(window);

@@ -62,8 +62,8 @@
   /* ── Utilities ──────────────────────────────────────────────────────── */
   function r(id) { return _root ? _root.querySelector('#rv-' + id) : null; }
   function esc(s) { return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-  function today() { return new Date().toISOString().slice(0,10); }
-  function addDays(ds, n) { var d=new Date(ds+'T12:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+  function today() { return global.QuilynProgress.localDay(new Date()); }
+  function addDays(ds, n) { var d=new Date(ds+'T12:00:00'); d.setDate(d.getDate()+n); return global.QuilynProgress.localDay(d); }
   function setsEqual(a,b) { if(a.length!==b.length) return false; return a.slice().sort().join('|')===b.slice().sort().join('|'); }
   function shuffle(arr) { var a=arr.slice(),i,j,t; for(i=a.length-1;i>0;i--){j=Math.floor(Math.random()*(i+1));t=a[i];a[i]=a[j];a[j]=t;} return a; }
   function nocache(url) { return url+(url.indexOf('?')<0?'?':'&')+'_t='+Date.now(); }
@@ -118,7 +118,9 @@
     else{c.box=1;if(wasSurprise){c.surpriseCount=(c.surpriseCount||0)+1;srs.surpriseIds=[key].concat((srs.surpriseIds||[]).filter(function(k){return k!==key;})).slice(0,20);}}
     c.dueDate=addDays(t,BOX_DAYS[(c.box||1)-1]);
     if(srs.lastStudyDate!==t){srs.streak=(srs.lastStudyDate===addDays(t,-1))?(srs.streak||0)+1:1;srs.lastStudyDate=t;}
-    saveSRS(); return wasSurprise;
+    saveSRS();
+    global.QuilynProgress.activity("review", getTrack(), key);
+    return wasSurprise;
   }
 
   /* ── Session ────────────────────────────────────────────────────────── */
@@ -131,7 +133,9 @@
     renderQ(0);
   }
 
+  var cardGraded = false;
   function renderQ(idx) {
+    cardGraded = false;
     var key=session[idx]; var entry=cardBank[key]; var q=entry.q;
     var isMulti=q.type==='multi-select';
     var box=srs.cards[key]?srs.cards[key].box:1;
@@ -188,7 +192,8 @@
   }
 
   function submitConf(conf) {
-    if(!currentSelected.length) return;
+    if(cardGraded || !currentSelected.length) return;
+    cardGraded = true;
     var q=currentQ; var key=currentKey;
     var qn=r('qcontainer'); if(!qn) return;
     qn.querySelectorAll('.opt').forEach(function(el){el.classList.add('dis');});
@@ -308,7 +313,7 @@
       '<section id="rv-loading">'+
         '<div class="loading-state">'+
           '<div class="spinner"></div>'+
-          '<div>Loading question bank… (48 modules)</div>'+
+          '<div>Loading question bank…</div>'+
           '<div id="rv-load-prog" style="margin-top:6px;font-size:13px;color:var(--pa-muted,#939bbd)"></div>'+
         '</div>'+
       '</section>'+
@@ -389,11 +394,14 @@
   var _sidebarEl = null;
 
   /* ── Public API ─────────────────────────────────────────────────────── */
+  var generation = 0;
   function mount(contentEl, sidebarEl) {
+    var request = ++generation;
     /* Reset state from any prior mount */
     cardBank={}; srs={}; session=[]; sessIdx=0; sessResults=[]; currentSelected=[]; currentQ=null; currentKey=null; _root=null; _sidebarEl=sidebarEl||null;
 
     contentEl.innerHTML=getHTML();
+    document.getElementById("paContent").focus({preventScroll:true});
     _root=contentEl.querySelector('.pa-view--review');
 
     srs=loadSRS();
@@ -424,20 +432,25 @@
     showSec('loading');
 
     var activeTrackId = getTrack();
-    fetch(nocache('data/registry.json'))
-      .then(function(res){if(!res.ok)throw new Error('registry.json HTTP '+res.status);return res.json();})
+    DOMAINS = ['Case Management','Data & Integration','Application Development','Security','User Experience','Pega GenAI','DevOps','Insights'];
+    global.QuilynRuntime.json('data/registry.json')
       .then(function(reg){
+        if(request !== generation) throw new Error('CANCELLED');
         var track=reg.tracks.filter(function(t){return t.trackId===activeTrackId;})[0];
         if(!track) throw new Error(activeTrackId + ' track not found in registry.json');
         var mods=track.modules.filter(function(m){return m.ready!==false;});
+        if (activeTrackId === 'PSSA') {
+          DOMAINS = Array.from(new Set(mods.map(function(m) { return m.examDomain; }).filter(Boolean)));
+        }
         if(mods.length===0) throw new Error('EMPTY_TRACK');
         var loaded=0;
         var progEl=r('load-prog'); if(progEl) progEl.textContent='0 / '+mods.length+' modules';
         return Promise.all(mods.map(function(meta){
-          return fetch(nocache(meta.file))
-            .then(function(res){if(!res.ok)throw new Error(meta.file+' HTTP '+res.status);return res.json();})
+          return global.QuilynRuntime.json(meta.file)
             .then(function(data){
+              if(request !== generation) return;
               var mid=data.moduleId||meta.id; var mname=data.moduleTitle||meta.name;
+              if (data.examDomain || meta.examDomain) MOD_DOMAIN[mid] = data.examDomain || meta.examDomain;
               (data.practiceQuiz||[]).forEach(function(q){cardBank[mid+'::'+q.questionId]={moduleId:mid,moduleName:mname,q:q};});
               loaded++;
               if(progEl) progEl.textContent=loaded+' / '+mods.length+' modules loaded';
@@ -445,6 +458,7 @@
         }));
       })
       .then(function(){
+        if(request !== generation) return;
         if(Object.keys(cardBank).length === 0) {
           showSec('empty');
           if(sidebarEl) sidebarEl.innerHTML='<li><div class="rv-sidebar-stat"><span style="color:var(--pa-muted,#939bbd)">No cards</span></div></li>';
@@ -454,6 +468,7 @@
         }
       })
       .catch(function(err){
+        if(request !== generation) return;
         if(err.message==='EMPTY_TRACK') {
           showSec('empty');
           if(sidebarEl) sidebarEl.innerHTML='<li><div class="rv-sidebar-stat"><span style="color:var(--pa-muted,#939bbd)">No cards</span></div></li>';
@@ -465,6 +480,7 @@
   }
 
   function unmount() {
+    generation++;
     _root=null; _sidebarEl=null;
     cardBank={}; srs={}; session=[]; sessIdx=0; sessResults=[]; currentSelected=[]; currentQ=null; currentKey=null;
   }

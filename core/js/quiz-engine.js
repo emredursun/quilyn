@@ -20,6 +20,7 @@
 (function (global) {
   "use strict";
 
+  function esc(v) { return String(v == null ? "" : v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
   var LETTERS = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
   function setsEqual(a, b) {
@@ -38,16 +39,18 @@
   function loadState() {
     try {
       var raw = localStorage.getItem(storageKey());
-      return raw ? JSON.parse(raw) : {};
+      return global.QuilynProgress ? global.QuilynProgress.read(storageKey(), {}) : (raw ? JSON.parse(raw) : {});
     } catch (e) { return {}; }
   }
 
   function saveState(state) {
-    try { localStorage.setItem(storageKey(), JSON.stringify(state)); } catch (e) {}
+    if (global.QuilynProgress) global.QuilynProgress.write(storageKey(), state);
+    else try { localStorage.setItem(storageKey(), JSON.stringify(state)); } catch (e) {}
   }
 
   function clearState() {
-    try { localStorage.removeItem(storageKey()); } catch (e) {}
+    if (global.QuilynProgress) global.QuilynProgress.remove(storageKey());
+    else try { localStorage.removeItem(storageKey()); } catch (e) {}
   }
 
   /* ---- Keyboard shortcut support ---- */
@@ -56,6 +59,7 @@
   function _kbHandler(e) {
     /* Ignore if focus is on an input/textarea */
     var tag = document.activeElement && document.activeElement.tagName;
+    if (Array.from(document.querySelectorAll('[aria-modal="true"]')).some(function(el) { return el.getClientRects().length; }) || !_kbContainer || !_kbContainer.isConnected || !_kbContainer.getClientRects().length) return;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
     var key = e.key.toUpperCase();
@@ -67,20 +71,20 @@
       if (optEls && optEls[idx]) { e.preventDefault(); optEls[idx].click(); }
       return;
     }
-    if (key === 'ENTER' && _kbActiveIdx != null) {
+    if (key === 'ENTER' && tag !== 'BUTTON' && tag !== 'A' && _kbActiveIdx != null) {
       var checkBtn = _kbContainer && _kbContainer.querySelector('.pa-q[data-idx="' + _kbActiveIdx + '"] .check');
       if (checkBtn && !checkBtn.disabled) { e.preventDefault(); checkBtn.click(); }
       return;
     }
     if (key === 'H' && _kbActiveIdx != null) {
-      var hintBtn = _kbContainer && _kbContainer.querySelector('.pa-q[data-idx="' + _kbActiveIdx + '"] .hint');
+      var hintBtn = _kbContainer && _kbContainer.querySelector('.pa-q[data-idx="' + _kbActiveIdx + '"] .pa-hint-btn');
       if (hintBtn) { e.preventDefault(); hintBtn.click(); }
     }
   }
 
   var _kbContainer = null;
 
-  function render(container, questions, onComplete, pill) {
+  function render(container, questions, onComplete, pill, transient) {
     container.innerHTML = "";
     var total = questions.length;
     var graded = new Array(total).fill(false);
@@ -93,7 +97,9 @@
     document.addEventListener('keydown', _kbHandler);
 
     // Restore persisted state; each entry: { selected: [ids], graded: bool, correct: bool }
-    var state = loadState();
+    var state = transient ? {} : loadState();
+    function persist() { if (!transient) saveState(state); }
+    var completed = Object.keys(state).length === total && Object.keys(state).every(function(k) { return state[k].graded; });
 
     /* ---- Reset button (inline, above questions) ---- */
     var resetBtn = document.createElement("button");
@@ -125,13 +131,13 @@
         pill.querySelector(".pqp-s").textContent = s;
         pill.querySelector(".pqp-fill").style.width = (g / total * 100) + "%";
       }
-      if (g === total) finish(s);
+      if (g === total && total > 0) finish(s);
     }
 
     function finish(score) {
       var pct = Math.round(score / total * 100);
       var msg;
-      if (pct >= 90) msg = "Outstanding — you are exam-ready.";
+      if (pct >= 90) msg = "Strong module result. Keep reviewing the wider exam coverage.";
       else if (pct >= 75) msg = "Solid. Review the misses and the Exam Pitfalls tab.";
       else if (pct >= 60) msg = "Getting there. Re-read the Study Guide, then retry.";
       else msg = "Work through the Study Guide again, then retry.";
@@ -149,13 +155,13 @@
         retryHtml;
       result.classList.add("show");
       result.scrollIntoView({ behavior: "smooth", block: "center" });
-      if (typeof onComplete === "function") onComplete(pct, score, total);
+      if (!completed && typeof onComplete === "function") onComplete(pct, score, total);
+      completed = true;
 
       var retryBtn = result.querySelector(".pa-retry-wrong");
       if (retryBtn) {
         retryBtn.addEventListener("click", function () {
-          clearState();
-          render(container, wrongQuestions, null, pill);
+          render(container, wrongQuestions, null, pill, true);
           container.scrollIntoView({ behavior: "smooth" });
         });
       }
@@ -218,9 +224,9 @@
 
       var optsHtml = q.options.map(function (o, i) {
         return (
-          '<div class="pa-opt ' + (isMulti ? "multi" : "single") + '" data-id="' + o.id + '">' +
+          '<div class="pa-opt ' + (isMulti ? "multi" : "single") + '" data-id="' + esc(o.id) + '">' +
             '<span class="key">' + LETTERS[i] + "</span>" +
-            '<span class="txt">' + o.text + "</span>" +
+            '<span class="txt">' + esc(o.text) + "</span>" +
           "</div>"
         );
       }).join("");
@@ -230,14 +236,14 @@
           '<span class="qtype ' + (isMulti ? "multi" : "") + '">' + typeLabel + "</span>" +
           '<span class="qno">Question ' + (idx + 1) + " / " + total + "</span>" +
         "</div>" +
-        '<div class="scenario">' + q.scenario + "</div>" +
+        '<div class="scenario">' + esc(q.scenario) + "</div>" +
         '<div class="opts">' + optsHtml + "</div>" +
         '<div class="controls">' +
           '<button class="pa-btn primary check" type="button">Check answer</button>' +
         "</div>" +
-        (q.hint ? '<div class="hint-wrap"><button class="pa-hint-btn" type="button"><span class="hint-icon">💡</span> Hint <span class="hint-caret">▾</span></button><div class="hintbox">' + q.hint + "</div></div>" : "") +
+        (q.hint ? '<div class="hint-wrap"><button class="pa-hint-btn" type="button"><span class="hint-icon">💡</span> Hint <span class="hint-caret">▾</span></button><div class="hintbox">' + esc(q.hint) + "</div></div>" : "") +
         '<div class="verdict"></div>' +
-        '<div class="rationale"><b>Rationale:</b> ' + (q.rationale || "") + "</div>";
+        '<div class="rationale"><b>Rationale:</b> ' + esc(q.rationale || "") + "</div>";
 
       listWrap.appendChild(card);
 
@@ -284,7 +290,7 @@
           }
           // Persist selection immediately
           state[idx] = { selected: selected.slice(), graded: false };
-          saveState(state);
+          persist();
         });
       });
 
@@ -303,7 +309,7 @@
 
         // Persist graded state
         state[idx] = { selected: selected.slice(), graded: true, correct: isCorrect };
-        saveState(state);
+        persist();
         refreshBar();
       });
     });
@@ -313,11 +319,12 @@
 
     /* ---- Reset ---- */
     resetBtn.addEventListener("click", function () {
-      clearState();
-      render(container, questions, onComplete, pill);
+      if (!transient) clearState();
+      render(container, questions, onComplete, pill, transient);
       container.scrollIntoView({ behavior: "smooth" });
     });
   }
 
-  global.PegaQuiz = { render: render };
+  function unmount() { document.removeEventListener('keydown', _kbHandler); _kbContainer = null; _kbActiveIdx = null; }
+  global.PegaQuiz = { render: render, unmount: unmount };
 })(window);

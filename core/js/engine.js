@@ -21,17 +21,20 @@
   var registry = null;       // parsed registry.json
   var activeTrackId = null;  // e.g. "PBA"
   var moduleCache = {};      // moduleId -> parsed JSON
+  var moduleRequest = 0;     // invalidates responses from previous routes
   var pendingInteractives = []; // HTML payloads for sandboxed iframes, set as srcdoc after inject
 
   /* ============ State (localStorage) ============ */
   function loadState() {
     try {
       var raw = localStorage.getItem(STATE_KEY);
+      if (window.QuilynProgress) return window.QuilynProgress.read(STATE_KEY, { userProgress: {} });
       if (raw) return JSON.parse(raw);
     } catch (e) { /* ignore corrupt state */ }
     return { userProgress: {} };
   }
   function saveState(state) {
+    if (window.QuilynProgress) return window.QuilynProgress.write(STATE_KEY, state);
     try { localStorage.setItem(STATE_KEY, JSON.stringify(state)); } catch (e) { }
   }
   function trackState(trackId) {
@@ -47,12 +50,6 @@
     var tp = s.userProgress && s.userProgress[trackId];
     return !!(tp && tp.completedModules && tp.completedModules.indexOf(moduleId) >= 0);
   }
-  function markModuleComplete(trackId, moduleId) {
-    var s = trackState(trackId);
-    var cm = s.userProgress[trackId].completedModules;
-    if (cm.indexOf(moduleId) < 0) cm.push(moduleId);
-    saveState(s);
-  }
   function recordQuiz(trackId, moduleId, scorePercent) {
     var s = trackState(trackId);
     var recs = s.userProgress[trackId].quizRecords;
@@ -67,8 +64,12 @@
       scoreHistory: history
     };
     // A score of 70%+ marks the module complete (PCBA-style pass threshold).
-    if (scorePercent >= 70) markModuleComplete(trackId, moduleId);
+    if (scorePercent >= 70) {
+      var completed = s.userProgress[trackId].completedModules;
+      if (completed.indexOf(moduleId) < 0) completed.push(moduleId);
+    }
     saveState(s);
+    if (window.QuilynProgress) window.QuilynProgress.activity("quiz", trackId, moduleId);
   }
   function quizRecord(trackId, moduleId) {
     var s = loadState();
@@ -88,7 +89,7 @@
   }
   function esc(s) {
     return String(s == null ? "" : s)
-      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
   // Like esc() but wraps bare https:// URLs in clickable anchor tags.
   function linkify(s) {
@@ -131,10 +132,10 @@
     // Progress mini-bar
     var totalReady = track.modules.filter(function (m) { return m.ready !== false; }).length;
     var doneCount = track.modules.filter(function (m) { return isModuleComplete(activeTrackId, m.id); }).length;
-    var pct = totalReady ? Math.round(doneCount / track.modules.length * 100) : 0;
+    var pct = totalReady ? Math.round(doneCount / totalReady * 100) : 0;
     document.getElementById("paProgFill").style.width = pct + "%";
     document.getElementById("paProgLabel").textContent =
-      doneCount + " of " + track.modules.length + " modules complete (" + pct + "%)";
+      doneCount + " of " + totalReady + " available modules complete (" + pct + "%)";
 
     // Module list
     var hash = parseHash();
@@ -164,19 +165,27 @@
   }
 
   function route() {
+    if (!registry) return;
+    moduleRequest++;
+    if (window.PegaQuiz) window.PegaQuiz.unmount();
+    if (window._paCrumbObs) { window._paCrumbObs.disconnect(); window._paCrumbObs = null; }
     var hash = parseHash();
 
-    // SPA Shell Guard: Yield control if the route belongs to the App Shell
     if (hash.trackId === 'mock' || hash.trackId === 'review') {
+      closeSidebarMobile();
+      if (window.QuilynShell) window.QuilynShell.renderMode(hash.trackId);
       return;
     }
+    if (window.QuilynShell) window.QuilynShell.renderMode('lms');
 
+    if (window.PegaStore && getTrack(window.PegaStore.state.activeTrack)) activeTrackId = window.PegaStore.state.activeTrack;
     if (hash.trackId && getTrack(hash.trackId)) {
       activeTrackId = hash.trackId;
-      // Keep the shared store in sync so deep links (#TDS1/TDS1-M00) also drive
-      // the Mock Exam / Smart Review views and the track switcher label.
-      if (window.PegaStore) window.PegaStore.state.activeTrack = activeTrackId;
     }
+    // Home and deep links must agree with the track used by mock/review views.
+    window.QuilynActiveTrackId = activeTrackId;
+    if (window.PegaStore && window.PegaStore.state.activeTrack !== activeTrackId)
+      window.PegaStore.state.activeTrack = activeTrackId;
     renderSidebar();
     closeSidebarMobile();
 
@@ -200,7 +209,7 @@
     var attempted = [];
     track.modules.forEach(function (m, i) {
       var rec = quizRecord(activeTrackId, m.id);
-      if (rec && rec.attempts > 0) {
+      if (m.ready !== false && rec && rec.attempts > 0 && rec.highScore < 70) {
         attempted.push({ idx: i, m: m, rec: rec });
       }
     });
@@ -211,9 +220,9 @@
 
     var rows = weak.map(function (entry) {
       var pct = entry.rec.highScore;
-      var barColor = pct >= 70 ? "var(--pa-ok)" : pct >= 50 ? "var(--pa-brand)" : "var(--pa-err)";
+      var barColor = pct >= 70 ? "var(--pa-ok)" : pct >= 50 ? "var(--pa-brand)" : "var(--pa-bad)";
       return (
-        '<div class="pa-weak-row" data-go="#' + activeTrackId + "/" + entry.m.id + '">' +
+        '<a class="pa-weak-row" href="#' + activeTrackId + "/" + entry.m.id + '">' +
         '<div class="pa-weak-info">' +
         '<span class="pa-weak-num">M' + (entry.idx + 1) + "</span>" +
         '<span class="pa-weak-name">' + esc(entry.m.name) + "</span>" +
@@ -222,7 +231,7 @@
         '<div class="pa-weak-bar" style="width:' + pct + '%;background:' + barColor + '"></div>' +
         '</div>' +
         '<span class="pa-weak-pct">' + pct + "%</span>" +
-        "</div>"
+        "</a>"
       );
     }).join("");
 
@@ -244,32 +253,55 @@
       var metaText = soon ? "Coming soon" : (rec ? ("Best: " + rec.highScore + "% · " + rec.attempts + " attempt(s)") : "Not started");
       var trend = rec ? buildScoreTrend(rec.scoreHistory) : "";
       return (
-        '<div class="pa-card" data-go="#' + activeTrackId + "/" + m.id + '">' +
+        '<a class="pa-card" href="#' + activeTrackId + "/" + m.id + '">' +
         '<div class="cnum">Module ' + (i + 1) + (soon ? " · 🔒" : "") + "</div>" +
-        "<h4>" + esc(m.name) + "</h4>" +
+        "<h3>" + esc(m.name) + "</h3>" +
         '<div class="cmeta"><span>' + metaText + "</span>" +
         trend +
         (done ? '<span class="cdone">✓ Done</span>' : "") + "</div>" +
-        "</div>"
+        "</a>"
       );
     }).join("");
 
     var weakPanel = buildWeakAreaPanel(track);
+    var ready = track.modules.filter(function(m) { return m.ready !== false; });
+    var done = ready.filter(function(m) { return isModuleComplete(activeTrackId, m.id); }).length;
+    var events = window.QuilynProgress.read('quilyn_activity', {version:1,events:[]}).events;
+    var last = events.slice().reverse().find(function(e) { return e.track === activeTrackId && e.kind === 'visit' && ready.some(function(m) { return m.id === e.subject; }); });
+    var completedIds = ready.filter(function(m) { return isModuleComplete(activeTrackId,m.id); }).map(function(m) { return m.id; });
+    var next = selectNextModule(ready, completedIds, last && last.subject);
+    var ts = window.PegaStore.state.tracks[activeTrackId] || {};
+    var cardsDue = (ts.srs && ts.srs.cards) || {};
+    var day = window.QuilynProgress.localDay(new Date());
+    var due = Object.keys(cardsDue).filter(function(k) { return cardsDue[k].dueDate <= day; }).length;
+    var mockScores = ts.mock || {};
+    var scores = Object.values(mockScores);
+    var actions = '<section class="quilyn-today" aria-label="Your next steps">' +
+      '<div><span class="quilyn-eyebrow">YOUR NEXT STEP</span><h3>' + (next ? esc(next.name) : 'More content is on the way') + '</h3>' +
+      '<p>' + (last ? (next && next.id === last.subject ? 'Pick up where you left off.' : 'Continue to your next available module.') : 'Start with an available module. Your progress stays on this device.') + '</p>' +
+      (next ? '<a class="pa-btn primary" href="#' + activeTrackId + '/' + next.id + '">' + (last ? 'Continue learning' : 'Start learning') + '</a>' : '') + '</div>' +
+      '<div class="quilyn-summary"><h3>Today’s review</h3><p>' + due + ' scheduled cards due. New cards are available in Smart Review.</p><a href="#review">Open Smart Review →</a></div>' +
+      '<div class="quilyn-summary"><h3>Your coverage</h3><p>' + done + ' / ' + ready.length + ' available modules mastered (70%+ quiz).</p><p>' + ready.length + ' of ' + (track.plannedModuleCount || track.modules.length) + ' planned modules available.</p>' +
+      '<p>' + (scores.length ? 'Best mock result: ' + Math.max.apply(null,scores) + '%. This is practice performance.' : 'No mock exam results yet.') + '</p><a href="#mock">View mock exams →</a></div></section>';
 
     var c = document.getElementById("paContent");
     c.innerHTML =
       '<div class="pa-hero">' +
       "<h2>" + esc(track.trackName) + "</h2>" +
-      "<p>Offline study guide &amp; exam simulator. Select a module to begin. Progress is saved automatically in your browser.</p>" +
+      "<p>Build understanding, practice your recall, and follow your progress.</p>" +
       "</div>" +
+      actions +
       weakPanel +
-      '<div class="pa-cards">' + cards + "</div>" +
+      '<h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
       '<div class="pa-footer">Quilyn · data-driven · ' + track.modules.length + " modules</div>";
 
-    c.querySelectorAll(".pa-card, .pa-weak-row").forEach(function (el) {
-      el.addEventListener("click", function () { location.hash = el.getAttribute("data-go"); });
-    });
     window.scrollTo({ top: 0 });
+    document.getElementById("paContent").focus({preventScroll:true});
+  }
+
+  function selectNextModule(ready, completed, lastId) {
+    return ready.find(function(m) { return m.id === lastId && !completed.includes(m.id); }) ||
+      ready.find(function(m) { return !completed.includes(m.id); }) || ready[0];
   }
 
   function renderComingSoon(meta) {
@@ -279,31 +311,30 @@
       '<div class="pa-empty">📦 This module is queued for the next content batch.<br>' +
       "Its deep-dive study guide and quiz are being authored.</div>";
     window.scrollTo({ top: 0 });
+    document.getElementById("paContent").focus({preventScroll:true});
   }
 
   /* ============ Module loader ============ */
   function loadModule(meta) {
+    var request = moduleRequest;
     setCrumbs(getTrack(activeTrackId).trackName, meta.name);
     var c = document.getElementById("paContent");
     c.innerHTML = '<div class="pa-empty">Loading module…</div>';
 
-    var done = function (data) { moduleCache[meta.id] = data; renderModule(meta, data); };
+    var done = function (data) {
+      moduleCache[meta.id] = data;
+      if (request === moduleRequest) renderModule(meta, data);
+    };
 
     if (moduleCache[meta.id]) { done(moduleCache[meta.id]); return; }
 
-    fetch(nocache(meta.file))
-      .then(function (r) {
-        if (!r.ok) throw new Error("HTTP " + r.status);
-        return r.json();
-      })
+    window.QuilynRuntime.json(meta.file)
       .then(done)
       .catch(function (err) {
-        c.innerHTML =
-          '<h2 class="pa-h2">' + esc(meta.name) + "</h2>" +
-          '<div class="pa-empty">⚠️ Could not load <code>' + esc(meta.file) + "</code>.<br>" +
-          "If you opened <code>index.html</code> directly from disk, your browser blocks local <code>fetch()</code>. " +
-          "Run a local server instead, e.g.:<br><br><code>python3 -m http.server</code><br>" +
-          "then open <code>http://localhost:8000</code>.<br><br><small>" + esc(err.message) + "</small></div>";
+        if (request !== moduleRequest) return;
+        c.innerHTML = '<h2 class="pa-h2">' + esc(meta.name) + '</h2><div class="pa-empty" role="alert">This module is unavailable. Connect to the internet or download this learning track in Settings for offline use.<br><button class="pa-btn" id="quilyn-retry-module">Try again</button></div>';
+        c.querySelector('#quilyn-retry-module').onclick = function() { loadModule(meta); };
+
       });
   }
 
@@ -311,6 +342,8 @@
   function renderModule(meta, data) {
     var c = document.getElementById("paContent");
     var moduleTitle = data.moduleTitle || meta.name;
+    window.QuilynProgress.activity('visit', activeTrackId, meta.id);
+    document.title = moduleTitle + ' — Quilyn';
     var academyLabel = (data.moduleId && /^(TAS|TAPI|TDS|AE|TMOB|TESTIM)/.test(data.moduleId)) ? "Tricentis Academy" : "Pega Academy";
     var moduleTitleHtml = data.moduleUrl
       ? '<h2 class="pa-h2">' + esc(moduleTitle) +
@@ -318,6 +351,8 @@
       : '<h2 class="pa-h2">' + esc(moduleTitle) + "</h2>";
     c.innerHTML =
       moduleTitleHtml +
+      '<p class="quilyn-provenance">Independent study notes · ' + (data.platformVersion ? 'Version ' + esc(data.platformVersion) : 'Version not documented') + ' · ' +
+      (data.sourceReviewedOn ? 'Reviewed ' + esc(data.sourceReviewedOn) : 'Review date not documented') + ' · Module mastery: 70% quiz score</p>' +
       '<div class="pa-tabs">' +
       '<button data-v="guide" class="active">📘 Study Guide</button>' +
       '<button data-v="pitfalls">⚠️ Exam Pitfalls</button>' +
@@ -339,7 +374,9 @@
     c.querySelectorAll("iframe.pa-interactive").forEach(function (frame) {
       var idx = parseInt(frame.getAttribute("data-int"), 10);
       if (isNaN(idx) || pendingInteractives[idx] == null) return;
-      frame.srcdoc = String(pendingInteractives[idx]).replace(/__THEME__/g, theme);
+      window.QuilynRuntime.interactive(String(pendingInteractives[idx]),theme).then(function(html) {
+        if (frame.isConnected) frame.srcdoc = html;
+      }).catch(function() { frame.title = 'Exercise unavailable. Connect and reload this module.'; });
       frame.addEventListener("load", function () {
         try { frame.contentWindow.postMessage({ type: "pa-theme", theme: currentTheme() }, "*"); } catch (e) { }
       });
@@ -372,14 +409,28 @@
     // Tab switching
     var tabs = c.querySelectorAll(".pa-tabs button");
     var views = c.querySelectorAll(".pa-view");
+    c.querySelector('.pa-tabs').setAttribute('role', 'tablist');
+    c.querySelector('.pa-tabs').setAttribute('aria-label', 'Module sections');
+    tabs.forEach(function(tab, index) {
+      var panel = document.getElementById('v-' + tab.dataset.v);
+      tab.id = 'tab-' + tab.dataset.v; tab.setAttribute('role','tab');
+      tab.setAttribute('aria-controls',panel.id); tab.setAttribute('aria-selected', String(index === 0)); tab.tabIndex = index === 0 ? 0 : -1;
+      panel.setAttribute('role','tabpanel'); panel.setAttribute('aria-labelledby',tab.id); panel.hidden = index !== 0;
+      tab.addEventListener('keydown', function(e) {
+        var keys = ['ArrowLeft','ArrowRight','Home','End']; if (!keys.includes(e.key)) return;
+        e.preventDefault(); var next = e.key === 'Home' ? 0 : e.key === 'End' ? tabs.length - 1 : (index + (e.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+        tabs[next].click(); tabs[next].focus();
+      });
+    });
     var quizMounted = false;
     var pill = c.querySelector(".pa-quiz-pill");
     tabs.forEach(function (b) {
       b.addEventListener("click", function () {
-        tabs.forEach(function (x) { x.classList.remove("active"); });
-        views.forEach(function (x) { x.classList.remove("active"); });
+        tabs.forEach(function (x) { x.classList.remove("active"); x.setAttribute("aria-selected", String(x === b)); x.tabIndex = x === b ? 0 : -1; });
+        views.forEach(function (x) { x.classList.remove("active"); x.hidden = true; });
         b.classList.add("active");
         document.getElementById("v-" + b.getAttribute("data-v")).classList.add("active");
+        document.getElementById("v-" + b.getAttribute("data-v")).hidden = false;
         pill.hidden = b.getAttribute("data-v") !== "quiz";
         if (b.getAttribute("data-v") === "quiz" && !quizMounted) {
           mountQuiz(meta, data, pill);
@@ -388,6 +439,7 @@
       });
     });
     window.scrollTo({ top: 0 });
+    document.getElementById("paContent").focus({preventScroll:true});
 
     // Activate scroll-aware breadcrumb: shows track only when H2 is visible,
     // expands to "Track / Module" when user has scrolled past the title.
@@ -405,6 +457,7 @@
         '<div class="pa-topics-head">📚 ' + topicsAcademyLabel + ' Topics</div>' +
         '<div class="pa-topics-links">' +
         data.topics.map(function (t) {
+          if (!t.url) return '<span class="pa-topic-link">' + esc(t.title) + ' · HTTPS source unavailable</span>';
           return '<a class="pa-topic-link" href="' + esc(t.url) + '" target="_blank" rel="noopener">' +
             esc(t.title) +
             (t.duration ? ' <span class="pa-topic-dur">· ' + esc(t.duration) + "</span>" : "") +
@@ -584,6 +637,7 @@
     if (!r.length) return '<div class="pa-empty">No quick recap available.</div>';
     return '<table class="pa-recap"><tbody>' +
       r.map(function (row) {
+        if (typeof row === "string") return '<tr><td colspan="2">' + esc(row) + "</td></tr>";
         return "<tr><th>" + esc(row.key) + "</th><td>" + esc(row.value) + "</td></tr>";
       }).join("") + "</tbody></table>";
   }
@@ -642,32 +696,49 @@
   }
   function closeSidebarMobile() {
     document.getElementById("paSidebar").classList.remove("open");
+    syncSidebar();
+  }
+  function syncSidebar() {
+    var sidebar = document.getElementById('paSidebar');
+    var mobile = window.matchMedia('(max-width: 860px)').matches;
+    var open = sidebar.classList.contains('open');
+    sidebar.inert = mobile && !open;
+    document.querySelector('.pa-main').inert = mobile && open;
+    document.getElementById('paMenuToggle').setAttribute('aria-expanded',String(open && mobile));
+    document.getElementById('paMenuToggle').setAttribute('aria-controls','paSidebar');
   }
 
   /* ============ Boot ============ */
   function boot() {
     window.addEventListener("pega-track-changed", function (e) {
       activeTrackId = e.detail;
-      renderSidebar();
-      var hash = location.hash;
-      if (hash.indexOf('#mock') === 0) {
-        var contentEl = document.getElementById('paContent');
-        if (contentEl) contentEl.innerHTML = '<pega-mock-view></pega-mock-view>';
-      } else if (hash.indexOf('#review') === 0) {
-        var contentEl = document.getElementById('paContent');
-        if (contentEl) contentEl.innerHTML = '<pega-review-view></pega-review-view>';
-      }
+      route();
     });
     document.getElementById("paMenuToggle").addEventListener("click", function () {
       document.getElementById("paSidebar").classList.toggle("open");
+      syncSidebar();
+      if (document.getElementById('paSidebar').classList.contains('open')) document.getElementById('quilyn-sidebar-close').focus();
     });
+    var close = document.createElement('button'); close.id='quilyn-sidebar-close'; close.className='pa-btn quilyn-sidebar-close'; close.textContent='Close menu';
+    document.getElementById('paSidebar').prepend(close);
+    close.onclick=function(){closeSidebarMobile();document.getElementById('paMenuToggle').focus();};
+    document.getElementById('paSidebar').addEventListener('keydown',function(e) {
+      if (!window.matchMedia('(max-width: 860px)').matches || !this.classList.contains('open')) return;
+      if(e.key==='Escape'){e.preventDefault();close.click();}
+      if(e.key==='Tab') {
+        var items=Array.from(this.querySelectorAll('button,a[href],pega-track-switcher')).filter(function(el){return el.getClientRects().length;});
+        if(e.shiftKey && document.activeElement===items[0]){e.preventDefault();items[items.length-1].focus();}
+        else if(!e.shiftKey && document.activeElement===items[items.length-1]){e.preventDefault();items[0].focus();}
+      }
+    });
+    window.addEventListener('resize',syncSidebar); syncSidebar();
     window.addEventListener("hashchange", route);
     watchThemeForInteractives();
 
-    fetch(nocache(REGISTRY_URL))
-      .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    window.QuilynRuntime.json(REGISTRY_URL)
       .then(function (data) {
         registry = data;
+        window.QuilynRegistry = data;
         activeTrackId = (registry.tracks[0] || {}).trackId;
         route();
       })

@@ -7,6 +7,11 @@
   'use strict';
 
   var PASS = 0.65, TIME_MIN = 90;
+  function configureExam(track) {
+    var spec = track && track.exam || {};
+    PASS = (spec.passPercent || 65) / 100;
+    TIME_MIN = spec.timeMinutes || 90;
+  }
   var EXAMS = {};
 
   /* ── Engine state ───────────────────────────────────────────────────── */
@@ -15,27 +20,33 @@
   var answers = [];   // array of arrays — selected option indices per question
   var checked = [];   // bool per question — true after "Check Answer" clicked
   var remaining = 0;
-  var startTs = 0;
+  var deadline = 0;
   var paused = false;
+  var examFinished = false;
   var _root = null;
+  var mountedTrack = null;
   var LETTERS = ["A","B","C","D","E"];
 
-  function esc(t) { return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function esc(t) { return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
   function q(id) { return _root ? _root.querySelector('#mv-' + id) : null; }
 
   function getTrack() {
+    if (mountedTrack) return mountedTrack;
     return (global.PegaStore && global.PegaStore.state.activeTrack) ? global.PegaStore.state.activeTrack : 'PSA';
   }
   function loadScores() {
     if (!global.PegaStore) return {};
     var track = getTrack();
     if (!global.PegaStore.state.tracks[track]) global.PegaStore.state.tracks[track] = { mock: {} };
+    if (!global.PegaStore.state.tracks[track].mock) global.PegaStore.state.tracks[track].mock = {};
     return global.PegaStore.state.tracks[track].mock;
   }
   function saveScore(name, pct) {
     if (global.PegaStore) {
       var track = getTrack();
       if (!global.PegaStore.state.tracks[track]) global.PegaStore.state.tracks[track] = { mock: {} };
+      if (!global.PegaStore.state.tracks[track].mock) global.PegaStore.state.tracks[track].mock = {};
+      global.QuilynProgress.activity('mock', track, name);
       global.PegaStore.state.tracks[track].mock[name] = Math.max(global.PegaStore.state.tracks[track].mock[name]||0, pct);
     }
   }
@@ -47,18 +58,19 @@
   function saveState() {
     if (!current) return;
     try {
-      localStorage.setItem(stateKey(), JSON.stringify({
+      var value = {
         name: current, answers: answers, checked: checked, remaining: remaining
-      }));
+      };
+      global.QuilynProgress.write(stateKey(), value);
     } catch(e) {}
   }
   function clearState(name) {
-    try { localStorage.removeItem(stateKey(name)); } catch(e) {}
+    global.QuilynProgress.remove(stateKey(name));
   }
   function loadState(name) {
     try {
       var raw = localStorage.getItem(stateKey(name));
-      return raw ? JSON.parse(raw) : null;
+      return global.QuilynProgress.read(stateKey(name), null);
     } catch(e) { return null; }
   }
 
@@ -73,6 +85,8 @@
   function renderHome() {
     var scores = loadScores();
     var grid = q('examGrid'); if (!grid) return;
+    var disclosure=q('bankDisclosure');
+    if (disclosure) disclosure.textContent=getTrack()==='PSSA'?'These practice forms reuse original module quiz questions. Questions do not repeat between the three forms. Scores reflect practice, not an unseen readiness assessment.':'';
     grid.innerHTML = '';
 
     var examKeys = Object.keys(EXAMS);
@@ -90,9 +104,9 @@
         var saved = loadState(name);
         var inProgress = saved && saved.answers && saved.answers.length === qs.length &&
                          saved.answers.some(function(a) { return a.length > 0; });
-        var el = document.createElement('div'); el.className = 'examcard';
-        el.innerHTML = '<h3>' + esc(name) + '</h3>' +
-          '<p>' + qs.length + ' questions · 90 min · 65% to pass</p>' +
+        var el = document.createElement('button'); el.type = 'button'; el.className = 'examcard';
+        el.innerHTML = '<span class="quilyn-exam-title">' + esc(name) + '</span>' +
+          '<p>' + qs.length + ' questions · ' + TIME_MIN + ' min · ' + Math.round(PASS * 100) + '% to pass</p>' +
           '<div class="best">' + esc(best) + '</div>' +
           (inProgress ? '<div class="in-progress-badge">In progress</div>' : '');
         el.onclick = function() { startExam(name); };
@@ -156,8 +170,11 @@
   /* ── Pause / Resume ─────────────────────────────────────────────────── */
   function pauseExam() {
     if (paused) return;
+    syncRemaining();
+    if (remaining <= 0) { submitExam(true); return; }
     paused = true;
     clearInterval(timerId);
+    deadline = 0;
     saveState();
 
     var pb = q('pauseBtn'); if (pb) pb.textContent = '▶ Resume';
@@ -171,6 +188,7 @@
       '<p style="margin:0;color:var(--pa-ink-soft,#939bbd);font-size:14px">Questions are hidden. Your progress is saved.</p>' +
       '<button class="v-btn v-primary" style="margin-top:8px;padding:10px 32px;font-size:15px" id="mv-resumeLayer">▶ Resume</button>';
     document.body.appendChild(layer);
+    global.QuilynRuntime.dialog(layer, resumeExam, 'Exam paused');
     document.getElementById('mv-resumeLayer').onclick = resumeExam;
   }
 
@@ -214,7 +232,9 @@
           '<button class="v-btn v-primary" id="mv-rdResume">Resume</button>' +
         '</div>' +
       '</div>';
+    overlay.setAttribute('data-quilyn-view','mock');
     document.body.appendChild(overlay);
+    global.QuilynRuntime.dialog(overlay, function() { overlay.remove(); }, 'Exam confirmation');
     overlay.querySelector('#mv-rdResume').onclick = function() {
       document.body.removeChild(overlay);
       doStartExam(name, saved);
@@ -229,18 +249,20 @@
   function doStartExam(name, saved) {
     current = name;
     paused = false;
+    examFinished = false;
     var qs = EXAMS[name];
 
     if (saved) {
       answers  = saved.answers;
       checked  = saved.checked;
-      remaining = saved.remaining;
+      var savedSeconds = Number(saved.remaining);
+      remaining = Number.isFinite(savedSeconds)
+        ? Math.max(0, Math.min(TIME_MIN * 60, savedSeconds)) : TIME_MIN * 60;
     } else {
       answers   = qs.map(function() { return []; });
       checked   = qs.map(function() { return false; });
       remaining = TIME_MIN * 60;
     }
-    startTs = Date.now();
 
     var examTitle = q('examTitle');
     if (examTitle) examTitle.textContent = name + ' — answer all ' + qs.length + ' questions, then Submit.';
@@ -412,14 +434,20 @@
   }
 
   function startTimer() {
-    clearInterval(timerId); renderTime();
+    clearInterval(timerId);
+    deadline = Date.now() + remaining * 1000;
+    renderTime();
     var tickCount = 0;
     timerId = setInterval(function() {
-      remaining--;
+      syncRemaining();
       renderTime();
       if (++tickCount % 10 === 0) saveState(); // persist every 10 s
       if (remaining <= 0) { clearInterval(timerId); submitExam(true); }
     }, 1000);
+  }
+
+  function syncRemaining() {
+    if (deadline && !paused) remaining = Math.max(0, Math.ceil((deadline - Date.now()) / 1000));
   }
 
   function renderTime() {
@@ -436,6 +464,7 @@
 
   /* ── Submit & Results ───────────────────────────────────────────────── */
   function submitExam(auto) {
+    syncRemaining();
     if (!auto) {
       var unanswered = answers.filter(function(a) { return a.length === 0; }).length;
       if (unanswered > 0) {
@@ -460,13 +489,18 @@
           '<button class="v-btn v-primary" id="mv-confirmOk">Submit</button>' +
         '</div>' +
       '</div>';
+    overlay.setAttribute('data-quilyn-view','mock');
     document.body.appendChild(overlay);
+    global.QuilynRuntime.dialog(overlay, function() { overlay.remove(); }, 'Exam confirmation');
     overlay.querySelector('#mv-confirmOk').onclick = function() { document.body.removeChild(overlay); onOk(); };
     overlay.querySelector('#mv-confirmCancel').onclick = function() { document.body.removeChild(overlay); };
   }
 
   function doSubmit(auto) {
+    syncRemaining();
     clearInterval(timerId);
+    deadline = 0;
+    examFinished = true;
     clearState(); // exam finished — clear saved progress
 
     var qs = EXAMS[current];
@@ -488,11 +522,11 @@
     var resScore = q('resScore');
     if (resScore) { resScore.textContent = correct + ' / ' + qs.length; resScore.className = 'big ' + (passed?'pass':'fail'); }
     var resPct = q('resPct');
-    if (resPct) resPct.textContent = pct + '%  (pass mark 65%)';
+    if (resPct) resPct.textContent = pct + '%  (pass mark ' + Math.round(PASS * 100) + '%)';
     var pill = q('resPill');
     if (pill) { pill.textContent = passed ? 'PASS' : 'FAIL'; pill.className = 'pill ' + (passed?'pass':'fail'); }
 
-    var used = Math.floor((Date.now()-startTs)/1000);
+    var used = TIME_MIN * 60 - remaining;
     if (auto) used = TIME_MIN * 60;
     var um = Math.floor(used/60), us = used % 60;
     var resTime = q('resTime');
@@ -505,7 +539,7 @@
       Object.keys(dom).forEach(function(d) {
         var o = dom[d]; if (!o || o.t === 0) return;
         var p = Math.round(o.c / o.t * 100);
-        var col = p >= 65 ? 'var(--pa-ok,#34d399)' : (p >= 50 ? 'var(--pa-warn,#fbbf24)' : 'var(--pa-bad,#fb7185)');
+        var col = p >= PASS * 100 ? 'var(--pa-ok,#34d399)' : (p >= 50 ? 'var(--pa-warn,#fbbf24)' : 'var(--pa-bad,#fb7185)');
         db.insertAdjacentHTML('beforeend',
           '<div class="dombar">' +
             '<div class="lab"><span>' + esc(d) + '</span><span>' + o.c + '/' + o.t + ' (' + p + '%)</span></div>' +
@@ -567,7 +601,8 @@
       '<section id="mv-home">' +
         '<div class="v-card">' +
           '<h2>Choose a mock exam</h2>' +
-          '<p class="v-muted">Each exam mirrors the real certification blueprint with a 90-minute timer and a 65% pass mark.</p>' +
+          '<p class="v-muted">Practice exams use a ' + TIME_MIN + '-minute timer and a ' + Math.round(PASS * 100) + '% pass mark. Available question coverage is shown below.</p>' +
+          '<p id="mv-bankDisclosure" class="v-muted"></p>' +
           '<div class="examgrid" id="mv-examGrid"></div>' +
         '</div>' +
         '<div class="v-card">' +
@@ -578,7 +613,7 @@
       /* ── Exam ── */
       '<section id="mv-exam" class="v-hide">' +
         '<div class="exambar">' +
-          '<span class="timer" id="mv-timer">90:00</span>' +
+          '<span class="timer" id="mv-timer">' + TIME_MIN + ':00</span>' +
           '<button class="v-btn pause-btn" id="mv-pauseBtn">⏸ Pause</button>' +
           '<div class="prog"><i id="mv-prog"></i></div>' +
           '<span class="ac">Answered <b id="mv-ansCount">0</b>/<span id="mv-ansTotal">0</span></span>' +
@@ -618,8 +653,8 @@
     return Object.keys(EXAMS).map(function(name, i) {
       var sc = scores[name];
       var best = sc != null ? (sc + '%') : null;
-      return '<li><a href="javascript:void(0)" data-exam="' + esc(name) + '" class="pa-shell-sidebar-item' + (best && sc >= 65 ? ' done' : '') + '">' +
-        '<span class="pa-shell-sidebar-num' + (best && sc >= 65 ? ' done' : '') + '">' + (i+1) + '</span>' +
+      return '<li><a href="#mock" data-exam="' + esc(name) + '" class="pa-shell-sidebar-item' + (best && sc >= PASS * 100 ? ' done' : '') + '">' +
+        '<span class="pa-shell-sidebar-num' + (best && sc >= PASS * 100 ? ' done' : '') + '">' + (i+1) + '</span>' +
         '<span style="flex:1;min-width:0">' +
           '<span style="display:block">' + esc(name) + '</span>' +
           (best ? '<span style="font-size:11px;color:var(--pa-ok,#34d399)">' + best + '</span>' :
@@ -633,6 +668,8 @@
     clearInterval(timerId); timerId = null; current = null; paused = false;
     answers = []; checked = []; _root = null;
 
+    mountedTrack = global.PegaStore.state.activeTrack;
+    document.getElementById("paContent").focus({preventScroll:true});
     contentEl.innerHTML = getHTML();
     _root = contentEl.querySelector('.pa-view--mock');
 
@@ -663,6 +700,7 @@
       showConfirm('Quit this exam? Your saved progress will be cleared.', function() {
         clearInterval(timerId);
         clearState();
+        examFinished = true;
         renderHome();
       });
     });
@@ -677,22 +715,24 @@
     });
   }
 
-  function unmount() {
-    clearInterval(timerId); timerId = null; current = null; paused = false; _root = null;
+  function unmount(skipSave) {
+    syncRemaining();
+    if (!skipSave && current && !examFinished) saveState();
+    clearInterval(timerId); timerId = null; current = null; paused = false; _root = null; mountedTrack = null;
     var layer = document.getElementById('mv-pauseLayer');
     if (layer) layer.remove();
+    document.querySelectorAll('[data-quilyn-view="mock"]').forEach(function(el) { el.remove(); });
   }
 
   /* Cache the parsed exam bank so we fetch the (large) JSON only once */
   var _examsPromise = null;
   function loadExamBank() {
     if (!_examsPromise) {
-      _examsPromise = fetch('data/mock-exams.json')
-        .then(function(res) { if (!res.ok) throw new Error('mock-exams.json HTTP ' + res.status); return res.json(); })
+      _examsPromise = global.QuilynRuntime.json('data/mock-exams.json')
         .catch(function(err) {
           console.error('Failed to load mock exams:', err);
           _examsPromise = null;
-          return {};
+          throw err;
         });
     }
     return _examsPromise;
@@ -701,15 +741,24 @@
   class PegaMockView extends HTMLElement {
     connectedCallback() {
       var self = this;
-      var track = getTrack();
-      loadExamBank().then(function(data) {
+      var track = global.PegaStore.state.activeTrack;
+      Promise.all([loadExamBank(), global.QuilynRuntime.json('data/registry.json')]).then(function(results) {
+        if (!self.isConnected || global.PegaStore.state.activeTrack !== track) return;
+        configureExam(results[1].tracks.find(function(t) { return t.trackId === track; }));
+        var data = results[0];
         EXAMS = (data && data[track]) || {};
         mount(self, document.getElementById('paModList'));
+      }).catch(function(err) {
+        console.error('Failed to load exam configuration:', err);
+        if (self.isConnected) self.textContent = 'Unable to load exam settings. Connect to the internet and reopen Mock Exams.';
       });
     }
     disconnectedCallback() { unmount(); }
   }
 
+  global.MockView = { unmount: unmount, flush: function() { if (_root && current && !examFinished) { syncRemaining(); saveState(); } } };
+  if (global.addEventListener) global.addEventListener('pagehide', global.MockView.flush);
+  if (typeof document !== 'undefined') document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') global.MockView.flush(); });
   customElements.define('pega-mock-view', PegaMockView);
 
 })(window);

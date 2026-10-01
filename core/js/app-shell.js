@@ -1,6 +1,6 @@
 /* =====================================================================
-   app-shell.js — SPA mode router + sole theme owner
-   Loaded LAST so our hashchange handler fires AFTER engine.js.
+   app-shell.js — Application chrome, theme and view mounting
+   engine.js is the sole route dispatcher.
    Manages: theme toggle, nav active state, mock/review view mount/unmount,
    LMS chrome show/hide.
    Never touches engine.js, quiz-engine.js, or data/*.
@@ -17,7 +17,7 @@
 
   function applyTheme(t) {
     htmlEl.setAttribute('data-theme', t);
-    try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+    global.QuilynProgress.write(THEME_KEY,t);
     syncThemeIcon(t);
   }
 
@@ -27,14 +27,6 @@
     if (iconUse) iconUse.setAttribute('href', t === 'light' ? '#i-sun' : '#i-moon');
   }
 
-  /* ── Hash → mode ────────────────────────────────────────────────────── */
-  function getMode(hash) {
-    if (!hash || hash === '#' || hash === '#home') return 'lms';
-    if (hash.indexOf('#mock') === 0)   return 'mock';
-    if (hash.indexOf('#review') === 0) return 'review';
-    return 'lms';
-  }
-
   /* ── Engine DOM references (engine.js owns these, we borrow them) ───── */
   function getContent()  { return document.getElementById('paContent'); }
   function getSidebar()  { return document.getElementById('paModList'); }
@@ -42,7 +34,7 @@
 
   /* ── LMS chrome helpers ─────────────────────────────────────────────── */
   function setLmsChrome(visible) {
-    ['.pa-track-switch', '.pa-progress-mini', '#paTrackSelect'].forEach(function (sel) {
+    ['.pa-progress-mini', '#paTrackSelect'].forEach(function (sel) {
       var el = document.querySelector(sel);
       if (el) el.style.display = visible ? '' : 'none';
     });
@@ -59,6 +51,7 @@
                    (mode === 'mock'   && isMock)   ||
                    (mode === 'review' && isReview);
       a.classList.toggle('active', active);
+      if (active) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current');
     });
   }
 
@@ -70,13 +63,11 @@
 
   /* ── Mode transitions ───────────────────────────────────────────────── */
   function enterLms() {
-    var contentEl = getContent();
-    if (contentEl) contentEl.innerHTML = '';
     currentMode = 'lms';
     setLmsChrome(true);
     setNavActive('lms');
     document.title = "Quilyn — Free Certification Exam Prep (Pega, Tricentis Tosca & Testim)";
-    /* Engine already re-rendered sidebar + content; nothing else to do */
+
   }
 
   function enterMock() {
@@ -109,15 +100,6 @@
     setCrumbs('Smart Review');
     document.title = "Smart Review — Quilyn";
     contentEl.innerHTML = '<pega-review-view></pega-review-view>';
-  }
-
-  /* ── Router ─────────────────────────────────────────────────────────── */
-  function route() {
-    var hash = location.hash || '#';
-    var mode = getMode(hash);
-    if      (mode === 'mock')   enterMock();
-    else if (mode === 'review') enterReview();
-    else                        enterLms();
   }
 
   /* ── Rewrite stale nav hrefs to hash routes ─────────────────────────── */
@@ -158,11 +140,20 @@
 
     patchNavHrefs();
 
-    /* Register hashchange AFTER engine.js (we're last in script load order) */
-    window.addEventListener('hashchange', route);
+    /* Tear down the previous view before inserting its replacement. Custom
+       element connection callbacks can run before the old node disconnects. */
+    global.QuilynShell = { renderMode: function(mode) {
+      if (global.MockView) global.MockView.unmount();
+      if (global.ReviewView) global.ReviewView.unmount();
+      var sidebar = getSidebar();
+      if (sidebar && (mode === 'mock' || mode === 'review')) sidebar.textContent = 'Loading…';
+      if (mode === 'mock') { currentMode = null; enterMock(); }
+      else if (mode === 'review') { currentMode = null; enterReview(); }
+      else enterLms();
+    } };
 
     /* Initial dispatch */
-    route();
+
   }
 
   if (document.readyState === 'loading') {

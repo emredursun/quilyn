@@ -44,11 +44,6 @@
     'Insights':               '#34d399'
   };
 
-  var DOMAINS = [
-    'Case Management','Data & Integration','Application Development',
-    'Security','User Experience','Pega GenAI','DevOps','Insights'
-  ];
-
   /* ── State helpers ──────────────────────────────────────────────── */
   var LMS_KEY = 'pega_lms_state';
   var UNIVERSAL_KEY = 'pega_universal_state';
@@ -59,7 +54,10 @@
 
   function getActiveTrackId() {
     var h = (location.hash || '').replace(/^#/, '').split('/');
-    return h[0] || null;
+    var candidate = h[0];
+    var tracks = window.QuilynRegistry && window.QuilynRegistry.tracks;
+    if (tracks && tracks.some(function(t) { return t.trackId === candidate; })) return candidate;
+    return window.QuilynActiveTrackId || null;
   }
 
   /* SRS lives inside pega_universal_state, keyed by track */
@@ -118,10 +116,12 @@
   function decorateCards() {
     var cards = document.querySelectorAll('.pa-card:not([data-enh])');
     cards.forEach(function(card) {
-      var go = card.getAttribute('data-go') || '';
+      var go = card.getAttribute('href') || card.getAttribute('data-go') || '';
       var parts = go.replace(/^#/, '').split('/');
       var moduleId = parts[1] || '';
-      var domain = MOD_DOMAIN[moduleId];
+      var currentTrack = window.QuilynRegistry && window.QuilynRegistry.tracks.find(function(t) { return t.trackId === parts[0]; });
+      var meta = currentTrack && currentTrack.modules.find(function(m) { return m.id === moduleId; });
+      var domain = meta && meta.examDomain || MOD_DOMAIN[moduleId];
       if (!domain) return;
 
       var color = DCOLORS[domain] || '#6d8bff';
@@ -151,146 +151,11 @@
   }
 
   /* ── Home stats / resume band ───────────────────────────────────── */
-  function buildProgressRing(pct) {
-    var r = 22, c = 2 * Math.PI * r;
-    var dash = (pct / 100) * c;
-    /* Uses currentColor (set to var(--pa-brand) via .pa-enh-ring in CSS) */
-    return '<div class="pa-enh-ring" aria-label="' + pct + '% complete">' +
-      '<svg width="56" height="56" viewBox="0 0 56 56" style="transform:rotate(-90deg)" aria-hidden="true">' +
-      '<circle cx="28" cy="28" r="' + r + '" fill="none" stroke="var(--pa-line)" stroke-width="4"/>' +
-      '<circle cx="28" cy="28" r="' + r + '" fill="none" stroke="currentColor" stroke-width="4"' +
-      ' stroke-dasharray="' + dash.toFixed(1) + ' ' + c.toFixed(1) + '"' +
-      ' stroke-linecap="round"/>' +
-      '</svg>' +
-      '<span class="pa-enh-ring__label">' + pct + '%</span>' +
-      '</div>';
-  }
-
-  function buildDomainBars(trackId, completedSet) {
-    /* Only for PSA track where we have the domain map */
-    if (trackId !== 'PSA') return '';
-    return DOMAINS.map(function(dom) {
-      var mods = Object.keys(MOD_DOMAIN).filter(function(mid){ return MOD_DOMAIN[mid] === dom; });
-      var done = mods.filter(function(mid){
-        return completedSet.indexOf(trackId.replace('PSA','SA') + '-' + mid.replace('SA-','') ) >= 0 ||
-               completedSet.indexOf(mid) >= 0;
-      }).length;
-      var pct = mods.length ? Math.round(done / mods.length * 100) : 0;
-      var col = DCOLORS[dom] || '#6d8bff';
-      return '<div class="pa-enh-domain">' +
-        '<div class="pa-enh-domain__meta">' +
-        '<span class="pa-enh-domain__name">' + dom + '</span>' +
-        '<span class="pa-enh-domain__count">' + done + '/' + mods.length + '</span>' +
-        '</div>' +
-        '<div class="pa-enh-domain__track">' +
-        '<div class="pa-enh-domain__fill" style="width:' + pct + '%;--domain-color:' + col + '"></div>' +
-        '</div>' +
-        '</div>';
-    }).join('');
-  }
-
-  function injectBand() {
-    var content = document.getElementById('paContent');
-    if (!content) return;
-    var cards = content.querySelector('.pa-cards');
-    if (!cards) return;
-
-    /* Remove stale band on re-route */
-    var old = content.querySelector('.pa-enh-band');
-    if (old) old.remove();
-
-    var trackId = getActiveTrackId();
-    if (!trackId) return;
-    var tp = getTrackProgress(trackId);
-
-    var completed = (tp && tp.completedModules) ? tp.completedModules : [];
-    var quizRecs  = (tp && tp.quizRecords) ? tp.quizRecords : {};
-
-    /* Total = the module links actually rendered for this track; fall back to progress counts */
-    var renderedCount = document.querySelectorAll('#paModList a').length;
-    var total = renderedCount || Math.max(Object.keys(quizRecs).length, completed.length, 1);
-    var done  = completed.length;
-    var pct   = total ? Math.min(100, Math.round(done / total * 100)) : 0;
-
-    /* Find first incomplete module (for Resume CTA) */
-    var resumeHash = null;
-    var resumeLabel = null;
-    var modList = document.querySelectorAll('#paModList a:not(.done)');
-    for (var i = 0; i < modList.length; i++) {
-      var a = modList[i];
-      if (!a.classList.contains('done')) {
-        var href = a.getAttribute('href');
-        var name = a.querySelector('.mname') ? a.querySelector('.mname').textContent.trim() : '';
-        if (href && name) { resumeHash = href; resumeLabel = name; break; }
-      }
-    }
-
-    /* SRS streak + due today */
-    var srs = loadSRS();
-    var streak   = (srs && srs.streak) ? srs.streak : 0;
-    var dueToday = countDueToday();
-
-    /* Band container — all layout/visual handled by .pa-enh-band in theme.css */
-    var band = document.createElement('div');
-    band.className = 'pa-enh-band';
-
-    /* Glow overlay — styled via .pa-enh-band__glow */
-    var glow = '<div class="pa-enh-band__glow" aria-hidden="true"></div>';
-
-    /* Left: progress ring — styled via .pa-enh-ring + .pa-enh-ring__label */
-    var leftCol = buildProgressRing(pct);
-
-    /* Centre: resume CTA — styled via .pa-enh-resume / .pa-enh-complete */
-    var resumeBtn = resumeHash
-      ? '<a href="' + resumeHash + '" class="pa-enh-resume">' +
-        icon('chevron-right') +
-        '<span class="pa-enh-resume__label">Continue: ' + resumeLabel + '</span>' +
-        '</a>'
-      : '<span class="pa-enh-complete">' + icon('check') + ' All modules complete!</span>';
-
-    /* Stats row — styled via .pa-enh-stats + .pa-enh-stat */
-    var statsItems = [
-      '<div class="pa-enh-stat">' +
-        icon('check', 'i-sm') +
-        '<span><b>' + done + '</b> / ' + total + ' complete</span>' +
-        '</div>',
-      streak > 0
-        ? '<div class="pa-enh-stat pa-enh-stat--streak">' +
-          icon('flame', 'i-sm') +
-          '<span><b>' + streak + '</b> day streak</span>' +
-          '</div>'
-        : '',
-      dueToday > 0
-        ? '<div class="pa-enh-stat">' +
-          icon('calendar', 'i-sm') +
-          '<span><b>' + dueToday + '</b> due today</span>' +
-          '</div>'
-        : ''
-    ].filter(Boolean).join('');
-
-    var centreCol = '<div class="pa-enh-centre">' +
-      resumeBtn +
-      '<div class="pa-enh-stats">' + statsItems + '</div>' +
-      '</div>';
-
-    /* Right: domain bars (PSA only) — styled via .pa-enh-domains + .pa-enh-domain* */
-    var domainBars = (trackId === 'PSA')
-      ? '<div class="pa-enh-domains">' + buildDomainBars(trackId, completed) + '</div>'
-      : '';
-
-    band.innerHTML = glow + leftCol + centreCol + (domainBars || '');
-    /* Note: responsive media query is now in theme.css — no injected <style> needed */
-
-    content.insertBefore(band, cards);
-  }
-
-  /* ── Main decoration pass ───────────────────────────────────────── */
   function decorate() {
     var content = document.getElementById('paContent');
     if (!content) return;
     decorateTabs();
     if (content.querySelector('.pa-cards')) {
-      injectBand();
       decorateCards();
     }
   }
@@ -313,5 +178,5 @@
     }
   });
 
-  window.addEventListener('hashchange', scheduleDecorate);
+
 })();

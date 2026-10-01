@@ -1,0 +1,15 @@
+const fs = require('fs'); const vm = require('vm'); const assert = require('assert');
+const registry = JSON.parse(fs.readFileSync('data/registry.json','utf8'));
+let source = fs.readFileSync('core/js/mock-view.js','utf8');
+source = source.replace('})(window);', 'window.testAPI={configureExam,getHTML,getPass:()=>PASS,getTime:()=>TIME_MIN}; })(window);');
+const window={};const context={window,HTMLElement:class{},customElements:{define(){}},console};
+vm.runInNewContext(source,context);
+const api=window.testAPI;
+api.configureExam(registry.tracks.find(t=>t.trackId==='PSSA'));
+assert.equal(api.getPass(),.70);assert.equal(api.getTime(),90);
+assert(41/60 < api.getPass());assert(42/60 >= api.getPass());
+assert(api.getHTML().includes('70% pass mark'));assert(!api.getHTML().includes('65% pass mark'));
+api.configureExam(registry.tracks.find(t=>t.trackId==='PSA'));
+assert.equal(api.getPass(),.65);assert(39/60>=api.getPass());assert(api.getHTML().includes('65% pass mark'));
+api.configureExam({exam:{passPercent:80,timeMinutes:45}});assert.equal(api.getTime(),45);assert(api.getHTML().includes('45-minute timer'));
+console.log('Mock settings verified: SSA 41/60 fails, 42/60 passes; PSA 39/60 passes; timing and labels follow track configuration.');

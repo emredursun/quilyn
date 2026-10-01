@@ -1,6 +1,8 @@
 /* core/js/track-switcher.js */
 (function(global) {
   'use strict';
+  const escapeHtml = value => String(value ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
   class PegaTrackSwitcher extends HTMLElement {
     constructor() {
@@ -18,8 +20,7 @@
       }
       
       // Load registry
-      fetch('data/registry.json?_t=' + Date.now())
-        .then(res => res.json())
+      global.QuilynRuntime.json('data/registry.json')
         .then(data => {
           this.tracks = data.tracks || [];
           this.render();
@@ -35,10 +36,18 @@
         }
       };
       document.addEventListener('click', this._outsideClickListener);
+      this._escapeListener = event => {
+        if (event.key === 'Escape' && this.isOpen) {
+          this.isOpen = false;
+          this.updateDropdown();
+          this.shadowRoot.querySelector('.trigger')?.focus();
+        }
+      };
+      this.shadowRoot.addEventListener('keydown', this._escapeListener);
       
       // Listen to PegaStore changes in case track changes elsewhere
       if (global.PegaStore) {
-        global.PegaStore.watch((state) => {
+        this._unsubscribe = global.PegaStore.watch((state) => {
           if (state.activeTrack && state.activeTrack !== this.activeTrackId) {
             this.activeTrackId = state.activeTrack;
             this.render();
@@ -48,13 +57,20 @@
     }
 
     disconnectedCallback() {
+      if (this._unsubscribe) this._unsubscribe();
       if (this._outsideClickListener) {
         document.removeEventListener('click', this._outsideClickListener);
       }
+      if (this._escapeListener) this.shadowRoot.removeEventListener('keydown', this._escapeListener);
     }
 
     selectTrack(id) {
-      if (this.activeTrackId === id) return;
+      if (this.activeTrackId === id) {
+        this.isOpen = false;
+        this.updateDropdown();
+        this.shadowRoot.querySelector('.trigger')?.focus();
+        return;
+      }
       this.activeTrackId = id;
       this.isOpen = false;
       if (global.PegaStore) {
@@ -69,6 +85,7 @@
         window.dispatchEvent(new CustomEvent('pega-track-changed', { detail: id }));
       }
       this.render();
+      this.shadowRoot.querySelector('.trigger')?.focus();
     }
 
     toggleDropdown() {
@@ -81,6 +98,8 @@
       if (dropdown) {
         dropdown.classList.toggle('open', this.isOpen);
       }
+      const trigger = this.shadowRoot.querySelector('.trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', String(this.isOpen));
     }
 
     render() {
@@ -98,6 +117,10 @@
             z-index: 100;
           }
           .trigger {
+            width: 100%;
+            font: inherit;
+            text-align: left;
+            color: inherit;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -161,7 +184,8 @@
             visibility: hidden;
             transform: translateY(-10px);
             transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s ease, visibility 0.2s ease;
-            overflow: hidden;
+            max-height: min(65vh, 560px);
+            overflow-y: auto;
           }
           .dropdown-menu.open {
             opacity: 1;
@@ -169,6 +193,11 @@
             transform: translateY(0);
           }
           .track-option {
+            width: 100%;
+            border: 0;
+            background: transparent;
+            text-align: left;
+            font: inherit;
             padding: 12px 16px;
             cursor: pointer;
             transition: background 0.2s;
@@ -185,6 +214,10 @@
             background: var(--pa-grad-soft);
             color: var(--pa-ink);
             font-weight: 500;
+          }
+          .trigger:focus-visible, .track-option:focus-visible {
+            outline: 2px solid var(--pa-brand);
+            outline-offset: 2px;
           }
           .track-icon {
             display: flex;
@@ -205,29 +238,29 @@
           }
         </style>
 
-        <div class="dropdown-menu">
+        <div class="dropdown-menu" id="track-options">
           ${this.tracks.map(t => `
-            <div class="track-option ${t.trackId === this.activeTrackId ? 'active' : ''}" data-id="${t.trackId}">
-              <div class="track-icon">${t.trackId === 'PSA' ? '🏛️' : '📊'}</div>
-              <div>
-                <div style="font-size: 14px">${t.trackName}</div>
-                <div style="font-size: 11px; color: var(--pa-muted); margin-top: 2px">${t.trackId} Track</div>
-              </div>
-            </div>
+            <button type="button" class="track-option ${t.trackId === this.activeTrackId ? 'active' : ''}" data-id="${escapeHtml(t.trackId)}" ${t.trackId === this.activeTrackId ? 'aria-current="true"' : ''}>
+              <span class="track-icon">${t.trackId === 'PSA' ? '🏛️' : '📊'}</span>
+              <span>
+                <span style="display:block;font-size: 14px">${escapeHtml(t.trackName)}</span>
+                <span style="display:block;font-size: 11px; color: var(--pa-muted); margin-top: 2px">${escapeHtml(t.trackId)} Track</span>
+              </span>
+            </button>
           `).join('')}
         </div>
 
-        <div class="trigger">
-          <div class="info">
+        <button type="button" class="trigger" aria-label="Learning track: ${escapeHtml(activeTrack.trackName)}" aria-controls="track-options" aria-expanded="${this.isOpen}">
+          <span class="info">
             <span class="label">Learning Track</span>
             <span class="name">
-              ${activeTrack.trackName}
+              ${escapeHtml(activeTrack.trackName)}
             </span>
-          </div>
+          </span>
           <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-        </div>
+        </button>
       `;
 
       this.shadowRoot.querySelector('.trigger').addEventListener('click', () => this.toggleDropdown());

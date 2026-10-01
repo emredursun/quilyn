@@ -1,0 +1,384 @@
+{
+  "moduleId": "SSA-M16",
+  "moduleTitle": "Integration errors",
+  "moduleUrl": "https://academy.pega.com/module/integration-errors/v7/in/92306/92336",
+  "moduleQuizUrl": "https://academy.pega.com/module/integration-errors/v7/quiz/in/92306/92336",
+  "learningObjectives": [
+    "Select and justify error handling in connectors in a business scenario.",
+    "Select and justify error detection configuration in a business scenario.",
+    "Select and justify integration testing and security in a business scenario."
+  ],
+  "estTime": "20–35 min + practice",
+  "examDomain": "Data and Integration",
+  "platformVersion": "25",
+  "sourceReviewedOn": "2026-10-01",
+  "reviewScope": "Official topic comparison and original-question editorial review; not vendor endorsement.",
+  "topics": [
+    {
+      "title": "Error handling in connectors",
+      "url": "https://academy.pega.com/topic/error-handling-connectors/v5/in/92306/92336/74761"
+    },
+    {
+      "title": "Error detection configuration",
+      "url": "https://academy.pega.com/topic/error-detection-configuration/v6/in/92306/92336/74761"
+    },
+    {
+      "title": "Integration testing and security",
+      "url": "https://academy.pega.com/topic/integration-testing-and-security/v4/in/92306/92336/74761"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Error handling in connectors",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Choose the right mechanism",
+          "description": "Distinguish transient failures from persistent configuration or request errors. Temporary unavailability can justify a controlled retry; malformed requests or invalid configuration need correction. Communicate failure early rather than silently returning misleading success."
+        },
+        {
+          "type": "text",
+          "text": "Worked example: A partner is restarting: notify the user and retry when appropriate. A wrong SOAP message schema keeps failing until its mapping is fixed, so repeated blind retries waste resources."
+        },
+        {
+          "type": "links",
+          "title": "Official reference",
+          "items": [
+            {
+              "label": "Error handling in connectors",
+              "url": "https://academy.pega.com/topic/error-handling-connectors/v5/in/92306/92336/74761"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Error detection configuration",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Choose the right mechanism",
+          "description": "For Data Page connector loads, inspect errors in the response Data Transform and invoke reusable handling such as a copy of pxErrorHandlingTemplate. The connector error-handler flow covers errors not handled earlier; the default ConnectionProblem flow is not automatically invoked after a response transform has already handled the error."
+        },
+        {
+          "type": "text",
+          "text": "Worked example: D_Policy detects page messages in its response transform, writes a safe diagnostic record and returns a user-actionable message. A fallback flow is reserved for unhandled failures."
+        },
+        {
+          "type": "links",
+          "title": "Official reference",
+          "items": [
+            {
+              "label": "Error detection configuration",
+              "url": "https://academy.pega.com/topic/error-detection-configuration/v6/in/92306/92336/74761"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Integration testing and security",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Choose the right mechanism",
+          "description": "Test success, incorrect data, timeout and authentication failures. Assert mappings on Data Pages and use appropriate credentials, certificates, keystores and approved endpoints. Secure transport does not make all incoming data safe; validate inputs and avoid exposing credentials in logs."
+        },
+        {
+          "type": "text",
+          "text": "Worked example: Run D_Address with synthetic valid and invalid IDs, then assert mapped fields and failure messages. Configure required certificates in a keystore and keep secrets out of test fixtures."
+        },
+        {
+          "type": "links",
+          "title": "Official reference",
+          "items": [
+            {
+              "label": "Integration testing and security",
+              "url": "https://academy.pega.com/topic/integration-testing-and-security/v4/in/92306/92336/74761"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Apply and explain",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Training environment checklist",
+          "items": [
+            "Implement the worked example in a training application; use synthetic data.",
+            "Test the expected path and at least one failure or boundary condition.",
+            "Explain why the alternative mechanism would not meet the requirement.",
+            "Revisit incorrect answers in Smart Review rather than memorizing option positions."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "These notes target the '25 exam. Shared Academy pages may show newer labels with '25 applicability; verify screens in your training environment."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Retry everything",
+      "trapDescription": "A malformed request is fixed by indefinite retry.",
+      "bestPractice": "Correct persistent configuration errors; retry transient failures deliberately."
+    },
+    {
+      "title": "Double handling",
+      "trapDescription": "The error flow must run even when the response transform handled the error.",
+      "bestPractice": "Choose the handling path appropriate to where the failure was detected."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "SSA-M16-Q01",
+      "type": "single-select",
+      "scenario": "A partner API is briefly unavailable during restart. Which response is most appropriate?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Report fabricated successful data"
+        },
+        {
+          "id": "B",
+          "text": "Delete all application rules"
+        },
+        {
+          "id": "C",
+          "text": "Keep retrying indefinitely without limits"
+        },
+        {
+          "id": "D",
+          "text": "A controlled retry and a clear failure message when needed"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "rationale": "Temporary unavailability can recover. Retry must remain controlled and the user must understand the failure rather than receive false success.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/error-handling-connectors/v5/in/92306/92336/74761"
+    },
+    {
+      "questionId": "SSA-M16-Q02",
+      "type": "single-select",
+      "scenario": "Every call fails because the SOAP request has the wrong schema. What is the priority?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Increase case urgency"
+        },
+        {
+          "id": "B",
+          "text": "Hide all error messages"
+        },
+        {
+          "id": "C",
+          "text": "Correct the request mapping and investigate the persistent error"
+        },
+        {
+          "id": "D",
+          "text": "Retry forever without changing the request"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "rationale": "A malformed request is a persistent configuration error. Repeating the same request will not repair it.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/error-handling-connectors/v5/in/92306/92336/74761"
+    },
+    {
+      "questionId": "SSA-M16-Q03",
+      "type": "single-select",
+      "scenario": "Where should a Data Page connector response be checked for early load errors?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Only the product export wizard"
+        },
+        {
+          "id": "B",
+          "text": "Response Data Transform"
+        },
+        {
+          "id": "C",
+          "text": "Only a portal theme rule"
+        },
+        {
+          "id": "D",
+          "text": "Only the case status label"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "rationale": "Response transforms are a suitable point to inspect Data Page errors and delegate reusable handling.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/error-detection-configuration/v6/in/92306/92336/74761"
+    },
+    {
+      "questionId": "SSA-M16-Q04",
+      "type": "single-select",
+      "scenario": "Which standard template can be copied for reusable Data Page error handling?",
+      "options": [
+        {
+          "id": "A",
+          "text": "pxErrorHandlingTemplate"
+        },
+        {
+          "id": "B",
+          "text": "pyStatusWork"
+        },
+        {
+          "id": "C",
+          "text": "pxUrgencyWorkClass"
+        },
+        {
+          "id": "D",
+          "text": "SplitForEach"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "rationale": "pxErrorHandlingTemplate provides an error-handling Data Transform pattern. The other names refer to unrelated properties or flow behavior.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/error-detection-configuration/v6/in/92306/92336/74761"
+    },
+    {
+      "questionId": "SSA-M16-Q05",
+      "type": "single-select",
+      "scenario": "A response Data Transform already detects and handles a connector error. What should not be assumed?",
+      "options": [
+        {
+          "id": "A",
+          "text": "That the transform can display an error"
+        },
+        {
+          "id": "B",
+          "text": "That failure behavior should be tested"
+        },
+        {
+          "id": "C",
+          "text": "That the user may need an alternative path"
+        },
+        {
+          "id": "D",
+          "text": "That the connector error-handler flow also runs automatically"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "rationale": "The fallback error flow covers failures not addressed by another mechanism. Earlier handling does not imply both paths execute.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/error-detection-configuration/v6/in/92306/92336/74761"
+    },
+    {
+      "questionId": "SSA-M16-Q06",
+      "type": "multi-select",
+      "scenario": "Which TWO cases belong in integration testing?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Only the response logo"
+        },
+        {
+          "id": "B",
+          "text": "Only a ruleset label with no call"
+        },
+        {
+          "id": "C",
+          "text": "Successful responses with assertions on mapped fields"
+        },
+        {
+          "id": "D",
+          "text": "Timeout and authentication failure paths"
+        }
+      ],
+      "correctOptions": [
+        "C",
+        "D"
+      ],
+      "rationale": "Mapping assertions validate data correctness; negative paths validate behavior when communication or authentication fails.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/integration-testing-and-security/v4/in/92306/92336/74761"
+    },
+    {
+      "questionId": "SSA-M16-Q07",
+      "type": "single-select",
+      "scenario": "An HTTPS service requires a client certificate and private key. Which Pega resource holds these materials?",
+      "options": [
+        {
+          "id": "A",
+          "text": "A field-value display label"
+        },
+        {
+          "id": "B",
+          "text": "Keystore"
+        },
+        {
+          "id": "C",
+          "text": "A work queue"
+        },
+        {
+          "id": "D",
+          "text": "An assignment goal"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "rationale": "Keystores hold security certificates and keys used for authenticated secure communication.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/integration-testing-and-security/v4/in/92306/92336/74761"
+    },
+    {
+      "questionId": "SSA-M16-Q08",
+      "type": "single-select",
+      "scenario": "A trusted endpoint returns text that is later rendered or queried. Which design remains necessary?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Validate and safely handle incoming data"
+        },
+        {
+          "id": "B",
+          "text": "Treat all returned text as executable code"
+        },
+        {
+          "id": "C",
+          "text": "Disable server-side checks"
+        },
+        {
+          "id": "D",
+          "text": "Write all credentials into user-visible messages"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "rationale": "Trusted transport does not establish that every payload is safe for every sink. Input validation and safe handling remain required.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/integration-testing-and-security/v4/in/92306/92336/74761"
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Error handling in connectors",
+      "value": "Distinguish transient failures from persistent configuration or request errors. Temporary unavailability can justify a controlled retry; malformed requests or invalid configuration need correction. Communicate failure early rather than silently returning misleading success."
+    },
+    {
+      "key": "Error detection configuration",
+      "value": "For Data Page connector loads, inspect errors in the response Data Transform and invoke reusable handling such as a copy of pxErrorHandlingTemplate. The connector error-handler flow covers errors not handled earlier; the default ConnectionProblem flow is not automatically invoked after a response transform has already handled the error."
+    },
+    {
+      "key": "Integration testing and security",
+      "value": "Test success, incorrect data, timeout and authentication failures. Assert mappings on Data Pages and use appropriate credentials, certificates, keystores and approved endpoints. Secure transport does not make all incoming data safe; validate inputs and avoid exposing credentials in logs."
+    }
+  ]
+}

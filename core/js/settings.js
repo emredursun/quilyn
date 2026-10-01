@@ -6,7 +6,12 @@
 (function (global) {
   'use strict';
 
-  var KNOWN_KEYS = ['pega_universal_state', 'pega_lms_state', 'pega_theme'];
+  var KNOWN_KEYS = ['pega_universal_state', 'pega_lms_state', 'pega_theme', 'quilyn_activity'];
+  var MAX_IMPORT_BYTES = 20 * 1024 * 1024;
+  function isRecord(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
+  function validEntry(key, value) {
+    return global.QuilynProgress ? global.QuilynProgress.validEntry(key, value) : false;
+  }
 
   function esc(s) {
     return String(s == null ? '' : s)
@@ -16,16 +21,29 @@
   /* ── Export ───────────────────────────────────────────────────────── */
   function gatherState() {
     var bundle = { version: 2, exportedAt: new Date().toISOString(), state: {} };
-    KNOWN_KEYS.forEach(function (k) {
+    function collect(k) {
+      var raw = localStorage.getItem(k);
+      if (raw === null) return;
       try {
-        var raw = localStorage.getItem(k);
-        if (raw != null) bundle.state[k] = JSON.parse(raw);
-      } catch (e) {}
+        var value = k === 'pega_theme' ? raw : JSON.parse(raw);
+        if (!validEntry(k,value)) throw new Error('Invalid saved value');
+        bundle.state[k] = value;
+      } catch (_) {
+        if (!bundle.recovery) bundle.recovery = {};
+        bundle.recovery[k] = raw;
+      }
+    }
+    KNOWN_KEYS.forEach(function (k) {
+      collect(k);
     });
     for (var i = 0; i < localStorage.length; i++) {
       var key = localStorage.key(i);
       if (key && (key.indexOf('pq_state_') === 0 || key.indexOf('pegaMock_') === 0)) {
-        try { bundle.state[key] = JSON.parse(localStorage.getItem(key)); } catch (e) {}
+        collect(key);
+      }
+      if (key && key.indexOf('quilyn_recovery_') === 0) {
+        if (!bundle.recovery) bundle.recovery = {};
+        bundle.recovery[key] = localStorage.getItem(key);
       }
     }
     return bundle;
@@ -43,20 +61,41 @@
     a.click();
     document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 5000);
-    showToast('Progress exported successfully');
+    showToast(bundle.recovery ? 'Export includes unreadable records as recovery text. They are not imported automatically.' : 'Progress exported successfully', 6000);
   }
 
   function importProgress(file) {
+    if (file.size > MAX_IMPORT_BYTES) { alert('Import failed: file is larger than 20 MB.'); return; }
     var reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onerror = function() { showToast('The backup file could not be read.', 6000); };
+    reader.onload = async function (e) {
       try {
         var bundle = JSON.parse(e.target.result);
-        if (!bundle || !bundle.state) throw new Error('Invalid file — missing state object.');
-        Object.keys(bundle.state).forEach(function (k) {
-          localStorage.setItem(k, JSON.stringify(bundle.state[k]));
-        });
-        showToast('Progress imported! Reloading…', 1400);
-        setTimeout(function () { location.reload(); }, 1500);
+        if (!isRecord(bundle) || bundle.version !== 2 || !isRecord(bundle.state))
+          throw new Error('Unsupported or invalid progress file.');
+        var keys = global.QuilynProgress.validateBundle(bundle);
+        var unknown = await global.QuilynProgress.validateReferences(bundle);
+        var body = document.getElementById('pa-import-preview');
+        body.hidden = false;
+        body.innerHTML = '<h4>Review your import</h4><p>This file will replace ' + keys.length +
+          ' saved entries. Other entries are kept. ' + unknown.length + ' unmatched content entries will be preserved.</p><ul>' +
+          keys.map(function(k) { return '<li>' + esc(k) + (localStorage.getItem(k) !== null ? ' — replace' : ' — add') + '</li>'; }).join('') +
+          '</ul><button class="pa-settings-btn primary" id="pa-import-confirm">Apply import</button>' +
+          '<button class="pa-settings-btn" id="pa-import-cancel">Cancel</button>';
+        body.querySelector('#pa-import-cancel').onclick = function() { body.hidden = true; };
+        body.querySelector('#pa-import-confirm').onclick = function() {
+          try {
+            if (global.PegaStore) global.PegaStore.flush();
+            if (global.MockView) global.MockView.flush();
+            global.QuilynProgress.applyBundle(bundle);
+            // Stop the old session without resaving it over the imported data.
+            if (global.MockView) global.MockView.unmount(true);
+            if (global.PegaQuiz) global.PegaQuiz.unmount();
+            location.reload();
+          } catch (err) { showToast(err.message, 8000); }
+        };
+        body.querySelector('#pa-import-confirm').focus();
+        return;
       } catch (err) {
         alert('Import failed: ' + err.message);
       }
@@ -71,9 +110,9 @@
     for (var i = 0; i < localStorage.length; i++) {
       var k = localStorage.key(i);
       if (k && (
-        k.indexOf('pega') === 0 ||
-        k.indexOf('pq_') === 0 ||
-        k.indexOf('pegaMock_') === 0
+        KNOWN_KEYS.includes(k) ||
+        /^pq_state_(?:default|#[A-Za-z0-9-]+\/[A-Za-z0-9-]+)$/.test(k) ||
+        /^pegaMock_[A-Za-z0-9-]+_.{1,120}$/.test(k) || k.indexOf('quilyn_recovery_') === 0
       )) {
         keysToRemove.push(k);
       }
@@ -89,6 +128,7 @@
     var t = document.createElement('div');
     t.className = 'pa-toast';
     t.textContent = msg;
+    t.setAttribute('role', 'status');
     document.body.appendChild(t);
     setTimeout(function () { t.classList.add('show'); }, 10);
     setTimeout(function () {
@@ -99,41 +139,12 @@
 
   /* ── Study heatmap (calendar) ─────────────────────────────────────── */
   function buildHeatmap() {
-    var state = null;
-    try { state = JSON.parse(localStorage.getItem('pega_universal_state') || 'null'); } catch (e) {}
-    if (!state || !state.tracks) return '';
-
-    /* Collect all study dates from both track SRS records */
+    var activity = global.QuilynProgress.read('quilyn_activity', { version: 1, events: [] });
     var dateCounts = {};
-    Object.keys(state.tracks).forEach(function (trackId) {
-      var srs = state.tracks[trackId] && state.tracks[trackId].srs;
-      if (!srs || !srs.cards) return;
-      Object.values(srs.cards).forEach(function (card) {
-        if (card.dueDate) {
-          /* Each dueDate implies the card was reviewed — credit the day before */
-          var reviewed = card.dueDate;
-          dateCounts[reviewed] = (dateCounts[reviewed] || 0) + 1;
-        }
-      });
+    activity.events.filter(function(e) { return e.kind !== 'visit'; }).forEach(function(e) {
+      dateCounts[e.day] = (dateCounts[e.day] || 0) + 1;
     });
-
-    /* Also track today from LMS quiz records */
-    var lms = null;
-    try { lms = JSON.parse(localStorage.getItem('pega_lms_state') || 'null'); } catch (e) {}
-    if (lms && lms.userProgress) {
-      Object.keys(lms.userProgress).forEach(function (trackId) {
-        var qr = lms.userProgress[trackId] && lms.userProgress[trackId].quizRecords;
-        if (!qr) return;
-        Object.values(qr).forEach(function (rec) {
-          if (rec.lastAttempted) {
-            var d = rec.lastAttempted.slice(0, 10);
-            dateCounts[d] = (dateCounts[d] || 0) + 1;
-          }
-        });
-      });
-    }
-
-    if (!Object.keys(dateCounts).length) return '';
+    if (!Object.keys(dateCounts).length) return '<p class="pa-empty">Study activity will appear after your next quiz or review. Historical activity is not inferred.</p>';
 
     /* Build last-12-weeks calendar */
     var today = new Date();
@@ -141,7 +152,7 @@
     for (var i = 83; i >= 0; i--) {
       var d = new Date(today);
       d.setDate(today.getDate() - i);
-      var ds = d.toISOString().slice(0, 10);
+      var ds = global.QuilynProgress.localDay(d);
       var count = dateCounts[ds] || 0;
       var level = count === 0 ? 0 : count < 3 ? 1 : count < 6 ? 2 : count < 10 ? 3 : 4;
       cells.push('<span class="pa-hm-cell l' + level + '" title="' + esc(ds) + (count ? ': ' + count + ' activities' : ': no activity') + '"></span>');
@@ -182,6 +193,7 @@
     if (modal) {
       modal.classList.add('pa-modal-open');
       refreshHeatmap();
+      global.QuilynRuntime.dialog(modal, hide, 'Settings');
       return;
     }
 
@@ -203,9 +215,11 @@
           '<div class="pa-settings-section">' +
             '<h4>📂 Import Progress</h4>' +
             '<p>Load a previously exported file. <strong>This overwrites current progress.</strong></p>' +
-            '<label class="pa-settings-btn" for="pa-import-file" style="cursor:pointer;">⬆ Import from File</label>' +
+            '<button class="pa-settings-btn" id="pa-import-trigger">Import from file</button>' +
             '<input type="file" id="pa-import-file" accept=".json" style="display:none">' +
           '</div>' +
+          '<div id="pa-import-preview" hidden></div>' +
+          '<div class="pa-settings-section"><h4>Offline learning</h4><div id="quilyn-offline-panel"></div></div>' +
           '<div id="pa-heatmap-wrap"></div>' +
           SHORTCUTS_HTML +
           '<div class="pa-settings-section pa-settings-danger">' +
@@ -217,6 +231,9 @@
       '</div>';
 
     document.body.appendChild(modal);
+    global.QuilynRuntime.dialog(modal, hide, 'Settings');
+    document.getElementById('pa-import-trigger').onclick = function() { document.getElementById('pa-import-file').click(); };
+    if (global.QuilynOffline) global.QuilynOffline.render(document.getElementById('quilyn-offline-panel'));
 
     modal.addEventListener('click', function (e) { if (e.target === modal) hide(); });
     document.getElementById('pa-settings-close').addEventListener('click', hide);
@@ -235,7 +252,7 @@
   }
 
   function hide() {
-    if (modal) modal.classList.remove('pa-modal-open');
+    if (modal) { modal.classList.remove('pa-modal-open'); global.QuilynRuntime.closeDialog(modal); }
   }
 
   global.PegaSettings = { show: show, hide: hide };

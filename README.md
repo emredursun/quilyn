@@ -1,6 +1,6 @@
 # Quilyn — Free Certification Exam Prep
 
-A free, offline-capable study app for IT certification exams — **Pega** (PCBA, PCSA), **Tricentis Tosca** (AS1, AS2, API testing, TDS1, TDS2, AE1, and mobile test automation), and **Tricentis Testim** (Product Consultant). Structured study guides, practice questions, mock exams, and spaced-repetition review. No account required, no tracking, works offline.
+A free, offline-capable study app for IT certification exams — **Pega** (PCBA, PCSA, PCSSA), **Tricentis Tosca** (AS1, AS2, API testing, TDS1, TDS2, AE1, and mobile test automation), and **Tricentis Testim** (Product Consultant). Structured study guides, practice questions, mock exams, and spaced-repetition review. No account required, no tracking, works offline.
 
 **[Live App →](https://emredursun.github.io/quilyn/)**
 
@@ -14,6 +14,7 @@ A free, offline-capable study app for IT certification exams — **Pega** (PCBA,
 |-------|---------|------|
 | Pega Certified Business Architect (PCBA) | 19 modules | 65% pass · 90 min |
 | Pega Certified System Architect (PCSA) | 48 modules | 65% pass · 90 min |
+| Pega Certified Senior System Architect (PCSSA ’25) | 25 modules · 203 practice questions | 70% pass · 90 min · 3 × 60-question practice mocks |
 | Tricentis Tosca Automation Specialist Level 1 (AS1) | 10 sections | practice + reference |
 | Tricentis Tosca Automation Specialist Level 2 (AS2) | 10 sections | practice + reference |
 | Tricentis Tosca API Testing | 14 sections | practice + reference |
@@ -30,15 +31,17 @@ A free, offline-capable study app for IT certification exams — **Pega** (PCBA,
 - **Quick Recap** — Cheat-sheet summary table
 
 ### App-level features
-- **Mock Exams** — Full timed exams (90 min, 65% pass mark) with domain breakdown
+- **Mock Exams** — Timed exams with track-specific duration and pass mark, plus domain breakdown
 - **Smart Review / SRS** — Spaced-repetition flashcards (Leitner 5-box) with confidence calibration
-- **Global Search** — `Ctrl/⌘ K` searches across all 185 modules instantly
-- **Progress Backup/Restore** — Export your scores & SRS progress as JSON; import on any device
-- **Study Activity Heatmap** — Calendar view of your study history
+- **Global Search** — `Ctrl/⌘ K` searches across all 210 modules instantly
+- **Progress Backup/Restore** — Export progress as JSON; validate and preview imports before applying them
+- **Study Activity Heatmap** — Calendar view of recorded quiz, exam and review activity
 - **Keyboard Shortcuts** — `A B C D` select options · `Enter` checks answer · `H` toggles hint
 - **Dark / Light theme** — Saved automatically
-- **PWA** — Installable, works offline after first visit
+- **PWA** — Installable; visited content is cached. Download complete available tracks in Settings for offline study
 - **No account required** — All data stays in your browser
+
+SSA mock forms reuse the module practice bank, with no question repeated between the three forms. Scores provide practice feedback rather than an independent readiness estimate.
 
 ---
 
@@ -55,6 +58,26 @@ python3 -m http.server 8000
 
 ---
 
+## Development checks and implementation
+
+Use Node 24 (see `.nvmrc`). No package installation is needed; checks use Node's built-in APIs.
+
+```bash
+npm run check             # JS syntax, content integrity, regression tests
+npm run validate:content  # Registry, module and mock-question validation
+npm test                 # Regression tests only
+npm run manifest:content # Regenerate assets and manifests after content changes
+```
+
+The Quality GitHub Actions workflow runs `npm run check` on pushes and pull requests.
+
+- [Implementation backlog, dependencies and acceptance criteria](docs/implementation-plan.md)
+- [Design system and interaction specification](docs/design-system-spec.md)
+- [Verification matrix and release gate](docs/verification-plan.md)
+- [Product and engineering audit](docs/enterprise-audit.md)
+
+The implementation is recorded in [Implementation results](docs/implementation-results.md). Local tests and browser scenarios passed; real-device accessibility, controlled performance measurements, editorial review and the first remote CI run remain release gates.
+
 ## Project structure
 
 ```
@@ -64,7 +87,7 @@ quilyn/
 ├── sw.js                         Service worker (offline caching)
 ├── core/
 │   ├── css/
-│   │   ├── theme.css             Design tokens & global styles
+│   │   ├── theme.css             Legacy layout & global styles
 │   │   └── views.css             Mock Exam & Smart Review view styles
 │   └── js/
 │       ├── store.js              Reactive state (ES6 Proxy + localStorage)
@@ -82,6 +105,7 @@ quilyn/
     ├── mock-exams.json           Mock exam question bank
     ├── business-architect/       19 PCBA module JSON files
     ├── system-architect/         48 PCSA module JSON files
+    ├── senior-system-architect/  First 6 PCSSA modules (Application Development Intermediate)
     ├── tosca-as1/                Tricentis Tosca AS1 section JSON files
     ├── tosca-as2/                Tricentis Tosca AS2 section JSON files
     ├── tosca-api/                Tricentis Tosca API Testing section JSON files
@@ -101,7 +125,10 @@ All content is authored as original study notes (concept cards, summaries, pract
 1. Create a module JSON in `data/business-architect/` or `data/system-architect/` following the schema of existing files (`studyGuide`, `examPitfalls`, `practiceQuiz`, `quickRecap`).
 2. Register it in `data/registry.json` with `"ready": true`.
 
-The UI renders it automatically — no code changes needed.
+3. Run `npm run manifest:content` to regenerate interactive assets, provenance inventory and offline packages.
+4. Run `npm run check` before publishing.
+
+The UI renders registered content automatically.
 
 ---
 
@@ -114,3 +141,7 @@ Quilyn is an independent, unofficial study aid created by a learner, for learner
 ## License
 
 [MIT](LICENSE) — free to use, fork, and adapt. See the license for a note on content and trademarks.
+
+### Senior System Architect learning approach
+
+The initial SSA section covers 18 official topics with concise decision rules, worked examples, common confusions, recall prompts and 48 original scenario questions. Smart Review reuses these questions for spaced retrieval and confidence feedback. Sources are linked at topic and question level. The section targets the ’25 exam; some shared Academy pages now display ’26 while also applying to ’25. Full SSA mock exams will be added after all six exam domains are covered.

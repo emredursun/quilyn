@@ -1,0 +1,318 @@
+{
+  "moduleId": "SSA-M09",
+  "moduleTitle": "Managing concurrent Case access",
+  "moduleUrl": "https://academy.pega.com/module/managing-concurrent-case-access/v7/in/92306/92316",
+  "moduleQuizUrl": "https://academy.pega.com/module/managing-concurrent-case-access/v7/quiz/in/92306/92316",
+  "learningObjectives": [
+    "Select and justify case locking in a business scenario."
+  ],
+  "estTime": "20–35 min + practice",
+  "examDomain": "Case Management",
+  "platformVersion": "25",
+  "sourceReviewedOn": "2026-10-01",
+  "reviewScope": "Official topic comparison and original-question editorial review; not vendor endorsement.",
+  "topics": [
+    {
+      "title": "Case locking",
+      "url": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+    }
+  ],
+  "studyGuide": [
+    {
+      "sectionTitle": "Case locking",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Choose the right mechanism",
+          "description": "Allow one user applies an exclusive lock when opening a case for editing. Allow multiple users permits concurrent opening and checks whether the persisted case changed when saving; a stale user must refresh. Locking protects data consistency and is separate from authorization."
+        },
+        {
+          "type": "text",
+          "text": "Worked example: Two coordinators open a booking. With multiple-user locking, the first saves a new date; the second must refresh and reconcile rather than overwrite that update. Use one-user locking when a long edit must be exclusive."
+        },
+        {
+          "type": "links",
+          "title": "Official reference",
+          "items": [
+            {
+              "label": "Case locking",
+              "url": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "sectionTitle": "Apply and explain",
+      "elements": [
+        {
+          "type": "list",
+          "title": "Training environment checklist",
+          "items": [
+            "Implement the worked example in a training application; use synthetic data.",
+            "Test the expected path and at least one failure or boundary condition.",
+            "Explain why the alternative mechanism would not meet the requirement.",
+            "Revisit incorrect answers in Smart Review rather than memorizing option positions."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "These notes target the '25 exam. Shared Academy pages may show newer labels with '25 applicability; verify screens in your training environment."
+        }
+      ]
+    }
+  ],
+  "examPitfalls": [
+    {
+      "title": "Concurrent access is not last-writer-wins",
+      "trapDescription": "Allow multiple users means blindly overwrite on save.",
+      "bestPractice": "Detect intervening changes and require refresh."
+    },
+    {
+      "title": "Lock versus permission",
+      "trapDescription": "A lock grants a user access to confidential data.",
+      "bestPractice": "Configure access control independently."
+    }
+  ],
+  "practiceQuiz": [
+    {
+      "questionId": "SSA-M09-Q01",
+      "type": "single-select",
+      "scenario": "A claims calculation requires exclusive editing while an adjuster prepares it. Which case locking strategy fits?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Disable authorization"
+        },
+        {
+          "id": "B",
+          "text": "Use a field-value list"
+        },
+        {
+          "id": "C",
+          "text": "Allow one user"
+        },
+        {
+          "id": "D",
+          "text": "Allow multiple users without conflict checks"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "rationale": "An exclusive edit lock prevents another editor from changing the case during that edit. Field values and authorization do not implement concurrency control.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+    },
+    {
+      "questionId": "SSA-M09-Q02",
+      "type": "single-select",
+      "scenario": "Two agents open the same case under Allow multiple users. Agent A saves first. What should Agent B do if the saved case has changed?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Disable the SLA"
+        },
+        {
+          "id": "B",
+          "text": "Refresh and reconcile before saving"
+        },
+        {
+          "id": "C",
+          "text": "Force an unconditional overwrite"
+        },
+        {
+          "id": "D",
+          "text": "Delete Agent A's assignment"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "rationale": "Optimistic concurrency detects stale data at save. Refreshing preserves the prior save and lets the user apply changes to current data.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+    },
+    {
+      "questionId": "SSA-M09-Q03",
+      "type": "multi-select",
+      "scenario": "Which TWO statements describe Allow multiple users?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Several users may open the case"
+        },
+        {
+          "id": "B",
+          "text": "The system checks for an intervening change before saving"
+        },
+        {
+          "id": "C",
+          "text": "All writes bypass conflict detection"
+        },
+        {
+          "id": "D",
+          "text": "Every editor receives a separate independent case automatically"
+        }
+      ],
+      "correctOptions": [
+        "A",
+        "B"
+      ],
+      "rationale": "Concurrent opening and save-time conflict detection are the defining behavior. The users still share one case instance.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+    },
+    {
+      "questionId": "SSA-M09-Q04",
+      "type": "single-select",
+      "scenario": "A second operator sees that a case is locked. Does waiting for the lock establish permission to read sensitive fields?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Yes; every unlocked case is public"
+        },
+        {
+          "id": "B",
+          "text": "Yes; urgency grants field access"
+        },
+        {
+          "id": "C",
+          "text": "Only if the operator has the same timezone"
+        },
+        {
+          "id": "D",
+          "text": "No; authorization must still permit access"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "rationale": "Locks coordinate writers. Access rules and policies determine what the operator may access.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+    },
+    {
+      "questionId": "SSA-M09-Q05",
+      "type": "single-select",
+      "scenario": "Which failure does case locking primarily prevent?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Incorrect translations"
+        },
+        {
+          "id": "B",
+          "text": "A missing ruleset prerequisite"
+        },
+        {
+          "id": "C",
+          "text": "Conflicting updates overwriting each other's data"
+        },
+        {
+          "id": "D",
+          "text": "Every connector timeout"
+        }
+      ],
+      "correctOptions": [
+        "C"
+      ],
+      "rationale": "The locking strategy addresses concurrent changes to shared case data, not integration availability or ruleset setup.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+    },
+    {
+      "questionId": "SSA-M09-Q06",
+      "type": "single-select",
+      "scenario": "An exclusive edit lock has expired while another operator saved. Which assumption is unsafe?",
+      "options": [
+        {
+          "id": "A",
+          "text": "The users may need to reconcile overlapping changes"
+        },
+        {
+          "id": "B",
+          "text": "The first editor can save its old snapshot without checking"
+        },
+        {
+          "id": "C",
+          "text": "The first editor should reload current data"
+        },
+        {
+          "id": "D",
+          "text": "The edit needs a valid lock when committing"
+        }
+      ],
+      "correctOptions": [
+        "B"
+      ],
+      "rationale": "An expired lock does not reserve ownership forever. Saving stale state can overwrite another operator's work.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+    },
+    {
+      "questionId": "SSA-M09-Q07",
+      "type": "single-select",
+      "scenario": "A case type has parallel review tasks. Which requirement favors multiple-user locking?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Reviewers need concurrent access, with save conflicts handled"
+        },
+        {
+          "id": "B",
+          "text": "Every field is confidential"
+        },
+        {
+          "id": "C",
+          "text": "A single editor must hold exclusive access for the whole task"
+        },
+        {
+          "id": "D",
+          "text": "The application has only one ruleset"
+        }
+      ],
+      "correctOptions": [
+        "A"
+      ],
+      "rationale": "Concurrent work is supported when the design accepts refresh/reconciliation. Confidentiality is a separate access-control concern.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+    },
+    {
+      "questionId": "SSA-M09-Q08",
+      "type": "single-select",
+      "scenario": "Which test most directly validates a concurrency design?",
+      "options": [
+        {
+          "id": "A",
+          "text": "Run a quiz about case terminology"
+        },
+        {
+          "id": "B",
+          "text": "Change only the portal theme"
+        },
+        {
+          "id": "C",
+          "text": "Export a ruleset without opening a case"
+        },
+        {
+          "id": "D",
+          "text": "Open the same case in two sessions, save changes and observe the second save"
+        }
+      ],
+      "correctOptions": [
+        "D"
+      ],
+      "rationale": "A two-session stale-save test exercises the actual lock and conflict behavior rather than only configuration metadata.",
+      "hint": "Identify the requirement, then compare the scope and timing of each proposed mechanism.",
+      "sourceUrl": "https://academy.pega.com/topic/case-locking/v7/in/92306/92316/93531"
+    }
+  ],
+  "quickRecap": [
+    {
+      "key": "Case locking",
+      "value": "Allow one user applies an exclusive lock when opening a case for editing. Allow multiple users permits concurrent opening and checks whether the persisted case changed when saving; a stale user must refresh. Locking protects data consistency and is separate from authorization."
+    }
+  ]
+}
