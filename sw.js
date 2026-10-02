@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quilyn-v71';
+const CACHE_NAME = 'quilyn-v72';
 const STATIC_ASSETS = [
   './', './index.html', './manifest.json', './icon.svg', './favicon.ico',
   './assets/brand/icon-192.png', './assets/brand/icon-512.png',
@@ -6,7 +6,7 @@ const STATIC_ASSETS = [
   './core/css/tokens.css', './core/css/learning.css', './core/css/components.css',
   './core/js/bootstrap.js', './core/css/theme.css', './core/css/views.css',
   './core/js/progress.js', './core/js/runtime.js', './core/js/learning-history.js', './core/js/study-plan.js', './core/css/learning-history.css', './core/js/offline.js',
-  './core/js/library.js', './core/css/library.css', './data/library-index.json', './core/js/store.js', './core/js/quiz-engine.js',
+  './core/js/home-view.js', './core/css/home.css', './core/js/library.js', './core/css/library.css', './data/library-index.json', './core/js/store.js', './core/js/quiz-engine.js',
   './core/js/engine.js', './core/js/mobile-nav.js', './core/js/enhancement.js',
   './core/js/mock-view.js', './core/js/review-view.js',
   './core/js/app-shell.js', './core/js/search.js',

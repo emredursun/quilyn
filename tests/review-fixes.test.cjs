@@ -25,7 +25,7 @@ test('lazy feature JS and CSS use the runtime script version from the HTML shell
  const html=fs.readFileSync('index.html','utf8'),token=html.match(/runtime\.js\?v=([^"']+)/)[1],versions=[...html.matchAll(/(?:core\/(?:js|css)\/[^"']+?)\?v=([^"']+)/g)].map(m=>m[1]);assert.ok(versions.every(v=>v===token));
  const assets=[],window={};const document={baseURI:'https://example.com/quilyn/',currentScript:{src:'https://example.com/quilyn/core/js/runtime.js?v='+token},addEventListener(){},createElement:()=>({remove(){}}),head:{appendChild(el){assets.push(el);el.onload();}}};
  vm.runInNewContext(fs.readFileSync('core/js/runtime.js','utf8'),{window,document,URL,Map});
- await window.QuilynRuntime.personalization();await window.QuilynRuntime.library();await window.QuilynRuntime.review();assert.equal(assets.length,6);assert.ok(assets.every(el=>new URL(el.src||el.href,document.baseURI).searchParams.get('v')===token));
+ await window.QuilynRuntime.personalization();await window.QuilynRuntime.library();await window.QuilynRuntime.review();await window.QuilynRuntime.home();assert.equal(assets.length,8);assert.ok(assets.every(el=>new URL(el.src||el.href,document.baseURI).searchParams.get('v')===token));
 });
 function quotaQuiz(){
  const events={},values=new Map([['pq_state_#PSA/SA-M01',JSON.stringify({version:2,attemptId:'older-attempt',answers:{old:{selected:['A'],graded:true,signature:'old'}}})]]),writes=[],cards=[],notices=[],container=node();let reset,retry,renders=0,archives=0;

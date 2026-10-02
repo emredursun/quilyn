@@ -129,5 +129,5 @@
     });
     if (global.QuilynStorageNotice) global.dispatchEvent(new CustomEvent('quilyn-storage-error', {detail:global.QuilynStorageNotice}));
   });
-  global.QuilynRuntime = { json: json, learning:learning, personalization:personalization, library:function(){return feature('library','QuilynLibrary','core/css/library.css');}, review:review, safeUrl: safeUrl, cleanContent: cleanContent, interactive: interactive, dialog: dialog, closeDialog: closeDialog, enhance: enhance };
+  global.QuilynRuntime = { json: json, home:function(){return feature('home-view','QuilynHome','core/css/home.css');}, learning:learning, personalization:personalization, library:function(){return feature('library','QuilynLibrary','core/css/library.css');}, review:review, safeUrl: safeUrl, cleanContent: cleanContent, interactive: interactive, dialog: dialog, closeDialog: closeDialog, enhance: enhance };
 })(window);

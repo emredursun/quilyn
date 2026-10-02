@@ -295,27 +295,15 @@
     var due = Object.keys(cardsDue).filter(function(k) { return cardsDue[k].dueDate <= day; }).length;
     var mockScores = ts.mock || {};
     var scores = Object.values(mockScores);
-    var actions = '<section class="quilyn-today" aria-label="Your next steps">' +
-      '<div><span class="quilyn-eyebrow">YOUR NEXT STEP</span><h3>' + (next ? esc(next.name) : 'More content is on the way') + '</h3>' +
-      '<p>' + (last ? (next && next.id === last.subject ? 'Pick up where you left off.' : 'Continue to your next available module.') : 'Start with an available module. Your progress stays on this device.') + '</p>' +
-      (next ? '<a class="pa-btn primary" href="#' + activeTrackId + '/' + next.id + '">' + (last ? 'Continue learning' : 'Start learning') + '</a>' : '') + '</div>' +
-      '<div class="quilyn-summary"><h3>Today’s review</h3><p>' + due + ' scheduled cards due. New cards are available in Smart Review.</p><a href="#review">Open Smart Review →</a></div>' +
-      '<div class="quilyn-summary"><h3>Your coverage</h3><p>' + done + ' / ' + ready.length + ' available modules mastered (70%+ quiz).</p><p>' + ready.length + ' of ' + (track.plannedModuleCount || track.modules.length) + ' planned modules available.</p>' +
-      '<p>' + (scores.length ? 'Best mock result: ' + Math.max.apply(null,scores) + '%. This is practice performance.' : 'No mock exam results yet.') + '</p><a href="#mock">View mock exams →</a></div></section>';
-
-    var c = document.getElementById("paContent");
-    c.innerHTML =
-      '<div class="pa-hero">' +
-      "<h2>" + esc(track.trackName) + "</h2>" +
-      "<p>Build understanding, practice your recall, and follow your progress.</p>" +
-      "</div>" +
-      actions +
-      weakPanel +
-      '<nav class="pa-learning-links" aria-label="Learning records"><a href="#plan"><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg> Study plan</a><a href="#plan/bookmarks"><svg class="i" aria-hidden="true"><use href="#i-bookmark"/></svg> Bookmarks</a> <a href="#history">Attempt history</a><a href="#mistakes">Mistakes notebook</a><a href="#library">Learning library</a><a href="#updates">What’s new</a><a href="learn/">Reading guides</a></nav><h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
-      '<div class="pa-footer">Quilyn · data-driven · ' + track.modules.length + " modules</div>";
-
-    window.scrollTo({ top: 0 });
-    document.getElementById("paContent").focus({preventScroll:true});
+    var c = document.getElementById('paContent'), request = moduleRequest;
+    c.textContent = 'Loading your learning workspace…';
+    window.QuilynRuntime.home().then(function(home) {
+      if(request !== moduleRequest)return;
+      c.innerHTML = home.render({track:track,next:next,returning:!!last,resuming:!!(last&&next&&next.id===last.subject),done:done,total:ready.length,due:due,scores:scores}) +
+        weakPanel + '<h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + '</div>' +
+        '<div class="pa-footer">Quilyn · ' + track.modules.length + ' modules</div>';
+      window.scrollTo({top:0});c.focus({preventScroll:true});
+    }).catch(function(e){if(request === moduleRequest)c.textContent=e.message;});
   }
 
   function selectNextModule(ready, completed, lastId) {

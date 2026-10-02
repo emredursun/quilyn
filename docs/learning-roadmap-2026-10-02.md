@@ -225,3 +225,7 @@ BA-M10–M14 için 76 soru / 304 seçenek açıklaması önceki `42cb826` checkp
 - `dc7bdde`: kart, buton, sekme, cevap ve bağlantılar için ortak hover dili; hover metinleri için kontrast regresyonu ve azaltılmış hareket desteği.
 
 Bu kayıtlar yerel commit durumunu belirtir; push veya production deployment yapılmadı.
+
+### Home workspace redesign
+
+Upper Home section redesigned around an explicit learning action, compact Smart Review, labeled module mastery and grouped tools. See [research and verification](home-workspace-2026-10-02.md). 94/94 checks passed, shell 297.3 KB; query 20261002z / SW v72. Local commit only. Next editorial package: PSA module option feedback, beginning with SA-M01–M03; PBA and PSSA feedback coverage is already complete. Other-track source/version review and physical device/accessibility checks remain open.
