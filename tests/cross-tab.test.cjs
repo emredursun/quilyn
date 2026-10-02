@@ -18,3 +18,36 @@ test('progress broadcasts only relevant same-origin storage changes',()=>{
 test('visible-tab fallback detects updates when the embedded browser omits storage events',()=>{
  const shared=new Map(),a=make(shared),b=make(shared),updates=[];b.window.addEventListener('quilyn-progress-external',e=>updates.push(e.detail.key));a.window.QuilynProgress.write('pega_theme','light');b.tick();assert.deepEqual(updates,['pega_theme']);b.tick();assert.equal(updates.length,1);b.window.QuilynProgress.write('pega_theme','dark');b.tick();assert.equal(updates.length,1);
 });
+
+test('mock conflict locks option clicks, grading and the answered counter before any save',()=>{
+ const events={},writes=[],attrs={},classes=new Set(),counter={textContent:0},bar={style:{}},controls=[{disabled:false}];let refreshes=0,locks=0;
+ const option={dataset:{j:'0'},classList:{add:c=>classes.add(c),toggle(c,on){on?classes.add(c):classes.delete(c);}},setAttribute:(k,v)=>attrs[k]=v};
+ const card={querySelectorAll:()=>[option],querySelector:()=>controls[0]};
+ const root={querySelector:s=>s==='#mv-ansCount'?counter:s==='#mv-prog'?bar:{prepend(){}},querySelectorAll:s=>s.includes('.opt')?[option]:controls};
+ const window={addEventListener:(k,fn)=>events[k]=fn,PegaStore:{state:{activeTrack:'PSA'}},QuilynProgress:{write:(k,v)=>writes.push(v)}};
+ const source=fs.readFileSync('core/js/mock-view.js','utf8').replace('})(window);',`window.testMock={pick,checkAnswer,updateBar,submitExam,doSubmit,prime:function(){mountedTrack='PSA';current='Exam';EXAMS={Exam:[{t:'single',o:['A'],a:[0]}]};answers=[[]];checked=[false];_root=window.root;examNav=window.nav;},answers:()=>answers,checked:()=>checked};})(window);`);
+ window.root=root;window.nav={refresh(){refreshes++;},disable(){locks++;}};
+ vm.runInNewContext(source,{window,HTMLElement:class{},customElements:{define(){}},document:{addEventListener(){},createElement:()=>({setAttribute(){},appendChild(){}})},clearInterval(){},Date});
+ window.testMock.prime();option.onclick=()=>window.testMock.pick(0,0,card);
+ events['quilyn-progress-external']({detail:{key:'pegaMock_PSA_Exam'}});
+ option.onclick();window.testMock.checkAnswer(0,card);window.testMock.updateBar();window.testMock.submitExam(true);window.testMock.doSubmit(true);
+ assert.equal(window.testMock.answers()[0].length,0);assert.equal(window.testMock.checked()[0],false);assert.equal(counter.textContent,0);assert.equal(refreshes,0);assert.equal(locks,1);assert.equal(writes.length,0);assert.equal(attrs['aria-disabled'],'true');assert.ok(classes.has('disabled'));assert.ok(!classes.has('sel'));
+});
+
+test('disabled exam navigation rejects stale handlers and stays disabled after refresh',()=>{
+ const nodes={},cards=[{},{}];let saves=0;
+ const nav={contains:()=>false,querySelector:s=>nodes[s]||(nodes[s]={}),querySelectorAll:()=>Object.values(nodes),scrollIntoView(){}};
+ const root={querySelector:()=>({children:cards,before(){}})},window={};
+ vm.runInNewContext(fs.readFileSync('core/js/learning-history.js','utf8'),{window,document:{createElement:()=>nav},Date});
+ const config={index:0,view:'single',flags:[false,false],answers:[[],[]],save(){saves++;}};
+ const api=window.QuilynJournal.examControls(root,config),next=nodes['#jl-next'].onclick,flag=nodes['#jl-flag'].onclick,jump=nodes['#jl-jump'].onchange,layout=nodes['#jl-layout'].onchange;
+ api.disable();next();flag();jump.call({value:'1'});layout.call({value:'list'});api.refresh();
+ assert.equal(config.index,0);assert.equal(config.view,'single');assert.equal(config.flags[0],false);assert.equal(saves,0);assert.ok(Object.values(nodes).every(n=>n.disabled));
+});
+
+test('reset suspension cancels scheduled store writes and rejects later progress writes',async()=>{
+ const shared=new Map(),a=make(shared);a.window.PegaStore.state.tracks.PSA.mock.Exam=88;
+ a.window.QuilynProgress.beginReset();a.window.PegaStore.discard();shared.clear();
+ a.window.PegaStore.flush();await Promise.resolve();a.window.PegaStore.state.tracks.PSA.mock.Exam=99;await Promise.resolve();
+ assert.equal(shared.size,0);assert.equal(a.window.QuilynProgress.write('quilyn_study',{version:1,tracks:{}}),false);assert.equal(a.window.QuilynProgress.archive('pq_state_#PSA/SA-M01',{version:2,answers:{}}),false);assert.equal(shared.size,0);
+});

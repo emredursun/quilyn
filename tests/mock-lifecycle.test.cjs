@@ -10,6 +10,7 @@ test('import teardown stops a live exam without overwriting imported answers',()
   vm.runInNewContext(source,{window,HTMLElement:class{},customElements:{define(){}},clearInterval(){},
     document:{addEventListener(){},getElementById:()=>null,querySelectorAll:()=>[]},console,Date});
   window.primeExam();window.MockView.unmount(true);assert.equal(writes.length,0);
+  window.primeExam();window.MockView.discard();window.MockView.flush();assert.equal(writes.length,0);
   window.primeExam();window.MockView.unmount();assert.equal(writes.length,1);
   assert.equal(writes[0].key,'pegaMock_PBA_Exam');assert.equal(writes[0].value.remaining,50);
 });

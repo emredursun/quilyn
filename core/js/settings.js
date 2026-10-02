@@ -106,6 +106,10 @@
   function resetAll() {
     if (!confirm('Delete ALL quiz scores, SRS cards, and streaks? This cannot be undone.')) return;
     if (!confirm('Last chance — click OK to permanently reset everything.')) return;
+    if(global.QuilynProgress)global.QuilynProgress.beginReset();
+    if(global.QuilynStudy)global.QuilynStudy.discardLesson();
+    if(global.MockView)global.MockView.discard();
+    if(global.PegaStore)global.PegaStore.discard();
     var keysToRemove = [];
     for (var i = 0; i < localStorage.length; i++) {
       var k = localStorage.key(i);
@@ -225,7 +229,7 @@
           SHORTCUTS_HTML +
           '<div class="pa-settings-section pa-settings-danger">' +
             '<h4>🗑️ Reset All Progress</h4>' +
-            '<p>Permanently delete quiz scores, SRS progress, streaks, attempt history mistakes notebook, study plan and bookmarks.</p>' +
+            '<p>Permanently delete quiz scores, SRS progress, streaks, attempt history, mistakes notebook, study plan and bookmarks.</p>' +
             '<button class="pa-settings-btn danger" id="pa-reset-btn">Reset Everything</button>' +
           '</div>' +
         '</div>' +

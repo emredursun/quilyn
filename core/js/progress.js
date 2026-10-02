@@ -2,7 +2,7 @@
 (function (global) {
   'use strict';
   var ACTIVITY_KEY = 'quilyn_activity';
-  var observed=new Map();
+  var observed=new Map(), resetting=false;
   function sessionKey(key){return /^pq_state_|^pegaMock_/.test(key);}
   function conflict(key){return sessionKey(key)&&observed.has(key)&&localStorage.getItem(key)!==observed.get(key);}
   var record = function (v) { return v !== null && typeof v === 'object' && !Array.isArray(v); };
@@ -92,6 +92,7 @@
     } catch (e) { notify('Saved progress could not be read. Export a backup before resetting your data.'); return fallback; }
   }
   function write(key, value) {
+    if(resetting)return false;
     if (!validEntry(key, value)) { notify('Progress was not saved because its format is invalid.'); return false; }
     try {
       if(conflict(key)){notify('This quiz or exam changed in another tab. Reopen it to use the latest saved answers; this tab will not overwrite them.');return false;}
@@ -119,6 +120,7 @@
     return keys;
   }
   function applyBundle(b) {
+    if(resetting)throw new Error("Progress reset is in progress. Reload before importing.");
     var keys = validateBundle(b), previous = {};
     keys.forEach(function (k) { previous[k] = localStorage.getItem(k); });
     try {
@@ -194,6 +196,7 @@
     return next;
   }
   function archive(key, value) {
+    if(resetting)return false;
     try { localStorage.setItem('quilyn_recovery_' + key + '_' + Date.now() + '_' + Math.random().toString(36).slice(2), JSON.stringify(value)); return true; }
     catch (_) { notify('Older answers could not be preserved. Export a backup; quiz changes will not be saved in this session.'); return false; }
   }
@@ -230,6 +233,6 @@
   // A visible-tab fallback also catches updates missed while the page was suspended.
   if(global.setInterval)global.setInterval(poll,2000);
 
-  global.QuilynProgress = { validEntry: validEntry, read: read, write: write, remove: remove, validateBundle: validateBundle,
+  global.QuilynProgress = { beginReset: function(){resetting=true;}, validEntry: validEntry, read: read, write: write, remove: remove, validateBundle: validateBundle,
     applyBundle: applyBundle, quizState:quizState, quizSignature:quizSignature, archive:archive, validateReferences: validateReferences, activity: activity, localDay: localDay, activityKey: ACTIVITY_KEY };
 })(window);

@@ -110,13 +110,14 @@
     function draw(){
       var focused=nav.contains(document.activeElement)?document.activeElement.id:null;
       nav.innerHTML='<label>View <select id="jl-layout"><option value="single"'+(config.view==='single'?' selected':'')+'>One question</option><option value="list"'+(config.view==='list'?' selected':'')+'>All questions</option></select></label><label>Question <select id="jl-jump">'+cards.map(function(c,i){return '<option value="'+i+'"'+(config.index===i?' selected':'')+'>Q'+(i+1)+(config.answers[i].length?' · Answered':' · Unanswered')+(config.flags[i]?' · Marked':'')+'</option>';}).join('')+'</select></label><button class="v-btn" id="jl-prev"'+(config.index===0?' disabled':'')+'>Previous</button><button class="v-btn" id="jl-flag" aria-pressed="'+!!config.flags[config.index]+'">'+(config.flags[config.index]?'Unmark':'Mark for review')+'</button><button class="v-btn" id="jl-next"'+(config.index===cards.length-1?' disabled':'')+'>Next</button>';
+      if(config.disabled)nav.querySelectorAll('button,select').forEach(function(control){control.disabled=true;});
       if(focused){var control=nav.querySelector('#'+focused);if(control&&!control.disabled)control.focus({preventScroll:true});}
       cards.forEach(function(c,i){c.hidden=config.view==='single'&&i!==config.index;});
-      nav.querySelector('#jl-layout').onchange=function(){config.view=this.value;changed();};nav.querySelector('#jl-jump').onchange=function(){config.index=Number(this.value);changed();};
-      nav.querySelector('#jl-prev').onclick=function(){config.index--;changed();};nav.querySelector('#jl-next').onclick=function(){config.index++;changed();};nav.querySelector('#jl-flag').onclick=function(){config.flags[config.index]=!config.flags[config.index];changed();};
+      nav.querySelector('#jl-layout').onchange=function(){if(config.disabled)return;config.view=this.value;changed();};nav.querySelector('#jl-jump').onchange=function(){if(config.disabled)return;config.index=Number(this.value);changed();};
+      nav.querySelector('#jl-prev').onclick=function(){if(config.disabled)return;config.index--;changed();};nav.querySelector('#jl-next').onclick=function(){if(config.disabled)return;config.index++;changed();};nav.querySelector('#jl-flag').onclick=function(){if(config.disabled)return;config.flags[config.index]=!config.flags[config.index];changed();};
     }
-    function changed(){draw();config.save(config);(config.view==='single'?nav:cards[config.index]).scrollIntoView({block:'start'});}
-    draw();return {refresh:draw,config:config};
+    function changed(){if(config.disabled)return;draw();config.save(config);(config.view==='single'?nav:cards[config.index]).scrollIntoView({block:'start'});}
+    draw();return {refresh:draw,disable:function(){config.disabled=true;draw();},config:config};
   }
   global.QuilynJournal={id:id,abandon:abandon,valid:valid,record:record,read:read,quizQuestion:quizQuestion,mockQuestion:mockQuestion,bankSignature:bankSignature,feedbackHTML:feedbackHTML,validFeedback:validFeedback,mount:mount,examControls:examControls};
 })(window);

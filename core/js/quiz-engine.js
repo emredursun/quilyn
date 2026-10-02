@@ -95,7 +95,7 @@
     function persist() { if (!transient && writable) saveState(state); }
     if(externalQuiz)global.removeEventListener('quilyn-progress-external',externalQuiz);
     externalQuiz=function(event){if(!transient&&(event.detail.key===storageKey()||event.detail.key===null)){
-      writable=false;container.querySelectorAll('input,button').forEach(function(control){control.disabled=true;});
+      if(!writable)return;writable=false;container.querySelectorAll('.pa-opt').forEach(function(option){option.classList.add('disabled');option.setAttribute('aria-disabled','true');});container.querySelectorAll('input,button').forEach(function(control){control.disabled=true;});
       var notice=document.createElement('p');notice.setAttribute('role','alert');notice.textContent='This quiz changed in another tab. Reopen the lesson to use the latest saved answers.';container.prepend(notice);
     }};
     global.addEventListener('quilyn-progress-external',externalQuiz);
@@ -168,6 +168,7 @@
       var retryBtn = result.querySelector(".pa-retry-wrong");
       if (retryBtn) {
         retryBtn.addEventListener("click", function () {
+          if(!transient&&!writable)return;
           render(container, wrongQuestions, null, pill, true, context);
           container.scrollIntoView({ behavior: "smooth" });
         });
@@ -286,7 +287,7 @@
       /* Option click */
       optEls.forEach(function (el) {
         el.addEventListener("click", function () {
-          if (graded[idx]) return;
+          if ((!transient&&!writable)||graded[idx]) return;
           _kbActiveIdx = idx; /* track which question is active for keyboard */
           var id = el.getAttribute("data-id");
           if (isMulti) {
@@ -306,7 +307,7 @@
 
       /* Check answer */
       checkBtn.addEventListener("click", function () {
-        if (graded[idx]) return;
+        if ((!transient&&!writable)||graded[idx]) return;
         if (selected.length === 0) {
           var verdict = card.querySelector(".verdict");
           verdict.textContent = "Select an answer first.";
@@ -333,6 +334,7 @@
 
     /* Reset */
     resetBtn.addEventListener("click", function () {
+      if(!transient&&!writable)return;
       if(global.QuilynJournal&&!global.QuilynJournal.abandon(state.attemptId))return;
       if (!transient) clearState();
       render(container, questions, onComplete, pill, transient, context);

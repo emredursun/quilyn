@@ -1,5 +1,6 @@
 (function (global) {
   'use strict';
+  var assetVersion = document.currentScript ? new URL(document.currentScript.src,document.baseURI).searchParams.get('v') : '';
   var requests = new Map();
   function json(path) {
     var key = path.split('?')[0];
@@ -41,7 +42,7 @@
         return new Promise(function(resolve,reject) {
           var el=document.createElement(tag);assets.push(el);
           if(tag==='link')el.rel='stylesheet';
-          el[attr]=path+'?v=20261002q';el.onload=resolve;
+          el[attr]=path+(assetVersion?'?v='+encodeURIComponent(assetVersion):'');el.onload=resolve;
           el.onerror=function(){reject(new Error('Unable to load '+name+'. Reopen this page to retry.'));};
           document.head.appendChild(el);
         });

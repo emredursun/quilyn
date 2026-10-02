@@ -85,3 +85,8 @@ test('explicit guide link overrides saved tab, while Resume restores quiz withou
  const env=setup(),saved={tab:'quiz',section:null,at:'2026-10-02T12:00:00Z'},h=lessonHarness(env,{saved,requestedTab:'guide'});
  assert.equal(h.active(),'guide');h.controls['#sp-resume'].onclick();assert.equal(h.active(),'quiz');assert.equal(h.focus(),'quiz');env.s.leaveLesson();assert.equal(env.s.preferences('PSA').positions.M1.tab,'quiz');assert.deepEqual([...env.values.keys()],['quilyn_study']);
 });
+
+test('discarding a lesson removes its listeners without saving on later pagehide',()=>{
+ const env=setup(),h=lessonHarness(env);h.events.scroll();env.s.discardLesson();env.values.clear();env.s.leaveLesson();
+ assert.equal(env.values.size,0);assert.equal(h.events.scroll,undefined);assert.equal(h.events['quilyn-progress-external'],undefined);
+});

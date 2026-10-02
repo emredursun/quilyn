@@ -165,7 +165,7 @@
 
   /* Pause / Resume */
   function pauseExam() {
-    if (paused || examMode==='simulation') return;
+    if (externalConflict || paused || examMode==='simulation') return;
     syncRemaining();
     if (remaining <= 0) { submitExam(true); return; }
     paused = true;
@@ -189,7 +189,7 @@
   }
 
   function resumeExam() {
-    if (!paused) return;
+    if (externalConflict || !paused) return;
     paused = false;
     var layer = document.getElementById('mv-pauseLayer');
     if (layer) layer.remove();
@@ -391,7 +391,7 @@
   }
 
   function pick(i, j, card) {
-    if (checked[i]) return; // locked after individual check
+    if (externalConflict || checked[i]) return; // locked after individual check
     var qu = EXAMS[current][i];
     if (isMulti(qu)) {
       var pos = answers[i].indexOf(j);
@@ -410,7 +410,7 @@
   }
 
   function checkAnswer(i, card) {
-    if (examMode==='simulation'||checked[i] || answers[i].length === 0) return;
+    if (externalConflict || examMode==='simulation'||checked[i] || answers[i].length === 0) return;
     checked[i] = true;
 
     var qu = EXAMS[current][i];
@@ -443,7 +443,7 @@
 
   function updateBar() {
     var qs = EXAMS[current]; if (!qs) return;
-    if(examNav)examNav.refresh();
+    if(examNav&&!externalConflict)examNav.refresh();
     var ans = answers.filter(function(a) { return a.length > 0; }).length;
     var ac = q('ansCount'); if (ac) ac.textContent = ans;
     var prog = q('prog'); if (prog) prog.style.width = (ans/qs.length*100) + '%';
@@ -481,7 +481,7 @@
 
   /* Submit & Results */
   function submitExam(auto) {
-    if(examFinished)return;
+    if(externalConflict||examFinished)return;
     syncRemaining();
     if (!auto) {
       var unanswered = answers.filter(function(a) { return a.length === 0; }).length;
@@ -520,6 +520,7 @@
     return global.QuilynJournal.record({id:attemptId,track:getTrack(),kind:'mock',mode:examMode,name:current,total:qs.length,startedAt:startedAt,status:status,elapsedSeconds:Math.max(0,TIME_MIN*60-remaining)},qs.map(function(qu,i){return {slot:String(i),snapshot:global.QuilynJournal.mockQuestion(getTrack(),current,qu,i),selected:answers[i].map(function(j){return String.fromCharCode(65+j);}),conf:null};}).filter(function(row,i){return status==='completed'||(status==='abandoned'?answers[i].length>0:checked[i]);}));
   }
   function doSubmit(auto) {
+    if(externalConflict||examFinished)return;
     syncRemaining();
     clearInterval(timerId);
     deadline = 0;
@@ -729,6 +730,7 @@
       if (paused) resumeExam(); else pauseExam();
     });
     q('quitBtn').addEventListener('click', function() {
+      if(externalConflict)return;
       if (q('quitBtn').textContent === 'Back to results') {
         q('submitBtn').classList.remove('v-hide');
         q('submitBtn2').classList.remove('v-hide');
@@ -737,6 +739,7 @@
         show('results'); return;
       }
       showConfirm('Quit this exam? Your saved progress will be cleared.', function() {
+        if(externalConflict)return;
         syncRemaining();clearInterval(timerId);
         if(recordExam('abandoned'))clearState();else saveState();
         examFinished = true;
@@ -798,13 +801,15 @@
   }
 
   if(global.addEventListener)global.addEventListener('quilyn-progress-external',function(event){
-    if(!_root||!current||examFinished||event.detail.key!==stateKey()&&event.detail.key!==null)return;
+    if(!_root||!current||examFinished||externalConflict||event.detail.key!==stateKey()&&event.detail.key!==null)return;
     externalConflict=true;clearInterval(timerId);timerId=null;
+    if(examNav)examNav.disable();
+    _root.querySelectorAll('#mv-exam .opt').forEach(function(option){option.classList.add('disabled');option.setAttribute('aria-disabled','true');});
     _root.querySelectorAll('#mv-exam input,#mv-exam button,#mv-exam select').forEach(function(control){control.disabled=true;});
     var notice=document.createElement('p');notice.setAttribute('role','alert');notice.textContent='This exam changed in another tab. Return to the practice list and reopen the saved session.';
     var leave=document.createElement('button');leave.className='v-btn';leave.textContent='Return to practice list';leave.onclick=function(){current=null;renderHome();};notice.appendChild(leave);q('exam').prepend(notice);
   });
-  global.MockView = { unmount: unmount, flush: function() { if (_root && current && !examFinished) { syncRemaining(); saveState(); } } };
+  global.MockView = { unmount: unmount, discard: function(){unmount(true);}, flush: function() { if (_root && current && !examFinished) { syncRemaining(); saveState(); } } };
   if (global.addEventListener) global.addEventListener('pagehide', global.MockView.flush);
   if (typeof document !== 'undefined') document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') global.MockView.flush(); });
   customElements.define('pega-mock-view', PegaMockView);

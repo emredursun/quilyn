@@ -78,20 +78,21 @@
      single task, which would re-serialize the whole state tree N times.
      Instead we coalesce: mark dirty, then flush once on the microtask /
      next frame. Reads stay synchronous and always see live `rawState`. */
-  var flushScheduled = false;
+  var flushScheduled = false, discarded=false;
   var schedule = (typeof Promise !== 'undefined')
     ? function(fn) { Promise.resolve().then(fn); }
     : function(fn) { setTimeout(fn, 0); };
 
   function flush() {
     flushScheduled = false;
+    if(discarded)return;
     var next=merge(baseline,rawState,loadState());
     if(saveState(next)!==false){replace(rawState,next);baseline=copy(next);}
     notify();
   }
 
   function scheduleFlush() {
-    if (flushScheduled) return;
+    if (discarded || flushScheduled) return;
     flushScheduled = true;
     schedule(flush);
   }
@@ -142,6 +143,7 @@
   global.PegaStore = {
     state: proxyState,
     flush: flushIfPending,
+    discard: function(){discarded=true;flushScheduled=false;},
     watch: function(callback) {
       listeners.push(callback);
       // Immediately invoke with current state

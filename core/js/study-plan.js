@@ -95,8 +95,9 @@
     global.addEventListener('scroll',updateSection,{passive:true});
     activeLesson={root:root,flush:flush,cleanup:function(){global.removeEventListener('scroll',updateSection);global.removeEventListener('quilyn-progress-external',external);}};
   }
-  function leaveLesson(){if(activeLesson){activeLesson.flush();activeLesson.cleanup();activeLesson=null;}}
+  function discardLesson(){if(activeLesson){activeLesson.cleanup();activeLesson=null;}}
+  function leaveLesson(){if(activeLesson)activeLesson.flush();discardLesson();}
   global.addEventListener('pagehide',leaveLesson);
   document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden'&&activeLesson)activeLesson.flush();});
-  global.QuilynStudy={valid:valid,read:read,preferences:preferences,change:change,recommend:recommend,mount:mount,attachLesson:attachLesson,leaveLesson:leaveLesson};
+  global.QuilynStudy={valid:valid,read:read,preferences:preferences,change:change,recommend:recommend,mount:mount,attachLesson:attachLesson,leaveLesson:leaveLesson,discardLesson:discardLesson};
 })(window);
