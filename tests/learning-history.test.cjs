@@ -219,3 +219,11 @@ test('parallel development editorial review separates integration from release a
  assert.match(d.practiceQuiz[11].options[0].text,/integration, before release/);assert.match(d.studyGuide[1].elements[4].caption,/deployment guarantee/);assert.match(d.examPitfalls[5].bestPractice,/Approval is a separate/);
  assert.doesNotMatch(JSON.stringify(d),/PREREQUISITE: Lock|unlocked Ruleset cannot be branched|all must pass|all delivery-phase roles who join after/);
 });
+
+test('Pulse editorial review keeps notification preferences explicit and avoids invented storage guarantees',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m20_collaboration_with_users.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M20');
+ assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m20_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[3,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[9].scenario,/chosen Pulse email/);assert.match(d.practiceQuiz[9].options[0].text,/email notification/);assert.match(d.practiceQuiz[11].options[0].text,/dialog listing Cases/);assert.match(d.practiceQuiz[13].options[1].text,/comment/);
+ assert.doesNotMatch(JSON.stringify(d),/permanent case history data|persist as long as the case exists|not external email by default|original CSR loses access/);
+});
