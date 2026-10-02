@@ -53,7 +53,7 @@
   }
   function learning(){return feature('learning-history','QuilynJournal','core/css/learning-history.css');}
   function review(){return feature('review-view','ReviewView');}
-  function personalization(){return Promise.all([learning(),feature('study-plan','QuilynStudy')]).then(function(values){return values[1];});}
+  function personalization(){return Promise.all([learning(),feature('study-plan','QuilynStudy','core/css/study-plan.css')]).then(function(values){return values[1];});}
   var dialogs = new Map();
   function closeDialog(el) {
     var entry = dialogs.get(el);

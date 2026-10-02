@@ -90,3 +90,12 @@ test('discarding a lesson removes its listeners without saving on later pagehide
  const env=setup(),h=lessonHarness(env);h.events.scroll();env.s.discardLesson();env.values.clear();env.s.leaveLesson();
  assert.equal(env.values.size,0);assert.equal(h.events.scroll,undefined);assert.equal(h.events['quilyn-progress-external'],undefined);
 });
+
+test('study workspace separates saved collection from daily planning and escapes bookmark content',()=>{
+ const env=setup();vm.runInNewContext(fs.readFileSync('core/js/study-plan.js','utf8').replace('global.QuilynStudy={','global.QuilynStudy={workspace:workspace,'),env.context);
+ const s=env.context.window.QuilynStudy,p=preferences(),t={...track,trackName:'Track <unsafe>'},plan=s.recommend(t,user(),{mistakes:{}},p,date),saved=[{id:'M1',name:'Saved <script>lesson</script>'}];
+ const bookmarks=s.workspace(t,p,plan,saved,[],'Estimate','', 'bookmarks',date);
+ assert.ok(bookmarks.includes('id="sp-search"'));assert.ok(bookmarks.includes('aria-current="page"'));assert.ok(bookmarks.includes('data-remove="M1"'));assert.ok(bookmarks.includes('&lt;script&gt;'));assert.ok(!bookmarks.includes('<script>'));assert.ok(!bookmarks.includes('id="sp-form"'));assert.ok(!bookmarks.includes('TODAY’S FOCUS'));
+ const daily=s.workspace(t,p,plan,saved,[],'Estimate','',null,date);assert.ok(daily.includes('id="sp-form"'));assert.ok(daily.includes('Suggested time, not completed time'));assert.ok(daily.includes('How the estimate works'));assert.ok(!daily.includes('data-remove='));assert.equal((daily.match(/>Start activity /g)||[]).length,1);
+ const empty=s.workspace(t,p,plan,[],[],'Estimate','', 'bookmarks',date);assert.ok(empty.includes('Build your revision shortlist'));assert.ok(empty.includes('href="#home"'));
+});

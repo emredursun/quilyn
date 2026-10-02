@@ -38,7 +38,7 @@ Veri değişikliklerinde anlamlı regresyon ve migration testleri; `npm run chec
 
 ## Durum
 
-Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 ve PBA'nın 293 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. PSSA ve PBA dışındaki track'lerdeki 1.366 sorunun editoryal açıklama/bölüm eşleştirmesi ve 185 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Push/yayın yapılmadı.
+Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 ve PBA'nın 293 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. Toplam 1.862 sorunun 659'unda seçenek açıklamaları ve ders hedefleri var; kalan 1.203 sorunun editoryal açıklama/bölüm eşleştirmesi ve 185 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Push/yayın yapılmadı.
 
 ### Aşama 1 teslim kaydı
 
@@ -257,3 +257,9 @@ SA-M07–M09: 54 soru / 216 seçenek açıklaması ve gerçek ders hedefleri. To
 Kaynaklar: [Views](https://academy.pega.com/topic/views/v6), [Fields](https://academy.pega.com/topic/fields/v7), [Calculated values](https://academy.pega.com/topic/calculated-values/v6), [Data Pages](https://academy.pega.com/topic/data-pages/v5), [Visual Data Model](https://academy.pega.com/topic/data-pages-and-visual-data-model/v4/in/96211/66521), [Relationships](https://academy.pega.com/topic/data-relationships/v5/in/96211/66606). Kaynak başlığında sürüm görmek bütün yerel içeriği doğrulamaz. İnceleme envanteri ayrıca tutuluyor.
 
 Manifest/statik sayfalar/interactive asset'leri yeniden üretildi. `npm run check`: 98/98 başarılı. Query 20261002ac; SW quilyn-v75. Fiziksel cihaz/ekran okuyucu testleri açık; push/yayın yapılmadı.
+
+### Study plan / Bookmarks workspace redesign
+
+Daily agenda and saved collection are distinct views with Home's typography/theme identity. One next activity, honest time allocation, progressive estimate details, searchable bookmark cards and keyboard focus after mutations. [Research and verification](study-workspace-2026-10-02.md). 99/99 checks passed; 320/390 px light/dark checks and pre-cached offline plan/collection passed. Query 20261002ad; SW quilyn-v76. Local commit only.
+
+Source review inventory records source-page version observations separately from local lesson verification. All 67 pending Pega module references have an observed version on a readable contextual or canonical source page; this does not close the 185 full local module reviews. Seven contextual pages were unreadable through the research tool; canonical same-revision pages were observed instead. Tricentis pages requiring client-rendered/authenticated content remain unverified. 1.203 question feedback tasks and physical device/screen-reader checks remain open.

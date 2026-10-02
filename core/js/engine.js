@@ -179,7 +179,7 @@
       var content=document.getElementById('paContent');content.textContent='Loading learning records…';
       window.QuilynRuntime.personalization().then(function(study){
         if(request!==moduleRequest)return;
-        var title=hash.trackId==='plan'?'Study plan':hash.trackId==='history'?'Attempt history':'Mistakes notebook';
+        var title=hash.trackId==='plan'?(hash.moduleId==='bookmarks'?'Bookmarks':'Study plan'):hash.trackId==='history'?'Attempt history':'Mistakes notebook';
         setCrumbs(title,null);
         document.title=title+' — Quilyn';
         if(hash.trackId==='plan')study.mount(content,getTrack(activeTrackId),hash.moduleId);
