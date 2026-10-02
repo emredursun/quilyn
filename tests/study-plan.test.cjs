@@ -56,12 +56,32 @@ test('unknown bookmark references are preserved and reported during backup impor
 });
 test('scrolling back to the toolbar does not erase the last reading section and listeners are cleaned up',()=>{
  const {s,context}=setup();const events={};context.window.addEventListener=(name,fn)=>events[name]=fn;context.window.removeEventListener=(name,fn)=>{if(events[name]===fn)delete events[name];};
- const controls={},toolbar={querySelector(id){return controls[id]||(controls[id]={setAttribute(){}});}},tab={dataset:{v:'guide'},click(){}};let headingTop=-10;const heading={textContent:'Section two',getBoundingClientRect:()=>({top:headingTop})};
- const root={isConnected:true,querySelector(selector){return selector==='.pa-tabs'?{before(){}}:tab;},querySelectorAll:()=>[heading]};context.document.createElement=()=>toolbar;
+ const controls={},toolbar={setAttribute(){},querySelector(id){return controls[id]||(controls[id]={setAttribute(){},classList:{add(){}}});}},tab={dataset:{v:'guide'},click(){}};let headingTop=-10;const heading={textContent:'Section two',getBoundingClientRect:()=>({top:headingTop})};
+ const root={isConnected:true,querySelector(selector){return selector==='.sp-section-bar'?{before(){},appendChild(){},getBoundingClientRect:()=>({bottom:140})}:tab;},querySelectorAll:()=>[heading]};context.document.createElement=()=>toolbar;
  s.attachLesson(root,'PSSA','M1');events.scroll();headingTop=900;events.scroll();s.leaveLesson();assert.equal(s.preferences('PSSA').positions.M1.section,'Section two');assert.equal(events.scroll,undefined);
 });
 
 test('guide and recap deep links use the same quiz storage slot as the module route',()=>{
  const window={location:{hash:'#PSSA/SSA-M01/guide'}};vm.runInNewContext(fs.readFileSync('core/js/quiz-engine.js','utf8').replace('global.PegaQuiz = {','global.PegaQuiz = {storageKey:storageKey,'),{window});
  const original=window.PegaQuiz.storageKey();assert.equal(original,'pq_state_#PSSA/SSA-M01');for(const hash of ['#PSSA/SSA-M01','#PSSA/SSA-M01/quiz','#PSSA/SSA-M01/recap']){window.location.hash=hash;assert.equal(window.PegaQuiz.storageKey(),original);}
+});
+
+function lessonHarness(env,{saved,requestedTab,headingTops=[-500,155]}={}){
+ const events={},controls={},moved=new Set();let active='guide',focus=null;const tabs=Object.fromEntries(['guide','pitfalls','quiz','recap'].map(v=>[v,{dataset:{v},click(){active=v;},focus(){focus=v;}}]));
+ if(saved)env.s.change('PSA',p=>p.positions.M1=saved);
+ const toolbar={setAttribute(){},querySelector(id){if(moved.has(id))return null;return controls[id]||(controls[id]={id,setAttribute(){},classList:{add(){}}});}};
+ const bar={before(){},appendChild(node){moved.add(node.id);},getBoundingClientRect:()=>({bottom:140})};
+ const headings=['First section','Saved section'].map((text,i)=>({textContent:text,getBoundingClientRect:()=>({top:headingTops[i]}),focus(){focus=text;},scrollIntoView(){headingTops[i]=155;}}));
+ const root={isConnected:true,querySelector(selector){if(selector==='.sp-section-bar')return bar;if(selector==='.pa-tabs button.active')return tabs[active];const match=/data-v="([^"]+)"/.exec(selector);return match?tabs[match[1]]:null;},querySelectorAll:()=>headings};
+ env.context.document.createElement=()=>toolbar;env.context.window.addEventListener=(name,fn)=>events[name]=fn;env.context.window.removeEventListener=name=>delete events[name];
+ env.s.attachLesson(root,'PSA','M1',requestedTab);return {controls,events,headings,active:()=>active,focus:()=>focus};
+}
+test('resuming under the sticky bar keeps the same section on a subsequent save',()=>{
+ const env=setup(),saved={tab:'guide',section:'Saved section',at:'2026-10-02T12:00:00Z'},h=lessonHarness(env,{saved});
+ h.controls['#sp-resume'].onclick();assert.equal(h.focus(),'Saved section');env.s.leaveLesson();assert.equal(env.s.preferences('PSA').positions.M1.section,'Saved section');
+ assert.deepEqual([...env.values.keys()],['quilyn_study']);
+});
+test('explicit guide link overrides saved tab, while Resume restores quiz without changing mastery',()=>{
+ const env=setup(),saved={tab:'quiz',section:null,at:'2026-10-02T12:00:00Z'},h=lessonHarness(env,{saved,requestedTab:'guide'});
+ assert.equal(h.active(),'guide');h.controls['#sp-resume'].onclick();assert.equal(h.active(),'quiz');assert.equal(h.focus(),'quiz');env.s.leaveLesson();assert.equal(env.s.preferences('PSA').positions.M1.tab,'quiz');assert.deepEqual([...env.values.keys()],['quilyn_study']);
 });

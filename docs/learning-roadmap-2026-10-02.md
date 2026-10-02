@@ -90,3 +90,33 @@ Aşama 1–2 doğrulandı ve `296fb78` commit’ine alındı. Push/yayın yapıl
 - Otomatik doğrulama: 72/72 test; tüm 203 bölüm hedefi, kaynaklı mock eşleştirmesi, editoryal snapshot/yedek uyumluluğu, eski kayıt bağlantısı, geçersiz metadata ve HTML kaçış kontrolü. İçerik, asset, manifest ve kabuk bütçesi kontrolleri geçti. Son asset query `20261002g`; service worker `quilyn-v52`.
 - Tarayıcı: quiz grading/yenileme → seçenek açıklaması → ilgili başlık; Yanlışlar defterinde snapshot açıklaması; Smart Review’den Log files bölümüne dönüş; simulation teslim öncesi açıklama sayısı 0, teslim ve Review answers sonrasında 3 açıklama paneli; mock Q59’dan ilgili başlığa dönüş; eski bölüm hedefinde bildirim. 390 px görünümde taşma yok, console warning/error boş. Fiziksel cihaz/ekran okuyucu ve bu pakette yeniden offline test yapılmadı.
 - [Mobil açıklama ekranı](screenshots/lesson-feedback-mobile-2026-10-02.png). Push/yayın yapılmadı.
+
+
+### Study plan erişimi — 2 Ekim 2026
+
+Kullanıcının ders araç çubuğu geri bildirimi üzerine Study plan ve Bookmarks sol menüde ayrı, her ekran için kalıcı bağlantılara taşındı; Home ekranında da ayrı girişler var. Ders üzerinde yer imi ve yalnız anlamlı kayıt olduğunda Resume reading gösterilir. Kaydetme sonucu/hatası status ile duyurulur. Bookmarks bağlantısı doğrudan liste başlığına odaklanır; mobil seçim menüyü kapatır. Resume reading bölüm başlığına klavye odağını taşır. Bu yerleşim tasarım değerlendirmesidir; kullanıcı araştırmasıyla “en iyi” olduğu kanıtlanmadı.
+
+72 test geçti; tarayıcıda kayıt/yenileme, listeye erişim, okuma konumu, 320 px taşma ve mobil menü kapanma kontrolü yapıldı. Güncelleme yerel, henüz commit/push yapılmadı. Asset query 20261002h; SW quilyn-v53. [Görünüm](screenshots/study-navigation-2026-10-02.png).
+
+
+### Sabit çubukta Bookmark — 2 Ekim 2026
+
+Kullanıcının önerisiyle Bookmark ders sekmeleriyle aynı sticky dış çubuğun sağına taşındı. Düğme tablist’in ve yatay kaydırılan sekme alanının dışındadır; ok tuşları/Home/End yalnız dört sekmeyi dolaşır. Masaüstünde ikon/metin ve mobilde erişilebilir ad/title ile 44×48 px ikon düğmesi kullanılır. Resume reading ders başlığının altında kalır. Durum aria-pressed ve canlı status ile iletilir.
+
+72 otomatik test geçti. Tarayıcıda sayfa aşağı kaydırıldığında masaüstü çubuk top=81 px, mobil top=8 px; 320 px yatay taşma yok. Ekleme, yenileme sonrası korunma, kaldırma, End → Quick Recap ve ArrowRight → Study Guide doğrulandı. Console warning/error boş. Son asset query 20261002i ve SW quilyn-v54. Henüz commit/push yapılmadı. [Masaüstü](screenshots/sticky-bookmark-desktop-2026-10-02.png), [Mobil](screenshots/sticky-bookmark-mobile-2026-10-02.png).
+
+
+### Resume reading doğrulaması ve sabit çubuk — 2 Ekim 2026
+
+Kullanıcı isteğiyle Resume reading Bookmark’ın soluna, sticky dış çubuğa alındı. İki işlem tablist dışında durur; mobilde her biri 44×48 px dokunma alanıyla ikon gösterir. Kayıt yoksa Resume gizlidir.
+
+Yakalanan sorun: okuma bölümünü seçmek için kullanılan sabit 150 px sınırı, masaüstünde geri dönülen başlığın konumundan küçük olabiliyordu; sonraki kayıtta önceki bölüm seçilebiliyordu. Sınır artık sabit çubuğun alt kenarı + 24 px üzerinden hesaplanır. Regresyon testi aynı bölüme dönüş ve tekrar kaydı, URL sekme önceliği, Resume ile quiz’e dönüş, ilerleme/mastery anahtarlarının değişmemesini kapsar.
+
+74/74 otomatik test geçti. Ayrı localhost origin’de ilk ziyarette Resume gizli; ikinci Guide bölümüne kaydırma → yenileme → Resume ile Managing Personas and Channel interfaces başlığına dönüş; ikinci yenilemede aynı başlık korunması; quiz sekmesi → yenileme → Guide’a geçiş → Resume ile quiz’e dönüş doğrulandı. 320 px taşma yok; Resume Bookmark’ın solunda. Console warning/error boş. Gerçek cihaz/ekran okuyucu testi yapılmadı. Query 20261002j; SW quilyn-v55. Henüz commit/push yapılmadı. [Tarayıcı kanıtı](screenshots/resume-reading-2026-10-02.png).
+
+
+### Ders çubuğu işlem renkleri ve kısa Resume etiketi — 2 Ekim 2026
+
+Bookmark ve Resume için ders sekmelerinin mor renginden ayrışan petrol/turkuaz palet eklendi. Açık ve koyu tema; normal, hover, kayıtlı ve klavye odağı durumları tanımlandı. Kayıtlı Bookmark dolu ikon ve aria-pressed ile de belirtilir. Görünür etiket Resume; erişilebilir ad ve title Resume reading olarak kalır. Metin kontrastı tanımlı renk çiftlerinde en az 5.98:1.
+
+74/74 otomatik test geçti. Tarayıcıda açık/koyu renkler, kısa etiket, kayıtlı Bookmark ve 2 px klavye odağı doğrulandı. 320 px görünümde yatay taşma yok; iki işlem 44×48 px. Konsol warning/error boş. Fiziksel cihaz ve ekran okuyucu testi yapılmadı. Query 20261002k; SW quilyn-v56. Henüz commit/push yapılmadı. [Açık tema](screenshots/lesson-actions-light-2026-10-02.png), [Koyu tema](screenshots/lesson-actions-dark-2026-10-02.png).

@@ -160,6 +160,7 @@
     if (window.PegaQuiz) window.PegaQuiz.unmount();
     if (window._paCrumbObs) { window._paCrumbObs.disconnect(); window._paCrumbObs = null; }
     var hash = parseHash();
+    document.querySelectorAll('.pa-study-nav a').forEach(function(a){var current=a.getAttribute('href')==='#'+hash.trackId+(hash.moduleId?'/'+hash.moduleId:'');if(current)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
 
     if (hash.trackId === 'history' || hash.trackId === 'mistakes' || hash.trackId === 'plan') {
       var request=moduleRequest;
@@ -172,7 +173,7 @@
         var title=hash.trackId==='plan'?'Study plan':hash.trackId==='history'?'Attempt history':'Mistakes notebook';
         setCrumbs(title,null);
         document.title=title+' — Quilyn';
-        if(hash.trackId==='plan')study.mount(content,getTrack(activeTrackId));
+        if(hash.trackId==='plan')study.mount(content,getTrack(activeTrackId),hash.moduleId);
         else window.QuilynJournal.mount(content,activeTrackId,hash.trackId);
       }).catch(function(e){if(request===moduleRequest)content.textContent=e.message;});return;
     }
@@ -301,7 +302,7 @@
       "</div>" +
       actions +
       weakPanel +
-      '<nav aria-label="Learning records"><a href="#plan">Study plan & bookmarks</a> · <a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></nav><h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
+      '<nav class="pa-learning-links" aria-label="Learning records"><a href="#plan"><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg> Study plan</a><a href="#plan/bookmarks"><svg class="i" aria-hidden="true"><use href="#i-bookmark"/></svg> Bookmarks</a> <a href="#history">Attempt history</a><a href="#mistakes">Mistakes notebook</a></nav><h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
       '<div class="pa-footer">Quilyn · data-driven · ' + track.modules.length + " modules</div>";
 
     window.scrollTo({ top: 0 });
@@ -360,12 +361,12 @@
       moduleTitleHtml +
       '<p class="quilyn-provenance">Independent study notes · ' + (data.platformVersion ? 'Version ' + esc(data.platformVersion) : 'Version not documented') + ' · ' +
       (data.sourceReviewedOn ? 'Reviewed ' + esc(data.sourceReviewedOn) : 'Review date not documented') + ' · Module mastery: 70% quiz score</p>' +
-      '<div class="pa-tabs">' +
+      '<div class="sp-section-bar"><div class="pa-tabs">' +
       '<button data-v="guide" class="active">📘 Study Guide</button>' +
       '<button data-v="pitfalls">⚠️ Exam Pitfalls</button>' +
       '<button data-v="quiz">🧠 Practice Quiz</button>' +
       '<button data-v="recap">⚡ Quick Recap</button>' +
-      "</div>" +
+      "</div></div>" +
       '<section class="pa-view active" id="v-guide">' + buildStudyGuide(data) + "</section>" +
       '<section class="pa-view" id="v-pitfalls">' + buildPitfalls(data) + "</section>" +
       '<section class="pa-view" id="v-quiz">' +
