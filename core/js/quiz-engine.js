@@ -66,7 +66,8 @@
 
   var _kbContainer = null;
 
-  function render(container, questions, onComplete, pill, transient, context) {
+  /* Unsaved practice stays local to this render, including Reset and Retry. */
+  function render(container, questions, onComplete, pill, transient, context, unsaved) {
     container.innerHTML = "";
     var total = questions.length;
     var graded = new Array(total).fill(false);
@@ -80,22 +81,21 @@
 
     // Restore persisted state; each entry: { selected: [ids], graded: bool, correct: bool }
     var prior = transient ? {} : loadState();
-    var state = global.QuilynProgress.quizState(prior, questions), writable = true;
+    var state = global.QuilynProgress.quizState(prior, questions), writable = !unsaved, conflicted = false;
+    var legacy = prior.version !== 2 && Object.keys(prior).length > 0;
+    var needsArchive = !transient && Object.keys(prior).length && JSON.stringify(prior) !== JSON.stringify(state);
+    if (writable && needsArchive) writable = global.QuilynProgress.archive(storageKey(), prior);
     if(global.QuilynJournal && prior.attemptId){
       var priorAttempt=global.QuilynJournal.read().attempts.find(function(a){return a.id===prior.attemptId;});
       if(Object.keys(prior.answers||{}).length!==Object.keys(state.answers).length || priorAttempt&&priorAttempt.total!==questions.length){
-        global.QuilynJournal.abandon(prior.attemptId);delete state.attemptId;delete state.startedAt;
+        if(writable)global.QuilynJournal.abandon(prior.attemptId);delete state.attemptId;delete state.startedAt;
       }
     }
-    var legacy = prior.version !== 2 && Object.keys(prior).length > 0;
-    if (!transient && Object.keys(prior).length && JSON.stringify(prior) !== JSON.stringify(state)) {
-      writable = global.QuilynProgress.archive(storageKey(), prior);
-      if (writable) saveState(state);
-    }
+    if (writable && needsArchive) saveState(state);
     function persist() { if (!transient && writable) saveState(state); }
     if(externalQuiz)global.removeEventListener('quilyn-progress-external',externalQuiz);
     externalQuiz=function(event){if(!transient&&(event.detail.key===storageKey()||event.detail.key===null)){
-      if(!writable)return;writable=false;container.querySelectorAll('.pa-opt').forEach(function(option){option.classList.add('disabled');option.setAttribute('aria-disabled','true');});container.querySelectorAll('input,button').forEach(function(control){control.disabled=true;});
+      if(conflicted)return;conflicted=true;writable=false;container.querySelectorAll('.pa-opt').forEach(function(option){option.classList.add('disabled');option.setAttribute('aria-disabled','true');});container.querySelectorAll('input,button').forEach(function(control){control.disabled=true;});
       var notice=document.createElement('p');notice.setAttribute('role','alert');notice.textContent='This quiz changed in another tab. Reopen the lesson to use the latest saved answers.';container.prepend(notice);
     }};
     global.addEventListener('quilyn-progress-external',externalQuiz);
@@ -162,14 +162,14 @@
         retryHtml;
       result.classList.add("show");
       result.scrollIntoView({ behavior: "smooth", block: "center" });
-      if (!completed && typeof onComplete === "function") onComplete(pct, score, total);
+      if (writable && !completed && typeof onComplete === "function") onComplete(pct, score, total);
       completed = true;
 
       var retryBtn = result.querySelector(".pa-retry-wrong");
       if (retryBtn) {
         retryBtn.addEventListener("click", function () {
-          if(!transient&&!writable)return;
-          render(container, wrongQuestions, null, pill, true, context);
+          if(!transient&&conflicted)return;
+          render(container, wrongQuestions, null, pill, true, context, !writable);
           container.scrollIntoView({ behavior: "smooth" });
         });
       }
@@ -287,7 +287,7 @@
       /* Option click */
       optEls.forEach(function (el) {
         el.addEventListener("click", function () {
-          if ((!transient&&!writable)||graded[idx]) return;
+          if ((!transient&&conflicted)||graded[idx]) return;
           _kbActiveIdx = idx; /* track which question is active for keyboard */
           var id = el.getAttribute("data-id");
           if (isMulti) {
@@ -307,7 +307,7 @@
 
       /* Check answer */
       checkBtn.addEventListener("click", function () {
-        if ((!transient&&!writable)||graded[idx]) return;
+        if ((!transient&&conflicted)||graded[idx]) return;
         if (selected.length === 0) {
           var verdict = card.querySelector(".verdict");
           verdict.textContent = "Select an answer first.";
@@ -321,7 +321,7 @@
         // Persist graded state
         state.answers[q.questionId] = { selected: selected.slice(), graded: true, correct: isCorrect, signature: global.QuilynProgress.quizSignature(q) };
         persist();
-        if(global.QuilynJournal){
+        if(writable&&global.QuilynJournal){
           var rows=questions.filter(function(item){return state.answers[item.questionId]&&state.answers[item.questionId].graded;}).map(function(item){return {snapshot:global.QuilynJournal.quizQuestion(context.track,context.moduleId||'',item,context.domain),selected:state.answers[item.questionId].selected.slice(),conf:null};});
           global.QuilynJournal.record({id:state.attemptId,track:context.track,kind:transient?'retry':'quiz',mode:'practice',name:context.name||'Quiz',total:total,startedAt:state.startedAt,status:rows.length===total?'completed':'in-progress'},rows);
         }
@@ -334,10 +334,10 @@
 
     /* Reset */
     resetBtn.addEventListener("click", function () {
-      if(!transient&&!writable)return;
-      if(global.QuilynJournal&&!global.QuilynJournal.abandon(state.attemptId))return;
-      if (!transient) clearState();
-      render(container, questions, onComplete, pill, transient, context);
+      if(!transient&&conflicted)return;
+      if(writable&&global.QuilynJournal&&!global.QuilynJournal.abandon(state.attemptId))return;
+      if (!transient && writable) clearState();
+      render(container, questions, onComplete, pill, transient, context, !writable);
       container.scrollIntoView({ behavior: "smooth" });
     });
   }
