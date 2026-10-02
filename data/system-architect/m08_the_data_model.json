@@ -21,7 +21,7 @@
         },
         {
           "type": "analogy",
-          "text": "A Pega data model is like a factory's inventory system: Data Classes are the warehouse shelves (organized by type), Data Records are the physical items (actual data instances), and Data Pages are the forklifts — they retrieve items from wherever they are stored (local warehouse or external supplier) and bring them to the production floor, caching the load so the trip only happens once."
+          "text": "A Pega data model is like a factory's inventory system: Data Classes are the warehouse shelves (organized by type), Data Records are the physical items (actual data instances), and Data Pages are the forklifts — they retrieve items from wherever they are stored (local warehouse or external supplier) and bring them to the production floor, caching the load for reuse according to scope, parameters and refresh configuration."
         },
         {
           "type": "concept",
@@ -61,7 +61,7 @@
         {
           "type": "concept",
           "term": "pyGUID & local entry",
-          "description": "Add records locally on the Records tab (stored in Pega DB tables). Each local record receives an auto-assigned pyGUID (unique ID) stored with the Case for later retrieval. External sources: each database row is one record."
+          "description": "Local records can be added on the Records tab in the Pega-managed store and receive generated identifiers such as pyGUID. A record identifier is distinct from the Case workflow status and the data type definition."
         },
         {
           "type": "diagram",
@@ -189,7 +189,15 @@
         "A"
       ],
       "hint": "App Studio calls it a 'data object'; Dev Studio uses the technical class term.",
-      "rationale": "In Dev Studio a data object is a data type (class) and its fields are Properties. A 'data class' is not a Pega term; 'data record' refers to a specific instance, not the type definition."
+      "rationale": "In Dev Studio a data object is a data type (class) and its fields are Properties. A 'data class' is not a Pega term; 'data record' refers to a specific instance, not the type definition.",
+      "optionExplanations": {
+        "A": "The data object corresponds to a data type/class and its fields to properties.",
+        "B": "This preserves the wrong terminology distinction between the two Studios.",
+        "C": "Fields can be primitive properties; they are not all embedded objects.",
+        "D": "A Data Page loads instances of a type rather than defining the type itself."
+      },
+      "lessonSection": "section-734a27967e3f",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q02",
@@ -217,7 +225,15 @@
         "A"
       ],
       "hint": "1,000 customers = 1,000 Data Records; the field definitions are the data object itself.",
-      "rationale": "A Data Record is the collection of values for one specific instance of a data object — one customer's name and email. Fields define the structure; Data Pages fetch and cache data — neither is an instance."
+      "rationale": "A Data Record is the collection of values for one specific instance of a data object — one customer's name and email. Fields define the structure; Data Pages fetch and cache data — neither is an instance.",
+      "optionExplanations": {
+        "A": "One record contains the field values for one particular customer.",
+        "B": "The shared field definitions describe the type rather than an individual record.",
+        "C": "The cache can hold a record, but it is not the record identity or definition.",
+        "D": "A relationship links data rather than representing this customer instance."
+      },
+      "lessonSection": "section-d7c3d4cbc243",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q03",
@@ -245,7 +261,15 @@
         "A"
       ],
       "hint": "'py' prefix = Pega system property; GUID = globally unique identifier.",
-      "rationale": "pyGUID is the auto-generated unique identifier assigned to a local Data Record — it allows the record to be retrieved and associated with the correct Case. It is system-generated, not user-supplied."
+      "rationale": "pyGUID is the auto-generated unique identifier assigned to a local Data Record — it allows the record to be retrieved and associated with the correct Case. It is system-generated, not user-supplied.",
+      "optionExplanations": {
+        "A": "pyGUID provides the generated identifier for this locally created record.",
+        "B": "An email value is not the generated pyGUID even if another design uses email as a key.",
+        "C": "Case status describes workflow state rather than the customer record identifier.",
+        "D": "pyGUID does not indicate whether a record is simulated or production data."
+      },
+      "lessonSection": "section-d7c3d4cbc243",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q04",
@@ -273,7 +297,15 @@
         "A"
       ],
       "hint": "App Studio provides a Records tab for adding local Data Records without database access.",
-      "rationale": "The Records tab lets SAs add local Data Records to Pega's database tables — no external database access needed, and each record gets a pyGUID. The Integration Designer sources data from external systems; Records tab is for local data."
+      "rationale": "The Records tab lets SAs add local Data Records to Pega's database tables — no external database access needed, and each record gets a pyGUID. The Integration Designer sources data from external systems; Records tab is for local data.",
+      "optionExplanations": {
+        "A": "The Records tab supports local data record entry into the Pega-managed store.",
+        "B": "The Integration Map describes sourcing rather than inserting records into any external database.",
+        "C": "Local record entry is not restricted to Dev Studio rule creation.",
+        "D": "Pulse supports collaboration, not the local Product Records entry interface."
+      },
+      "lessonSection": "section-d7c3d4cbc243",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q05",
@@ -301,12 +333,20 @@
         "A"
       ],
       "hint": "Think: what does 'check the Pega-provided objects first' mean in practice?",
-      "rationale": "Pega ships pre-configured objects (like Address-Postal) that should be reused or extended before creating custom ones. Building a custom address object when one already exists creates unnecessary duplication."
+      "rationale": "Pega ships pre-configured objects (like Address-Postal) that should be reused or extended before creating custom ones. Building a custom address object when one already exists creates unnecessary duplication.",
+      "optionExplanations": {
+        "A": "Review and extend suitable existing data structures before duplicating them.",
+        "B": "One unstructured string loses typed fields and useful model-driven behavior.",
+        "C": "Pega includes reusable data structures; the blanket absence claim is incorrect.",
+        "D": "Extension is possible; an exact match is not required before considering reuse."
+      },
+      "lessonSection": "section-734a27967e3f",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q06",
       "type": "single-select",
-      "scenario": "An SA reviews the default Data Pages auto-created for a new 'Product' data object. How many Data Pages are created and of what types?",
+      "scenario": "An SA reviews the default Data Pages generated for a 'Product' data object configured to a system of record. How many Data Pages are created and of what types?",
       "options": [
         {
           "id": "A",
@@ -329,7 +369,15 @@
         "A"
       ],
       "hint": "Data objects get three; Case Types get two (both read-only).",
-      "rationale": "A data object gets three default Data Pages: single read-only, list read-only, and a single Savable (read-and-write) B is wrong because two Data Pages (both read-only) is the default for a Case Type, not a."
+      "rationale": "A data object gets three default Data Pages: single read-only, list read-only, and a single Savable (read-and-write) B is wrong because two Data Pages (both read-only) is the default for a Case Type, not a.",
+      "optionExplanations": {
+        "A": "For a data object configured to a system of record, defaults cover single/list reads and a savable page.",
+        "B": "Two read pages omit the savable data-object page in this configured pattern.",
+        "C": "One page does not describe the separate generated read and save responsibilities.",
+        "D": "A list savable page is not part of the three-page default described here."
+      },
+      "lessonSection": "section-3c45fa685397",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q07",
@@ -357,7 +405,15 @@
         "A"
       ],
       "hint": "Multiple lines on BOTH sides = many-to-many; multiple lines on ONE side = one-to-many.",
-      "rationale": "Multiple-line icons on both sides indicate a many-to-many relationship. B is wrong because one-to-one uses single lines on both sides. C is wrong because one-to-many shows a single line on one side and multiple on the other — not multiple on both. D is wrong because multiple lines encode the cardinality of an established relationship, not a disconnection."
+      "rationale": "Multiple-line icons on both sides indicate a many-to-many relationship. B is wrong because one-to-one uses single lines on both sides. C is wrong because one-to-many shows a single line on one side and multiple on the other — not multiple on both. D is wrong because multiple lines encode the cardinality of an established relationship, not a disconnection.",
+      "optionExplanations": {
+        "A": "Multiplicity at both ends represents students with many courses and courses with many students.",
+        "B": "One-to-one would restrict both ends to one related instance.",
+        "C": "One-to-many indicates multiplicity at only one end rather than both.",
+        "D": "The markers describe cardinality, not disconnected entities."
+      },
+      "lessonSection": "section-3c45fa685397",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q08",
@@ -385,7 +441,15 @@
         "A"
       ],
       "hint": "Which tool shows data objects, Data Pages, and systems of record together?",
-      "rationale": "The Integration Map (in the Integration Designer) shows data objects, their Data Pages, and the systems of record that source them — the single view for data flow architecture. The Data Model shows fields and relationships."
+      "rationale": "The Integration Map (in the Integration Designer) shows data objects, their Data Pages, and the systems of record that source them — the single view for data flow architecture. The Data Model shows fields and relationships.",
+      "optionExplanations": {
+        "A": "The map connects data objects, sourcing pages and their systems of record.",
+        "B": "Access Roles describe permissions rather than the Integration Map structure.",
+        "C": "A transform execution sequence is different from this data-sourcing map.",
+        "D": "Ruleset references are not the integration dependencies shown here."
+      },
+      "lessonSection": "section-b12e00ac3826",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q09",
@@ -413,7 +477,15 @@
         "A"
       ],
       "hint": "A Data Record is always a single instance — one row, one product.",
-      "rationale": "For an externally sourced data object, each row in the external table is one Data Record. A Data Page fetches records; a Data Record IS an instance — the records live in the external system, not in the Data Page."
+      "rationale": "For an externally sourced data object, each row in the external table is one Data Record. A Data Page fetches records; a Data Record IS an instance — the records live in the external system, not in the Data Page.",
+      "optionExplanations": {
+        "A": "Each returned inventory row represents one Product record in this example.",
+        "B": "The table contains many records rather than constituting one Product instance.",
+        "C": "A Data Page can cache the fetched rows; the cache is not a single record definition.",
+        "D": "A column name is metadata, not one complete inventory record."
+      },
+      "lessonSection": "section-d7c3d4cbc243",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q10",
@@ -443,12 +515,20 @@
       ],
       "hint": "Two true statements about what a data object IS and what it CAN DO across Case Types.",
       "rationale": "Data objects group related fields modeling a single entity and are reusable across all Case Types — define once, reference many times C is wrong because a data object stores as many Data Records as the business needs; there is.",
-      "selectCount": 2
+      "selectCount": 2,
+      "optionExplanations": {
+        "A": "A data object provides a structured definition for an entity and its fields.",
+        "B": "Case Types can reuse the same entity definition instead of duplicating it.",
+        "C": "An object definition can describe many records and be reused.",
+        "D": "A relationship associates data; it is not the object definition itself."
+      },
+      "lessonSection": "section-734a27967e3f",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q11",
       "type": "single-select",
-      "scenario": "An SA explains why changing the data source from an internal database to a cloud API does not require changes to the Case Life Cycle. Which Pega capability provides this insulation?",
+      "scenario": "A Customer data source changes from an internal database to a cloud API, while preserving the data contract used by the Case workflow. Which Pega capability separates source access details from the application's data usage?",
       "options": [
         {
           "id": "A",
@@ -471,7 +551,15 @@
         "A"
       ],
       "hint": "What Pega capability hides storage/access details from the business logic layer?",
-      "rationale": "Pega Live Data is the virtualization layer — it abstracts where and how data is accessed so business logic remains unchanged when the data source changes. Swapping the connector touches only the data layer."
+      "rationale": "Live Data and Data Pages separate data usage from source access details. If the replacement preserves the required contract, the workflow can continue consuming the same data. Mapping, permissions, errors and integration behavior still require validation.",
+      "optionExplanations": {
+        "A": "Live Data separates application-facing data usage from the sourcing implementation.",
+        "B": "A deployment pipeline does not provide the runtime data abstraction.",
+        "C": "Permissions regulate access but do not map a changed source to the expected data shape.",
+        "D": "A reporting dashboard does not insulate the Case workflow from sourcing details."
+      },
+      "lessonSection": "section-3c45fa685397",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q12",
@@ -499,7 +587,15 @@
         "A"
       ],
       "hint": "New field = structure change (design-time); updating a value = runtime operation.",
-      "rationale": "Adding a 'Loyalty Tier' field changes the data object's structure — a design-time change in Dev Studio. Runtime field value updates (e.g., changing a customer's tier) are operational, not structural."
+      "rationale": "Adding a 'Loyalty Tier' field changes the data object's structure — a design-time change in Dev Studio. Runtime field value updates (e.g., changing a customer's tier) are operational, not structural.",
+      "optionExplanations": {
+        "A": "A new Loyalty Tier field changes the schema and can affect consumers of Customer data.",
+        "B": "A value update changes an instance, not the entity structure.",
+        "C": "Adding a field does not inherently reassign every record identifier.",
+        "D": "Refreshing a page does not make a schema change equivalent to a record update."
+      },
+      "lessonSection": "section-734a27967e3f",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q13",
@@ -527,7 +623,15 @@
         "A"
       ],
       "hint": "Changing a customer's ADDRESS VALUE vs adding a new ADDRESS FIELD to the object schema — which is which?",
-      "rationale": "Changing a customer's address value = runtime data operation (normal business activity, done via Case). Adding a new 'Apartment Number' field = design-time structural change (requires Dev Studio). Two completely different operations."
+      "rationale": "Changing a customer's address value = runtime data operation (normal business activity, done via Case). Adding a new 'Apartment Number' field = design-time structural change (requires Dev Studio). Two completely different operations.",
+      "optionExplanations": {
+        "A": "Updating one address value changes a record; adding a field changes the schema.",
+        "B": "Routine record updates do not require a new type definition.",
+        "C": "The Records tab is not interchangeable with structural data-model design.",
+        "D": "A save mechanism may support the update, but the distinction is schema versus instance."
+      },
+      "lessonSection": "section-d7c3d4cbc243",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q14",
@@ -555,16 +659,24 @@
         "A"
       ],
       "hint": "Case Types get two (both read-only); data objects get three (including read-and-write).",
-      "rationale": "A Case Type gets two default Data Pages, both read-only: one for loading a single Case record and one for loading a list B is wrong because three Data Pages including a Savable page is the default for a data object,."
+      "rationale": "A Case Type gets two default Data Pages, both read-only: one for loading a single Case record and one for loading a list B is wrong because three Data Pages including a Savable page is the default for a data object,.",
+      "optionExplanations": {
+        "A": "The described Case Type defaults provide single and list read-only sourcing pages.",
+        "B": "The data-object savable default is not the Case Type default asked for here.",
+        "C": "Case processing persistence is not summarized by one default savable Data Page.",
+        "D": "The described generated Case Type pattern does include read pages."
+      },
+      "lessonSection": "section-3c45fa685397",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q15",
       "type": "single-select",
-      "scenario": "At runtime a user views a Customer data object's fields — First name, Last name, Email. Where do these field values physically reside during the session?",
+      "scenario": "At runtime a user views Customer fields retrieved through a configured Data Page. Where does Pega hold the sourced values in memory?",
       "options": [
         {
           "id": "A",
-          "text": "On a Data Page cached in memory — the Data Page loads the values from the configured data source and holds them for the session"
+          "text": "On the Data Page — cached in memory under its configured scope and refresh policy"
         },
         {
           "id": "B",
@@ -583,7 +695,15 @@
         "A"
       ],
       "hint": "Data Pages are the runtime home for data object field values.",
-      "rationale": "At runtime, a data object's field values are loaded from the configured source and held on a Data Page cached in memory B is wrong because the Ruleset contains rule definitions, not runtime data values.."
+      "rationale": "The Data Page caches sourced values in memory. Visibility and reuse depend on scope, parameters and refresh configuration; the cache is distinct from the persisted source records.",
+      "optionExplanations": {
+        "A": "The sourced Customer values are held in an in-memory Data Page under its configured scope.",
+        "B": "Rulesets store rule definitions rather than these customer values.",
+        "C": "An Access Role defines authorization rather than storing customer field values.",
+        "D": "Pulse messages do not act as the data cache for the Customer object."
+      },
+      "lessonSection": "section-3c45fa685397",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q16",
@@ -612,20 +732,28 @@
         "B"
       ],
       "hint": "Data Pages virtualize data access and support caching — they are not rule storage or write-only constructs.",
-      "rationale": "Data Pages provide a virtualization layer so the application accesses data through a consistent interface regardless of the underlying source (database, REST API, etc.). They support caching at configurable scopes (Thread, Requestor, Node) to reduce redundant source calls. Data Pages do not replace Rulesets and can be configured for both read and write operations."
+      "rationale": "Data Pages provide a virtualization layer so the application accesses data through a consistent interface regardless of the underlying source (database, REST API, etc.). They support caching at configurable scopes (Thread, Requestor, Node) to reduce redundant source calls. Data Pages do not replace Rulesets and can be configured for both read and write operations.",
+      "optionExplanations": {
+        "A": "Data Pages separate the application data contract from source access details.",
+        "B": "Caching can reuse loaded data subject to scope, parameters and refresh configuration.",
+        "C": "Rule definitions remain in the rules infrastructure, not replacement Data Page storage.",
+        "D": "Savable Data Pages can execute configured save plans to the source."
+      },
+      "lessonSection": "section-3c45fa685397",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q17",
       "type": "multi-select",
-      "scenario": "An SA is reviewing the Data Page scope types available in Pega. Which TWO are valid Data Page scope types that control how long data is cached?",
+      "scenario": "An SA is reviewing the Data Page scope types available in Pega. Which TWO are valid Data Page scope types that determine cache visibility?",
       "options": [
         {
           "id": "A",
-          "text": "Thread — data is cached for the duration of the current processing thread only"
+          "text": "Thread — cached data is visible within the current processing thread"
         },
         {
           "id": "B",
-          "text": "Requestor — data is cached for the duration of the user's active session"
+          "text": "Requestor — cached data is visible within the current requestor context"
         },
         {
           "id": "C",
@@ -641,7 +769,15 @@
         "B"
       ],
       "hint": "Recall the three Pega Data Page scopes — Thread, Requestor, and Node — and what each covers.",
-      "rationale": "Thread scope caches the Data Page for a single processing thread — typically a single server-side operation. Requestor scope caches the data for the user's entire session. Global and Database are not valid Pega Data Page scope types; the third valid scope is Node, which caches data across all user sessions on a server node."
+      "rationale": "Thread and Requestor are valid scopes; Node is another supported scope. Scope determines visibility, while refresh and invalidation configuration also affect data lifetime. Global and Database are not the scope names.",
+      "optionExplanations": {
+        "A": "Thread scope makes a cached page available in the current processing thread.",
+        "B": "Requestor scope shares it within the requestor context, subject to refresh configuration.",
+        "C": "Node is a valid scope; permanent, never-invalidated Global is not.",
+        "D": "Database is a persistence location, not one of the Data Page cache scopes."
+      },
+      "lessonSection": "section-3c45fa685397",
+      "explanationReviewedOn": "2026-10-02"
     },
     {
       "questionId": "m08_q18",
@@ -670,7 +806,15 @@
         "B"
       ],
       "hint": "Integration Designer maps data objects and their integrations — it does not run SQL or build ML models.",
-      "rationale": "The Integration Designer provides a visual overview of all data objects and their relationships, and allows the SA to view and manage the integration connectors (REST, SOAP, etc.) associated with each data object. It does not include a SQL query editor or machine learning model generation capabilities."
+      "rationale": "The Integration Designer provides a visual overview of all data objects and their relationships, and allows the SA to view and manage the integration connectors (REST, SOAP, etc.) associated with each data object. It does not include a SQL query editor or machine learning model generation capabilities.",
+      "optionExplanations": {
+        "A": "The Integration Designer provides a visual overview of the data architecture.",
+        "B": "It supports inspecting and configuring the source integrations used for the objects.",
+        "C": "A general-purpose SQL editor is not the stated Integration Designer capability.",
+        "D": "Creating machine learning models is not the role of this integration map."
+      },
+      "lessonSection": "section-b12e00ac3826",
+      "explanationReviewedOn": "2026-10-02"
     }
   ],
   "quickRecap": [

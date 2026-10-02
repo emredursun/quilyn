@@ -136,3 +136,14 @@ test('PSA Center-out, GenAI and Blueprint feedback has complete, real lesson tar
  const center=JSON.parse(fs.readFileSync(registry.tracks.find(t=>t.trackId==='PSA').modules[3].file));assert.match(center.practiceQuiz[7].options[1].text,/testing remains necessary/);assert.match(center.practiceQuiz[13].options[0].text,/validate/);
  const genai=JSON.parse(fs.readFileSync(registry.tracks.find(t=>t.trackId==='PSA').modules[4].file));assert.match(genai.practiceQuiz[14].options[0].text,/individual features/);assert.doesNotMatch(genai.practiceQuiz[14].rationale,/cannot access any/);
 });
+
+test('PSA data feedback has real targets and distinguishes ownership, cardinality and caching',()=>{
+ const r=JSON.parse(fs.readFileSync('data/registry.json'));let count=0;
+ for(const m of r.tracks.find(t=>t.trackId==='PSA').modules.slice(6,9)){const d=JSON.parse(fs.readFileSync(m.file)),ids=new Set(d.studyGuide.map(s=>s.sectionId));for(const q of d.practiceQuiz){count++;assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));}}
+ assert.equal(count,54);
+ const rel=JSON.parse(fs.readFileSync('data/system-architect/m09_creating_a_data_relationship.json'));
+ assert.match(rel.practiceQuiz[1].scenario,/delivery address/);assert.doesNotMatch(rel.practiceQuiz[1].scenario,/CVV/);
+ assert.match(rel.practiceQuiz[8].rationale,/not a security boundary/);assert.doesNotMatch(rel.practiceQuiz[8].options[0].text,/cannot be accessed/);
+ assert.doesNotMatch(rel.practiceQuiz[4].rationale,/retrieves a single record, not/);assert.match(rel.practiceQuiz[18].options[1].text,/List of records/);
+ const data=JSON.parse(fs.readFileSync('data/system-architect/m08_the_data_model.json'));assert.match(data.practiceQuiz[5].scenario,/configured to a system of record/);assert.match(data.practiceQuiz[16].rationale,/refresh and invalidation/);
+});

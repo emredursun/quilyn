@@ -249,3 +249,11 @@ Center-out soruları ortak erişilebilirlik bileşenlerinin uygulamaya özgü te
 Kaynaklar: [Center-out accessibility](https://academy.pega.com/topic/accessibility-center-out-development/v1), [GenAI](https://academy.pega.com/topic/generative-ai-pega/v4), [Blueprint generation](https://academy.pega.com/topic/generating-pega-blueprint/v3), [Blueprint import](https://academy.pega.com/topic/importing-pega-blueprint-pega-platform/v3), [W3C evaluation](https://www.w3.org/WAI/test-evaluate/). Tarihler soru açıklamalarının incelemesine aittir; bütün modülün sürüm doğrulaması değildir.
 
 Manifest ve statik dersler yeniden üretildi. `npm run check`: 97/97 başarılı; başlangıç kabuğu 297,3 KB. Tarayıcıda SA-M04 Q8 doğru yanıt, dört açıklama ve ders bağlantısı doğrulandı. [Görsel](screenshots/psa-accessibility-feedback-2026-10-02.png). Query 20261002ab; SW quilyn-v74. Yerel commit; push/yayın yok. Fiziksel cihaz ve ekran okuyucu testleri hâlâ yapılmış sayılmıyor.
+
+### PSA veri modelleme açıklama paketi
+
+SA-M07–M09: 54 soru / 216 seçenek açıklaması ve gerçek ders hedefleri. Toplam açıklamalı soru 659/1.862; kalan 1.203. Case-owned Embedded Data ile authorization ayrıldı; CVV saklama örneği yerine teslimat adresi kullanıldı. Data reference'ın tek kayıtla sınırlı olduğu iddiası kaldırıldı. Veri kaynağı değişiminde contract/test gerekliliği, cache scope ile refresh ayrımı ve system-of-record bağlantısı olan data object'in default sayfaları açıklaştırıldı. Yarım rationale'lar tamamlandı; cevap anahtarları korundu.
+
+Kaynaklar: [Views](https://academy.pega.com/topic/views/v6), [Fields](https://academy.pega.com/topic/fields/v7), [Calculated values](https://academy.pega.com/topic/calculated-values/v6), [Data Pages](https://academy.pega.com/topic/data-pages/v5), [Visual Data Model](https://academy.pega.com/topic/data-pages-and-visual-data-model/v4/in/96211/66521), [Relationships](https://academy.pega.com/topic/data-relationships/v5/in/96211/66606). Kaynak başlığında sürüm görmek bütün yerel içeriği doğrulamaz. İnceleme envanteri ayrıca tutuluyor.
+
+Manifest/statik sayfalar/interactive asset'leri yeniden üretildi. `npm run check`: 98/98 başarılı. Query 20261002ac; SW quilyn-v75. Fiziksel cihaz/ekran okuyucu testleri açık; push/yayın yapılmadı.
