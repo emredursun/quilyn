@@ -101,3 +101,15 @@ test('all PSSA lesson targets resolve and sourced mock feedback matches its orig
  assert.equal(mapped,203);assert.equal(explained,203);
  for(const qs of Object.values(bank.PSSA))for(const q of qs){const original=lookup.get(q.sourceModuleId+'/'+q.sourceQuestionId);if(original){assert.equal(q.lessonSection,original.lessonSection);assert.deepEqual(q.optionExplanations,original.optionExplanations);}}
 });
+
+test('reviewed PBA questions have complete feedback and real lesson targets',()=>{
+ const registry=JSON.parse(fs.readFileSync('data/registry.json'));let count=0;
+ for(const m of registry.tracks.find(t=>t.trackId==='PBA').modules){const d=JSON.parse(fs.readFileSync(m.file));const ids=new Set(d.studyGuide.map(s=>s.sectionId));
+  for(const q of d.practiceQuiz)if(q.optionExplanations){count++;assert.ok(ids.has(q.lessonSection),m.id+' '+q.questionId);assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));}
+ }
+ assert.ok(count>=55);
+ const d=JSON.parse(fs.readFileSync('data/business-architect/m03_pega_center_out_architecture.json'));
+ assert.match(d.practiceQuiz[13].options[0].text,/evaluate/);
+ assert.match(d.studyGuide[5].elements[0].description,/evaluation/);
+ assert.ok(!JSON.stringify(d).includes('automatically brings all consuming applications into compliance'));
+});
