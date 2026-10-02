@@ -732,6 +732,16 @@
     });
     window.QuilynMobileNav.init();
     window.addEventListener("hashchange", route);
+    window.addEventListener('quilyn-progress-external',function(e){
+      if(!registry)return;
+      var current=parseHash();
+      if(e.detail.key==='pega_theme'){var theme=window.QuilynProgress.read('pega_theme','dark');document.documentElement.setAttribute('data-theme',theme);var icon=document.querySelector('#paThemeIcon use');if(icon)icon.setAttribute('href',theme==='light'?'#i-sun':'#i-moon');}
+      if(['plan','history','mistakes'].includes(current.trackId)||!current.moduleId&&['home',''].includes(current.trackId)){
+        if(current.trackId==='plan'&&document.activeElement&&document.activeElement.matches('input,select'))return;
+        // Store receives its storage event after Progress dispatches this one.
+        Promise.resolve().then(function(){if(['pega_lms_state','pega_universal_state','quilyn_study','quilyn_learning',null].includes(e.detail.key))route();});
+      }else if(e.detail.key==='pega_lms_state'&&current.trackId!=='mock'&&current.trackId!=='review')renderSidebar();
+    });
     watchThemeForInteractives();
 
     window.QuilynRuntime.json(REGISTRY_URL)

@@ -86,12 +86,14 @@
     }
     function flush(){if(root.isConnected){var pos=capture();change(track,function(p){p.positions[module]=pos;});}}
     function resume(){if(!saved)return;var tab=root.querySelector('.pa-tabs button[data-v="'+saved.tab+'"]');if(tab){tab.click();if(saved.tab!=='guide')tab.focus();}if(saved.tab==='guide'&&saved.section){var heading=Array.from(root.querySelectorAll('#v-guide .pa-section>h3')).find(function(h){return h.textContent===saved.section;});if(heading){heading.focus({preventScroll:true});heading.scrollIntoView({block:'start'});}}}
+    function external(event){if(event.detail.key==='quilyn_study'||event.detail.key===null){saved=preferences(track).positions[module];bookmarkLabel();resumeButton.hidden=!(saved&&(saved.section||saved.tab!=='guide'));}}
+    global.addEventListener('quilyn-progress-external',external);
     resumeButton.onclick=resume;
     // Restore the tab, but scroll to a saved section only after the user chooses Resume.
     var initialTab=TABS.includes(requestedTab)?requestedTab:saved&&saved.tab;
     if(initialTab){var tab=root.querySelector('.pa-tabs button[data-v="'+initialTab+'"]');if(tab)tab.click();}
     global.addEventListener('scroll',updateSection,{passive:true});
-    activeLesson={root:root,flush:flush,cleanup:function(){global.removeEventListener('scroll',updateSection);}};
+    activeLesson={root:root,flush:flush,cleanup:function(){global.removeEventListener('scroll',updateSection);global.removeEventListener('quilyn-progress-external',external);}};
   }
   function leaveLesson(){if(activeLesson){activeLesson.flush();activeLesson.cleanup();activeLesson=null;}}
   global.addEventListener('pagehide',leaveLesson);

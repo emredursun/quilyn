@@ -38,7 +38,7 @@ Veri değişikliklerinde anlamlı regresyon ve migration testleri; `npm run chec
 
 ## Durum
 
-Aşama 1–2 doğrulandı ve `296fb78` commit’ine alındı. Push/yayın yapılmadı. Aşama 3’ün ilk kişiselleştirme paketi yerel olarak kodlandı ve doğrulandı; bu paket `a6e418e` commit’ine alındı. Sonuçlardan belirli ders bölümüne editoryal eşleştirme ve yanlış şık açıklamaları kalan Aşama 3 işleridir. Aşama 4 henüz uygulanmadı.
+Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. Diğer track'lerdeki 1.659 sorunun editoryal açıklama/bölüm eşleştirmesi ve 185 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Push/yayın yapılmadı.
 
 ### Aşama 1 teslim kaydı
 
@@ -169,3 +169,13 @@ Doğrulama: `npm run check` 74/74 başarılı; 1862 quiz, 982 mock, tüm içerik
 - `learn/`: 11 track ve 210 ders için 222 statik sayfa. Derslerin metin/tablo/kavram/kaynakları HTML'de bulunur; interactive etkinlikler app bağlantısıyla açılır. Her sayfada ayrı title/description, self-canonical, sosyal metadata, responsive açık/koyu görünüm; sitemap 223 URL içerir. Hash app bağlantıları korunur. Oluşturulan sayfalar manifest komutuyla tekrar üretilir ve check ile güncelliği doğrulanır. [Google JavaScript SEO](https://developers.google.com/search/docs/crawling-indexing/javascript/javascript-seo-basics) ve [canonical yönergeleri](https://developers.google.com/search/docs/crawling-indexing/consolidate-duplicate-urls) kullanıldı. Indexleme/sıralama garantisi yok; Search Console mülk doğrulaması kullanıcı hesabı gerektirir.
 - 77 otomatik test başarılı; tüm kütüphane hedefleri, metadata doğruluğu, filtreler, 210 benzersiz ders title'ı ve canonical/sitemap kontrol edildi. Tarayıcıda PSSA kavram araması → Case locking heading odak/top≈80 px; 390 px kütüphane ve statik ders görünümünde taşma yok. TAS1 kart/sol menü Mini Practice ve yeni oturum 10:00 ile başladı. Temiz test origin'inde warning/error boş. Test sırasında eski cache'teki geçici `qs` hatası yakalanıp düzeltildi; temiz origin'de tekrar kontrol edildi.
 - [Mobil kütüphane](screenshots/library-mobile-2026-10-02.png). Query 20261002p; SW quilyn-v62. Fiziksel cihaz/ekran okuyucu testi yapılmadı. Push/yayın yapılmadı.
+
+
+### Aşama 4 — Sekmeler arası kayıt eşitleme
+
+- Store, bu sekmenin değiştirdiği alanları en son kalıcı kayıt üzerine birleştirir. Başka track veya SRS kartındaki kayıtlar, eski bir sekme kaydedince silinmez. Mevcut nesne referansları korunur; diğer sekmenin Learning Track seçimi burada açık sınavı başka track'e yönlendirmez.
+- Storage event ile gelen kayıtlar, görünür sekmede iki saniyelik fallback ve focus kontrolüyle takip edilir. Bookmark/Resume durumu, home/plan/geçmiş sayfaları güncellenir. Çalışma planında input/select düzenlenirken sayfa yeniden oluşturulmaz. Kayıtların tümü hâlâ cihaz/origin yerelidir; bu bir backend cihaz senkronizasyonu değildir. Aynı alan üzerindeki eşzamanlı değişikliklerde transaction garantisi yoktur; localStorage tabanlı son yazım davranışı geçerlidir.
+- Aynı quiz/mock kaydı başka sekmede değişirse mevcut ekranın cevap işlemleri durdurulur ve yeniden açma bildirimi gösterilir. Progress sınırı, stale oturumun yeni cevabı üzerine yazmasını veya silmesini de reddeder. Mock'ta practice list'e dönüş sağlanır; simülasyonun kayıtlı deadline'ı korunur.
+- 82/82 otomatik test başarılı. Gecikmiş storage event öncesi farklı track kayıtlarının birleşmesi, nesne kimliğinin korunması, track'in burada değişmemesi, echo write yapılmaması, hatalı remote verinin reddi, stale quiz/mock write/reset'in engellenmesi ve event'siz fallback kontrol edildi. Kabuk 293,8 KB, 300 KB sınırı korunuyor.
+- Gömülü tarayıcıda iki sekme aynı kaydı paylaşıyor; ikinci sekme yenilendiğinde Bookmark doğru. İlk denemede background sekme anlık storage güncellemesi göstermedi. Bu yüzden tarayıcıda yenilemesiz iki-sekme eşitlemesi başarıyla doğrulanmış sayılmadı; fallback otomatik model testiyle doğrulandı. Chrome/Safari gerçek sekme davranışı ve fiziksel cihaz/ekran okuyucu kontrolü ayrıca gerekir. Console warning/error boştu.
+- Query 20261002q; SW quilyn-v63. Kullanıcı talimatıyla yalnız yerel commit; push/yayın yok.

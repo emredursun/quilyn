@@ -93,6 +93,12 @@
       if (writable) saveState(state);
     }
     function persist() { if (!transient && writable) saveState(state); }
+    if(externalQuiz)global.removeEventListener('quilyn-progress-external',externalQuiz);
+    externalQuiz=function(event){if(!transient&&(event.detail.key===storageKey()||event.detail.key===null)){
+      writable=false;container.querySelectorAll('input,button').forEach(function(control){control.disabled=true;});
+      var notice=document.createElement('p');notice.setAttribute('role','alert');notice.textContent='This quiz changed in another tab. Reopen the lesson to use the latest saved answers.';container.prepend(notice);
+    }};
+    global.addEventListener('quilyn-progress-external',externalQuiz);
     context=context||{};
     if(global.QuilynJournal){state.attemptId=state.attemptId||global.QuilynJournal.id();state.startedAt=state.startedAt||new Date().toISOString();}
     var completed = Object.keys(state.answers).length === total && Object.keys(state.answers).every(function(k) { return state.answers[k].graded; });
@@ -334,6 +340,7 @@
     });
   }
 
-  function unmount() { document.removeEventListener('keydown', _kbHandler); _kbContainer = null; _kbActiveIdx = null; }
+  var externalQuiz=null;
+  function unmount() { if(externalQuiz){global.removeEventListener('quilyn-progress-external',externalQuiz);externalQuiz=null;} document.removeEventListener('keydown', _kbHandler); _kbContainer = null; _kbActiveIdx = null; }
   global.PegaQuiz = { render: render, unmount: unmount };
 })(window);

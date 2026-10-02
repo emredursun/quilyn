@@ -2,6 +2,9 @@
 (function (global) {
   'use strict';
   var ACTIVITY_KEY = 'quilyn_activity';
+  var observed=new Map();
+  function sessionKey(key){return /^pq_state_|^pegaMock_/.test(key);}
+  function conflict(key){return sessionKey(key)&&observed.has(key)&&localStorage.getItem(key)!==observed.get(key);}
   var record = function (v) { return v !== null && typeof v === 'object' && !Array.isArray(v); };
   var strings = function (v) { return Array.isArray(v) && v.every(function (x) { return typeof x === 'string'; }); };
   var number = function (v, min, max) { return typeof v === 'number' && Number.isFinite(v) && v >= min && v <= max; };
@@ -80,15 +83,18 @@
   function read(key, fallback) {
     try {
       var raw = localStorage.getItem(key);
+      if(sessionKey(key)){observed.set(key,raw);if(!watched.has(key))watched.set(key,raw);}
       if (raw === null) return fallback;
       var value = key === 'pega_theme' ? raw : JSON.parse(raw);
       if (!validEntry(key, value)) throw new Error('invalid saved data');
+      if(watched&&watched.has(key)&&watched.get(key)!==raw){watched.set(key,raw);external(key);}
       return value;
     } catch (e) { notify('Saved progress could not be read. Export a backup before resetting your data.'); return fallback; }
   }
   function write(key, value) {
     if (!validEntry(key, value)) { notify('Progress was not saved because its format is invalid.'); return false; }
     try {
+      if(conflict(key)){notify('This quiz or exam changed in another tab. Reopen it to use the latest saved answers; this tab will not overwrite them.');return false;}
       var current = localStorage.getItem(key), valid = true;
       if (current !== null) {
         try { valid = validEntry(key, key === 'pega_theme' ? current : JSON.parse(current)); } catch (_) { valid = false; }
@@ -98,12 +104,12 @@
           notify('Invalid saved data was preserved in your export as a recovery entry. New progress will be saved separately from that copy.');
         }
       }
-      localStorage.setItem(key, key === 'pega_theme' ? value : JSON.stringify(value)); return true;
+      localStorage.setItem(key, key === 'pega_theme' ? value : JSON.stringify(value)); if(sessionKey(key))observed.set(key,localStorage.getItem(key));watched.set(key,localStorage.getItem(key));return true;
     }
     catch (e) { notify('Progress could not be saved. Browser storage may be full or unavailable. Export a backup.'); return false; }
   }
   function remove(key) {
-    try { localStorage.removeItem(key); return true; }
+    try { if(conflict(key)){notify('The saved session changed in another tab. Reopen it before resetting.');return false;}localStorage.removeItem(key);if(sessionKey(key))observed.set(key,null);watched.set(key,null);return true; }
     catch (_) { notify('Saved progress could not be removed. Browser storage is unavailable.'); return false; }
   }
   function validateBundle(b) {
@@ -203,6 +209,27 @@
     state.events = state.events.slice(-10000);
     write(ACTIVITY_KEY, state);
   }
+  var watched=new Map();
+  ['pega_universal_state','pega_lms_state','quilyn_study','quilyn_learning','pega_theme'].forEach(function(key){try{watched.set(key,localStorage.getItem(key));}catch(_){}});
+  function external(key){global.dispatchEvent(new CustomEvent('quilyn-progress-external',{detail:{key:key}}));}
+  function poll(){
+    if(typeof document!=='undefined'&&document.visibilityState==='hidden')return;
+    observed.forEach(function(_,key){if(!watched.has(key))watched.set(key,localStorage.getItem(key));});
+    watched.forEach(function(previous,key){try{var current=localStorage.getItem(key);if(current!==previous){watched.set(key,current);external(key);}}catch(_){}});
+  }
+  if(global.addEventListener){
+    global.addEventListener('storage',function(event){
+      if(event.storageArea&&event.storageArea!==localStorage)return;
+      if(event.key!==null&&!/^(pega_|pq_state_|pegaMock_|quilyn_)/.test(event.key))return;
+      if(event.key)watched.set(event.key,event.newValue);external(event.key);
+    });
+    global.addEventListener('focus',poll);
+    if(typeof document!=='undefined')document.addEventListener('visibilitychange',poll);
+  }
+  // Some embedded browsers share storage but omit cross-view storage events.
+  // A visible-tab fallback also catches updates missed while the page was suspended.
+  if(global.setInterval)global.setInterval(poll,2000);
+
   global.QuilynProgress = { validEntry: validEntry, read: read, write: write, remove: remove, validateBundle: validateBundle,
     applyBundle: applyBundle, quizState:quizState, quizSignature:quizSignature, archive:archive, validateReferences: validateReferences, activity: activity, localDay: localDay, activityKey: ACTIVITY_KEY };
 })(window);

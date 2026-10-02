@@ -14,6 +14,7 @@
   }
   function practiceLabel(name,count){return count<40?'Mini Practice '+name.replace(/^Mock Exam\s*/, ''):name;}
   function practiceMinutes(count){return count<40?Math.max(5,count*2):BASE_TIME;}
+  var externalConflict=false;
   var EXAMS = {};
   var dismissActions = null;
   function closeActions() {
@@ -66,7 +67,7 @@
     return 'pegaMock_' + getTrack() + '_' + (name || current);
   }
   function saveState() {
-    if (!current || examFinished) return;
+    if (!current || examFinished || externalConflict) return;
     try {
       var value = {
         name: current, answers: answers, checked: checked, remaining: remaining, durationMinutes:TIME_MIN
@@ -252,6 +253,7 @@
 
   function doStartExam(name, saved) {
     current = name;
+    externalConflict=false;
     paused = false;
     examFinished = false;
     var qs = EXAMS[name];
@@ -795,6 +797,13 @@
     disconnectedCallback() { if(_root && this.contains(_root))unmount(); }
   }
 
+  if(global.addEventListener)global.addEventListener('quilyn-progress-external',function(event){
+    if(!_root||!current||examFinished||event.detail.key!==stateKey()&&event.detail.key!==null)return;
+    externalConflict=true;clearInterval(timerId);timerId=null;
+    _root.querySelectorAll('#mv-exam input,#mv-exam button,#mv-exam select').forEach(function(control){control.disabled=true;});
+    var notice=document.createElement('p');notice.setAttribute('role','alert');notice.textContent='This exam changed in another tab. Return to the practice list and reopen the saved session.';
+    var leave=document.createElement('button');leave.className='v-btn';leave.textContent='Return to practice list';leave.onclick=function(){current=null;renderHome();};notice.appendChild(leave);q('exam').prepend(notice);
+  });
   global.MockView = { unmount: unmount, flush: function() { if (_root && current && !examFinished) { syncRemaining(); saveState(); } } };
   if (global.addEventListener) global.addEventListener('pagehide', global.MockView.flush);
   if (typeof document !== 'undefined') document.addEventListener('visibilitychange', function() { if (document.visibilityState === 'hidden') global.MockView.flush(); });

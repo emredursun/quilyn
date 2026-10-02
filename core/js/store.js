@@ -47,6 +47,30 @@
 
   var listeners = [];
   var rawState = loadState();
+  var baseline=JSON.parse(JSON.stringify(rawState));
+  function same(a,b){return JSON.stringify(a)===JSON.stringify(b);}
+  function object(v){return v&&typeof v==='object'&&!Array.isArray(v);}
+  function copy(v){return v===undefined?undefined:JSON.parse(JSON.stringify(v));}
+  // Apply this tab's changed fields to the latest persisted record. Arrays are
+  // atomic; unrelated tracks/cards survive a stale tab's next write.
+  function merge(base,local,remote){
+    if(same(base,local))return copy(remote);
+    if(object(base)&&object(local)&&object(remote)){
+      var result=copy(remote);
+      new Set(Object.keys(base).concat(Object.keys(local))).forEach(function(key){
+        if(same(base[key],local[key]))return;
+        if(!Object.prototype.hasOwnProperty.call(local,key))delete result[key];
+        else result[key]=merge(base[key],local[key],remote[key]);
+      });return result;
+    }
+    return copy(local);
+  }
+  function replace(target,next){
+    Object.keys(target).forEach(function(k){if(!Object.prototype.hasOwnProperty.call(next,k))delete target[k];});
+    Object.keys(next).forEach(function(k){if(object(target[k])&&object(next[k]))replace(target[k],next[k]);else target[k]=copy(next[k]);});
+  }
+  function notify(){listeners.slice().forEach(function(fn){try{fn(proxyState);}catch(e){console.error(e);}});}
+
 
   /* ── Batched persistence + notification ───────────────────────────────
      A naive Proxy fires saveState() + every listener on EACH mutation.
@@ -61,8 +85,9 @@
 
   function flush() {
     flushScheduled = false;
-    saveState(rawState);
-    listeners.slice().forEach(function(fn) { try { fn(proxyState); } catch (e) { console.error(e); } });
+    var next=merge(baseline,rawState,loadState());
+    if(saveState(next)!==false){replace(rawState,next);baseline=copy(next);}
+    notify();
   }
 
   function scheduleFlush() {
@@ -104,6 +129,16 @@
 
   var proxyState = new Proxy(rawState, handler);
 
+  window.addEventListener('quilyn-progress-external',function(update){
+    var event={key:update.detail.key,newValue:localStorage.getItem(STORAGE_KEY)};
+    if(event.storageArea&&event.storageArea!==localStorage)return;
+    if(event.key!==STORAGE_KEY&&event.key!==null)return;
+    if(event.key===STORAGE_KEY&&event.newValue!==null){try{if(global.QuilynProgress&&!global.QuilynProgress.validEntry(STORAGE_KEY,JSON.parse(event.newValue)))return;}catch(_){return;}}
+    var remote=loadState(),track=rawState.activeTrack;
+    var next=merge(baseline,rawState,remote);
+    // A second tab changing tracks must not navigate an active exam here.
+    next.activeTrack=track;replace(rawState,next);baseline=copy(remote);notify();
+  });
   global.PegaStore = {
     state: proxyState,
     flush: flushIfPending,
