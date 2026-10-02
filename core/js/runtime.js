@@ -33,6 +33,25 @@
     var script = '<script src="' + new URL(index[digest][theme],document.baseURI).href + '"></script>';
     return body.includes('</body>') ? body.replace('</body>',script+'</body>') : body+script;
   }
+  var features = new Map();
+  function feature(name, exportName, stylesheet) {
+    if (!features.has(name)) {
+      var assets=[];
+      function load(tag,attr,path) {
+        return new Promise(function(resolve,reject) {
+          var el=document.createElement(tag);assets.push(el);
+          if(tag==='link')el.rel='stylesheet';
+          el[attr]=path+'?v=20261002c';el.onload=resolve;
+          el.onerror=function(){reject(new Error('Unable to load '+name+'. Reopen this page to retry.'));};
+          document.head.appendChild(el);
+        });
+      }
+      features.set(name,Promise.all([load('script','src','core/js/'+name+'.js'),stylesheet?load('link','href',stylesheet):Promise.resolve()]).then(function(){return global[exportName];}).catch(function(err){assets.forEach(function(el){el.remove();});features.delete(name);throw err;}));
+    }
+    return features.get(name);
+  }
+  function learning(){return feature('learning-history','QuilynJournal','core/css/learning-history.css');}
+  function review(){return feature('review-view','ReviewView');}
   var dialogs = new Map();
   function closeDialog(el) {
     var entry = dialogs.get(el);
@@ -108,5 +127,5 @@
     });
     if (global.QuilynStorageNotice) global.dispatchEvent(new CustomEvent('quilyn-storage-error', {detail:global.QuilynStorageNotice}));
   });
-  global.QuilynRuntime = { json: json, safeUrl: safeUrl, cleanContent: cleanContent, interactive: interactive, dialog: dialog, closeDialog: closeDialog, enhance: enhance };
+  global.QuilynRuntime = { json: json, learning:learning, review:review, safeUrl: safeUrl, cleanContent: cleanContent, interactive: interactive, dialog: dialog, closeDialog: closeDialog, enhance: enhance };
 })(window);

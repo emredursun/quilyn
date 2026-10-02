@@ -44,14 +44,28 @@
         return record(t) && (t.mock === undefined || everyObject(t.mock, function (score) { return number(score, 0, 100); })) &&
           (t.srs === undefined || srs(t.srs));
       }) && (v.quiz === undefined || record(v.quiz));
-    if (/^pq_state_(?:default|#[A-Za-z0-9-]+\/[A-Za-z0-9-]+)$/.test(key)) return everyObject(v, function (q, id) {
-      return /^\d+$/.test(id) && record(q) && strings(q.selected) && typeof q.graded === 'boolean' &&
-        (q.correct === undefined || typeof q.correct === 'boolean');
-    });
-    if (/^pegaMock_[A-Za-z0-9-]+_.{1,120}$/.test(key)) return record(v) && typeof v.name === 'string' &&
+    if (/^pq_state_(?:default|#[A-Za-z0-9-]+\/[A-Za-z0-9-]+)$/.test(key)) {
+      var modern = v && v.version === 2, entries = modern ? v.answers : v;
+      return (!modern || (v.attemptId === undefined || typeof v.attemptId === 'string' && v.attemptId.length <= 200) && (v.startedAt === undefined || date(v.startedAt))) && everyObject(entries, function(q, id) {
+        return (modern ? id.length > 0 && id.length <= 120 : /^\d+$/.test(id)) && record(q) &&
+          strings(q.selected) && new Set(q.selected).size === q.selected.length && typeof q.graded === 'boolean' &&
+          (q.correct === undefined || typeof q.correct === 'boolean') &&
+          (!modern || typeof q.signature === 'string' && q.signature.length <= 20000);
+      });
+    }
+    if (/^pegaMock_[A-Za-z0-9-]+_.{1,120}$/.test(key)) return record(v) && Array.isArray(v.answers) &&
+      (v.mode === undefined || ['practice','simulation'].includes(v.mode)) &&
+      (v.attemptId === undefined || typeof v.attemptId === 'string' && v.attemptId.length <= 200) &&
+      (v.startedAt === undefined || date(v.startedAt)) &&
+      (v.deadline === undefined || number(v.deadline,0,1e15)) &&
+      (v.signature === undefined || typeof v.signature === 'string' && v.signature.length <= 1000000) &&
+      (v.flags === undefined || Array.isArray(v.flags) && v.flags.length === v.answers.length && v.flags.every(function(b){return typeof b==='boolean';})) &&
+      (v.index === undefined || integer(v.index,0,Math.max(0,v.answers.length-1))) &&
+      (v.view === undefined || ['single','list'].includes(v.view)) && typeof v.name === 'string' &&
       number(v.remaining, 0, 86400) && Array.isArray(v.answers) && v.answers.every(function (a) {
         return Array.isArray(a) && new Set(a).size === a.length && a.every(function (i) { return integer(i, 0, 99); });
       }) && Array.isArray(v.checked) && v.checked.length === v.answers.length && v.checked.every(function (b) { return typeof b === 'boolean'; });
+    if (key === 'quilyn_learning') return !!global.QuilynJournal && global.QuilynJournal.valid(v);
     if (key === ACTIVITY_KEY) return record(v) && v.version === 1 && Array.isArray(v.events) && v.events.length <= 10000 &&
       v.events.every(function (e) { return record(e) && typeof e.id === 'string' && date(e.at) && /^\d{4}-\d{2}-\d{2}$/.test(e.day) &&
         typeof e.track === 'string' && ['quiz', 'mock', 'review', 'visit'].includes(e.kind) && typeof e.subject === 'string'; });
@@ -121,11 +135,13 @@
         var module = track && track.modules.find(function(m) { return m.id === match[2] && m.ready !== false; });
         if (!module) { unknown.push(key); continue; }
         var data = await global.QuilynRuntime.json(module.file);
-        for (var idx of Object.keys(value)) {
-          var question = data.practiceQuiz[Number(idx)];
-          if (!question || !value[idx].selected.every(function(id) { return question.options.some(function(o) { return o.id === id; }); }))
+        var modern = value.version === 2, entries = modern ? value.answers : value;
+        for (var id of Object.keys(entries)) {
+          var question = modern ? data.practiceQuiz.find(function(q) { return q.questionId === id; }) : data.practiceQuiz[Number(id)];
+          if (modern && (!question || entries[id].signature !== quizSignature(question))) { unknown.push(key + '/' + id); continue; }
+          if (!question || !entries[id].selected.every(function(option) { return question.options.some(function(o) { return o.id === option; }); }))
             throw new Error('Quiz answers do not match available content: ' + key);
-          if (question.type === 'single-select' && value[idx].selected.length > 1) throw new Error('Single-select quiz has multiple answers: ' + key);
+          if (question.type === 'single-select' && entries[id].selected.length > 1) throw new Error('Single-select quiz has multiple answers: ' + key);
         }
       } else if ((match = /^pegaMock_([^_]+)_(.+)$/.exec(key))) {
         bank = bank || await global.QuilynRuntime.json('data/mock-exams.json');
@@ -148,6 +164,26 @@
     }
     return [...new Set(unknown)];
   }
+  function quizSignature(q) {
+    return JSON.stringify([q.type, q.scenario, q.options.map(function(o) { return [o.id,o.text]; }).sort(function(a,b) { return a[0].localeCompare(b[0]); }), q.correctOptions.slice().sort()]);
+  }
+  function quizState(saved, questions) {
+    var next = {version:2, answers:{}};
+    if (saved.attemptId) next.attemptId=saved.attemptId;
+    if (saved.startedAt) next.startedAt=saved.startedAt;
+    questions.forEach(function(q,i) {
+      var modern = saved.version === 2, prior = modern ? saved.answers[q.questionId] : saved[i];
+      var signature = quizSignature(q);
+      if (!prior || modern && prior.signature !== signature) return;
+      if (!prior.selected.every(function(id) { return q.options.some(function(o) { return o.id === id; }); })) return;
+      next.answers[q.questionId] = Object.assign({}, prior, {signature:signature});
+    });
+    return next;
+  }
+  function archive(key, value) {
+    try { localStorage.setItem('quilyn_recovery_' + key + '_' + Date.now() + '_' + Math.random().toString(36).slice(2), JSON.stringify(value)); return true; }
+    catch (_) { notify('Older answers could not be preserved. Export a backup; quiz changes will not be saved in this session.'); return false; }
+  }
   function localDay(d) {
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
@@ -161,5 +197,5 @@
     write(ACTIVITY_KEY, state);
   }
   global.QuilynProgress = { validEntry: validEntry, read: read, write: write, remove: remove, validateBundle: validateBundle,
-    applyBundle: applyBundle, validateReferences: validateReferences, activity: activity, localDay: localDay, activityKey: ACTIVITY_KEY };
+    applyBundle: applyBundle, quizState:quizState, quizSignature:quizSignature, archive:archive, validateReferences: validateReferences, activity: activity, localDay: localDay, activityKey: ACTIVITY_KEY };
 })(window);

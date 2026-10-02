@@ -6,7 +6,7 @@
 (function (global) {
   'use strict';
 
-  var KNOWN_KEYS = ['pega_universal_state', 'pega_lms_state', 'pega_theme', 'quilyn_activity'];
+  var KNOWN_KEYS = ['pega_universal_state', 'pega_lms_state', 'pega_theme', 'quilyn_activity', 'quilyn_learning'];
   var MAX_IMPORT_BYTES = 20 * 1024 * 1024;
   function isRecord(value) { return value !== null && typeof value === 'object' && !Array.isArray(value); }
   function validEntry(key, value) {
@@ -190,6 +190,7 @@
   var modal = null;
 
   function show() {
+    if (!global.QuilynJournal && global.QuilynRuntime.learning) { global.QuilynRuntime.learning().then(show).catch(function(e){showToast(e.message,6000);});return; }
     if (modal) {
       modal.classList.add('pa-modal-open');
       refreshHeatmap();
@@ -201,7 +202,7 @@
     modal.id = 'pa-settings-modal';
     modal.className = 'pa-modal-overlay pa-modal-open';
     modal.innerHTML =
-      '<div class="pa-modal" role="dialog" aria-modal="true" aria-label="Settings">' +
+      '<div class="pa-modal">' +
         '<div class="pa-modal-header">' +
           '<h3>⚙️ Settings</h3>' +
           '<button class="pa-modal-close" id="pa-settings-close" aria-label="Close">✕</button>' +
@@ -209,7 +210,7 @@
         '<div class="pa-modal-body" id="pa-settings-body">' +
           '<div class="pa-settings-section">' +
             '<h4>📦 Export Progress</h4>' +
-            '<p>Download your scores, SRS cards, and streaks as a JSON file. Use it to restore progress on another device or browser.</p>' +
+            '<p>Download your scores, SRS cards, streaks, attempt history and mistakes notebook as a JSON file. Use it to restore progress on another device or browser.</p>' +
             '<button class="pa-settings-btn primary" id="pa-export-btn">⬇ Export Progress</button>' +
           '</div>' +
           '<div class="pa-settings-section">' +
@@ -224,7 +225,7 @@
           SHORTCUTS_HTML +
           '<div class="pa-settings-section pa-settings-danger">' +
             '<h4>🗑️ Reset All Progress</h4>' +
-            '<p>Permanently delete all quiz scores, SRS progress, and streaks.</p>' +
+            '<p>Permanently delete quiz scores, SRS progress, streaks, attempt history and mistakes notebook records.</p>' +
             '<button class="pa-settings-btn danger" id="pa-reset-btn">Reset Everything</button>' +
           '</div>' +
         '</div>' +

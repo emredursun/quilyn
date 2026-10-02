@@ -99,7 +99,10 @@
     setNavActive('review');
     setCrumbs('Smart Review');
     document.title = "Smart Review — Quilyn";
-    contentEl.innerHTML = '<pega-review-view></pega-review-view>';
+    contentEl.innerHTML = '<pega-review-view>Loading Smart Review…</pega-review-view>';
+    if(global.QuilynRuntime && global.QuilynRuntime.review)global.QuilynRuntime.review().catch(function(err){
+      var view=contentEl.querySelector('pega-review-view');if(view)view.textContent=err.message;
+    });
   }
 
   /* ── Rewrite stale nav hrefs to hash routes ─────────────────────────── */

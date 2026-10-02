@@ -1,15 +1,4 @@
-/* =====================================================================
-   Quilyn — engine.js
-   Client-side SPA router + localStorage state manager + view injector.
-
-   Responsibilities
-     - Load data/registry.json (the global track manifest).
-     - Render sidebar (track switcher + module list + progress).
-     - Hash router: #<trackId>/<moduleId>  e.g. #PBA/BA-M01
-     - Fetch a module's JSON on demand and inject Study Guide,
-       Exam Pitfalls, Practice Quiz, and Quick Recap views.
-     - Persist progress to localStorage under "pega_lms_state".
-   ===================================================================== */
+/* Learning dashboard and module rendering; routes are owned by app-shell.js. */
 (function () {
   "use strict";
 
@@ -24,7 +13,7 @@
   var moduleRequest = 0;     // invalidates responses from previous routes
   var pendingInteractives = []; // HTML payloads for sandboxed iframes, set as srcdoc after inject
 
-  /* ============ State (localStorage) ============ */
+  /* State (localStorage) */
   function loadState() {
     try {
       var raw = localStorage.getItem(STATE_KEY);
@@ -77,7 +66,7 @@
     return (tp && tp.quizRecords && tp.quizRecords[moduleId]) || null;
   }
 
-  /* ============ Helpers ============ */
+  /* Helpers */
   function getTrack(trackId) {
     if (!registry) return null;
     return registry.tracks.filter(function (t) { return t.trackId === trackId; })[0] || null;
@@ -118,7 +107,7 @@
     }).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
   }
 
-  /* ============ Sidebar ============ */
+  /* Sidebar */
   function renderSidebar() {
     var track = getTrack(activeTrackId);
     // Track switcher logic now handled by <pega-track-switcher>
@@ -155,7 +144,7 @@
     }).join("");
   }
 
-  /* ============ Router ============ */
+  /* Router */
   function parseHash() {
     var h = (location.hash || "").replace(/^#/, "");
     var parts = h.split("/").filter(Boolean);
@@ -171,6 +160,19 @@
     if (window._paCrumbObs) { window._paCrumbObs.disconnect(); window._paCrumbObs = null; }
     var hash = parseHash();
 
+    if (hash.trackId === 'history' || hash.trackId === 'mistakes') {
+      var request=moduleRequest;
+      if(window.QuilynShell) window.QuilynShell.renderMode('lms');
+      activeTrackId=window.PegaStore.state.activeTrack;
+      renderSidebar();closeSidebarMobile();
+      var content=document.getElementById('paContent');content.textContent='Loading learning records…';
+      window.QuilynRuntime.learning().then(function(journal){
+        if(request!==moduleRequest)return;
+        setCrumbs(hash.trackId==='history'?'Attempt history':'Mistakes notebook',null);
+        document.title=(hash.trackId==='history'?'Attempt history':'Mistakes notebook')+' — Quilyn';
+        journal.mount(content,activeTrackId,hash.trackId);
+      }).catch(function(e){if(request===moduleRequest)content.textContent=e.message;});return;
+    }
     if (hash.trackId === 'mock' || hash.trackId === 'review') {
       closeSidebarMobile();
       if (window.QuilynShell) window.QuilynShell.renderMode(hash.trackId);
@@ -199,27 +201,31 @@
     }
   }
 
-  /* ============ Home / Dashboard ============ */
+  /* Home / Dashboard */
   function buildScoreTrend(history) {
     if (!history || history.length < 2) return "";
     return '<span class="cspark">' + history.map(function (s) { return s + "%"; }).join(" → ") + "</span>";
   }
 
+  function recentQuizScore(rec) {
+    var values = (rec.scoreHistory || []).slice(-3);
+    return values.length ? Math.round(values.reduce(function(a,b) { return a+b; },0) / values.length) : rec.highScore;
+  }
   function buildWeakAreaPanel(track) {
     var attempted = [];
     track.modules.forEach(function (m, i) {
       var rec = quizRecord(activeTrackId, m.id);
-      if (m.ready !== false && rec && rec.attempts > 0 && rec.highScore < 70) {
+      if (m.ready !== false && rec && rec.attempts > 0 && recentQuizScore(rec) < 70) {
         attempted.push({ idx: i, m: m, rec: rec });
       }
     });
     if (!attempted.length) return "";
 
-    // Sort by highScore ascending, take bottom 5
-    var weak = attempted.slice().sort(function (a, b) { return a.rec.highScore - b.rec.highScore; }).slice(0, 5);
+    // Lowest recent averages, up to five modules.
+    var weak = attempted.slice().sort(function (a, b) { return recentQuizScore(a.rec) - recentQuizScore(b.rec); }).slice(0, 5);
 
     var rows = weak.map(function (entry) {
-      var pct = entry.rec.highScore;
+      var pct = recentQuizScore(entry.rec);
       var barColor = pct >= 70 ? "var(--pa-ok)" : pct >= 50 ? "var(--pa-brand)" : "var(--pa-bad)";
       return (
         '<a class="pa-weak-row" href="#' + activeTrackId + "/" + entry.m.id + '">' +
@@ -237,7 +243,7 @@
 
     return (
       '<div class="pa-weak-panel">' +
-      '<div class="pa-weak-head">📌 Focus Areas <span class="pa-weak-sub">lowest quiz scores</span></div>' +
+      '<div class="pa-weak-head">📌 Focus Areas <span class="pa-weak-sub">recent quiz averages</span></div>' +
       rows +
       "</div>"
     );
@@ -292,7 +298,7 @@
       "</div>" +
       actions +
       weakPanel +
-      '<h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
+      '<nav aria-label="Learning records"><a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></nav><h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
       '<div class="pa-footer">Quilyn · data-driven · ' + track.modules.length + " modules</div>";
 
     window.scrollTo({ top: 0 });
@@ -314,7 +320,7 @@
     document.getElementById("paContent").focus({preventScroll:true});
   }
 
-  /* ============ Module loader ============ */
+  /* Module loader */
   function loadModule(meta) {
     var request = moduleRequest;
     setCrumbs(getTrack(activeTrackId).trackName, meta.name);
@@ -326,10 +332,8 @@
       if (request === moduleRequest) renderModule(meta, data);
     };
 
-    if (moduleCache[meta.id]) { done(moduleCache[meta.id]); return; }
-
-    window.QuilynRuntime.json(meta.file)
-      .then(done)
+    Promise.all([moduleCache[meta.id] ? Promise.resolve(moduleCache[meta.id]) : window.QuilynRuntime.json(meta.file), window.QuilynRuntime.learning()])
+      .then(function(results){done(results[0]);})
       .catch(function (err) {
         if (request !== moduleRequest) return;
         c.innerHTML = '<h2 class="pa-h2">' + esc(meta.name) + '</h2><div class="pa-empty" role="alert">This module is unavailable. Connect to the internet or download this learning track in Settings for offline use.<br><button class="pa-btn" id="quilyn-retry-module">Try again</button></div>';
@@ -338,7 +342,7 @@
       });
   }
 
-  /* ============ Module view injector ============ */
+  /* Module view injector */
   function renderModule(meta, data) {
     var c = document.getElementById("paContent");
     var moduleTitle = data.moduleTitle || meta.name;
@@ -650,10 +654,10 @@
     PegaQuiz.render(mount, questions, function (pct) {
       recordQuiz(activeTrackId, meta.id, pct);
       renderSidebar(); // reflect completion immediately
-    }, pill);
+    }, pill, false, {track:activeTrackId,moduleId:meta.id,name:meta.name,domain:data.examDomain||meta.examDomain||'General'});
   }
 
-  /* ============ Chrome ============ */
+  /* Chrome */
   function setCrumbs(track, module) {
     var el = document.getElementById("paCrumbs");
     // Store context for the scroll-aware observer
@@ -699,7 +703,7 @@
     window.QuilynMobileNav.close();
   }
 
-  /* ============ Boot ============ */
+  /* Boot */
   function boot() {
     window.addEventListener("pega-track-changed", function (e) {
       activeTrackId = e.detail;

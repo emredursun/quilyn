@@ -1,8 +1,4 @@
-/* =====================================================================
-   review-view.js — Smart Review (SRS) view module
-   Exposes window.ReviewView = { mount(contentEl, sidebarEl), unmount() }
-   Never touches engine.js, quiz-engine.js, or data/*.
-   ===================================================================== */
+/* Smart Review: local Leitner scheduling and confidence feedback. */
 (function (global) {
   'use strict';
 
@@ -48,7 +44,7 @@
 
   var LETTERS = ['A','B','C','D','E','F'];
 
-  /* ── Per-mount state ────────────────────────────────────────────────── */
+  /* Per-mount state */
   var _root = null;
   var cardBank = {};
   var srs = {};
@@ -58,8 +54,9 @@
   var currentSelected = [];
   var currentQ = null;
   var currentKey = null;
+  var reviewAttempt=null,reviewStarted=null;
 
-  /* ── Utilities ──────────────────────────────────────────────────────── */
+  /* Utilities */
   function r(id) { return _root ? _root.querySelector('#rv-' + id) : null; }
   function esc(s) { return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
   function today() { return global.QuilynProgress.localDay(new Date()); }
@@ -79,7 +76,7 @@
     });
   }
 
-  /* ── SRS state ──────────────────────────────────────────────────────── */
+  /* SRS state */
   function loadSRS() {
     if (global.PegaStore) {
       var t = getTrack();
@@ -95,12 +92,43 @@
   }
   function saveSRS() { /* Auto-persisted by ES6 Proxy */ }
 
-  /* ── Due logic ──────────────────────────────────────────────────────── */
+  /* Due logic */
   function isDue(key) { var c=srs.cards[key]; return !c||c.dueDate<=today(); }
   function getDueKeys() {
     var keys=Object.keys(cardBank).filter(isDue);
     keys.sort(function(a,b){var da=srs.cards[a]?srs.cards[a].dueDate:'2000-01-01';var db=srs.cards[b]?srs.cards[b].dueDate:'2000-01-01';return da<db?-1:da>db?1:0;});
     return keys;
+  }
+  function currentStreak() {
+    return srs.lastStudyDate === today() || srs.lastStudyDate === addDays(today(), -1) ? (srs.streak || 0) : 0;
+  }
+  function mastered(key) { return !!srs.cards[key] && srs.cards[key].box === 5; }
+  function balanced(keys, limit) {
+    var groups = {};
+    keys.forEach(function(k) {
+      var m = cardBank[k].moduleId;
+      (groups[m] || (groups[m] = [])).push(k);
+    });
+    var modules = shuffle(Object.keys(groups)), result = [];
+    while (result.length < limit && modules.length) {
+      modules = modules.filter(function(m) {
+        if (result.length >= limit) return true;
+        result.push(groups[m].shift());
+        return groups[m].length > 0;
+      });
+    }
+    return result;
+  }
+  function selectSession() {
+    var due = getDueKeys(), seen = due.filter(function(k) { return !!srs.cards[k]; });
+    var fresh = shuffle(due.filter(function(k) { return !srs.cards[k]; }));
+    var priority = (srs.surpriseIds || []).filter(function(k) { return seen.includes(k) && srs.cards[k].box === 1; });
+    var chosen = balanced(priority, Math.ceil(SESSION_SIZE / 3));
+    var reviewLimit = fresh.length ? Math.ceil(SESSION_SIZE * .7) : SESSION_SIZE;
+    chosen = chosen.concat(balanced(seen.filter(function(k) { return !chosen.includes(k); }), Math.max(0, reviewLimit - chosen.length)));
+    chosen = chosen.concat(balanced(fresh, SESSION_SIZE - chosen.length));
+    chosen = chosen.concat(balanced(seen.filter(function(k) { return !chosen.includes(k); }), SESSION_SIZE - chosen.length));
+    return shuffle(chosen);
   }
   function getStats() {
     var t=today(),due=0,nw=0,mastered=0;
@@ -108,13 +136,13 @@
     return {total:Object.keys(cardBank).length,due:due,newCards:nw,mastered:mastered};
   }
 
-  /* ── Grading ────────────────────────────────────────────────────────── */
+  /* Grading */
   function gradeCard(key,correct,conf) {
     var t=today();
     if(!srs.cards[key]) srs.cards[key]={box:1,dueDate:t,totalSeen:0,totalCorrect:0,surpriseCount:0};
     var c=srs.cards[key]; c.totalSeen=(c.totalSeen||0)+1;
     var wasSurprise=(conf==='sure'&&!correct);
-    if(correct){if(conf==='sure')c.box=Math.min(5,(c.box||1)+1);c.totalCorrect=(c.totalCorrect||0)+1;}
+    if(correct){if(conf==='sure'){c.box=Math.min(5,(c.box||1)+1);srs.surpriseIds=(srs.surpriseIds||[]).filter(function(k){return k!==key;});}c.totalCorrect=(c.totalCorrect||0)+1;}
     else{c.box=1;if(wasSurprise){c.surpriseCount=(c.surpriseCount||0)+1;srs.surpriseIds=[key].concat((srs.surpriseIds||[]).filter(function(k){return k!==key;})).slice(0,20);}}
     c.dueDate=addDays(t,BOX_DAYS[(c.box||1)-1]);
     if(srs.lastStudyDate!==t){srs.streak=(srs.lastStudyDate===addDays(t,-1))?(srs.streak||0)+1:1;srs.lastStudyDate=t;}
@@ -123,11 +151,13 @@
     return wasSurprise;
   }
 
-  /* ── Session ────────────────────────────────────────────────────────── */
+  /* Session */
   function startSession() {
+    if(global.QuilynJournal)global.QuilynJournal.abandon(reviewAttempt);
     var due=getDueKeys();
     if(due.length===0){renderDashboard();showSec('dashboard');return;}
-    session=shuffle(due.slice(0,SESSION_SIZE)); sessIdx=0; sessResults=[];
+    session=selectSession(); sessIdx=0; sessResults=[];
+    reviewAttempt=global.QuilynJournal?global.QuilynJournal.id():null;reviewStarted=new Date().toISOString();
     showSec('session');
     var st=r('scnt-tot'); if(st) st.textContent=session.length;
     renderQ(0);
@@ -200,6 +230,7 @@
     var cw=_root.querySelector('#rv-conf-wrap'); if(cw) cw.classList.remove('show');
     var isCorrect=setsEqual(currentSelected,q.correctOptions);
     var wasSurprise=gradeCard(key,isCorrect,conf);
+    if(global.QuilynJournal)global.QuilynJournal.record({id:reviewAttempt,track:getTrack(),kind:'review',mode:'practice',name:'Smart Review',total:session.length,startedAt:reviewStarted,status:sessIdx===session.length-1?'completed':'in-progress'},[{snapshot:global.QuilynJournal.quizQuestion(getTrack(),cardBank[key].moduleId,q,MOD_DOMAIN[cardBank[key].moduleId]),selected:currentSelected.slice(),conf:conf}]);
     qn.querySelectorAll('.opt').forEach(function(el){
       var id=el.getAttribute('data-id');
       var inAns=q.correctOptions.indexOf(id)>=0;
@@ -232,7 +263,7 @@
     renderQ(sessIdx); scrollTop();
   }
 
-  /* ── Summary ────────────────────────────────────────────────────────── */
+  /* Summary */
   function renderSummary() {
     showSec('summary');
     var total=sessResults.length;
@@ -255,7 +286,7 @@
     scrollTop();
   }
 
-  /* ── Dashboard ──────────────────────────────────────────────────────── */
+  /* Dashboard */
   function renderDashboard() {
     var stats=getStats(); var t=today();
     var sr=r('stats-row');
@@ -264,15 +295,15 @@
       '<div class="stat-box"><div class="num">'+stats.newCards+'</div><div class="lbl">New Cards</div></div>'+
       '<div class="stat-box"><div class="num ok">'+stats.mastered+'</div><div class="lbl">Mastered</div></div>'+
       '<div class="stat-box"><div class="num">'+stats.total+'</div><div class="lbl">Total Cards</div></div>'+
-      '<div class="stat-box"><div class="num warn">'+(srs.streak||0)+'</div><div class="lbl">Day Streak</div></div>';
+      '<div class="stat-box"><div class="num warn">'+currentStreak()+'</div><div class="lbl">Day Streak</div></div>';
     var btnStart=r('btn-start');
     if(btnStart){if(stats.due===0){btnStart.textContent='✓ All caught up today!';btnStart.disabled=true;}else{btnStart.textContent='▶ Review '+Math.min(stats.due,SESSION_SIZE)+' Cards';btnStart.disabled=false;}}
     var dg=r('domain-grid');
     if(dg) dg.innerHTML=DOMAINS.map(function(dom){
       var keys=Object.keys(cardBank).filter(function(k){return(MOD_DOMAIN[cardBank[k].moduleId]||'')===dom;});
-      var mastered=keys.filter(function(k){return srs.cards[k]&&srs.cards[k].box>=3;}).length;
-      var pct=keys.length?Math.round(mastered/keys.length*100):0;
-      return '<div class="drow"><div class="dmeta"><span class="dname">'+esc(dom)+'</span><span class="dpct">'+pct+'% ('+mastered+'/'+keys.length+')</span></div><div class="dbar"><i style="width:'+pct+'%;background:'+(DCOLORS[dom]||'#4f7cff')+'"></i></div></div>';
+      var count=keys.filter(mastered).length;
+      var pct=keys.length?Math.round(count/keys.length*100):0;
+      return '<div class="drow"><div class="dmeta"><span class="dname">'+esc(dom)+'</span><span class="dpct">'+pct+'% ('+count+'/'+keys.length+')</span></div><div class="dbar"><i style="width:'+pct+'%;background:'+(DCOLORS[dom]||'#4f7cff')+'"></i></div></div>';
     }).join('');
     var surpIds=(srs.surpriseIds||[]).slice(0,10);
     var cardSurp=r('card-surp');
@@ -288,7 +319,7 @@
     renderSidebarStats();
   }
 
-  /* ── Sidebar ────────────────────────────────────────────────────────── */
+  /* Sidebar */
   function renderSidebarStats() {
     if(!_sidebarEl) return;
     var stats=getStats();
@@ -298,7 +329,7 @@
       '<li><div class="rv-sidebar-stat"><span>New Cards</span><b>'+stats.newCards+'</b></div></li>'+
       '<li><div class="rv-sidebar-stat"><span>Mastered</span><b style="color:var(--pa-ok,#34d399)">'+stats.mastered+'</b></div></li>'+
       '<li><div class="rv-sidebar-stat"><span>Total</span><b>'+stats.total+'</b></div></li>'+
-      '<li><div class="rv-sidebar-stat"><span>Streak</span><b style="color:var(--pa-warn,#fbbf24)">'+(srs.streak||0)+'</b></div></li>'+
+      '<li><div class="rv-sidebar-stat"><span>Streak</span><b style="color:var(--pa-warn,#fbbf24)">'+currentStreak()+'</b></div></li>'+
       '<li style="margin-top:12px">'+
         '<a href="javascript:void(0)" id="rv-sb-start" class="pa-shell-sidebar-item">▶ Start Session</a>'+
       '</li>';
@@ -306,7 +337,7 @@
     if(sbStart) sbStart.addEventListener('click',function(){showSec('session');startSession();});
   }
 
-  /* ── View HTML ──────────────────────────────────────────────────────── */
+  /* View HTML */
   function getHTML() {
     return '<div class="pa-view pa-view--review">'+
       /* loading */
@@ -338,7 +369,7 @@
       /* dashboard */
       '<section id="rv-dashboard" class="v-hide">'+
         '<div class="v-card">'+
-          '<h2>Overview</h2>'+
+          '<h2>Overview</h2><p><a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></p>'+
           '<div class="stats-row" id="rv-stats-row"></div>'+
           '<div class="v-row" style="margin-top:14px">'+
             '<button class="v-btn v-primary" id="rv-btn-start">▶ Start Review Session</button>'+
@@ -351,7 +382,7 @@
         '</div>'+
         '<div class="v-card v-hide" id="rv-card-surp">'+
           '<h2>⚡ High-Confidence Errors <span style="font-size:13px;color:var(--pa-muted,#939bbd);font-weight:400">(last 10)</span></h2>'+
-          '<p style="font-size:13px;color:var(--pa-muted,#939bbd);margin-bottom:10px">Cards you answered "Confident" but got wrong — the hypercorrection effect makes these the fastest to fix permanently.</p>'+
+          '<p style="font-size:13px;color:var(--pa-muted,#939bbd);margin-bottom:10px">Cards you answered "Confident" but got wrong — these receive priority in your next due review.</p>'+
           '<ul class="surp-list" id="rv-surp-list"></ul>'+
         '</div>'+
         '<div class="v-card">'+
@@ -360,7 +391,7 @@
             '<b>Spaced repetition (Leitner 5-box):</b> Today → +2 days → +4 → +8 → +16. Wrong answer = back to Box 1.<br>'+
             '<b>Confidence calibration:</b> "Confident" + correct → promoted. "Guessing"/"Unsure" + correct → stays (shorter interval).<br>'+
             '<b>⚡ Surprise:</b> "Confident" + wrong → Box 1 + priority queue. Hypercorrection effect.<br>'+
-            '<b>Interleaved:</b> Each session pulls from all modules in random order.'+
+            '<b>Interleaved:</b> Due reviews and new cards are balanced across available modules. Mastered means Box 5.'+
           '</div>'+
         '</div>'+
       '</section>'+
@@ -393,7 +424,7 @@
 
   var _sidebarEl = null;
 
-  /* ── Public API ─────────────────────────────────────────────────────── */
+  /* Public API */
   var generation = 0;
   function mount(contentEl, sidebarEl) {
     var request = ++generation;
@@ -420,6 +451,7 @@
       }
     });
     var btnQuit=r('btn-quit'); if(btnQuit) btnQuit.addEventListener('click',function(){
+      if(global.QuilynJournal)global.QuilynJournal.abandon(reviewAttempt);
       if(sessResults.length>0){renderSummary();}else{showSec('dashboard');renderDashboard();}
     });
     var btnNew=r('btn-newsess'); if(btnNew) btnNew.addEventListener('click',startSession);
@@ -433,7 +465,7 @@
 
     var activeTrackId = getTrack();
     DOMAINS = ['Case Management','Data & Integration','Application Development','Security','User Experience','Pega GenAI','DevOps','Insights'];
-    global.QuilynRuntime.json('data/registry.json')
+    Promise.all([global.QuilynRuntime.json('data/registry.json'),global.QuilynRuntime.learning?global.QuilynRuntime.learning():Promise.resolve()]).then(function(results){return results[0];})
       .then(function(reg){
         if(request !== generation) throw new Error('CANCELLED');
         var track=reg.tracks.filter(function(t){return t.trackId===activeTrackId;})[0];
@@ -481,6 +513,7 @@
 
   function unmount() {
     generation++;
+    if(global.QuilynJournal)global.QuilynJournal.abandon(reviewAttempt);reviewAttempt=null;
     _root=null; _sidebarEl=null;
     cardBank={}; srs={}; session=[]; sessIdx=0; sessResults=[]; currentSelected=[]; currentQ=null; currentKey=null;
   }
@@ -491,10 +524,11 @@
       mount(this, document.getElementById('paModList'));
     }
     disconnectedCallback() {
-      unmount();
+      if (_root && this.contains(_root)) unmount();
     }
   }
 
+  global.ReviewView={mount:mount,unmount:unmount};
   customElements.define('pega-review-view', PegaReviewView);
 
 })(window);

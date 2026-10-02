@@ -1,22 +1,4 @@
-/* =====================================================================
-   Quilyn — quiz-engine.js
-   Polymorphic Quiz Core: handles Single-Select and Multi-Select
-   questions with strict, zero-partial-credit Pega exam scoring.
-
-   Public API:
-     PegaQuiz.render(container, questions, onComplete)
-       - container : DOM element to render into
-       - questions : array of question objects (see schema below)
-       - onComplete: callback(scorePercent, correctCount, total) fired
-                     once every question has been graded.
-
-   Question schema (from data/business-architect/*.json):
-     {
-       questionId, type: "single-select" | "multi-select",
-       selectCount (multi only), scenario, options:[{id,text}],
-       correctOptions:[ids], hint, rationale
-     }
-   ===================================================================== */
+/* Quiz renderer: single/multiple selections, local progress and keyboard controls. */
 (function (global) {
   "use strict";
 
@@ -30,7 +12,7 @@
     return sa === sb;
   }
 
-  /* ---- localStorage helpers ---- */
+  /* localStorage helpers */
   // Key is derived from the URL hash so each module gets its own slot.
   function storageKey() {
     return "pq_state_" + (window.location.hash || "default");
@@ -53,7 +35,7 @@
     else try { localStorage.removeItem(storageKey()); } catch (e) {}
   }
 
-  /* ---- Keyboard shortcut support ---- */
+  /* Keyboard shortcut support */
   var _kbActiveIdx = null; // index of question currently targeted by keyboard
 
   function _kbHandler(e) {
@@ -84,7 +66,7 @@
 
   var _kbContainer = null;
 
-  function render(container, questions, onComplete, pill, transient) {
+  function render(container, questions, onComplete, pill, transient, context) {
     container.innerHTML = "";
     var total = questions.length;
     var graded = new Array(total).fill(false);
@@ -97,18 +79,37 @@
     document.addEventListener('keydown', _kbHandler);
 
     // Restore persisted state; each entry: { selected: [ids], graded: bool, correct: bool }
-    var state = transient ? {} : loadState();
-    function persist() { if (!transient) saveState(state); }
-    var completed = Object.keys(state).length === total && Object.keys(state).every(function(k) { return state[k].graded; });
+    var prior = transient ? {} : loadState();
+    var state = global.QuilynProgress.quizState(prior, questions), writable = true;
+    if(global.QuilynJournal && prior.attemptId){
+      var priorAttempt=global.QuilynJournal.read().attempts.find(function(a){return a.id===prior.attemptId;});
+      if(Object.keys(prior.answers||{}).length!==Object.keys(state.answers).length || priorAttempt&&priorAttempt.total!==questions.length){
+        global.QuilynJournal.abandon(prior.attemptId);delete state.attemptId;delete state.startedAt;
+      }
+    }
+    var legacy = prior.version !== 2 && Object.keys(prior).length > 0;
+    if (!transient && Object.keys(prior).length && JSON.stringify(prior) !== JSON.stringify(state)) {
+      writable = global.QuilynProgress.archive(storageKey(), prior);
+      if (writable) saveState(state);
+    }
+    function persist() { if (!transient && writable) saveState(state); }
+    context=context||{};
+    if(global.QuilynJournal){state.attemptId=state.attemptId||global.QuilynJournal.id();state.startedAt=state.startedAt||new Date().toISOString();}
+    var completed = Object.keys(state.answers).length === total && Object.keys(state.answers).every(function(k) { return state.answers[k].graded; });
+    if (legacy) {
+      var note = document.createElement('p');
+      note.textContent = 'Older answers were restored using the current question order. If this lesson changed since your last visit, reset the quiz to reassess. The original record is preserved in your backup.';
+      container.appendChild(note);
+    }
 
-    /* ---- Reset button (inline, above questions) ---- */
+    /* Reset button (inline, above questions) */
     var resetBtn = document.createElement("button");
     resetBtn.className = "pa-btn pa-quiz-reset";
     resetBtn.type = "button";
     resetBtn.textContent = "Reset Quiz";
     container.appendChild(resetBtn);
 
-    /* ---- Init pill ---- */
+    /* Init pill */
     if (pill) {
       pill.querySelector(".pqp-t").textContent = total;
       pill.querySelector(".pqp-g").textContent = "0";
@@ -161,13 +162,13 @@
       var retryBtn = result.querySelector(".pa-retry-wrong");
       if (retryBtn) {
         retryBtn.addEventListener("click", function () {
-          render(container, wrongQuestions, null, pill, true);
+          render(container, wrongQuestions, null, pill, true, context);
           container.scrollIntoView({ behavior: "smooth" });
         });
       }
     }
 
-    /* ---- Apply graded visual state to a card ---- */
+    /* Apply graded visual state to a card */
     function applyGradedState(card, q, selected) {
       var optEls = card.querySelectorAll(".pa-opt");
       var verdict = card.querySelector(".verdict");
@@ -208,10 +209,10 @@
       return isCorrect;
     }
 
-    /* ---- Build each question card ---- */
+    /* Build each question card */
     questions.forEach(function (q, idx) {
       var isMulti = q.type === "multi-select";
-      var saved = state[idx] || {};
+      var saved = state.answers[q.questionId] || {};
       var selected = saved.selected ? saved.selected.slice() : [];
 
       var card = document.createElement("div");
@@ -260,7 +261,7 @@
         });
       }
 
-      /* ---- Restore persisted state for this question ---- */
+      /* Restore persisted state for this question */
       if (saved.graded) {
         graded[idx] = true;
         correctFlags[idx] = applyGradedState(card, q, selected);
@@ -273,7 +274,7 @@
         });
       }
 
-      /* ---- Option click ---- */
+      /* Option click */
       optEls.forEach(function (el) {
         el.addEventListener("click", function () {
           if (graded[idx]) return;
@@ -289,12 +290,12 @@
             el.classList.add("selected");
           }
           // Persist selection immediately
-          state[idx] = { selected: selected.slice(), graded: false };
+          state.answers[q.questionId] = { selected: selected.slice(), graded: false, signature: global.QuilynProgress.quizSignature(q) };
           persist();
         });
       });
 
-      /* ---- Check answer ---- */
+      /* Check answer */
       checkBtn.addEventListener("click", function () {
         if (graded[idx]) return;
         if (selected.length === 0) {
@@ -308,8 +309,12 @@
         correctFlags[idx] = isCorrect;
 
         // Persist graded state
-        state[idx] = { selected: selected.slice(), graded: true, correct: isCorrect };
+        state.answers[q.questionId] = { selected: selected.slice(), graded: true, correct: isCorrect, signature: global.QuilynProgress.quizSignature(q) };
         persist();
+        if(global.QuilynJournal){
+          var rows=questions.filter(function(item){return state.answers[item.questionId]&&state.answers[item.questionId].graded;}).map(function(item){return {snapshot:global.QuilynJournal.quizQuestion(context.track,context.moduleId||'',item,context.domain),selected:state.answers[item.questionId].selected.slice(),conf:null};});
+          global.QuilynJournal.record({id:state.attemptId,track:context.track,kind:transient?'retry':'quiz',mode:'practice',name:context.name||'Quiz',total:total,startedAt:state.startedAt,status:rows.length===total?'completed':'in-progress'},rows);
+        }
         refreshBar();
       });
     });
@@ -317,10 +322,11 @@
     // Sync bar with any restored graded questions
     refreshBar();
 
-    /* ---- Reset ---- */
+    /* Reset */
     resetBtn.addEventListener("click", function () {
+      if(global.QuilynJournal&&!global.QuilynJournal.abandon(state.attemptId))return;
       if (!transient) clearState();
-      render(container, questions, onComplete, pill, transient);
+      render(container, questions, onComplete, pill, transient, context);
       container.scrollIntoView({ behavior: "smooth" });
     });
   }

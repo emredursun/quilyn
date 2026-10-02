@@ -32,6 +32,7 @@
   var examFinished = false;
   var _root = null;
   var mountedTrack = null;
+  var examMode='practice', attemptId=null, startedAt=null, simulationEnd=0, bankVersion='', flags=[], examNav=null;
   var LETTERS = ["A","B","C","D","E"];
 
   function esc(t) { return String(t==null?"":t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
@@ -63,11 +64,12 @@
     return 'pegaMock_' + getTrack() + '_' + (name || current);
   }
   function saveState() {
-    if (!current) return;
+    if (!current || examFinished) return;
     try {
       var value = {
         name: current, answers: answers, checked: checked, remaining: remaining
       };
+      if(attemptId)Object.assign(value,{mode:examMode,attemptId:attemptId,startedAt:startedAt,deadline:simulationEnd,signature:bankVersion,flags:flags,index:examNav?examNav.config.index:0,view:examNav?examNav.config.view:'list'});
       global.QuilynProgress.write(stateKey(), value);
     } catch(e) {}
   }
@@ -110,7 +112,7 @@
         var best = scores[name] != null ? ('Best: ' + scores[name] + '%') : 'Not attempted';
         var saved = loadState(name);
         var inProgress = saved && saved.answers && saved.answers.length === qs.length &&
-                         saved.answers.some(function(a) { return a.length > 0; });
+                         (saved.attemptId || saved.answers.some(function(a) { return a.length > 0; }));
         var el = document.createElement('button'); el.type = 'button'; el.className = 'examcard';
         el.innerHTML = '<span class="quilyn-exam-title">' + esc(name) + '</span>' +
           '<p>' + qs.length + ' questions · ' + TIME_MIN + ' min · ' + Math.round(PASS * 100) + '% to pass</p>' +
@@ -160,7 +162,7 @@
 
   /* Pause / Resume */
   function pauseExam() {
-    if (paused) return;
+    if (paused || examMode==='simulation') return;
     syncRemaining();
     if (remaining <= 0) { submitExam(true); return; }
     paused = true;
@@ -196,9 +198,15 @@
   function startExam(name) {
     closeActions();
     var saved = loadState(name);
+    if(saved && saved.signature && global.QuilynJournal && saved.signature!==global.QuilynJournal.bankSignature(getTrack(),name,EXAMS[name])){
+      if(!global.QuilynProgress.archive(stateKey(name),saved))return;
+      if(!global.QuilynJournal.abandon(saved.attemptId))return;
+      clearState(name);saved=null;
+      q('bankDisclosure').textContent='This exam content changed. Older saved answers were archived in your backup; start a fresh attempt.';
+    }
     /* Only offer resume if the saved state matches the current question count */
     if (saved && saved.answers && saved.answers.length === EXAMS[name].length &&
-        saved.answers.some(function(a) { return a.length > 0; })) {
+        (saved.attemptId || saved.answers.some(function(a) { return a.length > 0; }))) {
       showResumeDialog(name, saved);
       return;
     }
@@ -208,7 +216,8 @@
   function showResumeDialog(name, saved) {
     var answeredCount = saved.answers.filter(function(a) { return a.length > 0; }).length;
     var totalCount = EXAMS[name].length;
-    var rm = Math.floor(saved.remaining / 60), rs = saved.remaining % 60;
+    var seconds=saved.mode==='simulation'&&saved.deadline?Math.max(0,Math.ceil((saved.deadline-Date.now())/1000)):saved.remaining;
+    var rm = Math.floor(seconds / 60), rs = seconds % 60;
     var overlay = document.createElement('div');
     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:9999;display:flex;align-items:center;justify-content:center';
     overlay.innerHTML =
@@ -216,7 +225,7 @@
         '<div style="font-size:2.5rem;margin-bottom:12px">💾</div>' +
         '<h3 style="margin:0 0 8px;color:var(--pa-ink,#eef1fb)">Resume saved progress?</h3>' +
         '<p style="margin:0 0 20px;font-size:14px;color:var(--pa-ink-soft,#939bbd)">' +
-          answeredCount + ' of ' + totalCount + ' answered · ' +
+          (saved.mode==='simulation'?'Exam simulation':'Learning mode')+' · '+answeredCount + ' of ' + totalCount + ' answered · ' +
           (rm < 10 ? '0' : '') + rm + ':' + (rs < 10 ? '0' : '') + rs + ' remaining' +
         '</p>' +
         '<div style="display:flex;gap:10px;justify-content:center">' +
@@ -233,6 +242,7 @@
     };
     overlay.querySelector('#mv-rdFresh').onclick = function() {
       document.body.removeChild(overlay);
+      if(global.QuilynJournal&&!global.QuilynJournal.abandon(saved.attemptId))return;
       clearState(name);
       doStartExam(name, null);
     };
@@ -243,10 +253,17 @@
     paused = false;
     examFinished = false;
     var qs = EXAMS[name];
+    examMode=saved?saved.mode||'practice':(q('mode')?q('mode').value:'practice');
+    attemptId=saved&&saved.attemptId|| (global.QuilynJournal?global.QuilynJournal.id():null);
+    startedAt=saved&&saved.startedAt||new Date().toISOString();
+    simulationEnd=examMode==='simulation'?(saved&&saved.deadline||Date.now()+TIME_MIN*60000):0;
+    bankVersion=global.QuilynJournal?global.QuilynJournal.bankSignature(getTrack(),name,qs):'';
+    flags=saved&&saved.flags||qs.map(function(){return false;});examNav=null;
+    _root.querySelectorAll('.jl-exam-nav').forEach(function(n){n.remove();});
 
     if (saved) {
       answers  = saved.answers;
-      checked  = saved.checked;
+      checked  = examMode==='simulation'?qs.map(function(){return false;}):saved.checked;
       var savedSeconds = Number(saved.remaining);
       remaining = Number.isFinite(savedSeconds)
         ? Math.max(0, Math.min(TIME_MIN * 60, savedSeconds)) : TIME_MIN * 60;
@@ -257,7 +274,7 @@
     }
 
     var examTitle = q('examTitle');
-    if (examTitle) examTitle.textContent = name + ' — answer all ' + qs.length + ' questions, then Submit.';
+    if (examTitle) examTitle.textContent = name + (examMode==='simulation'?' · Exam simulation':' · Learning mode') + ' — answer all ' + qs.length + ' questions, then Submit.';
 
     /* Collect unique sources and render header attribution */
     var srcEl = q('examSources');
@@ -302,10 +319,10 @@
         "</div>" +
         "<div class='stem'>" + esc(qu.q) + "</div>" +
         "<div class='opts'>" + opts + "</div>" +
-        "<div class='check-wrap'><button class='v-btn check-btn' disabled>Check Answer</button></div>" +
+        "<div class='check-wrap'"+(examMode==='simulation'?' hidden':'')+"><button class='v-btn check-btn' disabled>Check Answer</button></div>" +
         "<div class='verdict'></div>" +
-        "<div class='rat'><b>Rationale:</b> " + esc(qu.r) + "</div>" +
-        (qu.src ? "<div class='qsrc'><a href='" + qu.src + "' target='_blank' rel='noopener'>View source question ↗</a></div>" : "");
+        "<div class='rat'><b>Rationale:</b> " + (examMode==='simulation'?'':esc(qu.r)) + "</div>" +
+        (qu.src && examMode!=='simulation' ? "<div class='qsrc'><a href='" + qu.src + "' target='_blank' rel='noopener'>View source question ↗</a></div>" : "");
 
       card.querySelectorAll('.opt').forEach(function(o) {
         o.onclick = function() { pick(i, parseInt(o.dataset.j), card); };
@@ -323,10 +340,12 @@
     if (sb) sb.classList.remove('v-hide');
     if (sb2) sb2.classList.remove('v-hide');
     if (qb) qb.textContent = 'Quit';
-    if (pb) { pb.textContent = 'Pause'; pb.disabled = false; }
+    if (pb) { pb.textContent = 'Pause'; pb.disabled = false;pb.classList.toggle('v-hide',examMode==='simulation'); }
 
-    updateBar(); startTimer();
+    if(global.QuilynJournal)examNav=global.QuilynJournal.examControls(_root,{index:saved&&saved.index||0,view:saved&&saved.view||(matchMedia('(max-width:860px)').matches?'single':'list'),flags:flags,answers:answers,save:function(){saveState();}});
+    updateBar(); startTimer();saveState();recordExam('in-progress');
     show('exam');
+    if(remaining<=0)submitExam(true);
   }
 
   /* Re-applies selection/check visuals to cards when restoring a saved session */
@@ -386,7 +405,7 @@
   }
 
   function checkAnswer(i, card) {
-    if (checked[i] || answers[i].length === 0) return;
+    if (examMode==='simulation'||checked[i] || answers[i].length === 0) return;
     checked[i] = true;
 
     var qu = EXAMS[current][i];
@@ -414,11 +433,12 @@
     var btn = card.querySelector('.check-btn');
     if (btn) btn.style.display = 'none';
 
-    saveState();
+    saveState();recordExam('in-progress');
   }
 
   function updateBar() {
     var qs = EXAMS[current]; if (!qs) return;
+    if(examNav)examNav.refresh();
     var ans = answers.filter(function(a) { return a.length > 0; }).length;
     var ac = q('ansCount'); if (ac) ac.textContent = ans;
     var prog = q('prog'); if (prog) prog.style.width = (ans/qs.length*100) + '%';
@@ -426,7 +446,8 @@
 
   function startTimer() {
     clearInterval(timerId);
-    deadline = Date.now() + remaining * 1000;
+    deadline = examMode==='simulation'?simulationEnd:Date.now() + remaining * 1000;
+    syncRemaining();
     renderTime();
     var tickCount = 0;
     timerId = setInterval(function() {
@@ -455,6 +476,7 @@
 
   /* Submit & Results */
   function submitExam(auto) {
+    if(examFinished)return;
     syncRemaining();
     if (!auto) {
       var unanswered = answers.filter(function(a) { return a.length === 0; }).length;
@@ -487,12 +509,17 @@
     overlay.querySelector('#mv-confirmCancel').onclick = function() { document.body.removeChild(overlay); };
   }
 
+  function recordExam(status){
+    if(!global.QuilynJournal||!attemptId)return true;
+    var qs=EXAMS[current];if(!qs)return true;
+    return global.QuilynJournal.record({id:attemptId,track:getTrack(),kind:'mock',mode:examMode,name:current,total:qs.length,startedAt:startedAt,status:status,elapsedSeconds:Math.max(0,TIME_MIN*60-remaining)},qs.map(function(qu,i){return {slot:String(i),snapshot:global.QuilynJournal.mockQuestion(getTrack(),current,qu,i),selected:answers[i].map(function(j){return String.fromCharCode(65+j);}),conf:null};}).filter(function(row,i){return status==='completed'||(status==='abandoned'?answers[i].length>0:checked[i]);}));
+  }
   function doSubmit(auto) {
     syncRemaining();
     clearInterval(timerId);
     deadline = 0;
     examFinished = true;
-    clearState(); // exam finished — clear saved progress
+    if(recordExam('completed'))clearState();
 
     var qs = EXAMS[current];
     var correct = 0;
@@ -563,6 +590,7 @@
         });
       }
 
+      var rat=card.querySelector('.rat');if(rat)rat.innerHTML='<b>Rationale:</b> '+esc(qu.r);
       card.classList.add('reviewed');
       var ok = setsEqual(answers[i], qu.a);
       card.classList.remove('ok','no'); card.classList.add(ok?'ok':'no');
@@ -594,7 +622,7 @@
           '<h2>Choose a mock exam</h2>' +
           '<p class="v-muted">Practice exams use a ' + TIME_MIN + '-minute timer and a ' + Math.round(PASS * 100) + '% pass mark. Available question coverage is shown below.</p>' +
           '<p id="mv-bankDisclosure" class="v-muted"></p>' +
-          '<div class="examgrid" id="mv-examGrid"></div>' +
+          '<p><a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></p><label>Mode <select id="mv-mode"><option value="practice">Learning — pause and check answers</option><option value="simulation">Exam simulation — continuous timer, answers after submission</option></select></label><p class="v-muted">Simulation time continues when you leave or reload. It cannot be paused.</p><div class="examgrid" id="mv-examGrid"></div>' +
         '</div>' +
         '<div class="v-card">' +
           '<h2>Domain weighting (per exam)</h2>' +
@@ -658,7 +686,7 @@
   /* Public API */
   function mount(contentEl, sidebarEl) {
     clearInterval(timerId); timerId = null; current = null; paused = false;
-    answers = []; checked = []; _root = null;
+    answers = []; checked = []; _root = null;examNav=null;
 
     mountedTrack = global.PegaStore.state.activeTrack;
     document.getElementById("paContent").focus({preventScroll:true});
@@ -687,7 +715,7 @@
       renderHome();
       if (sidebarEl) { sidebarEl.innerHTML = getSidebarHTML(); wireSidebar(sidebarEl); }
     });
-    q('retryBtn').addEventListener('click', function() { startExam(current); });
+    q('retryBtn').addEventListener('click', function() { q('mode').value=examMode;startExam(current); });
     q('reviewBtn').addEventListener('click', reviewExam);
     q('submitBtn').addEventListener('click', function() { submitExam(false); });
     q('submitBtn2').addEventListener('click', function() { submitExam(false); });
@@ -698,13 +726,13 @@
       if (q('quitBtn').textContent === 'Back to results') {
         q('submitBtn').classList.remove('v-hide');
         q('submitBtn2').classList.remove('v-hide');
-        q('pauseBtn').classList.remove('v-hide');
+        q('pauseBtn').classList.toggle('v-hide',examMode==='simulation');
         q('quitBtn').textContent = 'Quit';
         show('results'); return;
       }
       showConfirm('Quit this exam? Your saved progress will be cleared.', function() {
-        clearInterval(timerId);
-        clearState();
+        syncRemaining();clearInterval(timerId);
+        if(recordExam('abandoned'))clearState();else saveState();
         examFinished = true;
         renderHome();
       }, 'Quit');
@@ -749,7 +777,7 @@
     connectedCallback() {
       var self = this;
       var track = global.PegaStore.state.activeTrack;
-      Promise.all([loadExamBank(), global.QuilynRuntime.json('data/registry.json')]).then(function(results) {
+      Promise.all([loadExamBank(), global.QuilynRuntime.json('data/registry.json'),global.QuilynRuntime.learning?global.QuilynRuntime.learning():Promise.resolve()]).then(function(results) {
         if (!self.isConnected || global.PegaStore.state.activeTrack !== track) return;
         configureExam(results[1].tracks.find(function(t) { return t.trackId === track; }));
         var data = results[0];
@@ -760,7 +788,7 @@
         if (self.isConnected) self.textContent = 'Unable to load exam settings. Connect to the internet and reopen Mock Exams.';
       });
     }
-    disconnectedCallback() { unmount(); }
+    disconnectedCallback() { if(_root && this.contains(_root))unmount(); }
   }
 
   global.MockView = { unmount: unmount, flush: function() { if (_root && current && !examFinished) { syncRemaining(); saveState(); } } };
