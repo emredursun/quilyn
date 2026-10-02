@@ -194,3 +194,11 @@ test('SLA feedback separates configured actions and Case inheritance from task u
  assert.match(d.studyGuide[1].elements[1].description,/existing Assignment’s own SLA/);assert.match(d.practiceQuiz[14].scenario,/milestones/);
  assert.doesNotMatch(JSON.stringify(d),/not at data or\.|Urgency only goes up, never down|goal, additional interval|changing an SLA's Urgency increment affects/);
 });
+
+test('email editorial review distinguishes recipient references, templates and send events',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m17_sending_emails_case_processing.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M17');
+ assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m17_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[3,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.doesNotMatch(JSON.stringify(d),/Hardcoded = violation|Create Operator.{0,80}(?:built-in system templates|operator lifecycle notifications)|only pattern.*external emails|Notify sends only|Case owner \+ creator|fire-and-forget/);
+ assert.match(d.studyGuide[0].elements.at(-1).caption,/references, not message templates/);assert.match(d.practiceQuiz[12].hint,/not a claim that no other/);
+});
