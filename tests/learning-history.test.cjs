@@ -98,6 +98,6 @@ test('all PSSA lesson targets resolve and sourced mock feedback matches its orig
  for(const m of registry.tracks.find(t=>t.trackId==='PSSA').modules){const d=JSON.parse(fs.readFileSync(m.file));const ids=new Set(d.studyGuide.map(s=>s.sectionId));
   for(const q of d.practiceQuiz){assert.ok(ids.has(q.lessonSection));lookup.set(m.id+'/'+q.questionId,q);mapped++;if(q.optionExplanations){explained++;assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());}}
  }
- assert.equal(mapped,203);assert.equal(explained,72);
+ assert.equal(mapped,203);assert.equal(explained,203);
  for(const qs of Object.values(bank.PSSA))for(const q of qs){const original=lookup.get(q.sourceModuleId+'/'+q.sourceQuestionId);if(original){assert.equal(q.lessonSection,original.lessonSection);assert.deepEqual(q.optionExplanations,original.optionExplanations);}}
 });
