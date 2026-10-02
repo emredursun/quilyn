@@ -128,3 +128,11 @@ test('PSA draft, naming and access questions avoid the reviewed misleading claim
  const naming=d.practiceQuiz.find(q=>q.questionId==='m02_q12');assert.match(naming.scenario,/Process = 'Review documents'/);assert.match(naming.rationale,/verb\+noun/);
  const users=JSON.parse(fs.readFileSync('data/system-architect/m03_inviting_users_to_application.json'));assert.match(users.practiceQuiz[15].options[0].text,/configured authentication/);assert.doesNotMatch(users.practiceQuiz[15].options[1].text,/includes.*Persona/);
 });
+
+test('PSA Center-out, GenAI and Blueprint feedback has complete, real lesson targets',()=>{
+ const registry=JSON.parse(fs.readFileSync('data/registry.json'));let count=0;
+ for(const m of registry.tracks.find(t=>t.trackId==='PSA').modules.slice(3,6)){const d=JSON.parse(fs.readFileSync(m.file)),ids=new Set(d.studyGuide.map(s=>s.sectionId));for(const q of d.practiceQuiz){count++;assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,'2026-10-02');}}
+ assert.equal(count,49);
+ const center=JSON.parse(fs.readFileSync(registry.tracks.find(t=>t.trackId==='PSA').modules[3].file));assert.match(center.practiceQuiz[7].options[1].text,/testing remains necessary/);assert.match(center.practiceQuiz[13].options[0].text,/validate/);
+ const genai=JSON.parse(fs.readFileSync(registry.tracks.find(t=>t.trackId==='PSA').modules[4].file));assert.match(genai.practiceQuiz[14].options[0].text,/individual features/);assert.doesNotMatch(genai.practiceQuiz[14].rationale,/cannot access any/);
+});
