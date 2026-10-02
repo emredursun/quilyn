@@ -176,3 +176,12 @@ test('approval review keeps answer identities, complete feedback and evidence fo
  assert.match(cascade.studyGuide[2].elements[0].description,/Data Page, Activity or Data Transform/);
  assert.doesNotMatch(JSON.stringify(cascade),/authority matrix traverses|can be configured in App Studio|not an\./);
 });
+
+test('late-work feedback distinguishes finite recurrence, assignment completion and urgency caps',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m16_escalating_late_work.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ const review=inventory.modules.find(m=>m.id==='SA-M16');assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.equal(d.practiceQuiz.length,15);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m16_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[6].scenario,/at least three events/);assert.match(d.practiceQuiz[11].scenario,/timely processing/);assert.match(d.practiceQuiz[14].scenario,/Assignment remains incomplete/);
+ assert.match(d.studyGuide[0].elements.at(-1).description,/six/);assert.doesNotMatch(JSON.stringify(d),/continues firing indefinitely|fires continuously until case resolution|Passed Deadline Interval rule/);
+ assert.match(d.practiceQuiz[9].optionExplanations.A,/notification action still runs/);
+});
