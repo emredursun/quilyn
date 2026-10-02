@@ -87,6 +87,9 @@ export function validateContent(root) {
         check(record(topic) && text(topic.title), `${moduleLabel}: invalid topic`);
         sourceUrl(topic.url, `${moduleLabel} topic URL`);
       }
+      const sectionIds = (data.studyGuide || []).filter(s=>s.sectionId!==undefined).map(s=>s.sectionId);
+      unique(sectionIds, moduleLabel+' sections');
+      check(sectionIds.every(id=>typeof id==='string' && /^[A-Za-z0-9-]{1,120}$/.test(id)), moduleLabel+': invalid section ID');
       for (const section of (Array.isArray(data.studyGuide) ? data.studyGuide : [])) {
         if (!record(section) || !text(section.sectionTitle) || !Array.isArray(section.elements)) {
           errors.push(`${moduleLabel}: invalid study-guide section`); continue;
@@ -129,6 +132,11 @@ export function validateContent(root) {
         check(question.type !== 'single-select' || question.correctOptions.length === 1, `${qLabel}: single-select requires one correct answer`);
         check(question.type !== 'multi-select' || question.correctOptions.length >= 2, `${qLabel}: multi-select requires multiple correct answers`);
         check(question.selectCount === undefined || question.selectCount === question.correctOptions.length, `${qLabel}: selectCount does not match answers`);
+        check(question.lessonSection===undefined || sectionIds.includes(question.lessonSection), `${qLabel}: unknown lesson section`);
+        if(question.optionExplanations!==undefined){
+          check(record(question.optionExplanations) && Object.keys(question.optionExplanations).length===optionIds.length && optionIds.every(id=>text(question.optionExplanations[id])), `${qLabel}: incomplete option explanations`);
+          check(text(question.explanationReviewedOn) && /^\d{4}-\d{2}-\d{2}$/.test(question.explanationReviewedOn) && Number.isFinite(Date.parse(question.explanationReviewedOn)), `${qLabel}: missing explanation review date`);
+        }
         sourceUrl(question.sourceUrl, `${qLabel} sourceUrl`);
       }
     }

@@ -38,7 +38,7 @@ Veri değişikliklerinde anlamlı regresyon ve migration testleri; `npm run chec
 
 ## Durum
 
-Aşama 1–2 doğrulandı ve `296fb78` commit’ine alındı. Push/yayın yapılmadı. Aşama 3’ün ilk kişiselleştirme paketi yerel olarak kodlandı ve doğrulandı; bu paket henüz commit edilmedi. Sonuçlardan belirli ders bölümüne editoryal eşleştirme ve yanlış şık açıklamaları kalan Aşama 3 işleridir. Aşama 4 henüz uygulanmadı.
+Aşama 1–2 doğrulandı ve `296fb78` commit’ine alındı. Push/yayın yapılmadı. Aşama 3’ün ilk kişiselleştirme paketi yerel olarak kodlandı ve doğrulandı; bu paket `a6e418e` commit’ine alındı. Sonuçlardan belirli ders bölümüne editoryal eşleştirme ve yanlış şık açıklamaları kalan Aşama 3 işleridir. Aşama 4 henüz uygulanmadı.
 
 ### Aşama 1 teslim kaydı
 
@@ -77,3 +77,16 @@ Aşama 1–2 doğrulandı ve `296fb78` commit’ine alındı. Push/yayın yapıl
 - Tarayıcıda tarih/süre yenileme sonrasında korundu; track tercihleri ayrıştı; atlama, yer imi, son sekme ve Guide bölümüne dönüş çalıştı. 320/390 px yatay taşma yok; açık/koyu tema kontrol edildi. Test sunucusu kapalıyken plan ve kayıtlı tercihler açıldı; son cache sürümünde önceden yüklenen ders çevrimdışı açıldı. Yeni cache sürümü kurulmadan yüklenmiş dersin yeniden indirilmesi gerekebilir; hiç indirilmemiş içeriğin offline erişimi garanti edilmez.
 - Fiziksel iOS/Android ve VoiceOver/TalkBack kontrolü yapılmadı. Yedek veri döngüsü otomatik testle doğrulandı; gerçek dosya indirme/import akışı yeniden test edilmedi.
 - [Mobil çalışma planı](screenshots/study-plan-mobile-2026-10-02.png).
+
+
+### Aşama 3 — Ders bağlantıları ve açıklama altyapısı
+
+- PSSA’nın 25 modülündeki 203 quiz sorusu, sorunun kaynak URL’siyle Guide bölümünün referans URL’si birebir eşleştiği için ilgili bölüme bağlandı. 180 kaynaklı mock sorusunda aynı eşleştirme taşındı. Kararsız/fuzzy metin eşleşmesi kullanılmadı. Diğer track’lerde bölüm eşleştirmesi henüz yok; modül bağlantısı varsa Guide başlangıcına döner.
+- `#track/module/guide/sectionId` bağlantısı ilgili sekmeyi açar, başlığı ekranın görünür alanına kaydırır ve klavye odağını başlığa taşır. Kaldırılmış bölüm ID’sinde sessizce yanlış bölüme gitmek yerine görünür bildirim ve mevcut Guide gösterilir. Bölüm ID’leri içerikte saklanır; sonraki yeniden sıralamalarda bu ID’ler korunmalıdır.
+- Her seçeneğe özel açıklama, inceleme tarihi ve bölüm hedefi snapshot’a eklenir. Eski snapshot’lar geçerlidir; geçmiş açıklamalar yeni içerikle değiştirilmez. Cevap imzası aynı kaldığı için yalnız açıklama eklemek mevcut puanları sıfırlamaz. Quiz, Smart Review, mock cevap incelemesi, deneme geçmişi ve Yanlışlar defteri aynı gösterim işlevini kullanır. Simülasyonda teslim öncesi bu açıklamalar DOM’a eklenmez.
+- İlk editoryal kapsam: **SSA-M01’in 8 sorusu / 32 seçenek**. Mock formlarındaki aynı 7 soruya açıklamalar taşındı. Kalan 195 PSSA sorusunda seçenek açıklamaları henüz yazılmadı; mevcut soru açıklamaları korunuyor. Diğer track’lerdeki seçenek açıklamaları da bekliyor. Açıklamalar mevcut sorular için yazılmış bağımsız çalışma notlarıdır; resmî sınav soruları değildir.
+- Kaynak incelemesi 2 Ekim 2026: [Modular architecture and Enterprise reuse](https://academy.pega.com/topic/modular-architecture-and-enterprise-reuse/v1), [Class hierarchy structure](https://academy.pega.com/topic/class-hierarchy-structure/v1), [New Pega Platform applications](https://academy.pega.com/topic/new-pega-platform-applications/v1). Yanlış seçenek değerlendirmeleri, bu kaynaklardaki kapsamın sorunun senaryosuna uygulanmasıdır.
+- Yakalanan mevcut bug: quiz grading `.show` ekliyordu, CSS ise `.answered` bekliyordu; açıklama ve verdict görünmüyordu. Kart artık answered + ok/no sınıflarını da alır. Yenilemeden sonra geri yüklenen yanlış cevabın açıklaması görünür.
+- Otomatik doğrulama: 72/72 test; tüm 203 bölüm hedefi, kaynaklı mock eşleştirmesi, editoryal snapshot/yedek uyumluluğu, eski kayıt bağlantısı, geçersiz metadata ve HTML kaçış kontrolü. İçerik, asset, manifest ve kabuk bütçesi kontrolleri geçti. Son asset query `20261002g`; service worker `quilyn-v52`.
+- Tarayıcı: quiz grading/yenileme → seçenek açıklaması → ilgili başlık; Yanlışlar defterinde snapshot açıklaması; Smart Review’den Log files bölümüne dönüş; simulation teslim öncesi açıklama sayısı 0, teslim ve Review answers sonrasında 3 açıklama paneli; mock Q59’dan ilgili başlığa dönüş; eski bölüm hedefinde bildirim. 390 px görünümde taşma yok, console warning/error boş. Fiziksel cihaz/ekran okuyucu ve bu pakette yeniden offline test yapılmadı.
+- [Mobil açıklama ekranı](screenshots/lesson-feedback-mobile-2026-10-02.png). Push/yayın yapılmadı.

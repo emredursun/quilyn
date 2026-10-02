@@ -192,6 +192,9 @@
         }
       });
 
+      card.classList.add("answered");
+      card.classList.toggle("ok", isCorrect);
+      card.classList.toggle("no", !isCorrect);
       verdict.className = "verdict show " + (isCorrect ? "ok" : "no");
       if (isCorrect) {
         verdict.textContent = "✓ Correct.";
@@ -244,7 +247,7 @@
         "</div>" +
         (q.hint ? '<div class="hint-wrap"><button class="pa-hint-btn" type="button"><span class="hint-icon">💡</span> Hint <span class="hint-caret">▾</span></button><div class="hintbox">' + esc(q.hint) + "</div></div>" : "") +
         '<div class="verdict"></div>' +
-        '<div class="rationale"><b>Rationale:</b> ' + esc(q.rationale || "") + "</div>";
+        '<div class="rationale"><b>Rationale:</b> ' + esc(q.rationale || "") + (global.QuilynJournal ? global.QuilynJournal.feedbackHTML(global.QuilynJournal.quizQuestion(context.track,context.moduleId||"",q,context.domain)) : "") + "</div>";
 
       listWrap.appendChild(card);
 

@@ -76,3 +76,28 @@ test('notebook retries keep same-named question IDs from different modules indep
  const restored=p.quizState({0:{selected:['A'],graded:true},1:{selected:['B'],graded:true}},retryQuestions);assert.equal(Object.keys(restored.answers).length,2);assert.equal(Object.values(restored.answers)[0].selected[0],'A');assert.equal(Object.values(restored.answers)[1].selected[0],'B');
  assert.notEqual(retryQuestions[0].learningSnapshot.key,retryQuestions[1].learningSnapshot.key);
 });
+
+test('option explanations and lesson section survive history and backup without changing answer identity',()=>{
+ const {j,p}=setup(),q={...question,lessonSection:'topic-1',optionExplanations:{A:'Matches the requirement.',B:'Does not meet the scope.'},explanationReviewedOn:'2026-10-02'};
+ const snapshot=j.quizQuestion('PSSA','M1',q);assert.equal(snapshot.signature,j.quizQuestion('PSSA','M1',question).signature);
+ j.record(meta('feedback'),[{snapshot,selected:['B'],conf:null}]);q.optionExplanations.B='Later editorial revision';assert.equal(j.read().attempts[0].rows[0].snapshot.optionExplanations.B,'Does not meet the scope.');
+ assert.deepEqual(Array.from(p.validateBundle({version:2,state:{quilyn_learning:j.read()}})),['quilyn_learning']);
+ const html=j.feedbackHTML(snapshot);assert.match(html,/#PSSA\/M1\/guide\/topic-1/);assert.match(html,/Why each option fits or fails/);
+});
+test('malformed editorial metadata cannot enter stored learning snapshots',()=>{
+ const {j}=setup();for(const extra of [{lessonSection:'../bad'},{optionExplanations:{A:'Only one'}},{optionExplanations:{A:'',B:'Text'}},{explanationReviewedOn:'invalid'}]){
+  const snapshot=j.quizQuestion('PSSA','M1',{...question,...extra});assert.equal(j.valid({version:1,attempts:[{...meta('bad'),updatedAt:new Date().toISOString(),startedAt:new Date().toISOString(),elapsedSeconds:0,rows:[{snapshot,selected:['B'],conf:null}]}],mistakes:{}}),false);
+ }
+});
+test('old snapshots keep their fallback lesson links and authored text is escaped',()=>{
+ const {j}=setup();assert.match(j.feedbackHTML(j.quizQuestion('PSSA','M1',question)),/#PSSA\/M1\/guide"/);
+ const snapshot=j.quizQuestion('PSSA','M1',{...question,optionExplanations:{A:'<script>bad()</script>',B:'safe'}});assert.ok(!j.feedbackHTML(snapshot).includes('<script>'));assert.match(j.feedbackHTML(snapshot),/&lt;script&gt;/);
+});
+test('all PSSA lesson targets resolve and sourced mock feedback matches its originating question',()=>{
+ const registry=JSON.parse(fs.readFileSync('data/registry.json')),bank=JSON.parse(fs.readFileSync('data/mock-exams.json')),lookup=new Map();let mapped=0,explained=0;
+ for(const m of registry.tracks.find(t=>t.trackId==='PSSA').modules){const d=JSON.parse(fs.readFileSync(m.file));const ids=new Set(d.studyGuide.map(s=>s.sectionId));
+  for(const q of d.practiceQuiz){assert.ok(ids.has(q.lessonSection));lookup.set(m.id+'/'+q.questionId,q);mapped++;if(q.optionExplanations){explained++;assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());}}
+ }
+ assert.equal(mapped,203);assert.equal(explained,8);
+ for(const qs of Object.values(bank.PSSA))for(const q of qs){const original=lookup.get(q.sourceModuleId+'/'+q.sourceQuestionId);if(original){assert.equal(q.lessonSection,original.lessonSection);assert.deepEqual(q.optionExplanations,original.optionExplanations);}}
+});

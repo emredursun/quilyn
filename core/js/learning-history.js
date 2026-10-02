@@ -8,11 +8,22 @@
   function date(v){return typeof v==='string'&&Number.isFinite(Date.parse(v));}
   function equal(a,b){return JSON.stringify(a.slice().sort())===JSON.stringify(b.slice().sort());}
   function signature(q){return global.QuilynProgress.quizSignature({type:q.type,scenario:q.scenario,options:q.options,correctOptions:q.correct});}
+  function validFeedback(q, ids){
+    return (q.lessonSection===undefined || text(q.lessonSection,120)&&/^[A-Za-z0-9-]{1,120}$/.test(q.lessonSection)) &&
+      (q.explanationReviewedOn===undefined || /^\d{4}-\d{2}-\d{2}$/.test(q.explanationReviewedOn)&&date(q.explanationReviewedOn)) &&
+      (q.optionExplanations===undefined || q.optionExplanations && typeof q.optionExplanations==='object' && !Array.isArray(q.optionExplanations) && Object.keys(q.optionExplanations).length===ids.length && ids.every(function(id){return Object.prototype.hasOwnProperty.call(q.optionExplanations,id)&&text(q.optionExplanations[id],2000)&&q.optionExplanations[id].trim().length>0;}));
+  }
+  function feedbackFields(result,q){
+    if(q.lessonSection!==undefined)result.lessonSection=q.lessonSection;
+    if(q.optionExplanations!==undefined)result.optionExplanations=Object.assign({},q.optionExplanations);
+    if(q.explanationReviewedOn!==undefined)result.explanationReviewedOn=q.explanationReviewedOn;
+    return result;
+  }
   function validQuestion(q){
     return q&&text(q.key,20000)&&text(q.track,80)&&/^[A-Za-z0-9-]+$/.test(q.track)&&text(q.moduleId,120)&&text(q.questionId,120)&&text(q.domain,200)&&text(q.scenario,20000)&&text(q.rationale,20000)&&text(q.source,2000)&&(!q.source||/^https:\/\//.test(q.source))&&
       ['single-select','multi-select'].includes(q.type)&&Array.isArray(q.options)&&q.options.length>=2&&q.options.length<=12&&q.options.every(function(o){return o&&text(o.id,120)&&text(o.text,20000);})&&new Set(q.options.map(function(o){return o.id;})).size===q.options.length&&
       Array.isArray(q.correct)&&q.correct.length>0&&q.correct.every(function(a){return q.options.some(function(o){return o.id===a;});})&&new Set(q.correct).size===q.correct.length&&
-      (q.type!=='single-select'||q.correct.length===1)&&text(q.signature,100000)&&signature(q)===q.signature;
+      (q.type!=='single-select'||q.correct.length===1)&&text(q.signature,100000)&&signature(q)===q.signature&&validFeedback(q,q.options.map(function(o){return o.id;}));
   }
   function validRow(r){return r&&(r.slot===undefined||text(r.slot,200))&&validQuestion(r.snapshot)&&Array.isArray(r.selected)&&new Set(r.selected).size===r.selected.length&&r.selected.every(function(a){return r.snapshot.options.some(function(o){return o.id===a;});})&&(r.snapshot.type!=='single-select'||r.selected.length<=1)&&[null,'guess','unsure','sure'].includes(r.conf);}
   function bytes(state){return new TextEncoder().encode(JSON.stringify(state)).length;}
@@ -26,13 +37,13 @@
   function quizQuestion(track,module,q,domain){
     if(q.learningSnapshot)return q.learningSnapshot;
     var result={key:track+'/'+module+'/'+q.questionId,track:track,moduleId:module||'',questionId:q.questionId,domain:domain||'General',type:q.type,scenario:q.scenario,options:q.options.map(function(o){return {id:o.id,text:o.text};}),correct:q.correctOptions.slice(),rationale:q.rationale||'',source:global.QuilynRuntime.safeUrl(q.sourceUrl||q.src||'')};
-    if(!q.sourceUrl&&!q.src)result.source='';result.signature=signature(result);return result;
+    if(!q.sourceUrl&&!q.src)result.source='';result.signature=signature(result);return feedbackFields(result,q);
   }
   function mockQuestion(track,name,q,index){
     var result={track:track,moduleId:q.sourceModuleId||'',questionId:q.sourceQuestionId||q.questionId||'Q'+(index+1),domain:q.d||'General',type:q.a.length>1?'multi-select':'single-select',scenario:q.q,options:q.o.map(function(v,i){return {id:String.fromCharCode(65+i),text:v};}),correct:q.a.map(function(i){return String.fromCharCode(65+i);}),rationale:q.r||'',source:q.src||''};
     result.signature=signature(result);
     result.key=q.sourceModuleId&&q.sourceQuestionId?track+'/'+q.sourceModuleId+'/'+q.sourceQuestionId:track+'/mock/'+result.signature;
-    return result;
+    return feedbackFields(result,q);
   }
   function bankSignature(track,name,questions){return JSON.stringify(questions.map(function(q,i){var s=mockQuestion(track,name,q,i);return [s.key,s.signature];}));}
   function record(meta,rows){
@@ -63,9 +74,14 @@
   function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function contentVersion(a){return JSON.stringify(a.rows.map(function(r){return [r.slot||r.snapshot.key,r.snapshot.signature];}).sort(function(a,b){return a[0].localeCompare(b[0]);}));}
   function score(a){return a.rows.filter(function(r){return equal(r.selected,r.snapshot.correct);}).length;}
+  function feedbackHTML(s){
+    var detail=s.optionExplanations?'<details class="jl-feedback"><summary>Why each option fits or fails</summary><ul>'+s.options.map(function(o){return '<li><strong>'+esc(o.id)+' · '+(s.correct.includes(o.id)?'Correct':'Incorrect')+'</strong><p>'+esc(s.optionExplanations[o.id])+'</p></li>';}).join('')+'</ul>'+(s.explanationReviewedOn?'<p class="jl-meta">Explanation reviewed '+esc(s.explanationReviewedOn)+'</p>':'')+'</details>':'';
+    var lesson=s.moduleId?'<a class="jl-lesson-link" href="#'+encodeURIComponent(s.track)+'/'+encodeURIComponent(s.moduleId)+'/guide'+(s.lessonSection?'/'+encodeURIComponent(s.lessonSection):'')+'">'+(s.lessonSection?'Review related lesson section':'Open lesson')+'</a>':'';
+    return detail+lesson;
+  }
   function rowHTML(row){
     var s=row.snapshot, correct=equal(row.selected,s.correct);
-    return '<article class="jl-question"><p class="jl-meta">'+esc(s.domain)+' · '+(correct?'Correct':'Incorrect')+(row.conf==='sure'&&!correct?' · High-confidence error':'')+'</p><h3>'+esc(s.scenario)+'</h3><ul>'+s.options.map(function(o){return '<li>'+ (row.selected.includes(o.id)?'Your answer: ':'')+(s.correct.includes(o.id)?'Correct: ':'')+esc(o.text)+'</li>';}).join('')+'</ul><p>'+esc(s.rationale)+'</p>'+(s.moduleId?'<a href="#'+encodeURIComponent(s.track)+'/'+encodeURIComponent(s.moduleId)+'">Open lesson</a>':'')+(s.source?' <a href="'+esc(s.source)+'" target="_blank" rel="noopener">View source</a>':'')+'</article>';
+    return '<article class="jl-question"><p class="jl-meta">'+esc(s.domain)+' · '+(correct?'Correct':'Incorrect')+(row.conf==='sure'&&!correct?' · High-confidence error':'')+'</p><h3>'+esc(s.scenario)+'</h3><ul>'+s.options.map(function(o){return '<li>'+ (row.selected.includes(o.id)?'Your answer: ':'')+(s.correct.includes(o.id)?'Correct: ':'')+esc(o.text)+'</li>';}).join('')+'</ul><p>'+esc(s.rationale)+'</p>'+feedbackHTML(s)+(s.source?' <a href="'+esc(s.source)+'" target="_blank" rel="noopener">View source</a>':'')+'</article>';
   }
   function mount(el,track,view){
     var root=document.createElement('section');root.className='jl-view';el.replaceChildren(root);
@@ -102,5 +118,5 @@
     function changed(){draw();config.save(config);(config.view==='single'?nav:cards[config.index]).scrollIntoView({block:'start'});}
     draw();return {refresh:draw,config:config};
   }
-  global.QuilynJournal={id:id,abandon:abandon,valid:valid,record:record,read:read,quizQuestion:quizQuestion,mockQuestion:mockQuestion,bankSignature:bankSignature,mount:mount,examControls:examControls};
+  global.QuilynJournal={id:id,abandon:abandon,valid:valid,record:record,read:read,quizQuestion:quizQuestion,mockQuestion:mockQuestion,bankSignature:bankSignature,feedbackHTML:feedbackHTML,validFeedback:validFeedback,mount:mount,examControls:examControls};
 })(window);

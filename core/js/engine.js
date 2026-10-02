@@ -148,7 +148,7 @@
   function parseHash() {
     var h = (location.hash || "").replace(/^#/, "");
     var parts = h.split("/").filter(Boolean);
-    if (parts.length >= 2) return { trackId: parts[0], moduleId: parts[1], tab: parts[2] || null };
+    if (parts.length >= 2) return { trackId: parts[0], moduleId: parts[1], tab: parts[2] || null, section: parts[3] || null };
     if (parts.length === 1) return { trackId: parts[0], moduleId: null };
     return { trackId: null, moduleId: null };
   }
@@ -453,6 +453,12 @@
     // expands to "Track / Module" when user has scrolled past the title.
     activateCrumbObserver(moduleTitle);
     if(window.QuilynStudy)window.QuilynStudy.attachLesson(c,activeTrackId,meta.id,parseHash().tab);
+    var targetSection=parseHash().section;
+    if(targetSection && parseHash().tab==='guide'){
+      var target=Array.from(c.querySelectorAll('#v-guide [data-section-id]')).find(function(el){return el.getAttribute('data-section-id')===targetSection;});
+      if(target){var heading=target.querySelector('h3');heading.focus({preventScroll:true});heading.scrollIntoView({block:'start'});}
+      else {var notice=document.createElement('p');notice.className='jl-meta';notice.setAttribute('role','status');notice.textContent='This lesson section is no longer available. The current study guide is shown.';c.querySelector('.pa-tabs').before(notice);}
+    }
   }
 
   function buildObjectives(data) {
@@ -612,7 +618,7 @@
         inner += '<ul class="pa-bullets">' +
           sec.bulletPoints.map(function (b) { return "<li>" + linkify(b) + "</li>"; }).join("") + "</ul>";
       }
-      return '<div class="pa-section"><h3>' + esc(sec.sectionTitle) + "</h3>" + inner + "</div>";
+      return '<div class="pa-section"'+(sec.sectionId?' data-section-id="'+esc(sec.sectionId)+'"':'')+'><h3 tabindex="-1">' + esc(sec.sectionTitle) + "</h3>" + inner + "</div>";
     }).join("");
   }
 

@@ -321,7 +321,7 @@
         "<div class='opts'>" + opts + "</div>" +
         "<div class='check-wrap'"+(examMode==='simulation'?' hidden':'')+"><button class='v-btn check-btn' disabled>Check Answer</button></div>" +
         "<div class='verdict'></div>" +
-        "<div class='rat'><b>Rationale:</b> " + (examMode==='simulation'?'':esc(qu.r)) + "</div>" +
+        "<div class='rat'><b>Rationale:</b> " + (examMode==='simulation'?'':esc(qu.r)+(global.QuilynJournal?global.QuilynJournal.feedbackHTML(global.QuilynJournal.mockQuestion(getTrack(),current,qu,i)):'')) + "</div>" +
         (qu.src && examMode!=='simulation' ? "<div class='qsrc'><a href='" + qu.src + "' target='_blank' rel='noopener'>View source question ↗</a></div>" : "");
 
       card.querySelectorAll('.opt').forEach(function(o) {
@@ -590,7 +590,7 @@
         });
       }
 
-      var rat=card.querySelector('.rat');if(rat)rat.innerHTML='<b>Rationale:</b> '+esc(qu.r);
+      var rat=card.querySelector('.rat');if(rat)rat.innerHTML='<b>Rationale:</b> '+esc(qu.r)+(global.QuilynJournal?global.QuilynJournal.feedbackHTML(global.QuilynJournal.mockQuestion(getTrack(),current,qu,i)):'');
       card.classList.add('reviewed');
       var ok = setsEqual(answers[i], qu.a);
       card.classList.remove('ok','no'); card.classList.add(ok?'ok':'no');

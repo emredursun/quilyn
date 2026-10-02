@@ -197,7 +197,7 @@
           '</div>'+
         '</div>'+
         '<div class="verdict" id="rv-verdict"></div>'+
-        '<div class="rationale" id="rv-rationale"><b>Rationale:</b> '+esc(q.rationale)+'</div>'+
+        '<div class="rationale" id="rv-rationale"><b>Rationale:</b> '+esc(q.rationale)+(global.QuilynJournal?global.QuilynJournal.feedbackHTML(global.QuilynJournal.quizQuestion(getTrack(),entry.moduleId,q,domain)):'')+'</div>'+
         '<div class="btn-row" style="margin-top:13px">'+
           '<button class="v-btn v-primary v-hide" id="rv-btn-next">'+(idx+1<session.length?'Next →':'Results')+'</button>'+
         '</div>'+
