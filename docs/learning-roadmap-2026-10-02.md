@@ -120,3 +120,12 @@ Yakalanan sorun: okuma bölümünü seçmek için kullanılan sabit 150 px sın�
 Bookmark ve Resume için ders sekmelerinin mor renginden ayrışan petrol/turkuaz palet eklendi. Açık ve koyu tema; normal, hover, kayıtlı ve klavye odağı durumları tanımlandı. Kayıtlı Bookmark dolu ikon ve aria-pressed ile de belirtilir. Görünür etiket Resume; erişilebilir ad ve title Resume reading olarak kalır. Metin kontrastı tanımlı renk çiftlerinde en az 5.98:1.
 
 74/74 otomatik test geçti. Tarayıcıda açık/koyu renkler, kısa etiket, kayıtlı Bookmark ve 2 px klavye odağı doğrulandı. 320 px görünümde yatay taşma yok; iki işlem 44×48 px. Konsol warning/error boş. Fiziksel cihaz ve ekran okuyucu testi yapılmadı. Query 20261002k; SW quilyn-v56. Henüz commit/push yapılmadı. [Açık tema](screenshots/lesson-actions-light-2026-10-02.png), [Koyu tema](screenshots/lesson-actions-dark-2026-10-02.png).
+
+
+### Aşama 3 — Açıklama paketi 2: Versioning ve Rulesets
+
+Önceki arayüz paketi 162ed9e ile yerel commit olarak kaydedildi. SSA-M02 ve SSA-M03 için 16 soru / 64 seçenek açıklaması eklendi; kaynak kimlikleriyle eşleşen 14 mock kopyasına taşındı. PSSA seçenek açıklaması kapsamı 24/203 soruya ulaştı; 179 soru ve diğer track’ler bekliyor. Bu açıklamalar kaynakların senaryolara uygulanmasına dayanan bağımsız editoryal değerlendirmelerdir. Soru/şık metni, doğru cevaplar ve bölüm hedeflerinin HEAD sürümüyle aynı kaldığı ayrıca doğrulandı; açıklama eklenmesi eski grading’i geçersiz kılmaz.
+
+2 Ekim 2026 kaynak kontrolü: [Application versioning](https://academy.pega.com/topic/application-versioning/v6), [Application and production Rulesets](https://academy.pega.com/topic/application-and-production-rulesets/v7), [Ruleset validation](https://academy.pega.com/topic/ruleset-validation/v6), [The Ruleset list](https://academy.pega.com/topic/ruleset-list/v6). İçerikteki /in/... bağlantılarının bazıları araştırma aracında açılmadı; aynı sürümlerin topic sayfaları okunarak doğrulandı.
+
+74/74 test geçti; içerik/manifest/kabuk bütçesi kontrolleri başarılı. PSSA tüm bölüm hedefleri ve kaynaklı mock açıklamalarının ders ile eşleşmesi kontrol edildi. Tarayıcıda SSA-M02 Q01 yanlış cevap → seçenek açıklamalarını açma → yenileme sonrası grading → ilgili Guide başlığına dönüş doğrulandı; başlık görünür alanda ve odaklı. Console warning/error boş. Bu içerik paketinde yeni fiziksel cihaz, ekran okuyucu veya offline testi yapılmadı. Query 20261002l; SW quilyn-v57. Push/yayın yapılmadı. [Görünüm](screenshots/pssa-versioning-feedback-2026-10-02.png).
