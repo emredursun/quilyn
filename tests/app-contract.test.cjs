@@ -9,6 +9,7 @@ test('semantic reading colors meet normal-text contrast in both themes',()=>{
   const css=fs.readFileSync('core/css/tokens.css','utf8');
   for(const selector of [':root {',':root[data-theme="light"] {']){
     const block=blocks(css,selector);
+    for(const pair of [['ink','nav-hover-bg'],['hover-ink','nav-hover-bg'],['primary-ink','primary-hover']])assert.ok(contrast(color(block,pair[0]),color(block,pair[1]))>=4.5,selector+' hover '+pair.join('/'));
     for(const text of ['ink','ink-soft','muted','brand','ok','bad','warn']){
       const ratio=contrast(color(block,text),color(block,'surface-1'));
       assert.ok(ratio>=4.5,`${selector} ${text}: ${ratio.toFixed(2)}`);
