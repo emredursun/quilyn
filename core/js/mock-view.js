@@ -6,12 +6,14 @@
 (function (global) {
   'use strict';
 
-  var PASS = 0.65, TIME_MIN = 90;
+  var PASS = 0.65, TIME_MIN = 90, BASE_TIME=90;
   function configureExam(track) {
     var spec = track && track.exam || {};
     PASS = (spec.passPercent || 65) / 100;
-    TIME_MIN = spec.timeMinutes || 90;
+    BASE_TIME = TIME_MIN = spec.timeMinutes || 90;
   }
+  function practiceLabel(name,count){return count<40?'Mini Practice '+name.replace(/^Mock Exam\s*/, ''):name;}
+  function practiceMinutes(count){return count<40?Math.max(5,count*2):BASE_TIME;}
   var EXAMS = {};
   var dismissActions = null;
   function closeActions() {
@@ -67,7 +69,7 @@
     if (!current || examFinished) return;
     try {
       var value = {
-        name: current, answers: answers, checked: checked, remaining: remaining
+        name: current, answers: answers, checked: checked, remaining: remaining, durationMinutes:TIME_MIN
       };
       if(attemptId)Object.assign(value,{mode:examMode,attemptId:attemptId,startedAt:startedAt,deadline:simulationEnd,signature:bankVersion,flags:flags,index:examNav?examNav.config.index:0,view:examNav?examNav.config.view:'list'});
       global.QuilynProgress.write(stateKey(), value);
@@ -114,8 +116,8 @@
         var inProgress = saved && saved.answers && saved.answers.length === qs.length &&
                          (saved.attemptId || saved.answers.some(function(a) { return a.length > 0; }));
         var el = document.createElement('button'); el.type = 'button'; el.className = 'examcard';
-        el.innerHTML = '<span class="quilyn-exam-title">' + esc(name) + '</span>' +
-          '<p>' + qs.length + ' questions · ' + TIME_MIN + ' min · ' + Math.round(PASS * 100) + '% to pass</p>' +
+        el.innerHTML = '<span class="quilyn-exam-title">' + esc(practiceLabel(name,qs.length)) + '</span>' +
+          '<p>' + qs.length + ' questions · ' + practiceMinutes(qs.length) + ' min · ' + Math.round(PASS * 100) + '% practice target'+(qs.length<40?' · Short question bank; not a full-length exam':'')+'</p>' +
           '<div class="best">' + esc(best) + '</div>' +
           (inProgress ? '<div class="in-progress-badge">In progress</div>' : '');
         el.onclick = function() { startExam(name); };
@@ -147,7 +149,7 @@
       var pct = Math.round(avg / perExam * 100);
       return '<tr><td>' + esc(d) + '</td><td>' + pct + '%</td><td>' + avg + '</td></tr>';
     }).join('');
-    return '<table class="dtable"><thead><tr><th>Domain</th><th>Exam %</th><th>Questions</th></tr></thead><tbody>' + rows + '</tbody></table>';
+    return '<table class="dtable"><thead><tr><th>Domain</th><th>Bank share</th><th>Questions</th></tr></thead><tbody>' + rows + '</tbody></table>';
   }
 
   /* Exam flow */
@@ -253,6 +255,7 @@
     paused = false;
     examFinished = false;
     var qs = EXAMS[name];
+    TIME_MIN=saved?(saved.durationMinutes||BASE_TIME):practiceMinutes(qs.length);
     examMode=saved?saved.mode||'practice':(q('mode')?q('mode').value:'practice');
     attemptId=saved&&saved.attemptId|| (global.QuilynJournal?global.QuilynJournal.id():null);
     startedAt=saved&&saved.startedAt||new Date().toISOString();
@@ -274,7 +277,7 @@
     }
 
     var examTitle = q('examTitle');
-    if (examTitle) examTitle.textContent = name + (examMode==='simulation'?' · Exam simulation':' · Learning mode') + ' — answer all ' + qs.length + ' questions, then Submit.';
+    if (examTitle) examTitle.textContent = practiceLabel(name,qs.length) + (examMode==='simulation'?' · Exam simulation':' · Learning mode') + ' — answer all ' + qs.length + ' questions, then Submit.';
 
     /* Collect unique sources and render header attribution */
     var srcEl = q('examSources');
@@ -619,13 +622,13 @@
       /* Home */
       '<section id="mv-home">' +
         '<div class="v-card">' +
-          '<h2>Choose a mock exam</h2>' +
-          '<p class="v-muted">Practice exams use a ' + TIME_MIN + '-minute timer and a ' + Math.round(PASS * 100) + '% pass mark. Available question coverage is shown below.</p>' +
+          '<h2>Choose a practice exam</h2>' +
+          '<p class="v-muted">Longer practice banks use a ' + TIME_MIN + '-minute timer and a ' + Math.round(PASS * 100) + '% pass mark. Available question coverage is shown below. Mini Practice banks have fewer than 40 questions, use a suggested two-minute-per-question timer (minimum five minutes), and do not represent full exam coverage. Saved older sessions keep their original timer.</p>' +
           '<p id="mv-bankDisclosure" class="v-muted"></p>' +
           '<p><a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></p><label>Mode <select id="mv-mode"><option value="practice">Learning — pause and check answers</option><option value="simulation">Exam simulation — continuous timer, answers after submission</option></select></label><p class="v-muted">Simulation time continues when you leave or reload. It cannot be paused.</p><div class="examgrid" id="mv-examGrid"></div>' +
         '</div>' +
         '<div class="v-card">' +
-          '<h2>Domain weighting (per exam)</h2>' +
+          '<h2>Practice bank coverage</h2>' +
           '<div id="mv-domTable"></div>' +
         '</div>' +
       '</section>' +
@@ -671,12 +674,13 @@
   function getSidebarHTML() {
     var scores = loadScores();
     return Object.keys(EXAMS).map(function(name, i) {
+      var qs=EXAMS[name];
       var sc = scores[name];
       var best = sc != null ? (sc + '%') : null;
       return '<li><a href="#mock" data-exam="' + esc(name) + '" class="pa-shell-sidebar-item' + (best && sc >= PASS * 100 ? ' done' : '') + '">' +
         '<span class="pa-shell-sidebar-num' + (best && sc >= PASS * 100 ? ' done' : '') + '">' + (i+1) + '</span>' +
         '<span style="flex:1;min-width:0">' +
-          '<span style="display:block">' + esc(name) + '</span>' +
+          '<span style="display:block">' + esc(practiceLabel(name,qs.length)) + '</span>' +
           (best ? '<span style="font-size:11px;color:var(--pa-ok,#34d399)">' + best + '</span>' :
                   '<span style="font-size:11px;color:var(--pa-muted,#939bbd)">Not attempted</span>') +
         '</span></a></li>';

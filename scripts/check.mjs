@@ -20,6 +20,8 @@ console.log(`Syntax verified: ${sourceFiles.length + interactiveFiles.length + s
 run(['scripts/validate-content.mjs']);
 run(['scripts/interactive-assets.mjs', '--check']);
 run(['scripts/content-quality.mjs', '--check']);
+run(['scripts/library-index.mjs', '--check']);
+run(['scripts/static-pages.mjs', '--check']);
 run(['scripts/content-manifest.mjs', '--check']);
 const tests = readdirSync(join(root, 'tests')).filter(file => /\.test\.(?:cjs|mjs|js)$/.test(file))
   .sort().map(file => join('tests', file));

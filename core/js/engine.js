@@ -162,6 +162,15 @@
     var hash = parseHash();
     document.querySelectorAll('.pa-study-nav a').forEach(function(a){var current=a.getAttribute('href')==='#'+hash.trackId+(hash.moduleId?'/'+hash.moduleId:'');if(current)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
 
+    if (hash.trackId === 'library' || hash.trackId === 'updates') {
+      var libraryRequest=moduleRequest;
+      if(window.QuilynShell)window.QuilynShell.renderMode('lms');
+      activeTrackId=window.PegaStore.state.activeTrack;renderSidebar();closeSidebarMobile();
+      var libraryContent=document.getElementById('paContent');libraryContent.textContent='Loading library…';
+      setCrumbs(hash.trackId==='updates'?'What’s new':'Learning library',null);
+      document.title=(hash.trackId==='updates'?'What’s new':'Learning library')+' — Quilyn';
+      window.QuilynRuntime.library().then(function(api){if(libraryRequest===moduleRequest)return api.mount(libraryContent,activeTrackId,hash.trackId);}).catch(function(e){if(libraryRequest===moduleRequest)libraryContent.textContent=e.message;});return;
+    }
     if (hash.trackId === 'history' || hash.trackId === 'mistakes' || hash.trackId === 'plan') {
       var request=moduleRequest;
       if(window.QuilynShell) window.QuilynShell.renderMode('lms');
@@ -302,7 +311,7 @@
       "</div>" +
       actions +
       weakPanel +
-      '<nav class="pa-learning-links" aria-label="Learning records"><a href="#plan"><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg> Study plan</a><a href="#plan/bookmarks"><svg class="i" aria-hidden="true"><use href="#i-bookmark"/></svg> Bookmarks</a> <a href="#history">Attempt history</a><a href="#mistakes">Mistakes notebook</a></nav><h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
+      '<nav class="pa-learning-links" aria-label="Learning records"><a href="#plan"><svg class="i" aria-hidden="true"><use href="#i-calendar"/></svg> Study plan</a><a href="#plan/bookmarks"><svg class="i" aria-hidden="true"><use href="#i-bookmark"/></svg> Bookmarks</a> <a href="#history">Attempt history</a><a href="#mistakes">Mistakes notebook</a><a href="#library">Learning library</a><a href="#updates">What’s new</a><a href="learn/">Reading guides</a></nav><h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
       '<div class="pa-footer">Quilyn · data-driven · ' + track.modules.length + " modules</div>";
 
     window.scrollTo({ top: 0 });
@@ -361,6 +370,7 @@
       moduleTitleHtml +
       '<p class="quilyn-provenance">Independent study notes · ' + (data.platformVersion ? 'Version ' + esc(data.platformVersion) : 'Version not documented') + ' · ' +
       (data.sourceReviewedOn ? 'Reviewed ' + esc(data.sourceReviewedOn) : 'Review date not documented') + ' · Module mastery: 70% quiz score</p>' +
+      '<p class="quilyn-provenance"><a href="#library">Browse concepts</a> · <a target="_blank" rel="noopener noreferrer" href="https://github.com/emredursun/quilyn/issues/new?title='+encodeURIComponent('Content feedback: '+activeTrackId+'/'+meta.id)+'&amp;body='+encodeURIComponent('Lesson: https://emredursun.github.io/quilyn/#'+activeTrackId+'/'+meta.id+'\n\nDescribe the issue and include an official reference if available.\nDo not include personal progress or private data.')+'">Report a content issue ↗</a></p>' +
       '<div class="sp-section-bar"><div class="pa-tabs">' +
       '<button data-v="guide" class="active">📘 Study Guide</button>' +
       '<button data-v="pitfalls">⚠️ Exam Pitfalls</button>' +

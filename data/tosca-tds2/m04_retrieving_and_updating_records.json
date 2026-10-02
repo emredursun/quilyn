@@ -30,7 +30,8 @@
       ],
       "bulletPoints": [
         "Existing TDS type* = which dataset to search. ActionMode Constraint = which record(s) within it."
-      ]
+      ],
+      "sectionId": "section-1e587b911618"
     },
     {
       "sectionTitle": "Entering retrieved data: the {TD[...]} expression",
@@ -48,7 +49,8 @@
       ],
       "bulletPoints": [
         "{TD[ObjectName.AttributeName]} — TDS type first, then the specific Attribute, separated by a full stop."
-      ]
+      ],
+      "sectionId": "section-82547cfdb0d6"
     },
     {
       "sectionTitle": "Updating a test record",
@@ -70,7 +72,8 @@
       ],
       "bulletPoints": [
         "No standalone 'blind update' — every update is preceded by a matching find/search."
-      ]
+      ],
+      "sectionId": "section-8409e1690b4a"
     },
     {
       "sectionTitle": "How the repository evolves through the order process",
@@ -93,7 +96,8 @@
           "type": "warning",
           "text": "The backend status and the TDS repository status change in two separate steps — don't assume TDS updates itself automatically just because the backend changed."
         }
-      ]
+      ],
+      "sectionId": "section-f196b21c1178"
     },
     {
       "sectionTitle": "Moving consumed records to a new TDS type",
@@ -111,7 +115,8 @@
       ],
       "bulletPoints": [
         "'Existing alias name (record)*' = where the record is coming FROM. 'Existing or new TDS type*' = where it's going TO."
-      ]
+      ],
+      "sectionId": "section-f53e48ae0f86"
     },
     {
       "sectionTitle": "Hands-on",
@@ -120,7 +125,8 @@
           "type": "note",
           "text": "📄 Exercise 03A-03G (Retrieve Test Records, Update Test Records, Add Items to the Shopping Cart, Purchase Items, Process Payments through Non-UI, Process Purchase Order, Move used records to other TDS type) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
         }
-      ]
+      ],
+      "sectionId": "section-9376adb9c39d"
     }
   ],
   "examPitfalls": [
@@ -151,12 +157,26 @@
       "type": "single-select",
       "scenario": "A tester wants to log a newly registered customer into the DemoWebShop using their stored email address, TDS type 'CustomerDetails'. What expression goes in the TestStepValue's Value field?",
       "options": [
-        { "id": "A", "text": "{TD[Email.CustomerDetails]}" },
-        { "id": "B", "text": "{TD[CustomerDetails.Email]}" },
-        { "id": "C", "text": "{TDS[CustomerDetails:Email]}" },
-        { "id": "D", "text": "{TD.CustomerDetails.Email}" }
+        {
+          "id": "A",
+          "text": "{TD[Email.CustomerDetails]}"
+        },
+        {
+          "id": "B",
+          "text": "{TD[CustomerDetails.Email]}"
+        },
+        {
+          "id": "C",
+          "text": "{TDS[CustomerDetails:Email]}"
+        },
+        {
+          "id": "D",
+          "text": "{TD.CustomerDetails.Email}"
+        }
       ],
-      "correctOptions": ["B"],
+      "correctOptions": [
+        "B"
+      ],
       "hint": "TDS type comes first, then the attribute, joined by a period.",
       "rationale": "The correct syntax is {TD[ObjectName.AttributeName]} — TDS type first, then the Attribute, separated by a full stop: {TD[CustomerDetails.Email]}."
     },
@@ -165,12 +185,26 @@
       "type": "single-select",
       "scenario": "A tester adds 'TestData - Update record' to change a customer's Status from New to Active, but the module has no way to know which specific record to change. What's missing?",
       "options": [
-        { "id": "A", "text": "Nothing — Update record works standalone." },
-        { "id": "B", "text": "A preceding search/find step that identifies the target record, matched via 'Existing alias name (record)*'." },
-        { "id": "C", "text": "An ActionMode Constraint set to 'Update'." },
-        { "id": "D", "text": "A Repetitions value." }
+        {
+          "id": "A",
+          "text": "Nothing — Update record works standalone."
+        },
+        {
+          "id": "B",
+          "text": "A preceding search/find step that identifies the target record, matched via 'Existing alias name (record)*'."
+        },
+        {
+          "id": "C",
+          "text": "An ActionMode Constraint set to 'Update'."
+        },
+        {
+          "id": "D",
+          "text": "A Repetitions value."
+        }
       ],
-      "correctOptions": ["B"],
+      "correctOptions": [
+        "B"
+      ],
       "hint": "Updating in TDS is never a standalone action.",
       "rationale": "Updating a TDS record always pairs with a search — the Update module's 'Existing alias name (record)*' must match the identity used when the record was originally found, so Tosca knows exactly which record to change."
     },
@@ -179,12 +213,26 @@
       "type": "single-select",
       "scenario": "During payment processing, Tosca gets a 200 OK response from the backend and the payment status becomes Processing there. Is the TDS repository automatically updated at this point?",
       "options": [
-        { "id": "A", "text": "Yes, TDS always mirrors backend status changes instantly." },
-        { "id": "B", "text": "No — a separate step must search for the same Pending record, confirm it now shows Processing in the DemoWebShop, and then explicitly update the TDS repository." },
-        { "id": "C", "text": "Only if Repetitions is set to 1." },
-        { "id": "D", "text": "TDS status can never reach 'Processing'." }
+        {
+          "id": "A",
+          "text": "Yes, TDS always mirrors backend status changes instantly."
+        },
+        {
+          "id": "B",
+          "text": "No — a separate step must search for the same Pending record, confirm it now shows Processing in the DemoWebShop, and then explicitly update the TDS repository."
+        },
+        {
+          "id": "C",
+          "text": "Only if Repetitions is set to 1."
+        },
+        {
+          "id": "D",
+          "text": "TDS status can never reach 'Processing'."
+        }
       ],
-      "correctOptions": ["B"],
+      "correctOptions": [
+        "B"
+      ],
       "hint": "Payment processing is described as a deliberate two-step flow.",
       "rationale": "The backend status change and the TDS repository update are two distinct steps — TDS is only updated once Tosca separately searches for the record, confirms the new state, and applies the update."
     },
@@ -193,22 +241,51 @@
       "type": "single-select",
       "scenario": "A tester wants to move all fully-processed records from 'CustomerDetails' into a new type called 'CustomerDetails_Used'. Which value goes into 'Existing or new TDS type*' on the Move record module?",
       "options": [
-        { "id": "A", "text": "CustomerDetails" },
-        { "id": "B", "text": "CustomerDetails_Used" },
-        { "id": "C", "text": "New" },
-        { "id": "D", "text": "Processing" }
+        {
+          "id": "A",
+          "text": "CustomerDetails"
+        },
+        {
+          "id": "B",
+          "text": "CustomerDetails_Used"
+        },
+        {
+          "id": "C",
+          "text": "New"
+        },
+        {
+          "id": "D",
+          "text": "Processing"
+        }
       ],
-      "correctOptions": ["B"],
+      "correctOptions": [
+        "B"
+      ],
       "hint": "One field is the source type, the other is the destination.",
       "rationale": "'Existing alias name (record)*' takes the CURRENT type (CustomerDetails); 'Existing or new TDS type*' takes the DESTINATION type — CustomerDetails_Used."
     }
   ],
   "quickRecap": [
-    { "key": "Find module", "value": "TestData - Find & provide record; Existing TDS type* + ActionMode Constraint narrow the search." },
-    { "key": "TD expression", "value": "{TD[ObjectName.AttributeName]} — TDS type, then Attribute, separated by a full stop." },
-    { "key": "Update module", "value": "TestData - Update record — always paired with a matching search (Existing alias name (record)*)." },
-    { "key": "Payment sync", "value": "Backend status change (non-UI, 200 OK) happens first; TDS repository update is a separate, later step." },
-    { "key": "Move module", "value": "TestData - Move record to TDS type — 'Existing alias name (record)*' = FROM, 'Existing or new TDS type*' = TO." }
+    {
+      "key": "Find module",
+      "value": "TestData - Find & provide record; Existing TDS type* + ActionMode Constraint narrow the search."
+    },
+    {
+      "key": "TD expression",
+      "value": "{TD[ObjectName.AttributeName]} — TDS type, then Attribute, separated by a full stop."
+    },
+    {
+      "key": "Update module",
+      "value": "TestData - Update record — always paired with a matching search (Existing alias name (record)*)."
+    },
+    {
+      "key": "Payment sync",
+      "value": "Backend status change (non-UI, 200 OK) happens first; TDS repository update is a separate, later step."
+    },
+    {
+      "key": "Move module",
+      "value": "TestData - Move record to TDS type — 'Existing alias name (record)*' = FROM, 'Existing or new TDS type*' = TO."
+    }
   ],
   "topics": [
     {

@@ -54,6 +54,7 @@
       });
     }
     if (/^pegaMock_[A-Za-z0-9-]+_.{1,120}$/.test(key)) return record(v) && Array.isArray(v.answers) &&
+      (v.durationMinutes === undefined || integer(v.durationMinutes,1,1440)) &&
       (v.mode === undefined || ['practice','simulation'].includes(v.mode)) &&
       (v.attemptId === undefined || typeof v.attemptId === 'string' && v.attemptId.length <= 200) &&
       (v.startedAt === undefined || date(v.startedAt)) &&

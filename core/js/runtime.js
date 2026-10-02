@@ -41,7 +41,7 @@
         return new Promise(function(resolve,reject) {
           var el=document.createElement(tag);assets.push(el);
           if(tag==='link')el.rel='stylesheet';
-          el[attr]=path+'?v=20261002o';el.onload=resolve;
+          el[attr]=path+'?v=20261002p';el.onload=resolve;
           el.onerror=function(){reject(new Error('Unable to load '+name+'. Reopen this page to retry.'));};
           document.head.appendChild(el);
         });
@@ -128,5 +128,5 @@
     });
     if (global.QuilynStorageNotice) global.dispatchEvent(new CustomEvent('quilyn-storage-error', {detail:global.QuilynStorageNotice}));
   });
-  global.QuilynRuntime = { json: json, learning:learning, personalization:personalization, review:review, safeUrl: safeUrl, cleanContent: cleanContent, interactive: interactive, dialog: dialog, closeDialog: closeDialog, enhance: enhance };
+  global.QuilynRuntime = { json: json, learning:learning, personalization:personalization, library:function(){return feature('library','QuilynLibrary','core/css/library.css');}, review:review, safeUrl: safeUrl, cleanContent: cleanContent, interactive: interactive, dialog: dialog, closeDialog: closeDialog, enhance: enhance };
 })(window);

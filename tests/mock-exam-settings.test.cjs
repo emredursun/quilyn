@@ -1,7 +1,7 @@
 const fs = require('fs'); const vm = require('vm'); const assert = require('assert');
 const registry = JSON.parse(fs.readFileSync('data/registry.json','utf8'));
 let source = fs.readFileSync('core/js/mock-view.js','utf8');
-source = source.replace('})(window);', 'window.testAPI={configureExam,getHTML,getPass:()=>PASS,getTime:()=>TIME_MIN}; })(window);');
+source = source.replace('})(window);', 'window.testAPI={configureExam,getHTML,practiceMinutes,practiceLabel,getPass:()=>PASS,getTime:()=>TIME_MIN}; })(window);');
 const window={};const context={window,HTMLElement:class{},customElements:{define(){}},console};
 vm.runInNewContext(source,context);
 const api=window.testAPI;
@@ -13,3 +13,5 @@ api.configureExam(registry.tracks.find(t=>t.trackId==='PSA'));
 assert.equal(api.getPass(),.65);assert(39/60>=api.getPass());assert(api.getHTML().includes('65% pass mark'));
 api.configureExam({exam:{passPercent:80,timeMinutes:45}});assert.equal(api.getTime(),45);assert(api.getHTML().includes('45-minute timer'));
 console.log('Mock settings verified: SSA 41/60 fails, 42/60 passes; PSA 39/60 passes; timing and labels follow track configuration.');
+
+assert.equal(api.practiceMinutes(5),10);assert.equal(api.practiceMinutes(4),8);assert.equal(api.practiceMinutes(60),45);assert.equal(api.practiceLabel("Mock Exam 1",5),"Mini Practice 1");
