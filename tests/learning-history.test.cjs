@@ -161,3 +161,18 @@ test('PSA UI, guidance and routing review has complete feedback and current sour
  assert.match(guidance.practiceQuiz[16].options[0].text,/New, Open, Pending and Resolved/);assert.match(guidance.practiceQuiz[15].options[1].text,/configured/);
  assert.match(routing.practiceQuiz[10].options[0].text,/preceding task/);assert.match(routing.practiceQuiz[5].options[0].text,/Roles/);assert.doesNotMatch(JSON.stringify(routing),/would create 25 separate|creates 30 separate/);
 });
+
+test('approval review keeps answer identities, complete feedback and evidence for the local content',()=>{
+ const crypto=require('node:crypto'),r=JSON.parse(fs.readFileSync('data/registry.json')),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));let count=0;
+ const modules=r.tracks.find(t=>t.trackId==='PSA').modules.slice(12,14);
+ modules.forEach((m,index)=>{const bytes=fs.readFileSync(m.file),d=JSON.parse(bytes),sections=new Set(d.studyGuide.map(s=>s.sectionId)),review=inventory.modules.find(x=>x.id===m.id);
+  assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+  d.practiceQuiz.forEach((q,i)=>{count++;assert.equal(q.questionId,'m'+(13+index)+'_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,index===0&&i>=12||index===1&&[7,12,13].includes(i)?['A','B']:['A']);assert.ok(sections.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,'2026-10-02');});
+ });assert.equal(count,29);
+ const approval=JSON.parse(fs.readFileSync(modules[0].file)),cascade=JSON.parse(fs.readFileSync(modules[1].file));
+ assert.match(approval.practiceQuiz[0].options[0].text,/shared Work Queue/);assert.match(approval.practiceQuiz[7].options[0].text,/Resolved-Rejected/);
+ assert.match(approval.practiceQuiz[4].options[0].text,/Reject flow/);assert.doesNotMatch(JSON.stringify(approval.studyGuide),/auto-approve|Three approval actions|default is to return/);
+ assert.match(cascade.practiceQuiz[11].scenario,/reporting-structure/);assert.match(cascade.practiceQuiz[13].optionExplanations.B,/not assume arbitrary middle tiers/);
+ assert.match(cascade.studyGuide[2].elements[0].description,/Data Page, Activity or Data Transform/);
+ assert.doesNotMatch(JSON.stringify(cascade),/authority matrix traverses|can be configured in App Studio|not an\./);
+});

@@ -38,7 +38,7 @@ Veri değişikliklerinde anlamlı regresyon ve migration testleri; `npm run chec
 
 ## Durum
 
-Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 ve PBA'nın 293 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. Toplam 1.862 sorunun 714'ünde seçenek açıklamaları ve ders hedefleri var; kalan 1.148 sorunun editoryal açıklama/bölüm eşleştirmesi ve 182 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Push/yayın yapılmadı.
+Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 ve PBA'nın 293 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. Toplam 1.862 sorunun 743'ünde seçenek açıklamaları ve ders hedefleri var; kalan 1.119 sorunun editoryal açıklama/bölüm eşleştirmesi ve 180 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Push/yayın yapılmadı.
 
 ### Aşama 1 teslim kaydı
 
@@ -267,3 +267,7 @@ Source review inventory records source-page version observations separately from
 ### PSA SA-M10–M12 — UI, instructions and routing review
 
 55 questions / 220 option explanations completed; total 714/1862, with **1148 remaining**. Three local modules compared across guide, diagrams, interactions, pitfalls, all question fields and recap; evidence hashes recorded. Source comparison is distinct from a product runtime exercise. **182 local modules remain**. Full Page/task Form, status categories, current-user context, queue duplication and access-role conflation corrected. See [review evidence](psa-ui-guidance-routing-review-2026-10-02.md). 100/100 tests passed; shell 297.4 KB; query 20261002ae / SW v77. Physical device/AT and final overall review remain open. Local commit only; no push.
+
+## Approval editorial package — 2026-10-02
+
+29 questions / 116 option explanations completed in SA-M13–14, with every lesson surface compared and corrected against official sources. Coverage 743/1862; 1119 remaining. Two inventory entries now contain local-content hashes; 180 original queued modules remain. See [comparison record](psa-approval-review-2026-10-02.md). 101/101 tests passed; shell 297.4 KB; query 20261002af / SW v78. Physical device/AT tests and final overall review remain open. Local commit only; no push.
