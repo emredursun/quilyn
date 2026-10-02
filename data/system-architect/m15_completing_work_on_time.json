@@ -1,7 +1,7 @@
 {
   "moduleId": "m15",
   "moduleTitle": "Completing work on time",
-  "moduleUrl": "https://academy.pega.com/module/completing-work-time/v8/in/96211",
+  "moduleUrl": "https://academy.pega.com/module/completing-work-time/v8",
   "moduleQuizUrl": "https://academy.pega.com/module/completing-work-time/v8/quiz/in/96211",
   "learningObjectives": [
     "Explain the purpose of an SLA and its goal and deadline milestones",
@@ -21,14 +21,14 @@
         },
         {
           "type": "analogy",
-          "text": "SLAs in Pega are like a pizza delivery guarantee: the 'Goal' is the target delivery time (30 minutes — aim for this), the 'Deadline' is the breach point (45 minutes — must not exceed this). When the goal is missed, the urgency counter climbs (yellow). When the deadline is missed, it turns red and the system escalates automatically — whether that means reassigning the task or sending a manager alert."
+          "text": "Think of a delivery target and a late threshold. Reaching either milestone only performs what was configured: a priority change, a notification or another action. A deadline is not a universal instruction to close the request."
         },
         {
           "type": "concept",
           "term": "Goal vs. Deadline",
-          "description": "Two SLA time targets, both measured from when the Assignment (or Case) started:",
+          "description": "Goal and deadline use the SLA’s configured start reference. Case-resolution configuration can refer to this Case, its parent or the top-level Case.",
           "items": [
-            "GOAL — how long work SHOULD take (desired, earlier target); interval is always shorter",
+            "GOAL — desired completion time, normally the earlier target; calculate from the configured start reference",
             "DEADLINE — the longest time work MAY take before it is 'late'"
           ]
         },
@@ -41,6 +41,11 @@
           "type": "diagram",
           "svg": "<svg viewBox=\"0 0 780 260\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>SLA Goal and Deadline Timeline</title>\n<desc>Timeline measured from assignment start, showing goal and deadline milestones with urgency increasing by a defined value at each</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">SLA TIMELINE — measured from Assignment start</text>\n<rect x=\"40\" y=\"120\" width=\"700\" height=\"10\" rx=\"5\" fill=\"var(--t)\" opacity=\".15\"/>\n<circle cx=\"40\" cy=\"125\" r=\"10\" fill=\"#1E8A5B\"/>\n<text x=\"40\" y=\"165\" font-size=\"11\" fill=\"var(--t)\" text-anchor=\"middle\">Start</text>\n<text x=\"40\" y=\"181\" font-size=\"10\" fill=\"var(--t)\" opacity=\".6\" text-anchor=\"middle\">Urgency 10 (+0)</text>\n<circle cx=\"320\" cy=\"125\" r=\"12\" fill=\"#BA7517\"/>\n<text x=\"320\" y=\"100\" font-size=\"12\" font-weight=\"700\" fill=\"#BA7517\" text-anchor=\"middle\">GOAL</text>\n<text x=\"320\" y=\"115\" font-size=\"10.5\" fill=\"#BA7517\" text-anchor=\"middle\">(earlier target)</text>\n<text x=\"320\" y=\"165\" font-size=\"11\" fill=\"#BA7517\" text-anchor=\"middle\">Urgency +10</text>\n<text x=\"320\" y=\"181\" font-size=\"10\" fill=\"#BA7517\" text-anchor=\"middle\">→ 20</text>\n<circle cx=\"660\" cy=\"125\" r=\"12\" fill=\"#DC2626\"/>\n<text x=\"660\" y=\"100\" font-size=\"12\" font-weight=\"700\" fill=\"#DC2626\" text-anchor=\"middle\">DEADLINE</text>\n<text x=\"660\" y=\"115\" font-size=\"10.5\" fill=\"#DC2626\" text-anchor=\"middle\">(later limit)</text>\n<text x=\"660\" y=\"165\" font-size=\"11\" fill=\"#DC2626\" text-anchor=\"middle\">Urgency +10</text>\n<text x=\"660\" y=\"181\" font-size=\"10\" fill=\"#DC2626\" text-anchor=\"middle\">→ 30</text>\n<line x1=\"40\" y1=\"208\" x2=\"320\" y2=\"208\" stroke=\"#BA7517\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/>\n<text x=\"180\" y=\"224\" font-size=\"10.5\" fill=\"#BA7517\" text-anchor=\"middle\">Goal interval (shorter)</text>\n<line x1=\"320\" y1=\"232\" x2=\"660\" y2=\"232\" stroke=\"#DC2626\" stroke-width=\"1.5\" stroke-dasharray=\"4,3\"/>\n<text x=\"490\" y=\"248\" font-size=\"10.5\" fill=\"#DC2626\" text-anchor=\"middle\">Deadline interval (longer)</text>\n<text x=\"390\" y=\"54\" font-size=\"11\" fill=\"var(--t)\" opacity=\".6\" text-anchor=\"middle\">Urgency rises by a defined value at each milestone (max 100)</text>\n</svg>",
           "caption": "Goal and deadline are measured from the Assignment's start. Urgency rises by a configured value at the goal and again at the deadline (range 10–100)."
+        },
+        {
+          "type": "concept",
+          "term": "Three timed responses: worked example",
+          "description": "For a calendar-time policy, Goal at day 3 can notify; Deadline at day 7 can reassign; a passed deadline interval of three days with one event can resolve still-open work at day 10. Configure every action explicitly and account for processing delay and calendars. The post-deadline Rule configuration is covered in SA-M16."
         }
       ],
       "sectionId": "section-0a6fb7b919de"
@@ -51,7 +56,7 @@
         {
           "type": "concept",
           "term": "Urgency (Case vs. Assignment)",
-          "description": "Urgency = numeric priority (0–100, MAX 100):",
+          "description": "Urgency is numeric priority with maximum 100:",
           "items": [
             "CASE Urgency — priority of the Case itself",
             "ASSIGNMENT Urgency — initial value equals Case Urgency (default 10); Stage/Process-level SLA adjustments affect Case Urgency"
@@ -60,7 +65,7 @@
         {
           "type": "concept",
           "term": "Setting and increasing Urgency",
-          "description": "Set INITIAL Urgency on the Case Type's Settings tab. Each SLA interval defines an increase value (1–100). IMPORTANT: updating Case Urgency applies to NEW Assignments only — existing Assignments keep the Urgency from when they were created."
+          "description": "Set the Case Type’s initial urgency in Settings. Updating a Case’s urgency supplies the new value for new Assignments, not existing ones. This does not prevent an existing Assignment’s own SLA from adjusting its urgency."
         },
         {
           "type": "concept",
@@ -69,8 +74,8 @@
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 720 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">SLA — GOAL, DEADLINE &amp; URGENCY</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Goal</text><text x=\"117\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Target completion time</text><text x=\"117\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Advisory — not hard limit</text><text x=\"117\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Triggers Warning action</text><text x=\"117\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">e.g., \"should be done in 1 day\"</text><rect x=\"253\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Deadline</text><text x=\"360\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Hard limit</text><text x=\"360\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Triggers Escalation action</text><text x=\"360\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Urgency caps at 100</text><text x=\"360\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Escalation continues after cap</text><rect x=\"496\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Urgency</text><text x=\"603\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Numeric 0–100 priority score</text><text x=\"603\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Get Next Work selects</text><text x=\"603\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">HIGHEST urgency first</text><text x=\"603\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Urgency change: NEW</text><text x=\"603\" y=\"130\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">assignments ONLY</text></svg>",
-          "caption": "Goal = advisory target (warning); Deadline = hard limit (escalation); Urgency 0-100 caps at 100; Get Next Work picks highest Urgency; changes apply to new Assignments only."
+          "svg": "<svg viewBox=\"0 0 720 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">SLA — GOAL, DEADLINE &amp; URGENCY</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Goal</text><text x=\"117\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Target completion time</text><text x=\"117\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Advisory — not hard limit</text><text x=\"117\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Configured goal response</text><text x=\"117\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">e.g., \"should be done in 1 day\"</text><rect x=\"253\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Deadline</text><text x=\"360\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Hard limit</text><text x=\"360\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Configured deadline response</text><text x=\"360\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Urgency caps at 100</text><text x=\"360\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Escalation continues after cap</text><rect x=\"496\" y=\"30\" width=\"215\" height=\"140\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Urgency</text><text x=\"603\" y=\"72\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Numeric 0–100 priority score</text><text x=\"603\" y=\"86\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Get Next Work selects</text><text x=\"603\" y=\"100\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">HIGHEST urgency first</text><text x=\"603\" y=\"116\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Case-value inheritance: NEW</text><text x=\"603\" y=\"130\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Assignments; task SLA separate</text></svg>",
+          "caption": "Goal and deadline have configured responses. Case-value inheritance for new Assignments is distinct from an existing task’s SLA urgency changes."
         }
       ],
       "sectionId": "section-3f00f4f334b6"
@@ -86,12 +91,12 @@
         {
           "type": "concept",
           "term": "Configuring a goal & deadline",
-          "description": "In App Studio (Case Types → Settings, or a Lifecycle element → Goal & deadline): pick 'Use SLA' = Custom/Existing/Never. Choose a time anchor (This/Parent/Top-Level Case). Enter Goal and Deadline as Days + HH:MM:SS with an urgency-increase value."
+          "description": "Use the appropriate Case or lifecycle-element Goal & deadline configuration. Case resolution offers Custom SLA, Existing SLA or Never, and This/Parent/Top-level Case anchors. Do not assume every lifecycle panel exposes all Case-resolution options. The linked 24.2 challenge configures the Schedule repair Step; the supplemental topic now uses Pega Infinity Studio terminology."
         },
         {
           "type": "concept",
           "term": "Configuring escalation actions",
-          "description": "On the Goal and Deadline sections you add NOTIFY recipients (Creator and/or Participants — manage the participant list), choosing a default or composed message; you can also reassign or resolve. Escalation actions cannot be set on the Create Stage either."
+          "description": "Configure notification recipients and message at the relevant goal and deadline. The supplemental Case/Stage/Process instructions describe Creator and Participants. General SLA escalation also includes reassignment or resolution; available controls depend on the selected context."
         },
         {
           "type": "diagram",
@@ -102,7 +107,7 @@
           "type": "interactive",
           "title": "SLA Configuration Decisions",
           "height": 420,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\":\"Goal vs Deadline\",\"scenario\":\"A claims Step: agents SHOULD finish within 2 hours; they MUST finish within 8 hours or it escalates. How are these configured?\",\"opts\":[\"2 hours = Goal (earlier, soft target); 8 hours = Deadline (later, hard limit). Urgency rises at each.\",\"2 hours = Deadline; 8 hours = Goal (goals can be later than deadlines)\",\"Only the 8-hour deadline \\u2014 goals are unnecessary\",\"Two deadlines at different urgency levels\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. Goal is the earlier soft target; deadline is the later hard limit. The goal is always earlier.\",\"\\u2717 Incorrect. The goal is always EARLIER than the deadline.\",\"\\u2717 Incorrect. Skipping the goal loses the early-warning escalation at 2 hours.\",\"\\u2717 Incorrect. A Step has one goal and one deadline, not two deadlines.\"]}, {\"label\":\"Create Stage\",\"scenario\":\"An SA tries to add a goal and deadline to the Create Stage of a Case Type but the option is unavailable. Why?\",\"opts\":[\"The Create Stage collects data before Case processing starts, so it cannot have a goal/deadline or escalation action\",\"SLAs are only allowed on the last Stage of a Case\",\"You must first add an SLA at the Case level before any Stage SLA is allowed\",\"Goal/deadline can only be set in Dev Studio for the Create Stage\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. The Create Stage runs before Case processing begins, so SLAs/escalation actions cannot be set on it.\",\"\\u2717 Incorrect. SLAs are allowed on any Stage except the Create Stage \\u2014 not just the last one.\",\"\\u2717 Incorrect. A Case-level SLA is not a prerequisite for Stage SLAs.\",\"\\u2717 Incorrect. The Create Stage cannot have an SLA in any studio \\u2014 it is a design rule, not a UI limitation.\"]}, {\"label\":\"Urgency update\",\"scenario\":\"A manager raises a Case Type's initial Urgency from 10 to 30. What happens to Assignments that are already open?\",\"opts\":[\"They keep their original Urgency \\u2014 the new value applies only to NEW Assignments created afterward\",\"All open Assignments immediately jump to Urgency 30\",\"All Assignments reset to Urgency 10 and climb again\",\"Nothing changes until each Assignment's goal elapses\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. Updating Case Urgency affects new Assignments only; existing Assignments keep the Urgency they were created with.\",\"\\u2717 Incorrect. Existing Assignments are not retroactively changed.\",\"\\u2717 Incorrect. There is no reset-to-10 behavior.\",\"\\u2717 Incorrect. The new value is used at Assignment creation, not at goal elapse.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=67?'Good \\u2014 review the missed items.':'Re-read the module and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\":\"Goal vs Deadline\",\"scenario\":\"A claims Step: agents SHOULD finish within 2 hours; they MUST finish within 8 hours or it escalates. How are these configured?\",\"opts\":[\"2 hours = Goal (earlier, soft target); 8 hours = Deadline (later, hard limit). Configure the required response at each.\",\"2 hours = Deadline; 8 hours = Goal (goals can be later than deadlines)\",\"Only the 8-hour deadline \\u2014 goals are unnecessary\",\"Two deadlines at different urgency levels\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. Goal is the earlier soft target; deadline is the later hard limit. The goal is the desired target in this policy.\",\"\\u2717 Incorrect. This reverses the two times specified in the policy.\",\"\\u2717 Incorrect. Skipping the goal loses the early-warning escalation at 2 hours.\",\"\\u2717 Incorrect. A Step has one goal and one deadline, not two deadlines.\"]}, {\"label\":\"Create Stage\",\"scenario\":\"An SA tries to add a goal and deadline to the Create Stage of a Case Type but the option is unavailable. Why?\",\"opts\":[\"The Create Stage collects data before Case processing starts, so it cannot have a goal/deadline or escalation action\",\"SLAs are only allowed on the last Stage of a Case\",\"You must first add an SLA at the Case level before any Stage SLA is allowed\",\"Goal/deadline can only be set in Dev Studio for the Create Stage\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. The Create Stage runs before Case processing begins, so SLAs/escalation actions cannot be set on it.\",\"\\u2717 Incorrect. SLAs are allowed on any Stage except the Create Stage \\u2014 not just the last one.\",\"\\u2717 Incorrect. A Case-level SLA is not a prerequisite for Stage SLAs.\",\"\\u2717 Incorrect. The Create Stage cannot have an SLA in any studio \\u2014 it is a design rule, not a UI limitation.\"]}, {\"label\":\"Urgency update\",\"scenario\":\"A running Case’s Urgency is updated from 10 to 30. What happens to Assignments that are already open?\",\"opts\":[\"That update does not rewrite their Urgency \\u2014 the new value applies only to NEW Assignments created afterward\",\"All open Assignments immediately jump to Urgency 30\",\"All Assignments reset to Urgency 10 and climb again\",\"Nothing changes until each Assignment's goal elapses\"],\"correct\":0,\"fbs\":[\"\\u2713 Correct. Updating Case Urgency affects new Assignments only; this Case update does not rewrite existing Assignments; their own SLA may still adjust urgency.\",\"\\u2717 Incorrect. Existing Assignments are not retroactively changed.\",\"\\u2717 Incorrect. There is no reset-to-10 behavior.\",\"\\u2717 Incorrect. The new value is used at Assignment creation, not at goal elapse.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=67?'Good \\u2014 review the missed items.':'Re-read the module and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-9ade4377d31b"
@@ -111,8 +116,8 @@
   "examPitfalls": [
     {
       "title": "Goal vs. Deadline direction",
-      "trapDescription": "Questions ask the difference between Goal and Deadline in an SLA. Candidates say Goal is more strict. Goal is the TARGET completion time (advisory); Deadline is the HARD limit. Passing the Goal triggers a warning action; passing the Deadline triggers an escalation action.",
-      "bestPractice": "Set the Goal interval shorter than the Deadline interval — the Goal triggers an advisory warning action; the Deadline triggers the hard escalation action."
+      "trapDescription": "Goal is the desired target; deadline marks lateness. Neither inherently guarantees a warning, reassignment or resolution without configured actions.",
+      "bestPractice": "Configure responses at each milestone and use the intended start reference."
     },
     {
       "title": "Create Stage has NO SLA",
@@ -125,9 +130,9 @@
       "bestPractice": "Set initial Urgency on the Case Type Settings tab; Stage/Process SLA increases affect Case Urgency."
     },
     {
-      "title": "Updating Case Urgency = new Assignments only",
-      "trapDescription": "A question asks whether changing an SLA's Urgency increment affects assignments already in a user's Worklist. Candidates say yes. SLA Urgency changes apply only to NEWLY created Assignments — existing Assignments in the Worklist are not retroactively updated.",
-      "bestPractice": "Changing an SLA Urgency value only affects newly created Assignments — operators who already hold an Assignment in their Worklist keep their current Urgency score."
+      "title": "Case update versus task SLA",
+      "trapDescription": "Changing Case urgency does not retroactively initialize existing Assignments. This is not a rule that an existing Assignment’s own SLA cannot change urgency.",
+      "bestPractice": "Keep Case-value inheritance separate from task-level SLA adjustments."
     },
     {
       "title": "Get Next Work uses Urgency",
@@ -136,13 +141,13 @@
     },
     {
       "title": "Calculate time from / Use SLA options",
-      "trapDescription": "'Use SLA' = Custom / Existing / Never. 'Calculate time from the start of' = This Case / Parent Case / Top-level Case.",
+      "trapDescription": "Case-resolution settings offer Custom/Existing/Never and This/Parent/Top-level Case start references. Do not attribute every option to every lifecycle panel.",
       "bestPractice": "Reuse an Existing SLA for consistency; pick the right start reference for nested Cases."
     },
     {
       "title": "SLA vs. passed deadline (escalation)",
       "trapDescription": "A question asks what term describes the action taken after a Deadline is passed. Candidates say 'SLA breach action.' The specific Pega term is Escalation Action — it is configured on the SLA rule and triggers automatically after the Deadline interval elapses.",
-      "bestPractice": "Configure the passed deadline interval and its repeating escalation actions on the SLA rule — these run AFTER the Deadline and repeat until the Case resolves."
+      "bestPractice": "Configure post-deadline recurrence on the SLA Rule with the event limit and Assignment completion policy, not an invented list of arbitrary extra milestones."
     }
   ],
   "practiceQuiz": [
@@ -172,16 +177,24 @@
         "A"
       ],
       "hint": "Goal = should (earlier); Deadline = must/late (later); measured from start.",
-      "rationale": "The goal is the earlier 'should-finish' target; the deadline is the later hard limit before work is late, both measured from start B is wrong because they are distinct milestones with their own actions.."
+      "rationale": "The goal is the desired turnaround; the deadline marks lateness, with the configured start reference. They are distinct milestones and need not use the same actions.",
+      "optionExplanations": {
+        "A": "The goal is the desired turnaround; the deadline marks lateness, with the configured start reference.",
+        "B": "They are distinct milestones and need not use the same actions.",
+        "C": "This reverses desired target and late threshold.",
+        "D": "The deadline is configurable, not an immutable platform default."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-0a6fb7b919de"
     },
     {
       "questionId": "m15_q02",
       "type": "single-select",
-      "scenario": "A Case starts at Urgency 10 with a 4-hour goal and a 24-hour deadline. With default SLA behavior, what happens to Urgency at each milestone?",
+      "scenario": "An incomplete Case starts at urgency 10. Its SLA has a four-hour goal with +10 urgency and a 24-hour deadline with +10 urgency, and no resolution action. Assuming timely event processing, what urgency values follow the milestones?",
       "options": [
         {
           "id": "A",
-          "text": "At the goal, Urgency increases by the configured value; at the deadline, it increases again (and escalation fires). Urgency only goes up, never down, capped at 100."
+          "text": "20 at the goal and 30 at the deadline; the Case remains open"
         },
         {
           "id": "B",
@@ -199,8 +212,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Urgency only increases, at goal and again at deadline; max 100.",
-      "rationale": "Urgency rises by the configured value at the goal and again at the deadline, never decreasing, and is capped at 100. B is wrong because it does not reset to 0. C is wrong because it increases at the goal too. D is wrong because the deadline does not auto-resolve the Case — it fires escalation actions."
+      "hint": "Apply the two configured increments; do not assume a universal default action.",
+      "rationale": "Configured +10 increments yield 20 at the goal and 30 at the deadline, below the 100 cap. Neither event inherently resets urgency or jumps it to 100.",
+      "optionExplanations": {
+        "A": "Configured +10 increments yield 20 at the goal and 30 at the deadline, below the 100 cap.",
+        "B": "Neither event inherently resets urgency or jumps it to 100.",
+        "C": "The goal also has its configured +10 adjustment.",
+        "D": "No resolution action is configured in this scenario."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-0a6fb7b919de"
     },
     {
       "questionId": "m15_q03",
@@ -228,7 +249,15 @@
         "A"
       ],
       "hint": "Two urgencies; initial Assignment Urgency = Case Urgency = default 10.",
-      "rationale": "Case Urgency is the Case's priority and Assignment Urgency is a task's priority; an Assignment starts at the Case Urgency value (default 10) B is wrong because they are distinct.."
+      "rationale": "Case priority and task priority are distinct; the task initially uses the Case urgency. They are not merely two names for one property.",
+      "optionExplanations": {
+        "A": "Case priority and task priority are distinct; the task initially uses the Case urgency.",
+        "B": "They are not merely two names for one property.",
+        "C": "An initial value of 100 followed by automatic decay is not the documented default.",
+        "D": "The Case Type settings, not an individual operator priority, define the initial Case urgency."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-3f00f4f334b6"
     },
     {
       "questionId": "m15_q04",
@@ -256,7 +285,15 @@
         "A"
       ],
       "hint": "Highest-Urgency-first Assignment delivery is the purpose of Get Next Work.",
-      "rationale": "Get Next Work selects the highest-Urgency Assignment the user can perform, driving on-time completion. B is wrong because a Decision Table evaluates conditions, not Assignment Urgency ranking. C is wrong because queues are not sorted alphabetically for prioritization. D is wrong because a Data Page caches data and does not deliver prioritized work."
+      "rationale": "Get Next Work favors higher-urgency Assignments the user is eligible to perform. A Decision table can evaluate conditions but is not the named work-selection capability.",
+      "optionExplanations": {
+        "A": "Get Next Work favors higher-urgency Assignments the user is eligible to perform.",
+        "B": "A Decision table can evaluate conditions but is not the named work-selection capability.",
+        "C": "Alphabetical order does not implement urgency-based selection.",
+        "D": "Caching data does not by itself deliver the next eligible Assignment."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-3f00f4f334b6"
     },
     {
       "questionId": "m15_q05",
@@ -284,7 +321,15 @@
         "A"
       ],
       "hint": "Four levels — and one Stage is excluded.",
-      "rationale": "SLAs apply at Case Type, Stage, Process, and Step level, but the Create Stage cannot have one. B is wrong because Process and Stage SLAs are supported. C is wrong because the Create Stage is excluded. D is wrong because Case/Stage/Process SLAs are configured in the Case Life Cycle, not a separate panel."
+      "rationale": "Case, Stage, Process and supported task Steps can have SLAs; the Create Stage is excluded. The documented scopes include Processes and Stages.",
+      "optionExplanations": {
+        "A": "Case, Stage, Process and supported task Steps can have SLAs; the Create Stage is excluded.",
+        "B": "The documented scopes include Processes and Stages.",
+        "C": "The Create Stage is the stated exception.",
+        "D": "SLA support is broader than individual Steps."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-9ade4377d31b"
     },
     {
       "questionId": "m15_q06",
@@ -312,7 +357,15 @@
         "A"
       ],
       "hint": "What is special about when the Create Stage runs?",
-      "rationale": "The Create Stage runs before Case processing begins, so it cannot have a goal/deadline or escalation action. B is wrong because the reason is the pre-processing timing, not Step count. C is wrong because Admin Studio does not configure Stage SLAs. D is wrong because Stages other than Create can have SLAs, not only Resolution."
+      "rationale": "The Create Stage collects information before Case processing starts, so this configuration is unavailable. The exclusion is not explained by an assertion that the Stage has no Steps.",
+      "optionExplanations": {
+        "A": "The Create Stage collects information before Case processing starts, so this configuration is unavailable.",
+        "B": "The exclusion is not explained by an assertion that the Stage has no Steps.",
+        "C": "Changing to Admin Studio does not remove the Create Stage restriction.",
+        "D": "Other processing Stages support SLAs; they are not limited to resolution."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-9ade4377d31b"
     },
     {
       "questionId": "m15_q07",
@@ -340,16 +393,24 @@
         "A"
       ],
       "hint": "Calculate time from the start of: This Case / Parent / Top-level.",
-      "rationale": "The 'Calculate time from the start of' option offers This Case, Parent Case, and Top-level Case — choose Top-level Case. B is wrong because This Case measures from the child's own start. C is wrong because the start reference is a separate setting, not implied by Existing vs Custom. D is wrong because 'Never' removes the SLA entirely."
+      "rationale": "Top-level Case selects the required start reference for the child’s SLA. This Case would use the child’s own start.",
+      "optionExplanations": {
+        "A": "Top-level Case selects the required start reference for the child’s SLA.",
+        "B": "This Case would use the child’s own start.",
+        "C": "Reusing an SLA does not inherently choose the top-level start reference.",
+        "D": "Never removes the SLA rather than selecting its start reference."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-9ade4377d31b"
     },
     {
       "questionId": "m15_q08",
       "type": "single-select",
-      "scenario": "A manager raises a Case Type's initial Urgency from 10 to 25. What happens to Assignments already open in running Cases?",
+      "scenario": "A running Case’s urgency is updated from 10 to 25. Does this change alone retroactively rewrite the urgency of its already-open Assignments?",
       "options": [
         {
           "id": "A",
-          "text": "They keep their original Urgency; the new value applies only to Assignments created afterward"
+          "text": "No; the new Case value is used for new Assignments, not retroactively applied to existing ones"
         },
         {
           "id": "B",
@@ -367,8 +428,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "An updated Urgency value applies to new Assignments only, not existing ones.",
-      "rationale": "Updating Case Urgency uses the new value only for new Assignments; existing Assignments retain the Urgency they were created with. B is wrong because the change is not retroactive. C is wrong because there is no reset. D is wrong because Urgency can be edited on the Settings tab."
+      "hint": "Distinguish a Case urgency update from the existing Assignment’s own SLA adjustments.",
+      "rationale": "Updated Case urgency supplies the initial urgency for new Assignments; it does not retroactively change existing ones. Existing Assignments are not automatically rewritten to the new Case value.",
+      "optionExplanations": {
+        "A": "Updated Case urgency supplies the initial urgency for new Assignments; it does not retroactively change existing ones.",
+        "B": "Existing Assignments are not automatically rewritten to the new Case value.",
+        "C": "The change does not inherently reset existing tasks to 10.",
+        "D": "The scenario does not establish a prohibition on updating Case urgency."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-3f00f4f334b6"
     },
     {
       "questionId": "m15_q09",
@@ -396,16 +465,24 @@
         "A"
       ],
       "hint": "Recall the three types of escalation actions available when an SLA milestone is missed.",
-      "rationale": "SLA escalation actions can notify recipients, reassign the Task, or resolve the Case. B is wrong because more than email-to-assignee is supported. C is wrong because the SLA runs actions in addition to raising Urgency. D is wrong because deleting the Case is never an SLA escalation action."
+      "rationale": "Configured escalation can notify recipients, reassign work or resolve the Case. Escalation is not restricted to email for the assignee.",
+      "optionExplanations": {
+        "A": "Configured escalation can notify recipients, reassign work or resolve the Case.",
+        "B": "Escalation is not restricted to email for the assignee.",
+        "C": "Urgency adjustments and additional actions can coexist on the SLA.",
+        "D": "Deletion is not the resolution action described by these sources."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-0a6fb7b919de"
     },
     {
       "questionId": "m15_q10",
       "type": "single-select",
-      "scenario": "A Case has a 2-hour goal and 8-hour deadline with a 'notify team lead' escalation. The deadline passes. Does the Case continue or close?",
+      "scenario": "A Case has an eight-hour deadline with Notify team lead and +10 urgency configured, but no resolution action. What does this deadline configuration imply?",
       "options": [
         {
           "id": "A",
-          "text": "It continues — the deadline triggers the escalation action and raises Urgency, but the Case stays open until resolved"
+          "text": "Notify and adjust urgency when the event is processed; this configuration does not itself close the Case"
         },
         {
           "id": "B",
@@ -423,64 +500,88 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "A deadline triggers actions; it does not close the Case.",
-      "rationale": "The deadline fires escalation and increases Urgency, but the Case continues until someone resolves it. B is wrong because Pega does not auto-resolve at a deadline. C is wrong because pausing is not deadline behavior. D is wrong because Cases are never auto-deleted."
+      "hint": "Resolution is a separate configured action, not the inevitable meaning of a deadline.",
+      "rationale": "Notification and a configured urgency adjustment do not themselves resolve the Case. No Resolved-Expired outcome is configured here.",
+      "optionExplanations": {
+        "A": "Notification and a configured urgency adjustment do not themselves resolve the Case.",
+        "B": "No Resolved-Expired outcome is configured here.",
+        "C": "Notification does not inherently pause processing for supervisor restart.",
+        "D": "The deadline does not inherently delete the Case."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-0a6fb7b919de"
     },
     {
       "questionId": "m15_q11",
       "type": "single-select",
-      "scenario": "An SLA goal was missed but its 'Notify Manager' action never ran. What is the most likely cause?",
+      "scenario": "Inspection shows an existing SLA Rule, but no SLA applied to the Review Step. The Step needs its goal notification. Which configuration is missing?",
       "options": [
         {
           "id": "A",
-          "text": "The SLA was not actually attached to the Case Type, Stage, Process, or Step — an unattached SLA never runs"
+          "text": "Apply the existing SLA to the Review Step"
         },
         {
           "id": "B",
-          "text": "Goal and deadline were reversed, which suppresses notifications"
+          "text": "Change the form’s light/dark theme"
         },
         {
           "id": "C",
-          "text": "Work queues intercept SLA notifications"
+          "text": "Rename the reviewer’s Work Queue"
         },
         {
           "id": "D",
-          "text": "Notifications only fire at the deadline, never at the goal"
+          "text": "Create a report filter for overdue work"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "No action at all → is the SLA even applied?",
-      "rationale": "If the SLA is not attached to a Case Type/Stage/Process/Step, its timers never start and no action fires. B is wrong because reversing thresholds would fire the wrong action, not suppress it entirely. C is wrong because queues do not intercept SLA notifications. D is wrong because goal milestones can fire notifications."
+      "hint": "The scenario gives configuration evidence; a missing email alone would not prove the cause.",
+      "rationale": "An existing SLA must be applied to the relevant work to govern its intervals. Changing the page’s theme does not attach the SLA.",
+      "optionExplanations": {
+        "A": "An existing SLA must be applied to the relevant work to govern its intervals.",
+        "B": "Changing the page’s theme does not attach the SLA.",
+        "C": "Renaming a queue does not apply the SLA to the task.",
+        "D": "An overdue-work report does not establish the missing task SLA configuration."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-9ade4377d31b"
     },
     {
       "questionId": "m15_q12",
       "type": "single-select",
-      "scenario": "A Case needs escalations at three points: notify at 3 days, reassign at 7 days, and resolve at 10 days. What is the cleanest Pega design?",
+      "scenario": "An SLA must notify at day 3, reassign at day 7, then resolve still-open work at day 10. Which explicitly configured schedule represents those times?",
       "options": [
         {
           "id": "A",
-          "text": "One SLA with multiple intervals — goal, additional interval(s), and deadline — each carrying its own escalation action"
+          "text": "Goal day 3: Notify; deadline day 7: Reassign; passed deadline interval 3 days, one event: Resolve"
         },
         {
           "id": "B",
-          "text": "Three separate SLA rules attached at the same point"
+          "text": "Only a notification at day 7"
         },
         {
           "id": "C",
-          "text": "A Decision Table that checks elapsed time daily"
+          "text": "One goal at day 3 carrying all actions at the same time"
         },
         {
           "id": "D",
-          "text": "A work-queue priority rule with day-based triggers"
+          "text": "Alphabetical Work Queue ordering with no SLA intervals"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Multiple timed escalations = one SLA, multiple intervals.",
-      "rationale": "A single SLA supports multiple intervals, each with its own escalation action, so all three fire from one rule. B is wrong because three rules on one point is redundant and harder to maintain. C is wrong because Decision Tables evaluate data, not elapsed time. D is wrong because queue priority ordering cannot fire time-based actions."
+      "hint": "The later action is three days after the deadline; limit it to one passed deadline event.",
+      "rationale": "Goal at day 3, deadline at day 7 and one passed deadline event three days later supply the required schedule. A notification at day 7 does not represent the required reassignment and later resolution.",
+      "optionExplanations": {
+        "A": "Goal at day 3, deadline at day 7 and one passed deadline event three days later supply the required schedule.",
+        "B": "A notification at day 7 does not represent the required reassignment and later resolution.",
+        "C": "One shared milestone cannot express all three stated times.",
+        "D": "An alphabetical queue order is not this time-based policy."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-0a6fb7b919de"
     },
     {
       "questionId": "m15_q13",
@@ -508,8 +609,16 @@
         "A",
         "B"
       ],
-      "hint": "SLAs are applied at life cycle levels — Case Type, Stage, Process, and Step — not at data or.",
-      "rationale": "Pega supports SLA configuration at the Case Type, Stage, Process, and Step (Assignment) levels. Field Group and Application Settings levels do not support SLA configuration. Each level independently tracks time-based milestones for the work contained at that level."
+      "hint": "Case Type and processing Stage are lifecycle scopes; fields and report settings are not.",
+      "rationale": "Case Type scope supplies a deadline for the whole Case. A processing Stage can have its own completion target.",
+      "optionExplanations": {
+        "A": "Case Type scope supplies a deadline for the whole Case.",
+        "B": "A processing Stage can have its own completion target.",
+        "C": "Field Group is not one of the documented lifecycle SLA scopes.",
+        "D": "A global application setting is not the Case Type or lifecycle scope described here."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-9ade4377d31b"
     },
     {
       "questionId": "m15_q14",
@@ -518,7 +627,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Case Urgency reflects the overall priority of the Case across all its open Assignments"
+          "text": "Case Urgency expresses the Case’s overall priority, distinct from each Assignment’s priority"
         },
         {
           "id": "B",
@@ -538,20 +647,28 @@
         "B"
       ],
       "hint": "Remember the two urgency types and the hard cap — urgency has a ceiling value in Pega.",
-      "rationale": "Case Urgency aggregates the priority of the Case overall, while Assignment Urgency drives Get Next Work ordering for that specific Assignment. Urgency is capped at 100 — it cannot exceed 100 even when multiple SLAs fire. Urgency does not automatically reset when a Stage changes."
+      "rationale": "Case urgency expresses Case priority, distinct from individual Assignment priority. Assignment urgency is used in selecting the next eligible work.",
+      "optionExplanations": {
+        "A": "Case urgency expresses Case priority, distinct from individual Assignment priority.",
+        "B": "Assignment urgency is used in selecting the next eligible work.",
+        "C": "Urgency remains capped at 100.",
+        "D": "A Stage transition does not inherently reset urgency to zero."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-3f00f4f334b6"
     },
     {
       "questionId": "m15_q15",
       "type": "multi-select",
-      "scenario": "An SA is configuring an SLA for a claims processing Case Type. Which TWO elements must be defined on the SLA rule to set up escalation behavior?",
+      "scenario": "Which TWO items are the standard completion milestones in the SLA described here?",
       "options": [
         {
           "id": "A",
-          "text": "Goal — the target completion time after which urgency begins to increase"
+          "text": "Goal — the desired completion time"
         },
         {
           "id": "B",
-          "text": "Deadline — the maximum allowed time before escalation actions execute"
+          "text": "Deadline — the late threshold"
         },
         {
           "id": "C",
@@ -566,8 +683,16 @@
         "A",
         "B"
       ],
-      "hint": "SLA rules contain time thresholds — think Goal and Deadline, not routing or reporting constructs.",
-      "rationale": "An SLA rule requires a Goal (the target time, after which urgency may increase) and a Deadline (the hard time limit, after which escalation actions such as notifications or reassignments execute). Work Queues and Report Filters are not configured within SLA rules."
+      "hint": "Identify time milestones; escalation actions still need separate configuration.",
+      "rationale": "Goal is the desired completion milestone, with configurable responses. Deadline is the late threshold, also with configurable responses.",
+      "optionExplanations": {
+        "A": "Goal is the desired completion milestone, with configurable responses.",
+        "B": "Deadline is the late threshold, also with configurable responses.",
+        "C": "A queue is a potential routing destination, not a time milestone.",
+        "D": "A report filter is not a goal or deadline interval."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-0a6fb7b919de"
     }
   ],
   "quickRecap": [
@@ -577,15 +702,15 @@
     },
     {
       "key": "Goal vs Deadline",
-      "value": "Goal = earlier 'should'; Deadline = later 'must/late'. Measured from start; goal interval < deadline interval."
+      "value": "Goal is the desired target; deadline marks lateness. Calculate using the configured start reference."
     },
     {
       "key": "Urgency",
-      "value": "Numeric priority 10–100 (max 100); default initial 10; increase per interval 1–100. Case Urgency vs Assignment Urgency (initial Assignment = Case)."
+      "value": "Numeric priority with maximum 100 and default initial Case value 10. Configure increments at the intended intervals; distinguish Case priority from task priority."
     },
     {
       "key": "Updating Urgency",
-      "value": "New Case Urgency applies to NEW Assignments only, not existing ones. Set initial on the Settings tab."
+      "value": "Updated Case urgency initializes new Assignments; existing task SLAs may still adjust their own urgency."
     },
     {
       "key": "Get Next Work",
@@ -597,7 +722,7 @@
     },
     {
       "key": "Configure",
-      "value": "Use SLA = Custom/Existing/Never · Calculate from = This/Parent/Top-level Case · Goal & Deadline = Days+HH:MM:SS + Increase Urgency by."
+      "value": "Case-resolution settings: Custom/Existing/Never and This/Parent/Top-level Case. Lifecycle panels and version terminology may differ."
     },
     {
       "key": "Escalation actions",
@@ -607,13 +732,25 @@
   "topics": [
     {
       "title": "Service Level Agreements",
-      "url": "https://academy.pega.com/topic/service-level-agreements/v6/in/96211/66696",
+      "url": "https://academy.pega.com/topic/service-level-agreements/v6",
       "duration": "15 min"
     },
     {
       "title": "Setting goals and deadlines",
-      "url": "https://academy.pega.com/topic/additional-tasks-setting-goals-and-deadlines/v6/in/96211/66696",
+      "url": "https://academy.pega.com/topic/additional-tasks-setting-goals-and-deadlines/v6",
       "duration": "10 min"
+    },
+    {
+      "title": "Enforcing SLAs challenge (24.2)",
+      "url": "https://academy.pega.com/challenge/enforcing-service-level-agreements/v8",
+      "duration": "Reference"
+    },
+    {
+      "title": "Passed deadline interval",
+      "url": "https://academy.pega.com/topic/passed-deadline-interval/v4",
+      "duration": "Reference"
     }
-  ]
+  ],
+  "platformVersion": "Pega Platform '24.2 / '25",
+  "sourceReviewedOn": "2026-10-02"
 }

@@ -38,7 +38,7 @@ Veri değişikliklerinde anlamlı regresyon ve migration testleri; `npm run chec
 
 ## Durum
 
-Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 ve PBA'nın 293 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. Toplam 1.862 sorunun 758'ünde seçenek açıklamaları ve ders hedefleri var; kalan 1.104 sorunun editoryal açıklama/bölüm eşleştirmesi ve 179 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Push/yayın yapılmadı.
+Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 ve PBA'nın 293 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. Toplam 1.862 sorunun 773'ünde seçenek açıklamaları ve ders hedefleri var; kalan 1.089 sorunun editoryal açıklama/bölüm eşleştirmesi ve 178 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Push/yayın yapılmadı.
 
 ### Aşama 1 teslim kaydı
 
@@ -275,3 +275,7 @@ Source review inventory records source-page version observations separately from
 ## Late-work editorial package — 2026-10-02
 
 SA-M16: 15 questions / 60 explanations completed with full local-source comparison. Finite repeat limits, Assignment completion, urgency caps and scheduler assumptions corrected across all lesson surfaces. Total coverage 758/1862; 1104 questions and 179 original queued modules remain. See [comparison record](psa-late-work-review-2026-10-02.md). 102/102 tests passed; shell 297.4 KB; query 20261002ag / SW v79. [Physical-device and AT matrix](release/physical-device-at-validation-2026-10-02.md) prepared, not executed; actual device access and final overall review remain open. Local commit only; no push.
+
+## SLA editorial package — 2026-10-02
+
+SA-M15: 15 questions / 60 explanations completed with full local-source comparison, including diagrams and interactive feedback. Corrected Case/task urgency conflation, universal deadline/default claims and invented arbitrary intervals. Total coverage 773/1862; 1089 questions and 178 original queued modules remain. See [comparison record](psa-sla-review-2026-10-02.md). 103/103 tests passed; shell 297.4 KB; query 20261002ah / SW v80. Physical device/AT and final overall review remain open. Local commit only; no push.
