@@ -113,7 +113,7 @@
         {
           "type": "concept",
           "term": "Resolution Stage",
-          "description": "Marked red; defines end-of-life-cycle behavior. Every Case Type should have at least one Resolution Stage; a Case can resolve through more than one (e.g., approved vs. rejected). Case statuses ending in Resolved- (e.g., Resolved-Completed, Resolved-Rejected) typically close the Case."
+          "description": "Marked red; defines end-of-life-cycle behavior. Every Case Type should have at least one Resolution Stage; a Case can resolve through more than one (e.g., approved vs. rejected). Case statuses beginning with Resolved- (e.g., Resolved-Completed, Resolved-Rejected) typically close the Case."
         },
         {
           "type": "analogy",
@@ -171,6 +171,11 @@
           "type": "concept",
           "term": "Draft data objects",
           "description": "When you reference data that isn't built yet, Pega creates a Draft (placeholder) data object — no fields or integration settings — so the life cycle can progress in design; complete it later on the Data Objects landing page."
+        },
+        {
+          "type": "concept",
+          "term": "Draft mode and release checks",
+          "description": "Draft Processes can be run during development with incomplete configuration. Draft mode does not isolate changes from a live application. Resolve configuration errors and ensure draft mode is turned off before production release; App Studio can turn it off automatically when a saved Process has no configuration issues."
         },
         {
           "type": "analogy",
@@ -255,7 +260,15 @@
         "A"
       ],
       "hint": "Top-level lifecycle phases in a Case are which building block?",
-      "rationale": "Stages are the top-level phases of the Case Life Cycle — Submission, Processing, Settlement are Stages B is wrong because Processes are groupings of Steps that exist inside a Stage; they are finer-grained than."
+      "rationale": "Stages are the top-level phases of the Case Life Cycle — Submission, Processing, Settlement are Stages B is wrong because Processes are groupings of Steps that exist inside a Stage; they are finer-grained than.",
+      "optionExplanations": {
+        "A": "Submission, Processing and Settlement are the broad lifecycle phases.",
+        "B": "A Process groups work within one of those phases.",
+        "C": "A Step is a specific action inside a Process.",
+        "D": "Personas identify user groups rather than lifecycle milestones."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-f209fc37ec74"
     },
     {
       "questionId": "m02_q02",
@@ -283,7 +296,15 @@
         "A"
       ],
       "hint": "Which is the template (the cutter) and which is the result (the cookie)?",
-      "rationale": "A Case Type is the reusable design template (Stages, Processes, Steps, Data Model). A Case is a specific numbered instance created when the template executes for one request — analogous to class vs. object."
+      "rationale": "A Case Type is the reusable design template (Stages, Processes, Steps, Data Model). A Case is a specific numbered instance created when the template executes for one request — analogous to class vs. object.",
+      "optionExplanations": {
+        "A": "The reusable loan model produces individual numbered transactions.",
+        "B": "This reverses the model and its concrete instances.",
+        "C": "The template and the transaction are distinct artifacts.",
+        "D": "A Case Type is not an individual task in a workflow."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-316d538e9022"
     },
     {
       "questionId": "m02_q03",
@@ -311,7 +332,15 @@
         "A"
       ],
       "hint": "Is the Create Stage's position enforced by the platform, or is it a configurable default?",
-      "rationale": "The Create Stage is platform-enforced as the first Stage and immediately assigns the Case ID. It cannot be repositioned — only renamed. Exceptions during creation go to Alternate Stages, not a repositioned Create Stage."
+      "rationale": "The Create Stage is platform-enforced as the first Stage and immediately assigns the Case ID. It cannot be repositioned — only renamed. Exceptions during creation go to Alternate Stages, not a repositioned Create Stage.",
+      "optionExplanations": {
+        "A": "Keep the Create Stage first and model a rejection path separately.",
+        "B": "Moving the Create Stage is not an available design operation.",
+        "C": "An exception branch does not replace the fixed Create Stage.",
+        "D": "A Wait Step is not the proposed mechanism for delaying case identity."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-7adc11580ff7"
     },
     {
       "questionId": "m02_q04",
@@ -339,7 +368,15 @@
         "A"
       ],
       "hint": "Exception handling that branches off and returns to the main path — which Stage type?",
-      "rationale": "Alternate Stages handle exceptions; after remediation, a Change Stage automation returns the Case to the primary path. The Create Stage is always first; the Resolution Stage ends the Case — neither handles mid-process exceptions."
+      "rationale": "Alternate Stages handle exceptions; after remediation, a Change Stage automation returns the Case to the primary path. The Create Stage is always first; the Resolution Stage ends the Case — neither handles mid-process exceptions.",
+      "optionExplanations": {
+        "A": "An Alternate Stage models remediation outside the normal underwriting path.",
+        "B": "The initial creation phase is not the later exception branch.",
+        "C": "A normal milestone does not express the requested deviation as clearly.",
+        "D": "Concurrent work is not the off-path remediation sequence described."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-7adc11580ff7"
     },
     {
       "questionId": "m02_q05",
@@ -366,8 +403,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Red = end state; at least one required per Case Type.",
-      "rationale": "Every Case Type needs at least one Resolution Stage (shown in red) that defines end-of-life outcomes. Multiple Resolution Stages are allowed for different outcomes. Without one, the Case has no defined closure path."
+      "hint": "Red identifies a Resolution Stage; design an explicit closure path.",
+      "rationale": "A well-designed Case Type should include a Resolution Stage to express how work finishes. More than one Resolution Stage can represent different outcomes. This is design guidance, not a claim that the platform cannot save any other configuration.",
+      "optionExplanations": {
+        "A": "An explicit resolution phase makes the intended closure outcome clear.",
+        "B": "Remaining active forever does not satisfy the intended completion outcome.",
+        "C": "There can be multiple resolution outcomes; red identifies this stage type.",
+        "D": "Creation and resolution serve different positions and purposes."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-7adc11580ff7"
     },
     {
       "questionId": "m02_q06",
@@ -396,8 +441,16 @@
         "B"
       ],
       "hint": "The colors encode WHO does the work — human or system — not urgency or completion status.",
-      "rationale": "Green = Collect information Steps (user Tasks/Assignments); Yellow = Automation Steps (system actions like send email, create PDF, wait, etc.). Color encodes actor type, not status or priority. C inverts the mapping — this is the single most common color-confusion error on the exam. system, not optionality.",
-      "selectCount": 2
+      "rationale": "In this Case Life Cycle view, green Step icons identify user work and yellow Step icons identify system work. These colors do not describe completion, urgency, or whether the Step is optional.",
+      "selectCount": 2,
+      "optionExplanations": {
+        "A": "Green identifies work requiring a user action in this lifecycle view.",
+        "B": "Yellow identifies the system-executed steps in this lifecycle view.",
+        "C": "This reverses the actor-type color mapping.",
+        "D": "The colors distinguish actors, not optional versus mandatory work."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-7adc11580ff7"
     },
     {
       "questionId": "m02_q07",
@@ -425,7 +478,15 @@
         "A"
       ],
       "hint": "Independent, any order, both must finish before advancing — which configuration?",
-      "rationale": "Parallel Processes run concurrently within the same Stage; the Stage advances when all required Parallel Processes complete. Sequential Processes enforce order; Alternate Stages handle exceptions — neither enables true parallel execution."
+      "rationale": "Parallel Processes run concurrently within the same Stage; the Stage advances when all required Parallel Processes complete. Sequential Processes enforce order; Alternate Stages handle exceptions — neither enables true parallel execution.",
+      "optionExplanations": {
+        "A": "Independent processes let IT and HR work concurrently before stage completion.",
+        "B": "A sequential dependency adds an order the scenario does not require.",
+        "C": "These normal onboarding workstreams are not exception branches.",
+        "D": "Disconnected lifecycles would not provide the required shared completion gate."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-7adc11580ff7"
     },
     {
       "questionId": "m02_q08",
@@ -453,7 +514,15 @@
         "A"
       ],
       "hint": "Sequential screens for one user, submit on the last screen.",
-      "rationale": "The default Create Process is a Multi-step Form: one user steps through sequential Views and submits on the last screen. Parallel Processes assign work to multiple users simultaneously — a different pattern for a different use case."
+      "rationale": "The default Create Process is a Multi-step Form: one user steps through sequential Views and submits on the last screen. Parallel Processes assign work to multiple users simultaneously — a different pattern for a different use case.",
+      "optionExplanations": {
+        "A": "The default form guides one user through related creation screens.",
+        "B": "Parallel assignments split work rather than form one user's guided input.",
+        "C": "A branching form tree is not the default process described.",
+        "D": "A read-only fragment cannot collect the creation data requested."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-bf24340cde87"
     },
     {
       "questionId": "m02_q09",
@@ -480,8 +549,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "All three navigation styles include Previous/Next — the user can move back freely before final submission.",
-      "rationale": "All three Multi-step Form navigation styles (Standard, Tab, Chevron) include Next/Previous buttons for back-and-forth navigation. The 'Previous' button is a standard feature, not a custom addition."
+      "hint": "Standard, horizontal, and vertical navigation support Next and Previous before final submission.",
+      "rationale": "The standard, horizontal, and vertical Multi-step Form navigation styles support Next and Previous. Users can return to earlier Views before submission, subject to required-field constraints.",
+      "optionExplanations": {
+        "A": "The user can return before submission, subject to required-field constraints.",
+        "B": "Moving to a later View does not inherently lock all earlier input.",
+        "C": "Back navigation is not exclusive to Standard style.",
+        "D": "Ordinary form navigation does not require a special Dev Studio addition."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-bf24340cde87"
     },
     {
       "questionId": "m02_q10",
@@ -509,7 +586,15 @@
         "A"
       ],
       "hint": "Sketch the structure now, fill in the details later.",
-      "rationale": "Draft mode lets an SA sketch an entire Case Life Cycle with placeholder elements during workshops, marked for full configuration later. It is a design-speed tool, not a production mode or a caching mechanism."
+      "rationale": "Draft mode lets an SA sketch an entire Case Life Cycle with placeholder elements during workshops, marked for full configuration later. It is a design-speed tool, not a production mode or a caching mechanism.",
+      "optionExplanations": {
+        "A": "Draft mode supports running and refining an incomplete design.",
+        "B": "Caching business data does not provide incomplete-flow design support.",
+        "C": "An application summary is not the draft execution setting.",
+        "D": "Importing a proposed design does not ensure complete configuration."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-62bd5b9126af"
     },
     {
       "questionId": "m02_q11",
@@ -537,12 +622,20 @@
         "A"
       ],
       "hint": "Draft mode creates a placeholder, not a finished artifact.",
-      "rationale": "When you reference a non-existent data object in Draft mode, Pega creates a Draft placeholder with no fields or integration — the SA must complete it afterward. Draft mode never auto-creates production-ready data objects."
+      "rationale": "When you reference a non-existent data object in Draft mode, Pega creates a Draft placeholder with no fields or integration — the SA must complete it afterward. Draft mode never auto-creates production-ready data objects.",
+      "optionExplanations": {
+        "A": "The missing object is represented as a draft to finish later.",
+        "B": "A placeholder does not supply a production-ready data model.",
+        "C": "No REST endpoint or savable data page is specified here.",
+        "D": "An access definition does not create the object's fields and integration."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-62bd5b9126af"
     },
     {
       "questionId": "m02_q12",
       "type": "single-select",
-      "scenario": "An SA is naming four artifacts in a mortgage application and proposes: Stage = 'Review mortgage documents', Process = 'Document Review', Step = 'Collect applicant signature', Case Type = 'Mortgage Approval'. The lead SA says exactly ONE of the four violates the naming convention. Which one, and what is the correct replacement?",
+      "scenario": "An SA proposes four artifact names: Stage = 'Review mortgage documents', Process = 'Review documents', Step = 'Collect applicant signature', Case Type = 'Mortgage Approval'. Which proposed name violates the Stage/Process/Step naming convention, and what is a suitable replacement?",
       "options": [
         {
           "id": "A",
@@ -550,7 +643,7 @@
         },
         {
           "id": "B",
-          "text": "Process = 'Document Review' violates the convention — Processes use verb+noun, not a noun phrase. Replace with 'Review Documents'"
+          "text": "Process = 'Review documents' violates the convention — Processes must use a noun phrase rather than a verb+noun phrase. Replace with 'Document Review'"
         },
         {
           "id": "C",
@@ -564,8 +657,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Stage = noun/gerund; Process = verb+noun; Step = verb+noun; Case Type = outcome statement (noun phrase).",
-      "rationale": "Stage naming uses noun/noun phrase/gerund (e.g., 'Document Review'). 'Review mortgage documents' is verb+noun — that is the Process convention B is wrong because 'Document Review' IS the correct Process convention — a gerund noun phrase is acceptable."
+      "hint": "Stages describe phases; Processes and Steps describe actions.",
+      "rationale": "Use a phase name such as 'Document Review' for the Stage. 'Review documents' and 'Collect applicant signature' already follow the verb+noun convention for Processes and Steps. The case name identifies the repeatable business transaction.",
+      "optionExplanations": {
+        "A": "Document Review describes a phase rather than an action to perform.",
+        "B": "Review documents already follows the action-oriented Process convention.",
+        "C": "Collect applicant signature is an appropriate action-oriented Step name.",
+        "D": "The proposed case name describes the repeatable business transaction."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-316d538e9022"
     },
     {
       "questionId": "m02_q13",
@@ -593,7 +694,15 @@
         "A"
       ],
       "hint": "A bounded slice of the customer journey delivered as a Case Life Cycle.",
-      "rationale": "A Microjourney is a Case Life Cycle delivering one specific, meaningful outcome — e.g., 'submit a loan application.' It is not a field, a stage, or an integration: it is the named, scoped customer outcome the Case delivers."
+      "rationale": "A Microjourney is a Case Life Cycle delivering one specific, meaningful outcome — e.g., 'submit a loan application.' It is not a field, a stage, or an integration: it is the named, scoped customer outcome the Case delivers.",
+      "optionExplanations": {
+        "A": "The example describes a focused path to a meaningful customer outcome.",
+        "B": "An individual field cannot represent the whole unit of work.",
+        "C": "Release packaging is different from the customer work being modeled.",
+        "D": "A system of record holds data, not the defined journey model."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-316d538e9022"
     },
     {
       "questionId": "m02_q14",
@@ -621,7 +730,15 @@
         "A"
       ],
       "hint": "Automated transition to a named Stage — which automation type does this?",
-      "rationale": "The Change Stage automation explicitly transitions a Case to a named Stage — the standard way to leave an Alternate Stage and return to a specific Primary Stage. Collect information steps gather data; they don't drive Stage transitions."
+      "rationale": "The Change Stage automation explicitly transitions a Case to a named Stage — the standard way to leave an Alternate Stage and return to a specific Primary Stage. Collect information steps gather data; they don't drive Stage transitions.",
+      "optionExplanations": {
+        "A": "Change Stage explicitly selects the next lifecycle phase.",
+        "B": "Collecting data alone does not specify the destination Stage.",
+        "C": "A timer alone does not configure the return-to-Review transition.",
+        "D": "Assignment routing chooses a work recipient, not the lifecycle destination."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-7adc11580ff7"
     },
     {
       "questionId": "m02_q15",
@@ -652,7 +769,15 @@
       ],
       "hint": "Phase → group → action — three levels of hierarchy; one answer is a security artifact.",
       "rationale": "The three building blocks are Stages (top-level phases), Processes (groups of Steps within a Stage), and Steps (individual actions within a Process). D is wrong because Access Roles are a security construct (RBAC) that governs who can do what — they define permissions, not lifecycle structure, and are not a building block of the Case Life Cycle.",
-      "selectCount": 3
+      "selectCount": 3,
+      "optionExplanations": {
+        "A": "Stages group the high-level phases of the transaction.",
+        "B": "Processes group the work within each phase.",
+        "C": "Steps are the specific user or automated actions.",
+        "D": "Security roles are not one of the lifecycle's three structural levels."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-f209fc37ec74"
     },
     {
       "questionId": "m02_q16",
@@ -661,7 +786,7 @@
       "options": [
         {
           "id": "A",
-          "text": "The SA is correct — Case status communicates lifecycle position to users, drives reporting filters and notification conditions, and 'Resolved-' prefix statuses formally close the Case"
+          "text": "The SA is correct — Case status communicates the current condition and can be used in reporting filters and configured conditions; a Resolved- status identifies resolution"
         },
         {
           "id": "B",
@@ -680,7 +805,15 @@
         "A"
       ],
       "hint": "Does Pega use Case status values in anything besides the UI display label?",
-      "rationale": "Case statuses serve three roles: user visibility (current state), system behavior triggers (notifications, SLAs, reporting), and lifecycle control ('Resolved-' prefix closes the Case). A status string that serves all three is the correct choice."
+      "rationale": "Case status is useful for communicating and querying the condition of work. Reports, notifications, or routing logic can use it when configured to do so; naming a status alone does not create those rules. Resolution uses the Resolved- prefix.",
+      "optionExplanations": {
+        "A": "Status makes the case's current condition visible and usable in configured logic.",
+        "B": "Reports and conditions can use status, so it is not display-only.",
+        "C": "This incorrectly excludes status from queries and configured conditions.",
+        "D": "Pending statuses can inform logic too; resolution is not their only use."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-7adc11580ff7"
     },
     {
       "questionId": "m02_q17",
@@ -708,7 +841,15 @@
         "A"
       ],
       "hint": "The Case Life Cycle IS the Microjourney expressed as a visual, structured model.",
-      "rationale": "The Case Life Cycle IS the visual, structured model of the Microjourney — it shows the path from triggering event to the specific outcome. They are not separate artifacts: the Case Life Cycle gives the Microjourney its operational form."
+      "rationale": "The Case Life Cycle IS the visual, structured model of the Microjourney — it shows the path from triggering event to the specific outcome. They are not separate artifacts: the Case Life Cycle gives the Microjourney its operational form.",
+      "optionExplanations": {
+        "A": "The lifecycle expresses the work needed to deliver the modeled outcome.",
+        "B": "The journey is not simply a reporting metric or data schema.",
+        "C": "Constellation does not require choosing between these related concepts.",
+        "D": "An Access Group governs privileges rather than describing the business path."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-316d538e9022"
     },
     {
       "questionId": "m02_q18",
@@ -717,7 +858,7 @@
       "options": [
         {
           "id": "A",
-          "text": "A Collect information Step (Assignment) — a Step where a user must take an action, such as entering data or making a decision"
+          "text": "An Assignment (user Step) — a Step that requires a user to review information and make a decision"
         },
         {
           "id": "B",
@@ -736,7 +877,15 @@
         "A"
       ],
       "hint": "A user must take action → which Step category?",
-      "rationale": "A Step requiring a human to take action is a Collect information Step (Task/Assignment). Automation Steps execute system actions (send email, change Stage, wait timer) without human intervention."
+      "rationale": "The adjuster must act, so this is user work represented by an Assignment. It is not a system-only Automation, a whole Stage, or an interface. Approval/rejection can use the appropriate dedicated user Step.",
+      "optionExplanations": {
+        "A": "A human decision produces an Assignment rather than a system-only action.",
+        "B": "The required adjuster's review is not automatic execution.",
+        "C": "A whole Stage is a different level from the individual review Step.",
+        "D": "An interface delivers the task but does not categorize its execution."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-f209fc37ec74"
     },
     {
       "questionId": "m02_q19",
@@ -765,20 +914,28 @@
         "B"
       ],
       "hint": "Recall the three-level hierarchy: Stage groups Processes, Process contains Steps.",
-      "rationale": "In a Pega Case Life Cycle, a Stage is the top-level grouping that represents a business phase and can contain multiple Processes. Each Process holds the Steps (Assignments, Automations, Subprocesses) that execute within it. A Stage is not limited to one Process, and Steps belong to exactly one Process."
+      "rationale": "In a Pega Case Life Cycle, a Stage is the top-level grouping that represents a business phase and can contain multiple Processes. Each Process holds the Steps (Assignments, Automations, Subprocesses) that execute within it. A Stage is not limited to one Process, and Steps belong to exactly one Process.",
+      "optionExplanations": {
+        "A": "A Stage brings related work together around a business milestone.",
+        "B": "A Process organizes its actions in an execution sequence.",
+        "C": "Stages can contain multiple Processes, including independent parallel work.",
+        "D": "A configured Step belongs to its Process context, not multiple Stages at once."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-f209fc37ec74"
     },
     {
       "questionId": "m02_q20",
       "type": "multi-select",
-      "scenario": "A developer is working on a new Case Type and wants to save partial configuration without affecting the live application. Which TWO statements correctly describe Draft mode in Pega?",
+      "scenario": "A developer is iterating on an incomplete Case Type in a development environment. Which TWO statements correctly describe Draft mode and the checks needed before production release?",
       "options": [
         {
           "id": "A",
-          "text": "Draft mode allows an SA to save incomplete Case Type configuration without the changes affecting the live application"
+          "text": "Draft mode permits development testing of Process flows even when some configuration is incomplete"
         },
         {
           "id": "B",
-          "text": "A Case Type in Draft mode can be submitted by users for testing purposes without requiring all Stages to be configured"
+          "text": "Resolve configuration issues and turn off Draft mode on Process flows before releasing the application to production"
         },
         {
           "id": "C",
@@ -793,8 +950,16 @@
         "A",
         "B"
       ],
-      "hint": "Draft mode is a safe sandbox — changes are saved but not live, and incomplete Cases can still be tested.",
-      "rationale": "Draft mode lets SAs save in-progress Case Type configurations without exposing them to production users. Cases in Draft mode can be submitted for testing even when configuration is incomplete, making it a safe environment to iterate. Draft mode does not activate changes in production and does not lock the configuration."
+      "hint": "Running an incomplete flow for development is different from approving it for production.",
+      "rationale": "Draft mode enables development iteration with incomplete configuration. It is not a deployment isolation boundary. Complete the configuration, resolve its errors, and ensure Draft mode is disabled before production release.",
+      "optionExplanations": {
+        "A": "Incomplete draft Processes can be run for development testing.",
+        "B": "Resolving configuration issues and disabling draft mode are release checks.",
+        "C": "Draft mode is not a production activation or approval mechanism.",
+        "D": "It supports iteration rather than a permanent configuration lock."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-62bd5b9126af"
     },
     {
       "questionId": "m02_q21",
@@ -823,7 +988,15 @@
         "B"
       ],
       "hint": "Good Case Life Cycle design reflects real business phases with descriptive naming — not rigid execution rules.",
-      "rationale": "Best practice is to design Stages around meaningful business milestones in the Case's resolution. Stage names should use nouns or gerunds that clearly communicate the phase. Processes do not need to always execute — run conditions can make them optional. Step duration is independent of SLA configuration."
+      "rationale": "Best practice is to design Stages around meaningful business milestones in the Case's resolution. Stage names should use nouns or gerunds that clearly communicate the phase. Processes do not need to always execute — run conditions can make them optional. Step duration is independent of SLA configuration.",
+      "optionExplanations": {
+        "A": "Business milestones give the lifecycle meaningful phases.",
+        "B": "Nouns or gerunds communicate a phase rather than an instruction.",
+        "C": "Conditional paths can omit work that does not apply.",
+        "D": "Step duration is not required to span multiple business days."
+      },
+      "explanationReviewedOn": "2026-10-02",
+      "lessonSection": "section-316d538e9022"
     }
   ],
   "quickRecap": [
