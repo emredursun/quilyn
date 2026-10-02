@@ -147,3 +147,17 @@ test('PSA data feedback has real targets and distinguishes ownership, cardinalit
  assert.doesNotMatch(rel.practiceQuiz[4].rationale,/retrieves a single record, not/);assert.match(rel.practiceQuiz[18].options[1].text,/List of records/);
  const data=JSON.parse(fs.readFileSync('data/system-architect/m08_the_data_model.json'));assert.match(data.practiceQuiz[5].scenario,/configured to a system of record/);assert.match(data.practiceQuiz[16].rationale,/refresh and invalidation/);
 });
+
+test('PSA UI, guidance and routing review has complete feedback and current source evidence',()=>{
+ const crypto=require('node:crypto'),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));let count=0;
+ const r=JSON.parse(fs.readFileSync('data/registry.json')),modules=r.tracks.find(t=>t.trackId==='PSA').modules.slice(9,12);
+ for(const m of modules){const bytes=fs.readFileSync(m.file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),review=inventory.modules.find(x=>x.id===m.id);
+  assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.sourceReviewedOn,'2026-10-02');
+  for(const q of d.practiceQuiz){count++;assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.deepEqual(q.correctOptions,q.type==='multi-select'?['A','B']:['A']);}
+ }assert.equal(count,55);
+ const ui=JSON.parse(fs.readFileSync(modules[0].file)),guidance=JSON.parse(fs.readFileSync(modules[1].file)),routing=JSON.parse(fs.readFileSync(modules[2].file));
+ assert.match(ui.practiceQuiz[18].options[1].text,/Form View/);assert.doesNotMatch(JSON.stringify(ui),/Full Page views.*assigned directly|DEPTH LIMIT|Cosmos React/);
+ assert.match(ui.studyGuide.find(s=>s.sectionTitle==='Model-driven UI Controls').elements[0].description,/supported/);
+ assert.match(guidance.practiceQuiz[16].options[0].text,/New, Open, Pending and Resolved/);assert.match(guidance.practiceQuiz[15].options[1].text,/configured/);
+ assert.match(routing.practiceQuiz[10].options[0].text,/preceding task/);assert.match(routing.practiceQuiz[5].options[0].text,/Roles/);assert.doesNotMatch(JSON.stringify(routing),/would create 25 separate|creates 30 separate/);
+});
