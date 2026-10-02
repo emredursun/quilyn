@@ -202,3 +202,12 @@ test('email editorial review distinguishes recipient references, templates and s
  assert.doesNotMatch(JSON.stringify(d),/Hardcoded = violation|Create Operator.{0,80}(?:built-in system templates|operator lifecycle notifications)|only pattern.*external emails|Notify sends only|Case owner \+ creator|fire-and-forget/);
  assert.match(d.studyGuide[0].elements.at(-1).caption,/references, not message templates/);assert.match(d.practiceQuiz[12].hint,/not a claim that no other/);
 });
+
+
+test('team editorial review preserves keys and replaces unsupported management claims',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m18_creating_managing_teams_users.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M18');
+ assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m18_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[5,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[9].options[0].text,/Authorized managers on the Work Group tab/);assert.match(d.practiceQuiz[11].scenario,/Roles restriction configured/);assert.match(d.practiceQuiz[13].options[1].text,/not required to belong/);
+ assert.doesNotMatch(JSON.stringify(d),/scoped per Case Type|operator belongs to one Work Group|Deputy WGM field|requires a manager to manually act/);
+});
