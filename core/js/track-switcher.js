@@ -88,7 +88,7 @@
       }
       // If we are in lms mode (hash has track id or is home), change hash to the new track
       const mode = location.hash.replace('#', '').split('/')[0];
-      if (!['mock','review','history','mistakes'].includes(mode)) {
+      if (!['mock','review','history','mistakes','plan'].includes(mode)) {
         location.hash = "#" + id;
       } else {
         // We are in mock/review view. Since mock-view reads on mount, fire a custom event

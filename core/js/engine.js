@@ -148,29 +148,32 @@
   function parseHash() {
     var h = (location.hash || "").replace(/^#/, "");
     var parts = h.split("/").filter(Boolean);
-    if (parts.length >= 2) return { trackId: parts[0], moduleId: parts[1] };
+    if (parts.length >= 2) return { trackId: parts[0], moduleId: parts[1], tab: parts[2] || null };
     if (parts.length === 1) return { trackId: parts[0], moduleId: null };
     return { trackId: null, moduleId: null };
   }
 
   function route() {
     if (!registry) return;
+    if(window.QuilynStudy)window.QuilynStudy.leaveLesson();
     moduleRequest++;
     if (window.PegaQuiz) window.PegaQuiz.unmount();
     if (window._paCrumbObs) { window._paCrumbObs.disconnect(); window._paCrumbObs = null; }
     var hash = parseHash();
 
-    if (hash.trackId === 'history' || hash.trackId === 'mistakes') {
+    if (hash.trackId === 'history' || hash.trackId === 'mistakes' || hash.trackId === 'plan') {
       var request=moduleRequest;
       if(window.QuilynShell) window.QuilynShell.renderMode('lms');
       activeTrackId=window.PegaStore.state.activeTrack;
       renderSidebar();closeSidebarMobile();
       var content=document.getElementById('paContent');content.textContent='Loading learning records…';
-      window.QuilynRuntime.learning().then(function(journal){
+      window.QuilynRuntime.personalization().then(function(study){
         if(request!==moduleRequest)return;
-        setCrumbs(hash.trackId==='history'?'Attempt history':'Mistakes notebook',null);
-        document.title=(hash.trackId==='history'?'Attempt history':'Mistakes notebook')+' — Quilyn';
-        journal.mount(content,activeTrackId,hash.trackId);
+        var title=hash.trackId==='plan'?'Study plan':hash.trackId==='history'?'Attempt history':'Mistakes notebook';
+        setCrumbs(title,null);
+        document.title=title+' — Quilyn';
+        if(hash.trackId==='plan')study.mount(content,getTrack(activeTrackId));
+        else window.QuilynJournal.mount(content,activeTrackId,hash.trackId);
       }).catch(function(e){if(request===moduleRequest)content.textContent=e.message;});return;
     }
     if (hash.trackId === 'mock' || hash.trackId === 'review') {
@@ -298,7 +301,7 @@
       "</div>" +
       actions +
       weakPanel +
-      '<nav aria-label="Learning records"><a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></nav><h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
+      '<nav aria-label="Learning records"><a href="#plan">Study plan & bookmarks</a> · <a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></nav><h2 class="quilyn-section-title">All modules</h2><div class="pa-cards">' + cards + "</div>" +
       '<div class="pa-footer">Quilyn · data-driven · ' + track.modules.length + " modules</div>";
 
     window.scrollTo({ top: 0 });
@@ -332,7 +335,7 @@
       if (request === moduleRequest) renderModule(meta, data);
     };
 
-    Promise.all([moduleCache[meta.id] ? Promise.resolve(moduleCache[meta.id]) : window.QuilynRuntime.json(meta.file), window.QuilynRuntime.learning()])
+    Promise.all([moduleCache[meta.id] ? Promise.resolve(moduleCache[meta.id]) : window.QuilynRuntime.json(meta.file), window.QuilynRuntime.personalization()])
       .then(function(results){done(results[0]);})
       .catch(function (err) {
         if (request !== moduleRequest) return;
@@ -449,6 +452,7 @@
     // Activate scroll-aware breadcrumb: shows track only when H2 is visible,
     // expands to "Track / Module" when user has scrolled past the title.
     activateCrumbObserver(moduleTitle);
+    if(window.QuilynStudy)window.QuilynStudy.attachLesson(c,activeTrackId,meta.id,parseHash().tab);
   }
 
   function buildObjectives(data) {

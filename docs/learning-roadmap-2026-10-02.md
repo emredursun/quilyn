@@ -38,7 +38,7 @@ Veri değişikliklerinde anlamlı regresyon ve migration testleri; `npm run chec
 
 ## Durum
 
-Aşama 1 ve Aşama 2 kodlandı ve yerel olarak doğrulandı. Aşama 3–4 henüz uygulanmadı. Sıradaki paket çalışma planı ve kişiselleştirmedir. Aşama 1–2 yerel commit paketi olarak hazırlanmıştır. Push/yayın yapılmamıştır.
+Aşama 1–2 doğrulandı ve `296fb78` commit’ine alındı. Push/yayın yapılmadı. Aşama 3’ün ilk kişiselleştirme paketi yerel olarak kodlandı ve doğrulandı; bu paket henüz commit edilmedi. Sonuçlardan belirli ders bölümüne editoryal eşleştirme ve yanlış şık açıklamaları kalan Aşama 3 işleridir. Aşama 4 henüz uygulanmadı.
 
 ### Aşama 1 teslim kaydı
 
@@ -65,3 +65,15 @@ Aşama 1 ve Aşama 2 kodlandı ve yerel olarak doğrulandı. Aşama 3–4 henüz
 - **Offline:** Test sunucusu kapatıldıktan sonra cached shell yenilendi; PSSA Smart Review 203 kart, geçmiş, mock bankası, mobil simülasyon ve Learning modunda cevap kontrolü çalıştı. Bu test önceden yüklenmiş içerik içindir; ilk kez hiç indirilmemiş track'in offline açılacağı anlamına gelmez. Offline tarayıcı testi v47 ara pakette gerçekleştirildi; final v48 aynı cache mekanizmasını ve asset listesini kullanır. Son temiz tarayıcı oturumunda yakalanan console warning/error boştu.
 - **Sınırlar:** Fiziksel iOS/Android ve VoiceOver/TalkBack testleri yapılmadı. Gerçek dosya indirme testinde tarayıcı aracının download event'i zaman aşımına uğradı; export/import veri döngüsü otomatik testle doğrulandı, gerçek dosya seçimiyle import bu teslimatta doğrulanmadı. İlk doğrulama sırasında commit/push yapılmamıştı.
 - Görsel kanıtlar: [Smart Review track geçişi](screenshots/review-track-switch-2026-10-02.png), [mobil sınav modu](screenshots/exam-modes-mobile-2026-10-02.png), [Yanlışlar defteri](screenshots/mistakes-notebook-2026-10-02.png).
+
+
+### Aşama 3 — İlk kişiselleştirme paketi
+
+- `#plan`: track bazında sınav tarihi ve günlük süre. Vadesi gelen tekrarlar, aktif yanlışlar, son üç quiz sonucu ve tamamlanmamış mevcut modüllerden bütçeyi aşmayan öneriler. Gerekçe ve tahmini süre görünür; bugünlük atlama ve geri alma var. Tamamlanan track için kısa recap veya süreye sığan tam mock önerilir. Hazırlık yeterliliği iddiası üretilmez. 20/10 dakikalık başlangıç blokları ölçülmüş öğrenme süresi veya tüm sınav hazırlığını bitirme tahmini değildir.
+- Modül yer imleri, son sekme ve Guide bölüm konumu; kaydedilen konuma dönme düğmesi. Açık Guide/Recap URL’si kaydedilen sekmenin önüne geçer. Üst araç çubuğuna kaydırmak son okuma bölümünü silmez.
+- `quilyn_study` tercihler/yer imleri/konumlar Settings yedekleme, import ve reset kapsamındadır. Geçersiz tarih, süre, tekrar eden kimlik, prototip anahtarı ve kota hataları kontrol edilir. Bilinmeyen modül referansları import sırasında raporlanır ve korunur.
+- Guide/Recap URL’si quiz kaydını ayrı anahtara yazmaz; modülün mevcut kayıt anahtarı kullanılır. Son tarayıcı testinde yanlış cevap ve grading yenilemeden sonra korundu, kayıt hata bildirimi yoktu.
+- `npm run check`: 68/68 test başarılı; kaynak, içerik, manifest ve kabuk bütçesi kontrolleri geçti. `git diff --check` temiz. Asset query `20261002e`; service worker `quilyn-v50`.
+- Tarayıcıda tarih/süre yenileme sonrasında korundu; track tercihleri ayrıştı; atlama, yer imi, son sekme ve Guide bölümüne dönüş çalıştı. 320/390 px yatay taşma yok; açık/koyu tema kontrol edildi. Test sunucusu kapalıyken plan ve kayıtlı tercihler açıldı; son cache sürümünde önceden yüklenen ders çevrimdışı açıldı. Yeni cache sürümü kurulmadan yüklenmiş dersin yeniden indirilmesi gerekebilir; hiç indirilmemiş içeriğin offline erişimi garanti edilmez.
+- Fiziksel iOS/Android ve VoiceOver/TalkBack kontrolü yapılmadı. Yedek veri döngüsü otomatik testle doğrulandı; gerçek dosya indirme/import akışı yeniden test edilmedi.
+- [Mobil çalışma planı](screenshots/study-plan-mobile-2026-10-02.png).

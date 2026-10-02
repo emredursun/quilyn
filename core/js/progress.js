@@ -65,6 +65,7 @@
       number(v.remaining, 0, 86400) && Array.isArray(v.answers) && v.answers.every(function (a) {
         return Array.isArray(a) && new Set(a).size === a.length && a.every(function (i) { return integer(i, 0, 99); });
       }) && Array.isArray(v.checked) && v.checked.length === v.answers.length && v.checked.every(function (b) { return typeof b === 'boolean'; });
+    if (key === 'quilyn_study') return !!global.QuilynStudy && global.QuilynStudy.valid(v);
     if (key === 'quilyn_learning') return !!global.QuilynJournal && global.QuilynJournal.valid(v);
     if (key === ACTIVITY_KEY) return record(v) && v.version === 1 && Array.isArray(v.events) && v.events.length <= 10000 &&
       v.events.every(function (e) { return record(e) && typeof e.id === 'string' && date(e.at) && /^\d{4}-\d{2}-\d{2}$/.test(e.day) &&
@@ -153,6 +154,11 @@
           return answers.some(function(a) { return a >= exam[i].o.length; }) || (exam[i].t === 'single' && answers.length > 1);
         })) throw new Error('Saved exam answers do not match available content: ' + key);
       }
+      if(key==='quilyn_study')Object.keys(value.tracks).forEach(function(trackId){
+        var meta=registry.tracks.find(function(t){return t.trackId===trackId;});
+        var available=new Set(meta?meta.modules.filter(function(m){return m.ready!==false;}).map(function(m){return m.id;}):[]);
+        value.tracks[trackId].bookmarks.concat(Object.keys(value.tracks[trackId].positions)).forEach(function(id){if(!available.has(id))unknown.push(trackId+'/'+id);});
+      });
       var progress = key === 'pega_lms_state' ? value.userProgress : key === 'pega_universal_state' ? value.lms && value.lms.userProgress : null;
       if (progress) Object.keys(progress).forEach(function(trackId) {
         var trackMeta = registry.tracks.find(function(t) { return t.trackId === trackId; });

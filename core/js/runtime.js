@@ -41,7 +41,7 @@
         return new Promise(function(resolve,reject) {
           var el=document.createElement(tag);assets.push(el);
           if(tag==='link')el.rel='stylesheet';
-          el[attr]=path+'?v=20261002c';el.onload=resolve;
+          el[attr]=path+'?v=20261002e';el.onload=resolve;
           el.onerror=function(){reject(new Error('Unable to load '+name+'. Reopen this page to retry.'));};
           document.head.appendChild(el);
         });
@@ -52,6 +52,7 @@
   }
   function learning(){return feature('learning-history','QuilynJournal','core/css/learning-history.css');}
   function review(){return feature('review-view','ReviewView');}
+  function personalization(){return Promise.all([learning(),feature('study-plan','QuilynStudy')]).then(function(values){return values[1];});}
   var dialogs = new Map();
   function closeDialog(el) {
     var entry = dialogs.get(el);
@@ -127,5 +128,5 @@
     });
     if (global.QuilynStorageNotice) global.dispatchEvent(new CustomEvent('quilyn-storage-error', {detail:global.QuilynStorageNotice}));
   });
-  global.QuilynRuntime = { json: json, learning:learning, review:review, safeUrl: safeUrl, cleanContent: cleanContent, interactive: interactive, dialog: dialog, closeDialog: closeDialog, enhance: enhance };
+  global.QuilynRuntime = { json: json, learning:learning, personalization:personalization, review:review, safeUrl: safeUrl, cleanContent: cleanContent, interactive: interactive, dialog: dialog, closeDialog: closeDialog, enhance: enhance };
 })(window);

@@ -15,7 +15,7 @@
   /* localStorage helpers */
   // Key is derived from the URL hash so each module gets its own slot.
   function storageKey() {
-    return "pq_state_" + (window.location.hash || "default");
+    return "pq_state_" + (window.location.hash ? window.location.hash.split("/").slice(0,2).join("/") : "default");
   }
 
   function loadState() {
