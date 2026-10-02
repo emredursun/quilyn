@@ -227,3 +227,11 @@ test('Pulse editorial review keeps notification preferences explicit and avoids 
  assert.match(d.practiceQuiz[9].scenario,/chosen Pulse email/);assert.match(d.practiceQuiz[9].options[0].text,/email notification/);assert.match(d.practiceQuiz[11].options[0].text,/dialog listing Cases/);assert.match(d.practiceQuiz[13].options[1].text,/comment/);
  assert.doesNotMatch(JSON.stringify(d),/permanent case history data|persist as long as the case exists|not external email by default|original CSR loses access/);
 });
+
+test('reuse editorial review aligns principles and avoids integration guarantees',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m21_modular_architecture_enterprise_reuse.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M21');
+ assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.platformVersion,"Pega Platform '25");
+ assert.equal(d.practiceQuiz.length,16);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m21_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[0,5].includes(i)?['A','B','C']:[10,15].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[1].elements[5].caption,/Interoperable, Updateable, Configurable, Modular and Governed/);assert.match(d.practiceQuiz[1].hint,/not the complete rule-resolution/);assert.match(d.practiceQuiz[15].options[1].text,/governed compatibility/);
+ assert.doesNotMatch(JSON.stringify(d),/first matching rule wins|Single, Maximize, Manage, Build|Division → Region → Channel → Product|thresholds directly in App Studio/);
+});
