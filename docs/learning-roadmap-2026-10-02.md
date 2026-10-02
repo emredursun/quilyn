@@ -38,7 +38,7 @@ Veri değişikliklerinde anlamlı regresyon ve migration testleri; `npm run chec
 
 ## Durum
 
-Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. Diğer track'lerdeki 1.659 sorunun editoryal açıklama/bölüm eşleştirmesi ve 185 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Push/yayın yapılmadı.
+Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 ve PBA'nın 293 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. PSSA ve PBA dışındaki track'lerdeki 1.366 sorunun editoryal açıklama/bölüm eşleştirmesi ve 185 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Push/yayın yapılmadı.
 
 ### Aşama 1 teslim kaydı
 
@@ -205,3 +205,23 @@ BA-M07–M09: 53 soru / 212 seçenek, elle seçilmiş ders hedefleri; toplam PBA
 Kaynaklar: [Blueprint generation](https://academy.pega.com/topic/generating-pega-blueprint/v3), [Blueprint import](https://academy.pega.com/topic/importing-pega-blueprint-pega-platform/v3), [Case lifecycle](https://academy.pega.com/topic/pegas-case-life-cycle/v2), [Lifecycle design](https://academy.pega.com/topic/designing-case-life-cycle/v2), [Data model](https://academy.pega.com/topic/basics-data-model/v2), [Data objects](https://academy.pega.com/topic/understanding-data-objects/v2), [Data records](https://academy.pega.com/topic/application-data-records/v2), [Relationships](https://academy.pega.com/topic/creating-data-relationships/v2), [Data pages](https://academy.pega.com/topic/accessing-data-data-pages/v3). Kaynak incelemesi açıklama kapsamındadır; sürüm belirsizliğini bütün modüller için kaldırmaz.
 
 83/83 test geçti. Statik dersler/manifest güncel, bölüm hedefleri geçerli. Query 20261002t; SW quilyn-v66. UI değişmedi; fiziksel cihaz/ekran okuyucu testi yapılmadı. Yerel commit; push/yayın yok.
+
+
+### Aşama 3 — PBA workflow checkpoint ve açıklamaların tamamlanması
+
+BA-M10–M14 için 76 soru / 304 seçenek açıklaması önceki `42cb826` checkpoint commit'inde saklandı. BA-M15–M19 için kalan **58 soru / 232 seçenek** bu pakette tamamlandı. PBA toplam **293/293**, 19 modül; PSSA ile birlikte 496 soru açıklamalı. Bölüm hedefleri elle seçildi. Kaynak kimliği bulunmayan eski PBA mock sorularına tahmini eşleştirme yapılmadı.
+
+İçerik düzeltmeleri: Access Group anlatımında work group yerine work pools; control tipini değiştirme ile görsel stil değişimini ayıran BA-M16 Q6; UI görünürlüğünün authorization yerine geçmediğini belirten not; Continuous Delivery ile Continuous Deployment ayrımı; ortam sayılarının örnek olduğunu açıklaştıran deployment sorusu; Cloud Choice'da client-managed cloud sorumlulukları; proje ekibinin belirlediği Definition of Ready. Doğru cevap anahtarları 58 sorunun tamamında önceki commit ile karşılaştırıldı ve korundu. Metni değişen sorular mevcut içerik imzası mekanizmasıyla yeniden değerlendirilir; geçmiş deneme snapshot'ları değiştirilmez.
+
+2 Ekim açıklama kaynakları: [Personas/operators/access](https://academy.pega.com/topic/personas-operators-and-work-access/v2), [Authentication/authorization](https://academy.pega.com/topic/authentication-and-authorization/v2), [Portals](https://academy.pega.com/topic/identifying-portals-and-landing-pages/v3), [UI controls](https://academy.pega.com/topic/user-interface-controls-and-presentation/v3), [Dynamic UI](https://academy.pega.com/topic/dynamic-functionality-user-interface-elements/v2), [Insights/BIX](https://academy.pega.com/topic/application-data-insights/v3), [Release management](https://academy.pega.com/topic/release-management-pega/v2), [Release practices](https://academy.pega.com/topic/release-management-best-practices/v2), [Cloud deployment](https://academy.pega.com/topic/application-deployment-pega-cloud/v2), [Collaboration](https://academy.pega.com/topic/collaboration-tools-app-studio/v2), [Agile tools](https://academy.pega.com/topic/using-agile-studio-and-agile-workbench/v2), [Readiness](https://academy.pega.com/topic/user-story-readiness/v3), [Backlog](https://academy.pega.com/topic/maintaining-backlog/v2). Açıklamalar bağımsız editoryal yorumdur; tarih yalnız soru açıklamasına aittir, tüm modülün platform sürümü doğrulaması değildir.
+
+`manifest:content` ile indeks, statik dersler ve manifest yeniden oluşturuldu. `npm run check`: 92/92 başarılı. PBA kapsam testi artık tüm 293 soruda tam şık açıklaması ve gerçek bölüm hedefi gerektirir. Query 20261002y; SW quilyn-v71. Ortak UI önceki hover paketinde doğrulandı; veri paketinde fiziksel cihaz/ekran okuyucu testi yapılmadı. Push/yayın yok. Diğer track'lerin 1.366 sorusu ve 185 modülün sürüm/kaynak incelemesi hâlâ açık.
+
+### Hover ve kayıt güvenliği takip paketleri
+
+- `f5de2f3`: çakışan mock/quiz işlemlerinin kilitlenmesi, Reset Everything flush koruması ve lazy asset sürüm birliği.
+- `e3800aa`: storage quota başarısızlığı ile cross-tab çakışmasını ayıran kayıt yapılmadan pratik akışı.
+- `9fa221d`: belirgin açık/koyu sol menü hover/focus durumları.
+- `dc7bdde`: kart, buton, sekme, cevap ve bağlantılar için ortak hover dili; hover metinleri için kontrast regresyonu ve azaltılmış hareket desteği.
+
+Bu kayıtlar yerel commit durumunu belirtir; push veya production deployment yapılmadı.
