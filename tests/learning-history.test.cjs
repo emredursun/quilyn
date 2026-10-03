@@ -235,3 +235,11 @@ test('reuse editorial review aligns principles and avoids integration guarantees
  assert.match(d.studyGuide[1].elements[5].caption,/Interoperable, Updateable, Configurable, Modular and Governed/);assert.match(d.practiceQuiz[1].hint,/not the complete rule-resolution/);assert.match(d.practiceQuiz[15].options[1].text,/governed compatibility/);
  assert.doesNotMatch(JSON.stringify(d),/first matching rule wins|Single, Maximize, Manage, Build|Division → Region → Channel → Product|thresholds directly in App Studio/);
 });
+
+test('Rule creation review corrects version increments and prefix inheritance',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m22_creating_a_rule.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M22');
+ assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.equal(d.practiceQuiz.length,22);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m22_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,i===2?['C']:[4,18,19,20,21].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[3].elements[4].description,/timestamp normalized to GMT/);assert.match(d.studyGuide[2].elements[3].caption,/patch increment/);assert.match(d.practiceQuiz[18].options[0].text,/Application Layer/);assert.match(d.practiceQuiz[18].options[1].text,/directly from @baseclass/);
+ assert.doesNotMatch(JSON.stringify(d),/inherits from Work because|Only the major version number matters|checking in the earlier version|Promoted via Guardrails/);
+});
