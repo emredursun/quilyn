@@ -267,3 +267,11 @@ test('Process-modeling review corrects swapped colors and distinguishes End from
  assert.match(d.practiceQuiz[12].options[0].text,/green rectangle.*Subprocess.*blue rectangle/);assert.match(d.practiceQuiz[8].rationale,/not inherently the whole Case/);assert.match(d.practiceQuiz[13].rationale,/not a promise/);
  assert.doesNotMatch(JSON.stringify(d),/blue for Assignment steps|green for Subprocess steps|original flow does NOT resume|Utility Action \(reusable|End shape resolves the Case|exactly one green Start/);
 });
+
+test('calculation review corrects category diagram and explains ordered condition evaluation',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m26_calculating_fields_decision_tables.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M26');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'25 min');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=11?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[1].elements[3].description,/first row.*otherwise/);assert.match(d.practiceQuiz[13].options[0].text,/aggregate choices/);assert.match(d.practiceQuiz[3].scenario,/including its quantity/);assert.match(d.practiceQuiz[4].scenario,/comparable numeric monetary/);
+ assert.doesNotMatch(JSON.stringify(d),/Default Value \(once at creation\)|Sum, Count, Average|Expressions are supported only.*Double|tables can return any data type|built-in operations like @Sum/);assert.ok(d.topics.some(t=>t.url.includes('calculated-values/v6')));
+});

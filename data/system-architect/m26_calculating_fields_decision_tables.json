@@ -7,7 +7,7 @@
     "Explain what a calculated field is and how the calculation network keeps dependent fields current",
     "Choose among the three App Studio calculation types — Functions, Expressions, and Decision tables — and apply each correctly"
   ],
-  "estTime": "15 min",
+  "estTime": "25 min",
   "studyGuide": [
     {
       "sectionTitle": "Calculated values and the calculation network",
@@ -19,7 +19,7 @@
         },
         {
           "type": "analogy",
-          "text": "A Decision Table is like a tax bracket chart: find the row where your income falls (condition), intersect with the column for your filing status (second condition), and the cell gives your tax rate (result). Pega evaluates exactly the same way — no code, just organized rows of conditions and a corresponding output. When tax law changes, you update the table, not the code."
+          "text": "A Decision table resembles an ordered checklist of combinations: each row tests its configured inputs and supplies an outcome. Overlapping rows need deliberate ordering; an otherwise outcome handles unmatched combinations. It is not a matrix where a single row/column intersection alone selects a cell."
         },
         {
           "type": "concept",
@@ -33,8 +33,8 @@
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 780 250\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Calculation network</title>\n<desc>Updating quantity cascades through dependent calculated fields: line total, order total, tax, final charge</desc>\n<text x=\"20\" y=\"26\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">CALCULATION NETWORK — DEPENDENT CALCULATIONS</text>\n<!-- input -->\n<rect x=\"20\" y=\"96\" width=\"110\" height=\"44\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"75\" y=\"114\" font-size=\"11.5\" font-weight=\"700\" fill=\"#5A3200\" text-anchor=\"middle\">Quantity</text>\n<text x=\"75\" y=\"130\" font-size=\"10\" fill=\"#BA7517\" text-anchor=\"middle\">input field</text>\n<!-- arrow -->\n<line x1=\"130\" y1=\"118\" x2=\"168\" y2=\"118\" stroke=\"var(--t)\" stroke-width=\"2\" opacity=\".6\"/>\n<polygon points=\"168,112 180,118 168,124\" fill=\"var(--t)\" opacity=\".6\"/>\n<!-- line total -->\n<rect x=\"182\" y=\"96\" width=\"120\" height=\"44\" rx=\"8\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"242\" y=\"114\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0D3560\" text-anchor=\"middle\">Line total</text>\n<text x=\"242\" y=\"130\" font-size=\"10\" fill=\"#185FA5\" text-anchor=\"middle\">calculated</text>\n<line x1=\"302\" y1=\"118\" x2=\"340\" y2=\"118\" stroke=\"var(--t)\" stroke-width=\"2\" opacity=\".6\"/>\n<polygon points=\"340,112 352,118 340,124\" fill=\"var(--t)\" opacity=\".6\"/>\n<!-- order total -->\n<rect x=\"354\" y=\"96\" width=\"120\" height=\"44\" rx=\"8\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"414\" y=\"114\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0D3560\" text-anchor=\"middle\">Order total</text>\n<text x=\"414\" y=\"130\" font-size=\"10\" fill=\"#185FA5\" text-anchor=\"middle\">calculated</text>\n<line x1=\"474\" y1=\"118\" x2=\"512\" y2=\"118\" stroke=\"var(--t)\" stroke-width=\"2\" opacity=\".6\"/>\n<polygon points=\"512,112 524,118 512,124\" fill=\"var(--t)\" opacity=\".6\"/>\n<!-- tax -->\n<rect x=\"526\" y=\"60\" width=\"110\" height=\"44\" rx=\"8\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"581\" y=\"78\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0D3560\" text-anchor=\"middle\">Tax</text>\n<text x=\"581\" y=\"94\" font-size=\"10\" fill=\"#185FA5\" text-anchor=\"middle\">calculated</text>\n<!-- final charge -->\n<rect x=\"526\" y=\"132\" width=\"130\" height=\"44\" rx=\"8\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"591\" y=\"150\" font-size=\"11.5\" font-weight=\"700\" fill=\"#0E3D28\" text-anchor=\"middle\">Final charge</text>\n<text x=\"591\" y=\"166\" font-size=\"10\" fill=\"#1E8A5B\" text-anchor=\"middle\">calculated</text>\n<line x1=\"474\" y1=\"118\" x2=\"520\" y2=\"82\" stroke=\"var(--t)\" stroke-width=\"1.5\" opacity=\".4\"/>\n<line x1=\"636\" y1=\"96\" x2=\"636\" y2=\"130\" stroke=\"var(--t)\" stroke-width=\"1.5\" opacity=\".4\"/>\n<line x1=\"474\" y1=\"118\" x2=\"520\" y2=\"154\" stroke=\"var(--t)\" stroke-width=\"1.5\" opacity=\".4\"/>\n<rect x=\"20\" y=\"206\" width=\"740\" height=\"30\" rx=\"7\" fill=\"var(--t)\" opacity=\".05\"/>\n<text x=\"390\" y=\"226\" font-size=\"11\" fill=\"var(--t)\" opacity=\".7\" text-anchor=\"middle\">Changing one input field cascades updates through every dependent calculated field automatically.</text>\n</svg>",
-          "caption": "A calculated field can feed another calculation. Pega maintains a calculation network so that updating one input (Quantity) cascades through all dependent calculated fields (Line total → Order total → Tax → Final charge)."
+          "svg": "<svg viewBox=\"0 0 760 190\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"inherit\"><title>Configured calculation dependencies</title><rect x=\"10\" y=\"10\" width=\"740\" height=\"170\" rx=\"12\" fill=\"var(--pa-surface)\" stroke=\"var(--pa-brand)\"/><text x=\"30\" y=\"42\" font-size=\"16\" font-weight=\"700\" fill=\"var(--pa-brand)\">Configured calculation dependencies</text><text x=\"30\" y=\"74\" font-size=\"14\" fill=\"var(--pa-ink-2)\">Quantity × unit price → line cost → aggregate order total</text><text x=\"30\" y=\"104\" font-size=\"14\" fill=\"var(--pa-ink-2)\">Order total × configured rate → tax → final charge</text><text x=\"30\" y=\"134\" font-size=\"14\" fill=\"var(--pa-ink-2)\">Keep the dependency chain explicit; test changes to its inputs.</text></svg>",
+          "caption": "Calculated outputs can feed further calculations. The configured dependency network updates relevant dependent values; it is not a guarantee for unrelated fields or unmodeled dependencies."
         }
       ],
       "sectionId": "section-9ca70117de54"
@@ -45,7 +45,7 @@
         {
           "type": "concept",
           "term": "Functions",
-          "description": "Functions iterate over a data relationship (list) and aggregate values. Supported for Decimal, Currency, and Integer. App Studio provides Sum, Count, Average, Maximum, Minimum."
+          "description": "The basic aggregate Function choices operate over list relationships for Decimal, Currency and Integer fields. The reviewed source identifies Sum of, Average of, Maximum of and Minimum of; do not confuse these choices with every callable function in an expression."
         },
         {
           "type": "concept",
@@ -60,7 +60,7 @@
         {
           "type": "concept",
           "term": "Decision tables",
-          "description": "A Decision table evaluates conditions to return an appropriate result — for example, select a discount percentage based on customer tier. Rows define conditions; the matching row's result is returned. Check 'Evaluate all rows' to return multiple matching results."
+          "description": "A Decision table maps configured property or expression tests to results. In the standard evaluation described by the topic, test rows from the top; return the first row whose conditions all match, or the configured otherwise result. Numeric tests can use comparisons and ranges; overlapping conditions make ordering significant."
         },
         {
           "type": "concept",
@@ -71,12 +71,12 @@
           "type": "interactive",
           "title": "Pick the calculation type",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Sum across a list\", \"scenario\": \"An online cart must keep an ORDER TOTAL equal to the sum of every line item's cost as customers add, remove, or change items. Which calculation type fits?\", \"opts\": [\"A Function \\u2014 the Sum of function iterates over the list of line items and adds their costs\", \"An Expression \\u2014 reference a single field with the dot operator\", \"A Decision table \\u2014 test conditions to return the total\", \"A When condition \\u2014 return true when the total is reached\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Functions iterate over items in a list; Sum of adds all the line-item costs to produce the order total.\", \"\\u2717 Incorrect. An expression references named fields with the dot operator; it does not iterate over a list of instances to add them up \\u2014 that is a Function.\", \"\\u2717 Incorrect. A Decision table returns a result from logical tests on conditions, not a running sum over a list.\", \"\\u2717 Incorrect. A When condition returns true/false; it is not one of the three App Studio calculation types.\"]}, {\"label\": \"Formula from fields\", \"scenario\": \"Order tax must equal the tax rate multiplied by the order total: .TaxRate * .OrderTotal. Which calculation type is this?\", \"opts\": [\"An Expression \\u2014 it references fields with the dot operator and supports multiplication\", \"A Function \\u2014 Maximum of returns the product of two fields\", \"A Decision table \\u2014 multiplication is a logical test on conditions\", \"Concatenation \\u2014 joining .TaxRate and .OrderTotal produces the tax\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. An expression references fields by name (dot operator) and supports operations like multiplication \\u2014 .TaxRate * .OrderTotal.\", \"\\u2717 Incorrect. Maximum of finds the largest item in a list; it does not multiply two fields.\", \"\\u2717 Incorrect. A Decision table returns a result from conditions; multiplication is an expression operation.\", \"\\u2717 Incorrect. Concatenation assembles TEXT strings, not a numeric product.\"]}, {\"label\": \"Result from conditions\", \"scenario\": \"The interest rate for a loan must be selected from the loan type using a set of logical tests. The app is NOT based on Constellation. How do you make this work in App Studio?\", \"opts\": [\"Build the Decision table in Dev Studio, mark it as a relevant record, then reference it from App Studio\", \"Create a custom Decision table directly in App Studio \\u2014 always available regardless of UI architecture\", \"Use the Sum of function on the loan type list\", \"Use a concatenation expression to join loan type and rate\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Custom Decision tables in App Studio require Constellation. Otherwise, build it in Dev Studio and mark it as a relevant record so App Studio can reference it.\", \"\\u2717 Incorrect. Creating a CUSTOM Decision table directly in App Studio is supported only on Constellation-based applications.\", \"\\u2717 Incorrect. Sum of adds list items \\u2014 it cannot select a rate from the loan type via logical tests.\", \"\\u2717 Incorrect. Concatenation builds text strings; it does not perform conditional rate selection.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=67?'Good \\u2014 review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Sum across a list\", \"scenario\": \"An order total must aggregate the already calculated cost of every line item. Which basic aggregate calculation choice fits directly?\", \"opts\": [\"A Function — the Sum of function iterates over the list of line items and adds their costs\", \"An Expression — reference a single field with the dot operator\", \"A Decision table — test conditions to return the total\", \"A When condition — return true when the total is reached\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Functions iterate over items in a list; Sum of adds all the line-item costs to produce the order total.\", \"✗ Incorrect. The offered single-field reference does not aggregate all line costs. Expressions may use functions, so do not interpret this as a universal expression limitation.\", \"✗ Incorrect. A Decision table returns a result from logical tests on conditions, not a running sum over a list.\", \"✗ Incorrect. A When condition returns true/false; it is not one of the three App Studio calculation types.\"]}, {\"label\": \"Formula from fields\", \"scenario\": \"Order tax must equal the tax rate multiplied by the order total: .TaxRate * .OrderTotal. Which calculation type is this?\", \"opts\": [\"An Expression — it references fields with the dot operator and supports multiplication\", \"A Function — Maximum of returns the product of two fields\", \"A Decision table — multiplication is a logical test on conditions\", \"Concatenation — joining .TaxRate and .OrderTotal produces the tax\"], \"correct\": 0, \"fbs\": [\"✓ Correct. An expression references fields by name (dot operator) and supports operations like multiplication — .TaxRate * .OrderTotal.\", \"✗ Incorrect. Maximum of finds the largest item in a list; it does not multiply two fields.\", \"✗ Incorrect. A Decision table returns a result from conditions; multiplication is an expression operation.\", \"✗ Incorrect. Concatenation assembles TEXT strings, not a numeric product.\"]}, {\"label\": \"Result from conditions\", \"scenario\": \"The interest rate for a loan must be selected from the loan type using a set of logical tests. The app is NOT based on Constellation. How do you make this work in App Studio?\", \"opts\": [\"Build the Decision table in Dev Studio, mark it as a relevant record, then reference it from App Studio\", \"Create a custom Decision table directly in App Studio — always available regardless of UI architecture\", \"Use the Sum of function on the loan type list\", \"Use a concatenation expression to join loan type and rate\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Custom Decision tables in App Studio require Constellation. Otherwise, build it in Dev Studio and mark it as a relevant record so App Studio can reference it.\", \"✗ Incorrect. Creating a CUSTOM Decision table directly in App Studio is supported only on Constellation-based applications.\", \"✗ Incorrect. Sum of adds list items — it cannot select a rate from the loan type via logical tests.\", \"✗ Incorrect. Concatenation builds text strings; it does not perform conditional rate selection.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=67?'Good \\u2014 review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">THREE APP STUDIO CALCULATION TYPES</text><rect x=\"10\" y=\"30\" width=\"215\" height=\"148\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Calculated Value</text><text x=\"117\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Formula-based expression</text><text x=\"117\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Recomputed every time</text><text x=\"117\" y=\"102\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">referenced property changes</text><text x=\"117\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Always read-only</text><text x=\"117\" y=\"136\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Limited to Text, Integer,</text><text x=\"117\" y=\"150\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Double, Date, Boolean types</text><rect x=\"253\" y=\"30\" width=\"215\" height=\"148\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Default Value</text><text x=\"360\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Applied ONCE at Case creation</text><text x=\"360\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Can be overwritten by user</text><text x=\"360\" y=\"104\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Static or expression-based</text><text x=\"360\" y=\"120\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Different from Calculated:</text><text x=\"360\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">does not update dynamically</text><rect x=\"496\" y=\"30\" width=\"215\" height=\"148\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Decision Table</text><text x=\"603\" y=\"74\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Rule-based lookup table</text><text x=\"603\" y=\"88\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Condition rows → result</text><text x=\"603\" y=\"104\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Custom tables need</text><text x=\"603\" y=\"118\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"10\" font-weight=\"600\">Constellation UI</text><text x=\"603\" y=\"134\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Traditional: Dev Studio only</text></svg>",
-          "caption": "3 App Studio calculation types: Calculated Value (dynamic, read-only), Default Value (once at creation), Decision Table (rule-based lookup; custom tables need Constellation)."
+          "svg": "<svg viewBox=\"0 0 760 190\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"inherit\"><title>Three calculation approaches</title><rect x=\"10\" y=\"10\" width=\"740\" height=\"170\" rx=\"12\" fill=\"var(--pa-surface)\" stroke=\"var(--pa-brand)\"/><text x=\"30\" y=\"42\" font-size=\"16\" font-weight=\"700\" fill=\"var(--pa-brand)\">Three calculation approaches</text><text x=\"30\" y=\"74\" font-size=\"14\" fill=\"var(--pa-ink-2)\">Function → aggregate the configured list values.</text><text x=\"30\" y=\"104\" font-size=\"14\" fill=\"var(--pa-ink-2)\">Expression → combine fields, operators and supported functions.</text><text x=\"30\" y=\"134\" font-size=\"14\" fill=\"var(--pa-ink-2)\">Decision table → select an outcome from tested conditions.</text></svg>",
+          "caption": "Functions, Expressions and Decision tables are the reviewed calculation choices. Default Value is not a replacement for Functions in this list."
         }
       ],
       "sectionId": "section-8bf149b2a0a1"
@@ -85,8 +85,8 @@
   "examPitfalls": [
     {
       "title": "Three calculation types, not four",
-      "trapDescription": "App Studio allows exactly three calculation types: Functions, Expressions, and Decision tables. Watch for distractors that add 'Decision tree' or 'When' to this list.",
-      "bestPractice": "Memorize all three App Studio calculation types and their use case: Functions (aggregate a list), Expressions (formula on single values), Decision Tables (rule-based lookup)."
+      "trapDescription": "The reviewed Calculated values source describes Functions, Expressions and Decision tables. Do not turn the historical terminology into a claim about every platform version or every kind of decision Rule.",
+      "bestPractice": "Choose the aggregate option for a list, an expression for a formula and a table for condition-to-result combinations."
     },
     {
       "title": "Functions iterate over a list",
@@ -95,7 +95,7 @@
     },
     {
       "title": "Expression field-type limits",
-      "trapDescription": "Questions ask which field types support formula expressions. Candidates say all types. Expressions are supported only for specific field types (Text, Integer, Double, Date, Boolean) — complex types like Page or Page List cannot use a formula expression directly.",
+      "trapDescription": "The reviewed source excludes Email, Phone and Picklist from expression-calculated Simple fields. Do not substitute an incomplete list such as Text, Integer, Double, Date and Boolean or confuse input relationships with output type.",
       "bestPractice": "Don't expect an expression to compute Email, Phone, or Picklist fields."
     },
     {
@@ -116,7 +116,7 @@
     {
       "title": "Calculated fields are read-only and networked",
       "trapDescription": "A calculated field is read-only and recalculates whenever an input changes; Pega's calculation network cascades updates to all dependent calculated fields.",
-      "bestPractice": "Don't expect users to edit a calculated field or to trigger a manual recalculate."
+      "bestPractice": "In the configured calculated-field UI, users do not manually type the derived output. Test the input/dependency configuration rather than assuming every field participates automatically."
     }
   ],
   "practiceQuiz": [
@@ -146,7 +146,15 @@
         "A"
       ],
       "hint": "Calculated fields derive their value from inputs and recalculate automatically on change.",
-      "rationale": "A calculation expresses a relationship between fields, setting a calculated field's value from input fields; it recalculates whenever an input updates and is read-only. B, C, and D do not describe a calculated field."
+      "rationale": "A calculation expresses a relationship between fields, setting a calculated field's value from input fields; it recalculates whenever an input updates and is read-only. B, C, and D do not describe a calculated field.",
+      "optionExplanations": {
+        "A": "The configured calculation derives a value from its inputs and participates in dependency updates, unlike an arbitrary manually edited field.",
+        "B": "Manual free-text entry followed by locking does not define a calculation relationship between input and output fields.",
+        "C": "An SLA timer is a timing mechanism, not the definition of every field whose value is derived by a calculation.",
+        "D": "Routing may use data, but a routing-only field does not define the calculation relationship asked about here."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-9ca70117de54"
     },
     {
       "questionId": "m26_q02",
@@ -174,7 +182,15 @@
         "A"
       ],
       "hint": "Calculated fields are sourced from Functions, Expressions, or Decision tables in the Data Model.",
-      "rationale": "App Studio allows three calculation types: Functions, Expressions, and Decision tables. The other options mix in items (Decision trees, When conditions, Data transforms, Activities) that are not the App Studio calculation types."
+      "rationale": "App Studio allows three calculation types: Functions, Expressions, and Decision tables. The other options mix in items (Decision trees, When conditions, Data transforms, Activities) that are not the App Studio calculation types.",
+      "optionExplanations": {
+        "A": "These are the three approaches described in the reviewed calculation source; their purposes differ between aggregation, formula and condition mapping.",
+        "B": "Decision trees replace Functions in this option and are not the three named App Studio calculation approaches.",
+        "C": "When conditions and Decision trees are not the named calculation choices in this reviewed configuration list.",
+        "D": "Data Transforms and Activities are different Rule mechanisms, not replacements for the listed aggregate and table calculation choices."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q03",
@@ -202,12 +218,20 @@
         "A"
       ],
       "hint": "Recall what data structure Functions iterate over and which numeric field types they support.",
-      "rationale": "Functions iterate over items in a data relationship and are supported for Decimal, Currency, and Integer field types. The other options misstate both what they iterate over and the supported types."
+      "rationale": "Functions iterate over items in a data relationship and are supported for Decimal, Currency, and Integer field types. The other options misstate both what they iterate over and the supported types.",
+      "optionExplanations": {
+        "A": "The source describes numeric aggregate choices over items in a relationship list, matching both structure and output types here.",
+        "B": "Decision-table rows are conditional combinations, not the list relationship over which these numeric aggregates iterate.",
+        "C": "Case Stages are lifecycle configuration, not the collection of numeric property values used by these aggregate choices.",
+        "D": "Access Roles express security context; iterating roles is not the described numeric relationship aggregation mechanism."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q04",
       "type": "single-select",
-      "scenario": "An online retailer must keep a shopping-cart order total updated as customers add, remove, or change item quantities. Which function calculates the order total?",
+      "scenario": "Each shopping-cart line already has a calculated cost including its quantity. Which aggregate function produces the order total from those line costs?",
       "options": [
         {
           "id": "A",
@@ -230,12 +254,20 @@
         "A"
       ],
       "hint": "Which calculation function adds all values in a list of property instances to produce a running total?",
-      "rationale": "Sum of adds all items in the specified property instances — exactly what an order total needs. Average of, Maximum of, and Minimum of compute the average, largest, and smallest values respectively."
+      "rationale": "Sum of adds all items in the specified property instances — exactly what an order total needs. Average of, Maximum of, and Minimum of compute the average, largest, and smallest values respectively.",
+      "optionExplanations": {
+        "A": "Adding each already calculated line cost produces the order total; quantity is included at the line level in this scenario.",
+        "B": "The mean line cost is not the combined price of all ordered lines; averaging answers a different question.",
+        "C": "The largest line cost ignores the other lines and therefore cannot represent their combined order total.",
+        "D": "The smallest line cost ignores the other lines and therefore cannot represent their combined order total."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q05",
       "type": "single-select",
-      "scenario": "A retailer lets a customer apply the single most valuable promotional discount from a list of submitted codes. Which function identifies it?",
+      "scenario": "Each eligible promotional discount has a comparable numeric monetary value. Which function selects the largest value from that list?",
       "options": [
         {
           "id": "A",
@@ -258,7 +290,15 @@
         "A"
       ],
       "hint": "Which calculation function returns the single largest value from a list of property instances?",
-      "rationale": "Maximum of determines the largest value in the list, which is the most valuable discount. Minimum of would pick the smallest, Sum of adds them, and Average of averages them — none of which gives the single most valuable discount."
+      "rationale": "Maximum of determines the largest value in the list, which is the most valuable discount. Minimum of would pick the smallest, Sum of adds them, and Average of averages them — none of which gives the single most valuable discount.",
+      "optionExplanations": {
+        "A": "The comparable monetary values make the maximum the largest eligible discount; the comparison basis is explicit in the scenario.",
+        "B": "The minimum selects the smallest saving, contradicting the requirement for the largest comparable discount value.",
+        "C": "Summing applies combined values rather than selecting one largest discount; the scenario requests a single value.",
+        "D": "An average describes the mean discount, not the one largest monetary value required by the scenario."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q06",
@@ -286,12 +326,20 @@
         "A"
       ],
       "hint": "Recall the symbol used to reference a field by name within a Pega expression.",
-      "rationale": "Expressions reference fields by name using the dot operator ('.'), which lists the fields available in the current Case context; for a data-relationship field you prefix it with the property/list name. The other symbols are not used this way."
+      "rationale": "Expressions reference fields by name using the dot operator ('.'), which lists the fields available in the current Case context; for a data-relationship field you prefix it with the property/list name. The other symbols are not used this way.",
+      "optionExplanations": {
+        "A": "The dot starts a field reference in the expression editor; relationship prefixes provide the context for nested values.",
+        "B": "The at symbol is not this field-reference syntax; the source’s field completion is not an Access Role list.",
+        "C": "The hash symbol is not the described field-reference operator and Ruleset versions are not the requested field suggestions.",
+        "D": "A slash is an arithmetic/path symbol in other contexts, not the editor’s described field-reference completion mechanism."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q07",
       "type": "single-select",
-      "scenario": "A BA is setting up calculated fields in a Data Model and needs to know which field types do not support expressions. For which Simple field types can you NOT define an expression in Pega Platform?",
+      "scenario": "According to the reviewed Calculated values source, which group of Simple output field types does not support an expression calculation?",
       "options": [
         {
           "id": "A",
@@ -314,7 +362,15 @@
         "A"
       ],
       "hint": "Identify the three Simple field types that cannot have an expression calculation applied to them.",
-      "rationale": "Pega allows expressions on most Simple field types — including Text, Integer, Decimal, Currency, Date, DateTime, and Boolean. The three exceptions are Email, Phone, and Picklist fields, which cannot use calculated expressions. Remembering these three exceptions is a common exam topic because they are the only Simple types excluded from expression support."
+      "rationale": "The source excludes Email, Phone and Picklist among Simple output types. This statement concerns the reviewed calculation configuration, not every use of those values as inputs or every future platform version.",
+      "optionExplanations": {
+        "A": "These are the reviewed exclusions for Simple output fields; do not confuse that restriction with whether values can be referenced as inputs.",
+        "B": "These numeric types are not the excluded group; they support the described numeric calculation approaches.",
+        "C": "The reviewed exclusion list is Email, Phone and Picklist rather than this offered text/date group.",
+        "D": "The reviewed exclusion list is not this Boolean, Text and Currency combination; consult the output-type distinction."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q08",
@@ -342,7 +398,15 @@
         "A"
       ],
       "hint": "Joining text + fields with quotes and '+'.",
-      "rationale": "Concatenation assembles a text string by combining field references with static text (in quotation marks) joined with '+'; each reference is replaced with its current value at run time. A Sum function adds numbers, a Decision table returns a conditional result, and Boolean AND is a logical operation — none assembles the string."
+      "rationale": "Concatenation assembles a text string by combining field references with static text (in quotation marks) joined with '+'; each reference is replaced with its current value at run time. A Sum function adds numbers, a Decision table returns a conditional result, and Boolean AND is a logical operation — none assembles the string.",
+      "optionExplanations": {
+        "A": "Joining literal text and current field references creates the required sentence without treating text as an aggregate of numbers.",
+        "B": "Numeric summation is not string assembly; these text and field segments need concatenation instead.",
+        "C": "A table can return a result, but the described assembly of current fields and literal fragments is concatenation.",
+        "D": "Boolean AND combines truth conditions rather than joining text fragments into the requested sentence."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q09",
@@ -370,7 +434,15 @@
         "A"
       ],
       "hint": "Returning a result based on conditions tested against property values = Decision table.",
-      "rationale": "A Decision table evaluates one or more fields with logical tests (conditions) to return an appropriate result, such as an interest rate from a loan type. Functions aggregate lists, expressions compute formulas, and concatenation builds text — none selects a result from conditions."
+      "rationale": "A Decision table directly models loan-category-to-rate conditions. The offered Sum, loan-type multiplication and concatenation alternatives do not perform that lookup; this is not a claim that expressions cannot contain conditional logic or functions.",
+      "optionExplanations": {
+        "A": "The category-to-rate lookup is directly expressed by condition rows and outcomes, matching the stated selection requirement.",
+        "B": "Summing list values does not select a rate by loan category; it serves a different aggregation purpose.",
+        "C": "Multiplying a category label by a coefficient does not define the stated logical category-to-rate mapping.",
+        "D": "Joining category and rate as text does not evaluate the conditions required to select the appropriate numeric outcome."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q10",
@@ -398,7 +470,15 @@
         "A"
       ],
       "hint": "What must a developer do to a Dev Studio rule before citizen developers can reference it in App Studio?",
-      "rationale": "To reuse a Dev Studio decision table in App Studio, you must mark it as a relevant record. Locking a Ruleset, assigning an Access Role, or adding it to a Work Queue do not expose the table to App Studio."
+      "rationale": "To reuse a Dev Studio decision table in App Studio, you must mark it as a relevant record. Locking a Ruleset, assigning an Access Role, or adding it to a Work Queue do not expose the table to App Studio.",
+      "optionExplanations": {
+        "A": "Relevant designation makes the prepared table available in the App Studio selection context; permissions and applicability still matter separately.",
+        "B": "Ruleset locking concerns modification, not the relevant designation used for the calculated-field table selection list.",
+        "C": "An Access Role concerns authorization; it is not the reuse designation that makes this prepared table a relevant choice.",
+        "D": "A Work Queue holds Assignments; it is not where a Decision table is registered for calculation reuse."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q11",
@@ -426,7 +506,15 @@
         "A"
       ],
       "hint": "Which UI architecture is required for creating custom decision tables directly in App Studio?",
-      "rationale": "Only applications based on Constellation support creating custom decision tables directly in App Studio. Otherwise the table is built in Dev Studio and marked as a relevant record."
+      "rationale": "Only applications based on Constellation support creating custom decision tables directly in App Studio. Otherwise the table is built in Dev Studio and marked as a relevant record.",
+      "optionExplanations": {
+        "A": "The reviewed source limits direct custom-table creation in App Studio to Constellation; this is an architecture distinction.",
+        "B": "The reviewed source explicitly states a Constellation restriction, so universal availability contradicts that qualification.",
+        "C": "A user role alone does not replace the architecture prerequisite described for this custom creation feature.",
+        "D": "Unlocked Rule packaging alone does not replace the Constellation requirement for direct creation in App Studio."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q12",
@@ -456,7 +544,15 @@
       ],
       "hint": "Consider whether a calculated field can serve as input to another calculation — what happens then?",
       "rationale": "A calculated field can feed another calculation (A), and Pega's calculation network updates all relevant fields automatically when a value changes (B). C is wrong because the cascade is automatic, and D is wrong because calculated fields live in the Data model of a Case Type or data object, not in Access Roles.",
-      "selectCount": 2
+      "selectCount": 2,
+      "optionExplanations": {
+        "A": "A configured calculated output can supply another calculation, which is how the dependency chain is formed.",
+        "B": "Input changes can update relevant dependent calculations through that configured network; unrelated fields are not implied.",
+        "C": "Manual recalculation of each dependency contradicts the automatic update behavior described for the configured calculation network.",
+        "D": "These fields belong to the Case or data-object model; Access Roles provide security context rather than this calculation storage."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-9ca70117de54"
     },
     {
       "questionId": "m26_q13",
@@ -469,7 +565,7 @@
         },
         {
           "id": "B",
-          "text": "Decision tables support multiple simultaneous input conditions that must all be evaluated to determine the returned value"
+          "text": "A row can test multiple input conditions, all of which must match for that row’s result under the described standard evaluation"
         },
         {
           "id": "C",
@@ -477,7 +573,7 @@
         },
         {
           "id": "D",
-          "text": "Decision tables can only return numeric values and cannot be used to return text or date outputs"
+          "text": "Decision tables can return only numbers, never a supported text result"
         }
       ],
       "correctOptions": [
@@ -485,7 +581,15 @@
         "B"
       ],
       "hint": "Decision tables excel at condition-to-outcome mappings with multiple input columns — not simple formulas.",
-      "rationale": "Decision tables are designed for scenarios where discrete ranges or category combinations of inputs map to specific outputs — like age bracket plus coverage type mapping to a premium rate. They support multiple condition columns evaluated simultaneously. Simple arithmetic is better handled by an Expression, and Decision tables can return any data type including text."
+      "rationale": "Tables express combinations of condition columns and results. The described evaluation considers rows in order, returns a complete match and uses otherwise when unmatched. Do not claim every possible data type is supported; match the result to its configured target.",
+      "optionExplanations": {
+        "A": "Discrete categories or ranges mapped to outcomes suit a table, especially when the result depends on combinations of inputs.",
+        "B": "The described standard evaluation tests all conditions in a row; a full row match returns its result.",
+        "C": "A simple product is directly expressed as an expression; a condition table adds unnecessary structure for that requirement.",
+        "D": "The numeric-only claim is too restrictive; the result must suit its target, and supported text outcomes are not excluded."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     },
     {
       "questionId": "m26_q14",
@@ -494,7 +598,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Functions — built-in or custom mathematical or string operations applied to one or more input fields"
+          "text": "Functions — basic aggregate choices such as Sum of or Maximum of over a list relationship"
         },
         {
           "id": "B",
@@ -514,7 +618,15 @@
         "B"
       ],
       "hint": "App Studio offers three calculation types: Functions, Expressions, and Decision tables — no ML or SQL.",
-      "rationale": "App Studio provides three calculation types for Calculated Value fields: Functions (built-in operations like @Sum or @Abs), Expressions (formula-based arithmetic), and Decision tables (condition-outcome mappings). Machine Learning models and direct SQL queries are not available as Calculated Value types in App Studio."
+      "rationale": "The reviewed App Studio calculation choices include basic aggregate Functions and Decision tables, as well as Expressions. ML prediction and direct SQL are not the named calculation types; callable expression functions are not the same as these aggregate choices.",
+      "optionExplanations": {
+        "A": "These aggregate choices are the Function category in the reviewed calculation list, distinct from arbitrary callable expression functions.",
+        "B": "This category selects outcomes from tested conditions and is one of the described App Studio calculation approaches.",
+        "C": "Prediction is not one of the three named field calculation types; invoking a model would need different configuration.",
+        "D": "Direct SQL is not a named App Studio calculated-field choice; database access is a separate platform concern."
+      },
+      "explanationReviewedOn": "2026-10-03",
+      "lessonSection": "section-8bf149b2a0a1"
     }
   ],
   "quickRecap": [
@@ -551,7 +663,14 @@
     {
       "title": "Decision tables",
       "url": "https://academy.pega.com/topic/decision-tables/v5/in/96211/67251",
-      "duration": "20 min"
+      "duration": "15 min"
+    },
+    {
+      "title": "Calculated values — supporting calculation reference",
+      "url": "https://academy.pega.com/topic/calculated-values/v6/in/72681/66556",
+      "duration": "Supporting reference"
     }
-  ]
+  ],
+  "platformVersion": "Pega Platform '24.2 / '25",
+  "sourceReviewedOn": "2026-10-03"
 }
