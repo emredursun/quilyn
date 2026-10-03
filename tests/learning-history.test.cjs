@@ -259,3 +259,11 @@ test('Automation review scopes system actions and corrects ambiguous stage and u
  assert.match(d.practiceQuiz[0].scenario,/generation.*supported/);assert.match(d.practiceQuiz[8].scenario,/Run Data Transform/);assert.doesNotMatch(d.practiceQuiz[9].scenario,/not only the current/);assert.match(d.practiceQuiz[11].options[3].text,/previously visited.*next Stage/);assert.match(d.studyGuide[0].elements[0].description,/Questionnaire/);
  assert.doesNotMatch(JSON.stringify(d),/all run automatically, no Assignment|SYSTEM-EXECUTED, NO ASSIGNMENT|CREATE CASE — creates child Cases|always cascades to child Cases automatically.*Correct/);
 });
+
+test('Process-modeling review corrects swapped colors and distinguishes End from Case resolution',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m25_automating_workflow_decisions.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M25');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.platformVersion,"Pega Platform '25");
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=11?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[12].options[0].text,/green rectangle.*Subprocess.*blue rectangle/);assert.match(d.practiceQuiz[8].rationale,/not inherently the whole Case/);assert.match(d.practiceQuiz[13].rationale,/not a promise/);
+ assert.doesNotMatch(JSON.stringify(d),/blue for Assignment steps|green for Subprocess steps|original flow does NOT resume|Utility Action \(reusable|End shape resolves the Case|exactly one green Start/);
+});
