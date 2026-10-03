@@ -243,3 +243,11 @@ test('Rule creation review corrects version increments and prefix inheritance',(
  assert.match(d.studyGuide[3].elements[4].description,/timestamp normalized to GMT/);assert.match(d.studyGuide[2].elements[3].caption,/patch increment/);assert.match(d.practiceQuiz[18].options[0].text,/Application Layer/);assert.match(d.practiceQuiz[18].options[1].text,/directly from @baseclass/);
  assert.doesNotMatch(JSON.stringify(d),/inherits from Work because|Only the major version number matters|checking in the earlier version|Promoted via Guardrails/);
 });
+
+test('relevant-record review separates discovery from execution and guardrail enforcement',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m23_promoting_rule_reuse_relevant_records.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M23');
+ assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.equal(d.practiceQuiz.length,12);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m23_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,i===3?['A','B','C']:i===4?['A','B']:i===11?['A','C']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[2].rationale,/not evidence that every warning/);assert.match(d.practiceQuiz[7].scenario,/no class-specific inactive/);assert.match(d.practiceQuiz[9].scenario,/configured primary context/);assert.equal(d.topics[0].duration,'10 min');
+ assert.doesNotMatch(JSON.stringify(d),/Mark as mobile-eligible|Rules EXECUTED during the last|violations block marking|Guardrail compliance is prerequisite|only location for the full/);
+});
