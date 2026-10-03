@@ -275,3 +275,11 @@ test('calculation review corrects category diagram and explains ordered conditio
  assert.match(d.studyGuide[1].elements[3].description,/first row.*otherwise/);assert.match(d.practiceQuiz[13].options[0].text,/aggregate choices/);assert.match(d.practiceQuiz[3].scenario,/including its quantity/);assert.match(d.practiceQuiz[4].scenario,/comparable numeric monetary/);
  assert.doesNotMatch(JSON.stringify(d),/Default Value \(once at creation\)|Sum, Count, Average|Expressions are supported only.*Double|tables can return any data type|built-in operations like @Sum/);assert.ok(d.topics.some(t=>t.url.includes('calculated-values/v6')));
 });
+
+test('Decision Rule review allows multi-column tables and scopes conflict and delegation tools',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m27_decision_tables_and_trees.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M27');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[0].elements[0].description,/different columns may test different fields/);assert.match(d.practiceQuiz[0].scenario,/already has authorized/);assert.match(d.practiceQuiz[3].rationale,/not a requirement/);assert.match(d.practiceQuiz[13].options[0].text,/unreachable.*earlier broader/);
+ assert.doesNotMatch(JSON.stringify(d),/Different properties → Decision tree.*rule|table's columnar structure cannot handle|all rows always execute|Test tab on a Decision Rule|Both can return any data type/);
+});

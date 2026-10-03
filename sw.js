@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quilyn-v90';
+const CACHE_NAME = 'quilyn-v91';
 const STATIC_ASSETS = [
   './', './index.html', './manifest.json', './icon.svg', './favicon.ico',
   './assets/brand/icon-192.png', './assets/brand/icon-512.png',
