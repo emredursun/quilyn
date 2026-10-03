@@ -251,3 +251,11 @@ test('relevant-record review separates discovery from execution and guardrail en
  assert.match(d.practiceQuiz[2].rationale,/not evidence that every warning/);assert.match(d.practiceQuiz[7].scenario,/no class-specific inactive/);assert.match(d.practiceQuiz[9].scenario,/configured primary context/);assert.equal(d.topics[0].duration,'10 min');
  assert.doesNotMatch(JSON.stringify(d),/Mark as mobile-eligible|Rules EXECUTED during the last|violations block marking|Guardrail compliance is prerequisite|only location for the full/);
 });
+
+test('Automation review scopes system actions and corrects ambiguous stage and update questions',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m24_automation_shapes_case_life_cycle.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M24');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'20 min');
+ assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===4?['A','B','C']:[11,12].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[0].scenario,/generation.*supported/);assert.match(d.practiceQuiz[8].scenario,/Run Data Transform/);assert.doesNotMatch(d.practiceQuiz[9].scenario,/not only the current/);assert.match(d.practiceQuiz[11].options[3].text,/previously visited.*next Stage/);assert.match(d.studyGuide[0].elements[0].description,/Questionnaire/);
+ assert.doesNotMatch(JSON.stringify(d),/all run automatically, no Assignment|SYSTEM-EXECUTED, NO ASSIGNMENT|CREATE CASE — creates child Cases|always cascades to child Cases automatically.*Correct/);
+});
