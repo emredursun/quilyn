@@ -323,3 +323,11 @@ test('Wait review supports custom statuses and resolves prefix semantics without
  assert.match(d.practiceQuiz[2].options[0].text,/custom target status.*Resolved-prefixed/);assert.match(d.studyGuide[1].elements[0].description,/any or all.*already exist/);assert.match(d.practiceQuiz[4].options[3].text,/72 minutes/);assert.match(d.practiceQuiz[13].scenario,/48-hour/);
  assert.doesNotMatch(JSON.stringify(d),/No custom status values allowed|exactly 2\).*Trigger|To be resolved.*child still open|5 business days|only two statuses that trigger/);
 });
+
+test('Configuration Set review scopes DSS guidance and role defaults without instant-refresh promises',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m33_creating_setting_application_variables.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M33');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'20 min');
+ assert.equal(d.practiceQuiz.length,15);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[1].elements[0].description,/only after it contains a setting/);assert.match(d.practiceQuiz[7].rationale,/menu identifies.*Set and setting/);assert.match(d.practiceQuiz[13].scenario,/Email integration/);assert.match(d.examPitfalls[3].bestPractice,/WorkMgr4 also reads individual settings/);
+ assert.doesNotMatch(JSON.stringify(d),/Pega 8\.5\+|changes app behavior instantly|should not be manually edited|passes.*no|Runtime customization means Admins\/Managers/);
+});
