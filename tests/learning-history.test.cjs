@@ -339,3 +339,11 @@ test('data-validation review corrects Stage entry timing and removes the ambiguo
  assert.match(d.practiceQuiz[2].options[0].text,/Before.*Settlement/);assert.match(d.practiceQuiz[13].options[1].text,/block entry/);assert.match(d.practiceQuiz[6].options[0].text,/error prevents entry/);assert.match(d.studyGuide[1].elements[3].description,/different validation conditions at each use/);assert.match(d.practiceQuiz[9].optionExplanations.A,/passes.*comparison/);
  assert.doesNotMatch(JSON.stringify(d),/prevent the Case from exiting|Nothing automatically|both are needed|automatically repeat.*Correct|custom Java/);
 });
+
+test('Dev Studio validation review corrects qualifier diagrams and invocation-dependent timing',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m35_validating_data_dev_studio.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M35');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===7?['A','C']:i===11?['D']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[6].rationale,/Stage-specific sets/);assert.match(d.practiceQuiz[3].options[0].text,/can also call Edit Validate/);assert.match(d.practiceQuiz[5].scenario,/proposes to apply/);assert.match(d.practiceQuiz[12].options[1].text,/containing Rule runs on submission/);
+ assert.doesNotMatch(JSON.stringify(d),/four: Stages, Role, Skill|4 types: Stages, Role|fire on every change|executes every time|custom Java bypasses|client-side in the browser.*no server round-trip/);
+});
