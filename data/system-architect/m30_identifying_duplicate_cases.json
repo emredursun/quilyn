@@ -11,7 +11,7 @@
   "topics": [
     {
       "title": "Duplicate search",
-      "url": "https://academy.pega.com/topic/duplicate-search/v7/in/72681/66901/67036",
+      "url": "https://academy.pega.com/topic/duplicate-search/v7/in/96211/67036",
       "duration": "5 min"
     }
   ],
@@ -22,31 +22,31 @@
         {
           "type": "concept",
           "term": "Search duplicate cases",
-          "description": "Automation Step that identifies potential duplicate Cases by comparing field values. A duplicate occurs when a submitted Case matches an existing one. Example: same insurance authorization received twice — once online, once by fax."
+          "description": "Automation Step for checking whether existing Cases resemble the current submission. Place it at the point in the Process where duplicate review is needed; a match is a candidate for review, not proof that two requests are identical."
         },
         {
           "type": "analogy",
-          "text": "Duplicate case detection in Pega is like a hotel reservation system that warns 'a booking already exists for this guest on these dates.' When a new case is submitted, Pega searches existing cases for matching criteria — if a match is found, the operator decides to proceed (create a new reservation) or merge (link to the existing booking). The search runs automatically; the human makes the final call."
+          "text": "Think of a reservation desk checking a second booking request. First it filters out unrelated reservations, then scores the useful similarities. A staff member examines the candidates and either rejects the duplicate submission or continues processing a distinct request. Finding a similar reservation does not combine the two records."
         },
         {
           "type": "concept",
-          "term": "Basic conditions — mandatory match",
-          "description": "Conditions that MUST match exactly for a Case to be flagged as a duplicate. If ANY basic condition fails to match, the Case is NOT flagged — regardless of how many other fields match."
+          "term": "Basic conditions — candidate filter",
+          "description": "Each configured basic condition must evaluate to true before an existing Case reaches the scoring stage. An equality comparison can require identical dates of birth, for example. A failed basic condition excludes that candidate; extra weighted matches cannot rescue it."
         },
         {
           "type": "concept",
           "term": "Weighted conditions — scored match",
-          "description": "Each weighted condition carries a numeric score. When basic conditions match, the system evaluates weighted conditions and totals the score. Cases with sufficiently high scores are presented as potential duplicates for user review."
+          "description": "A true weighted condition contributes its assigned weight (1–100). After the basic filter passes, add the matching weights and compare the total with the configured threshold. Equality with the threshold qualifies; the score is not a probability or a promise of display order."
         },
         {
           "type": "concept",
           "term": "Resolving a duplicate",
-          "description": "When the user determines the current Case IS a duplicate, they resolve it with the status 'Resolved-Duplicate'. This closes the duplicate Case and keeps the original."
+          "description": "The review lets the user confirm a duplicate (Resolved-Duplicate, ending current processing) or ignore the suggestions and continue. Opening the original Case to update it requires customized behavior; detection alone does not merge records or transfer their data."
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 420 220\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"400\" height=\"200\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"210\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Duplicate Case Detection Flow</text><rect x=\"150\" y=\"45\" width=\"120\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"210\" y=\"63\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">New case submitted</text><line x1=\"210\" y1=\"73\" x2=\"210\" y2=\"93\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr30)\"/><rect x=\"140\" y=\"93\" width=\"140\" height=\"28\" rx=\"6\" fill=\"var(--pa-brand)\" opacity=\"0.2\" stroke=\"var(--pa-brand)\" stroke-width=\"1.5\"/><text x=\"210\" y=\"111\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Duplicate search runs</text><line x1=\"210\" y1=\"121\" x2=\"210\" y2=\"141\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr30)\"/><rect x=\"130\" y=\"141\" width=\"160\" height=\"28\" rx=\"6\" fill=\"var(--pa-brand)\" opacity=\"0.15\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"210\" y=\"159\" text-anchor=\"middle\" font-size=\"10\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Match found?</text><line x1=\"130\" y1=\"155\" x2=\"70\" y2=\"155\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr30)\"/><text x=\"98\" y=\"148\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ok)\">No</text><rect x=\"20\" y=\"143\" width=\"50\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1\"/><text x=\"45\" y=\"161\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink)\">Create new</text><line x1=\"290\" y1=\"155\" x2=\"350\" y2=\"155\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr30)\"/><text x=\"322\" y=\"148\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-err)\">Yes</text><rect x=\"350\" y=\"141\" width=\"55\" height=\"28\" rx=\"6\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"377\" y=\"153\" text-anchor=\"middle\" font-size=\"8\" fill=\"var(--pa-ink)\">Operator</text><text x=\"377\" y=\"165\" text-anchor=\"middle\" font-size=\"8\" fill=\"var(--pa-ink)\">decides</text><text x=\"210\" y=\"200\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Operator can proceed (new case) or link to existing duplicate.</text><defs><marker id=\"arr30\" markerWidth=\"6\" markerHeight=\"6\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 Z\" fill=\"var(--pa-ink-3)\"/></marker></defs></svg>",
-          "caption": "Duplicate search runs automatically at case creation; operator decides whether to proceed or link to the existing case."
+          "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 760 190\" role=\"img\" font-family=\"inherit\"><title>Duplicate review at the configured Step</title><rect x=\"10\" y=\"10\" width=\"740\" height=\"170\" rx=\"12\" fill=\"var(--pa-surface)\" stroke=\"var(--pa-brand)\"/><text x=\"30\" y=\"42\" font-size=\"16\" font-weight=\"bold\" fill=\"var(--pa-brand)\">Filter → score → review</text><g font-size=\"14\" fill=\"var(--pa-ink-2)\"><text x=\"30\" y=\"78\">All basic tests pass → sum weights of true conditions.</text><text x=\"30\" y=\"110\">Total ≥ threshold → candidates for review; no candidates → next Step.</text><text x=\"30\" y=\"142\">Confirm → resolve current Case; ignore → continue processing.</text></g></svg>",
+          "caption": "The configured Step filters and scores candidates, then supports a user decision. It is not an automatic merge."
         }
       ],
       "sectionId": "section-295b56a299a7"
@@ -54,39 +54,39 @@
   ],
   "examPitfalls": [
     {
-      "title": "Basic conditions MUST all match — one failure = no duplicate",
-      "trapDescription": "Candidates think basic conditions are scored like weighted ones, or that a near-match on a basic condition still flags a potential duplicate.",
-      "bestPractice": "Basic conditions are binary and mandatory — ALL must match exactly. If even one basic condition fails to match, the Case is not considered a duplicate at all, regardless of weighted condition scores."
+      "title": "A failed basic condition excludes a candidate",
+      "trapDescription": "Do not let a large weighted total override a failed basic test.",
+      "bestPractice": "Check that every configured basic test is true before adding weighted values."
     },
     {
-      "title": "Weighted conditions are scored — not mandatory",
-      "trapDescription": "Questions ask whether ALL weighted conditions must match for a case to be flagged as a potential duplicate. Candidates say yes. Weighted conditions assign a score — a case is flagged when the cumulative score exceeds the threshold, not when all conditions match.",
-      "bestPractice": "Weighted conditions each carry a numeric weight. They are scored and summed — higher total score = higher likelihood of duplicate. A candidate doesn't need to match ALL weighted conditions to be flagged."
+      "title": "The threshold includes equality",
+      "trapDescription": "A score equal to the threshold is sometimes incorrectly rejected.",
+      "bestPractice": "A total of 50 qualifies at threshold 50 if the basic filter passed. Not every weighted condition has to be true."
     },
     {
-      "title": "Resolution status is 'Resolved-Duplicate' — not 'Closed' or 'Cancelled'",
-      "trapDescription": "A question asks what status is set when a case is resolved as a duplicate. Candidates say 'Closed' or 'Cancelled.' The system sets the Case Status to 'Resolved-Duplicate' — this is the specific system-defined status for duplicate resolution.",
-      "bestPractice": "When a user confirms a Case is a duplicate, the correct resolution status is 'Resolved-Duplicate'. Not 'Closed', 'Cancelled', or any other status."
+      "title": "Confirming a duplicate ends current processing",
+      "trapDescription": "Do not substitute an invented Closed-Duplicate status or deletion for duplicate resolution.",
+      "bestPractice": "The confirmed current Case uses Resolved-Duplicate; ignoring the suggestions continues processing."
     },
     {
-      "title": "The automation is called 'Search duplicate cases' — it is an Automation Step",
-      "trapDescription": "Questions ask how duplicate detection is configured in the Case Life Cycle. Candidates describe adding a condition or a service. Duplicate detection is added as an Automation Step called 'Search duplicate cases' — it is a built-in step type, not a custom condition.",
-      "bestPractice": "'Search duplicate cases' is a specific Automation Step provided by Pega Platform. It is added to a Process to automatically search for potential duplicates based on configured conditions."
+      "title": "Search runs at the configured Step",
+      "trapDescription": "Do not assume every new Case is checked automatically at creation.",
+      "bestPractice": "Add the Search duplicate Cases automation to the intended Process and reason about when the Case reaches it."
     },
     {
-      "title": "Both basic AND weighted conditions must be configured together",
-      "trapDescription": "A question asks whether weighted conditions alone are sufficient for duplicate detection. Candidates say yes. Basic conditions (exact match criteria) are required alongside weighted conditions — weighted conditions alone cannot be used without at least one basic condition.",
-      "bestPractice": "The search uses basic conditions first (mandatory filter), then applies weighted conditions to score the remaining candidates. Both types work together — basic conditions narrow the field, weighted conditions rank the results."
+      "title": "Filtering is not a save-validation claim",
+      "trapDescription": "A description of the search algorithm does not establish every Rule form constraint.",
+      "bestPractice": "Explain basic filtering followed by weighted scoring without inventing a requirement that the configuration cannot be saved."
     },
     {
-      "title": "Duplicate detection is user-confirmed — not automatic resolution",
-      "trapDescription": "Questions describe a duplicate detection scenario and ask if the case is automatically closed. Candidates say yes. Pega surfaces potential duplicates to the user — the user must confirm whether the case is a duplicate and manually resolve it; no automatic closure occurs.",
-      "bestPractice": "The 'Search duplicate cases' Step presents potential duplicates to the USER for review. The user decides whether the Case is actually a duplicate and manually resolves it with 'Resolved-Duplicate' status."
+      "title": "A candidate needs a user decision",
+      "trapDescription": "A high score is not permission to combine records automatically.",
+      "bestPractice": "Review the records; confirm a duplicate or continue a distinct submission. Customizing original-Case updates is separate."
     },
     {
-      "title": "Weighted conditions produce a ranked list — the user decides from candidates",
-      "trapDescription": "Candidates think only one exact duplicate can be found — or that the system picks the most likely duplicate automatically.",
-      "bestPractice": "Multiple Cases may be presented as potential duplicates, ranked by weighted score. The user reviews the candidates and decides which (if any) is the actual duplicate."
+      "title": "A candidate list is not a ranking guarantee",
+      "trapDescription": "Numeric scores do not prove that the view sorts candidates or shows a statistical likelihood.",
+      "bestPractice": "Explain qualification and review without promising display order, automatic best-match selection or data transfer."
     }
   ],
   "practiceQuiz": [
@@ -115,17 +115,25 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Which specific Pega automation is designed for duplicate Case detection?",
-      "rationale": "'Search duplicate cases' is the Pega Automation Step for this purpose. B, C, and D describe mechanisms that don't exist for duplicate detection in this form."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "The supplied automation supports review of repeated submissions; the request still needs an operator decision.",
+      "optionExplanations": {
+        "A": "The supplied automation supports review of repeated submissions; the request still needs an operator decision.",
+        "B": "A Boolean condition alone is not the candidate search and resolution experience asked for here.",
+        "C": "Routing logic can choose a path, but does not supply this duplicate-review automation.",
+        "D": "A calculated property is not a mechanism for automatically combining submitted records."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q02",
       "type": "single-select",
-      "scenario": "In a duplicate search configuration, 'Patient date of birth' is set as a basic condition. Two Cases have all other fields matching, but different dates of birth. Are they flagged as potential duplicates?",
+      "scenario": "A basic condition requires equal patient dates of birth. All other fields match, but an existing Case has a different date of birth. Is it a duplicate candidate?",
       "options": [
         {
           "id": "A",
-          "text": "No — basic conditions must ALL match exactly; a mismatch on any one eliminates the Case as a duplicate candidate"
+          "text": "No — the date-of-birth basic test fails, excluding this candidate before scoring"
         },
         {
           "id": "B",
@@ -143,13 +151,21 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Basic conditions = mandatory match. Any failure = no duplicate.",
-      "rationale": "Basic conditions are mandatory — ALL must match exactly. A mismatch on even one basic condition means the Case is not flagged as a duplicate, regardless of weighted scores. B and C incorrectly apply weighted logic to basic conditions. D describes a queue that doesn't exist for basic condition failures."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "Different birth dates fail the equality test explicitly configured in this scenario.",
+      "optionExplanations": {
+        "A": "Different birth dates fail the equality test explicitly configured in this scenario.",
+        "B": "Scoring applies after basic filtering; other matching fields cannot restore this excluded candidate.",
+        "C": "The required filter is not merely a suggestion that a weighted total can override.",
+        "D": "The documented failed-filter outcome is continuing the Process, not a special review queue."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q03",
       "type": "single-select",
-      "scenario": "A duplicate search has three weighted conditions with scores 30, 40, and 30. An existing Case matches two of the three (total score 70). Is it presented as a potential duplicate?",
+      "scenario": "All basic conditions pass. Three weighted conditions have weights 30, 40 and 30; an existing Case matches the first two, totaling 70. Does it qualify for review?",
       "options": [
         {
           "id": "A",
@@ -171,8 +187,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Weighted conditions are scored and summed — the threshold determines what's flagged.",
-      "rationale": "Weighted conditions contribute scores that are summed and compared to a threshold. Whether a 70 score flags a duplicate depends on the configured threshold. B is wrong — weighted conditions don't all need to match. C is wrong — a threshold, not any positive score, determines flagging. D is wrong — 100 is not a required score."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "The qualifying boundary is inclusive: a threshold of 70 accepts 70, while a threshold of 71 rejects it.",
+      "optionExplanations": {
+        "A": "The qualifying boundary is inclusive: a threshold of 70 accepts 70, while a threshold of 71 rejects it.",
+        "B": "One unmatched weighted comparison is acceptable when the remaining total reaches the threshold.",
+        "C": "A positive score below the configured cutoff is insufficient.",
+        "D": "The example does not impose a universal perfect-score requirement."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q04",
@@ -181,7 +205,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Set the Case status to 'Resolved-Duplicate'"
+          "text": "Confirm the current Case as a duplicate; it resolves with status 'Resolved-Duplicate'"
         },
         {
           "id": "B",
@@ -199,8 +223,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "There is a specific status for resolving confirmed duplicates.",
-      "rationale": "'Resolved-Duplicate' is the correct status for resolving a confirmed duplicate Case. B uses 'Closed' which is not the documented status. C and D describe actions that don't exist for this purpose."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "Confirmation resolves the current submission rather than merely noting a similarity.",
+      "optionExplanations": {
+        "A": "Confirmation resolves the current submission rather than merely noting a similarity.",
+        "B": "This substitutes a different status for the documented duplicate-resolution status.",
+        "C": "The described automation offers a resolution decision, not an automatic record-combination operation.",
+        "D": "Deleting a record is not the duplicate-resolution action being tested."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q05",
@@ -209,7 +241,7 @@
       "options": [
         {
           "id": "A",
-          "text": "It must match exactly — any Case that doesn't match the basic condition is excluded from duplicate candidates"
+          "text": "It filters candidates: a Case must satisfy every configured basic condition before weighted scoring"
         },
         {
           "id": "B",
@@ -227,8 +259,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Basic = mandatory exact match. Failure = excluded from candidates.",
-      "rationale": "Basic conditions must match exactly — failure excludes the Case from all further comparison. B describes weighted condition behavior. C and D are incorrect descriptions of basic conditions."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "The filter tests must all pass; their operators define what satisfying them means.",
+      "optionExplanations": {
+        "A": "The filter tests must all pass; their operators define what satisfying them means.",
+        "B": "Adding points is the role of weighted comparisons, not the basic filter.",
+        "C": "This answer confuses filtering property values with a universal Case Type selector.",
+        "D": "Basic filtering comes before scoring rather than acting as a fallback after it."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q06",
@@ -237,7 +277,7 @@
       "options": [
         {
           "id": "A",
-          "text": "It carries a numeric weight — matching cases accumulate scores, and high-scoring cases are presented as potential duplicates"
+          "text": "It adds its assigned numeric weight when true; qualifying totals must meet or exceed the threshold after basic filtering"
         },
         {
           "id": "B",
@@ -255,8 +295,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Weighted = scored and summed. Higher score = more likely duplicate.",
-      "rationale": "Weighted conditions each have a numeric weight. Matching conditions accumulate a total score, and cases meeting the threshold are presented as potential duplicates. B describes basic condition behavior. C and D are fabricated."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "A weight measures relative comparison importance; qualification still depends on the filter and cutoff.",
+      "optionExplanations": {
+        "A": "A weight measures relative comparison importance; qualification still depends on the filter and cutoff.",
+        "B": "A failed weighted comparison adds nothing, but other matching comparisons may still qualify.",
+        "C": "Comparison importance is distinct from limiting the number of results shown.",
+        "D": "Scoring requires candidates to survive the basic filter, rather than starting when none survive."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q07",
@@ -265,7 +313,7 @@
       "options": [
         {
           "id": "A",
-          "text": "No — it presents potential duplicates to the user for review; the user decides and manually resolves with 'Resolved-Duplicate'"
+          "text": "No — a user reviews the candidates and may confirm the current Case as a duplicate or continue processing"
         },
         {
           "id": "B",
@@ -283,8 +331,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Duplicate detection is user-confirmed — not automatic resolution.",
-      "rationale": "The automation presents candidates to the user — the user reviews and manually resolves confirmed duplicates. B and C describe automatic resolution that doesn't happen. D describes incorrect behavior."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "The operator decides whether the current submission repeats an existing request.",
+      "optionExplanations": {
+        "A": "The operator decides whether the current submission repeats an existing request.",
+        "B": "Finding a strong match does not combine the records automatically.",
+        "C": "No score, including one above 100, replaces the required review decision.",
+        "D": "The automation provides runtime candidate review, not only a design-time warning."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q08",
@@ -293,15 +349,15 @@
       "options": [
         {
           "id": "A",
-          "text": "Basic conditions must all match exactly — any mismatch eliminates the candidate"
+          "text": "Every configured basic condition must evaluate to true for a candidate to reach scoring"
         },
         {
           "id": "B",
-          "text": "Weighted conditions carry a score — candidates are ranked by total score"
+          "text": "True weighted conditions add their assigned values to a total compared with the threshold"
         },
         {
           "id": "C",
-          "text": "Basic conditions are optional — you can configure a duplicate search with weighted conditions only"
+          "text": "A high weighted total overrides a failed basic condition"
         },
         {
           "id": "D",
@@ -312,9 +368,17 @@
         "A",
         "B"
       ],
-      "hint": "Basic conditions must all match exactly; weighted conditions contribute a numeric score.",
-      "rationale": "A and B are both correct. C is wrong — basic conditions serve as the mandatory filter. D is wrong — weighted conditions are scored proportionally, not binary.",
-      "selectCount": 2
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "Every configured basic test gates entry into scoring. The comparison contributes its full weight when true; qualification uses the summed total.",
+      "selectCount": 2,
+      "optionExplanations": {
+        "A": "Every configured basic test gates entry into scoring.",
+        "B": "The comparison contributes its full weight when true; qualification uses the summed total.",
+        "C": "A failed gate excludes the candidate regardless of its possible score.",
+        "D": "Matching every weighted comparison is unnecessary if the threshold is already reached."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q09",
@@ -323,7 +387,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Yes — the basic condition matches (policy number), and the weighted score is 20, which may meet the threshold"
+          "text": "It depends on the threshold: the score is 20 and qualifies only if the threshold is 20 or lower"
         },
         {
           "id": "B",
@@ -341,8 +405,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Basic condition passes; weighted conditions are scored (not all required to match).",
-      "rationale": "The basic condition (policy number) matches — so the Case is not eliminated. The weighted score is 20 (customer name matched, incident date didn't). Whether 20 meets the threshold determines if it's presented."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "Only the name comparison contributes, totaling 20; the unknown threshold prevents an unconditional yes.",
+      "optionExplanations": {
+        "A": "Only the name comparison contributes, totaling 20; the unknown threshold prevents an unconditional yes.",
+        "B": "This incorrectly requires the incident-date comparison to match as well.",
+        "C": "Passing the policy-number filter does not bypass the weighted threshold.",
+        "D": "Both weighted comparisons need not match; 20 can qualify at a sufficiently low threshold."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q10",
@@ -351,7 +423,7 @@
       "options": [
         {
           "id": "A",
-          "text": "A ranked list of potential duplicate Cases — the user reviews each and decides whether any is a true duplicate"
+          "text": "A list of candidate Cases to review before confirming a duplicate or continuing the current Case"
         },
         {
           "id": "B",
@@ -369,8 +441,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "The user sees candidates and decides — the system doesn't auto-select.",
-      "rationale": "Basic conditions MUST all match for a potential duplicate to be flagged. Weighted conditions each contribute a score, and the Case is surfaced only if the total score meets the threshold."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "The review concerns whether the current request duplicates an existing record; list order is not guaranteed here.",
+      "optionExplanations": {
+        "A": "The review concerns whether the current request duplicates an existing record; list order is not guaranteed here.",
+        "B": "A selected best match would remove the review decision described in the topic.",
+        "C": "The candidate records are displayed for review, rather than an unspecified warning alone.",
+        "D": "Automatic combination is different from the documented confirmation or continuation choice."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q11",
@@ -397,21 +477,29 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "'Search duplicate cases' is an Automation Step — it belongs in a Process.",
-      "rationale": "The 'Search duplicate cases' Step is an Automation shape added directly to a Process in the Case Life Cycle — typically in the Create Stage — so Pega checks for duplicates as soon as a new Case is submitted. It cannot be added as a standalone Stage or configured as a global application setting. Options B, C, and D all describe incorrect locations."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "Configure it as a Process Step; the check takes place when execution reaches that Step.",
+      "optionExplanations": {
+        "A": "Configure it as a Process Step; the check takes place when execution reaches that Step.",
+        "B": "Stage properties alone are not the specified automation Step.",
+        "C": "An application-wide setting is not the requested lifecycle placement.",
+        "D": "A When Rule does not itself supply the duplicate-search review Process."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q12",
       "type": "single-select",
-      "scenario": "Why is it important to configure at least one basic condition in a duplicate search?",
+      "scenario": "What purpose do basic conditions serve before weighted scoring in a duplicate search?",
       "options": [
         {
           "id": "A",
-          "text": "Basic conditions narrow the candidate pool to meaningful matches — without them, every Case in the system would be compared against weighted conditions"
+          "text": "They filter out Cases that fail the configured required tests before scoring the remaining candidates"
         },
         {
           "id": "B",
-          "text": "Basic conditions are required by Pega Platform — the Search duplicate cases Step cannot be saved without at least one"
+          "text": "They contribute numeric weights that are added to the scoring total"
         },
         {
           "id": "C",
@@ -425,8 +513,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Basic conditions act as a mandatory filter that limits the search scope.",
-      "rationale": "Basic conditions serve as a mandatory pre-filter. Without them, every existing Case would be scored against weighted conditions, creating performance and accuracy problems. B may be partially true from a UI perspective but is not the documented reason. C and D mischaracterize basic condition behavior."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "Filtering eliminates unrelated candidates before their weighted comparisons are evaluated.",
+      "optionExplanations": {
+        "A": "Filtering eliminates unrelated candidates before their weighted comparisons are evaluated.",
+        "B": "This assigns the scoring responsibility to the wrong kind of condition.",
+        "C": "A zero weighted total does not turn the basic filter into a replacement score.",
+        "D": "Filtering conditions are not a guarantee of searching all Case Types when omitted."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q13",
@@ -435,11 +531,11 @@
       "options": [
         {
           "id": "A",
-          "text": "When a potential duplicate is detected, the user is shown the matching records and can decide whether to proceed with the new Case or link to an existing one"
+          "text": "The user can review the candidates and confirm the current Case as a duplicate, ending its processing"
         },
         {
           "id": "B",
-          "text": "Users can choose to create a new Case even when a strong duplicate match is found, if the business scenario warrants it"
+          "text": "The user can ignore the suggestions and continue the current Case when it is not a duplicate"
         },
         {
           "id": "C",
@@ -454,67 +550,85 @@
         "A",
         "B"
       ],
-      "hint": "Duplicate detection surfaces matches for the user to decide — Pega does not auto-merge without user action.",
-      "rationale": "When the Search Duplicate Cases step detects a potential duplicate, users are presented with the matching records and given the choice to proceed with the new Case or link/close it. Users retain decision authority — Pega does not automatically merge or transfer data. The user can always opt to create a new Case if the situation warrants it."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "Confirmation ends processing of the current duplicate; it does not require merging its contents. Ignoring the suggestions allows the distinct current request to proceed to the next Step.",
+      "optionExplanations": {
+        "A": "Confirmation ends processing of the current duplicate; it does not require merging its contents.",
+        "B": "Ignoring the suggestions allows the distinct current request to proceed to the next Step.",
+        "C": "This removes the user decision and invents an automatic merge.",
+        "D": "Data transfer is not inherent in duplicate resolution; original-record updates require customization."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m30_q14",
       "type": "multi-select",
-      "scenario": "An SA is designing duplicate detection for a Home Insurance Claims application. Which TWO configuration choices improve the accuracy and flexibility of duplicate detection?",
+      "scenario": "Which TWO choices describe the documented condition-based design of duplicate search?",
       "options": [
         {
           "id": "A",
-          "text": "Combining basic conditions (which must all match) with weighted conditions (which contribute a score) for flexible detection"
+          "text": "Use basic conditions as the candidate filter before evaluating weighted conditions"
         },
         {
           "id": "B",
-          "text": "Configuring multiple weighted conditions with appropriate scores so a high cumulative score is required to flag a strong duplicate"
+          "text": "Assign relative weights to comparisons and choose the total-score threshold for candidate review"
         },
         {
           "id": "C",
-          "text": "Setting the minimum weighted score threshold to zero so that any partial match is automatically flagged as a duplicate"
+          "text": "A threshold of zero guarantees that every flagged Case is a genuine duplicate"
         },
         {
           "id": "D",
-          "text": "Using a Report Definition as the primary source for the duplicate search instead of configuring conditions directly on the step"
+          "text": "A matching Case-name prefix alone guarantees duplicate identity without field comparisons"
         }
       ],
       "correctOptions": [
         "A",
         "B"
       ],
-      "hint": "Good duplicate detection combines required basic conditions with scored weighted conditions above a meaningful threshold.",
-      "rationale": "Effective duplicate detection uses basic conditions (mandatory matches) to filter the candidate pool, then weighted conditions (with scores) to rank the remaining candidates. Configuring meaningful score thresholds ensures only strong matches are flagged. A threshold of zero would flag nearly everything, and Report Definitions are not used as the source for duplicate search configuration."
+      "hint": "Distinguish required filtering, weighted qualification and the user decision.",
+      "rationale": "Separate the required filter from the scoring comparisons so their different roles remain clear. Choose comparison importance and cutoff deliberately; this is configuration, not a guarantee of accuracy.",
+      "optionExplanations": {
+        "A": "Separate the required filter from the scoring comparisons so their different roles remain clear.",
+        "B": "Choose comparison importance and cutoff deliberately; this is configuration, not a guarantee of accuracy.",
+        "C": "A permissive cutoff is not evidence of identity and cannot bypass a failed basic filter.",
+        "D": "A name resemblance alone does not establish that two business requests are the same."
+      },
+      "lessonSection": "section-295b56a299a7",
+      "explanationReviewedOn": "2026-10-04"
     }
   ],
   "quickRecap": [
     {
-      "key": "Search duplicate cases",
-      "value": "Automation Step that identifies potential duplicate Cases using basic and weighted conditions."
+      "key": "Search timing",
+      "value": "Checks occur when the Case reaches the configured automation Step."
     },
     {
-      "key": "Basic conditions",
-      "value": "Mandatory exact match. ANY mismatch → Case excluded from all duplicate candidates. Example: patient date of birth must match."
+      "key": "Basic filter",
+      "value": "Every configured basic test must be true; scoring cannot override a failure."
     },
     {
-      "key": "Weighted conditions",
-      "value": "Each carries a numeric score. Total score of matching conditions determines if Case is presented as a potential duplicate."
+      "key": "Weights",
+      "value": "True conditions add their weights (1–100); compare the total with the cutoff."
     },
     {
-      "key": "User-confirmed resolution",
-      "value": "The automation presents candidates — the user reviews and decides. Confirmed duplicates are resolved with status 'Resolved-Duplicate'."
+      "key": "Boundary",
+      "value": "A total equal to the threshold qualifies after basic filtering."
     },
     {
-      "key": "Resolution status",
-      "value": "'Resolved-Duplicate' — not 'Closed', 'Cancelled', or 'Merged'."
+      "key": "No candidates",
+      "value": "Continue to the next Process Step when filtering or scoring yields no candidates."
     },
     {
-      "key": "Multiple candidates",
-      "value": "Multiple potential duplicates can be ranked by weighted score and presented to the user simultaneously."
+      "key": "Review",
+      "value": "Confirm the current duplicate to resolve it, or ignore suggestions and continue."
     },
     {
-      "key": "Step type",
-      "value": "'Search duplicate cases' is an Automation Step added to a Process in the Case Life Cycle."
+      "key": "Customization",
+      "value": "Opening the original for updates is a separate customization; no automatic merge or transfer is promised."
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-04",
+  "platformVersion": "Pega Platform '24.2 / '25"
 }

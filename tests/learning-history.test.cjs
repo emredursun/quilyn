@@ -299,3 +299,11 @@ test('optional-work review distinguishes promotion eligibility from lifecycle ef
  assert.match(d.studyGuide[0].elements[4].description,/first Stage-wide Action other than Edit details/);assert.match(d.studyGuide[0].elements[4].description,/Optional Processes are not supported/);assert.match(d.practiceQuiz[11].rationale,/Change Stage.*cancellation/);assert.match(d.practiceQuiz[9].scenario,/distinct configured Steps/);
  assert.doesNotMatch(JSON.stringify(d),/required workflow continues uninterrupted|never mandatory.*no|Every Case Type includes two|do NOT interrupt required Case flow/);
 });
+
+test('duplicate-search review preserves inclusive threshold and user resolution without ranking promises',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m30_identifying_duplicate_cases.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M30');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.sourceReviewedOn,'2026-10-04');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[2].scenario,/All basic conditions pass/);assert.match(d.practiceQuiz[8].options[0].text,/depends.*20 or lower/);assert.match(d.practiceQuiz[2].optionExplanations.A,/threshold of 70 accepts 70/);assert.match(d.studyGuide[0].elements[4].description,/requires customized behavior/);assert.equal(d.topics[0].url,'https://academy.pega.com/topic/duplicate-search/v7/in/96211/67036');
+ assert.doesNotMatch(JSON.stringify(d),/ranked list|runs automatically at case creation|all match exactly|cannot be saved without at least one|higher total score = higher likelihood/);
+});
