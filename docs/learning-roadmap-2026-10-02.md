@@ -38,7 +38,7 @@ Veri değişikliklerinde anlamlı regresyon ve migration testleri; `npm run chec
 
 ## Durum
 
-Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 ve PBA'nın 293 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. Toplam 1.862 sorunun 1226'inde seçenek açıklamaları ve ders hedefleri var; kalan 636 sorunun editoryal açıklama/bölüm eşleştirmesi ve 145 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Önceki tamamlanan paket 224b736 ile yayımlandı; SA-M18–48 paketleri yerel inceleme kapsamındadır.
+Aşama 1–2 tamamlandı ve yerel commit'lere alındı. Aşama 3'te çalışma planı, yer imleri, Resume ve PSSA'nın 203 ve PBA'nın 293 sorusunun ders bağlantıları/seçenek açıklamaları tamamlandı. Aşama 4'te kütüphane, statik track/ders sayfaları, Mini Practice etiketleri, içerik issue taslağı ve değişiklik notları tamamlandı. Çoklu sekme eşitleme bu kayıt altında uygulandı. Toplam 1.862 sorunun 1226'inde seçenek açıklamaları ve ders hedefleri var; kalan 636 sorunun editoryal açıklama/bölüm eşleştirmesi ve 144 modülün sürüm/kaynak incelemesi hâlâ açıktır. Fiziksel cihaz/ekran okuyucu kontrolleri ve Search Console doğrulaması dış ortam/hesap erişimi gerektirir. Önceki tamamlanan paket 224b736 ile yayımlandı; SA-M18–48 paketleri yerel inceleme kapsamındadır.
 
 ### Aşama 1 teslim kaydı
 

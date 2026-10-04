@@ -458,3 +458,9 @@ test('low-code review separates configured studio default from recommended autho
  assert.deepEqual(d.practiceQuiz[4].correctOptions,['B']);assert.deepEqual(d.practiceQuiz[5].correctOptions,['A','B','C']);assert.match(d.examPitfalls[1].trapDescription,/configured default/);assert.match(d.studyGuide[0].elements[6].svg,/pxPredictionStudio access/);assert.match(d.practiceQuiz[16].rationale,/not the same.*office opening hours/);assert.match(d.practiceQuiz[18].rationale,/high-level layer overview/);
  assert.doesNotMatch(JSON.stringify(d),/Technical members default to Dev Studio|Requires separate license|SA\/LSA roles|business-hours-only timer|Agile Workbench both live in Dev Studio/);
 });
+
+test('BA low-code review scopes co-development and integration replacement while preserving historical question IDs',()=>{
+ const crypto=require('node:crypto'),file='data/business-architect/m02_low_code_defined.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M02'),q=Object.fromEntries(d.practiceQuiz.map(q=>[q.questionId,q]));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,21);assert.equal(q.Q4,undefined);assert.deepEqual(q.Q1.correctOptions,['C']);assert.deepEqual(q.Q5.correctOptions,['B']);assert.deepEqual(q.Q10.correctOptions,['A','B']);
+ assert.match(q.Q10.options[1].text,/technical members also use App Studio/);assert.match(q.Q12.optionExplanations.D,/UI Ruleset/);assert.match(q.Q18.rationale,/configuration and testing/);assert.match(d.studyGuide[3].elements[3].description,/except the base Pega Platform layer/);assert.match(q.Q17.rationale,/distinct from.*office opening hours/);
+});
