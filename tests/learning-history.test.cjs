@@ -395,3 +395,11 @@ test('application access review restores production scale and permits intermedia
  assert.match(d.studyGuide[1].elements[3].description,/5 Production.*4 Staging.*3 Quality assurance.*2 Development.*1 Sandbox/);assert.match(d.studyGuide[1].elements[2].bulletPoints[0],/other than.*0\/5/);assert.match(d.practiceQuiz[6].rationale,/five to Production/);assert.match(d.practiceQuiz[8].rationale,/one application.*different role sets/);assert.match(d.practiceQuiz[1].scenario,/no applicable Access Deny/);assert.match(d.practiceQuiz[14].options[0].text,/Access Groups/);
  assert.doesNotMatch(JSON.stringify(d),/1 = Production|1=Production|5 = Sandbox|5=Sandbox|ARO records.*they do not deny|Access Role Objects|ALWAYS overrides ARO|Lower = More Restrictive/);
 });
+
+test('UI-element review scopes control examples and resolves hidden-input and disabled-after-entry ambiguity',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m42_configuring_ui_elements.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M42');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===5?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[3].scenario,/confirmation View.*selected earlier/);assert.match(d.practiceQuiz[4].scenario,/After account creation.*confirmation View/);assert.match(d.practiceQuiz[7].scenario,/not whether the control is supported/);assert.match(d.practiceQuiz[10].scenario,/pair of conditional settings/);assert.match(d.studyGuide[2].elements[1].description,/does not replace server-side authorization/);
+ assert.doesNotMatch(JSON.stringify(d),/only for Visible\/Disabled|Autocomplete, Button, Checkbox, Date, Grid, Text|frequently tested exam|require custom configuration|no page reload needed|Settings → Themes/);
+});
