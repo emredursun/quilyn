@@ -371,3 +371,11 @@ test('sourced-data review corrects mapping structures, copied-value limits and o
  assert.match(d.studyGuide[2].elements[1].description,/Report definition with List structure, Lookup with Page/);assert.match(d.studyGuide[4].elements[1].description,/Changed parameters overwrite.*removing.*clipboard/);assert.match(d.practiceQuiz[8].options[0].text,/Only SED/);assert.match(d.practiceQuiz[12].scenario,/optional but recommended/);assert.match(d.practiceQuiz[10].rationale,/Thread.*Node/);
  assert.doesNotMatch(JSON.stringify(d),/other 5 source types map automatically|Reference = always current|Saved with the Case permanently|DataPageName\[index\]|Report definition \(page structure\)|Lookup \(list structure\)/);
 });
+
+test('savable-page review corrects Copy answer and avoids universal remote rollback promises',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m39_saving_data_system_of_record.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M39');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
+ assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===3?['A','B']:i===4?['B']:i===11?['A','C']:i===12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[2].elements[2].description,/recommends Copy.*overwrite/);assert.match(d.studyGuide[1].elements[0].description,/not universally mandatory/);assert.match(d.practiceQuiz[8].rationale,/Database delete/);assert.match(d.studyGuide[0].elements[2].description,/Do not assume every remote API/);
+ assert.doesNotMatch(JSON.stringify(d),/must REFER, not Copy|always REFER, never copy|each clipboard property must be explicitly mapped|rolls back both sides|exactly one SOR commit|Navigation action|Case Close action/);
+});
