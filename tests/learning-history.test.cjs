@@ -435,3 +435,11 @@ test('Tracer review replaces archived source and distinguishes server debug sett
  assert.match(d.studyGuide[0].elements[5].description,/request ID/);assert.match(d.studyGuide[2].elements[2].description,/unavailable in the App Studio shell/);assert.match(d.studyGuide[2].elements[4].svg,/dynamic system setting, not URL parameter/);assert.match(d.practiceQuiz[11].rationale,/Break Conditions.*errors/);assert.match(d.practiceQuiz[13].scenario,/non-Constellation, non-Service/);assert.match(d.practiceQuiz[14].options[1].text,/UI Inspector/);
  assert.doesNotMatch(JSON.stringify(d),/only the most recently opened|opening a new one closes|logs every Rule execution event|NEVER run in production|Inspect \/ clipboard icon/);
 });
+
+test('Insights review uses property optimization and relevant records instead of blanket permission expansion',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m47_exploring_application_data_insights.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M47');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'25 min · 3 topics');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===11?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[9].scenario,/Show\/hide columns/);assert.match(d.practiceQuiz[9].options[0].text,/parent classes.*specific Class/);assert.match(d.practiceQuiz[13].options[1].text,/relevant record/);assert.match(d.studyGuide[1].elements[0].description,/excludes adding them directly to a View/);assert.match(d.studyGuide[1].elements[2].description,/not configured through.*Portal authoring/);
+ assert.doesNotMatch(JSON.stringify(d),/typically a.*permissions issue|CAUSE: insufficient user permissions|Not a report definition bug|all widgets update|Token expiry controls how long/);
+});
