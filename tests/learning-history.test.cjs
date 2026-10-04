@@ -379,3 +379,11 @@ test('savable-page review corrects Copy answer and avoids universal remote rollb
  assert.match(d.studyGuide[2].elements[2].description,/recommends Copy.*overwrite/);assert.match(d.studyGuide[1].elements[0].description,/not universally mandatory/);assert.match(d.practiceQuiz[8].rationale,/Database delete/);assert.match(d.studyGuide[0].elements[2].description,/Do not assume every remote API/);
  assert.doesNotMatch(JSON.stringify(d),/must REFER, not Copy|always REFER, never copy|each clipboard property must be explicitly mapped|rolls back both sides|exactly one SOR commit|Navigation action|Case Close action/);
 });
+
+test('application security review uses client-based CBAC and version-scoped policy guidance',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m40_application_security.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M40');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'40 min · 3 topics');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===8?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[11].rationale,/Client-based access.*requests/);assert.match(d.practiceQuiz[6].scenario,/configured failed-attempt threshold/);assert.match(d.studyGuide[1].elements[1].description,/earlier.*v5/);assert.match(d.studyGuide[0].elements[3].description,/not every listed task applies/);
+ assert.doesNotMatch(JSON.stringify(d),/CBAC \(Claim-Based|CBAC controls access to entire rule classes|Ranks above MFA|distinction frequently tested|not a soft warning that can be overridden|until every item on the checklist/);
+});
