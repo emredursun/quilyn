@@ -331,3 +331,11 @@ test('Configuration Set review scopes DSS guidance and role defaults without ins
  assert.match(d.studyGuide[1].elements[0].description,/only after it contains a setting/);assert.match(d.practiceQuiz[7].rationale,/menu identifies.*Set and setting/);assert.match(d.practiceQuiz[13].scenario,/Email integration/);assert.match(d.examPitfalls[3].bestPractice,/WorkMgr4 also reads individual settings/);
  assert.doesNotMatch(JSON.stringify(d),/Pega 8\.5\+|changes app behavior instantly|should not be manually edited|passes.*no|Runtime customization means Admins\/Managers/);
 });
+
+test('data-validation review corrects Stage entry timing and removes the ambiguous exit answer',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m34_validating_data_business_logic.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M34');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===11?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[2].options[0].text,/Before.*Settlement/);assert.match(d.practiceQuiz[13].options[1].text,/block entry/);assert.match(d.practiceQuiz[6].options[0].text,/error prevents entry/);assert.match(d.studyGuide[1].elements[3].description,/different validation conditions at each use/);assert.match(d.practiceQuiz[9].optionExplanations.A,/passes.*comparison/);
+ assert.doesNotMatch(JSON.stringify(d),/prevent the Case from exiting|Nothing automatically|both are needed|automatically repeat.*Correct|custom Java/);
+});
