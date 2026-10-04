@@ -291,3 +291,11 @@ test('conditional-execution review avoids universal OR bans and extra required R
  assert.match(d.practiceQuiz[9].scenario,/combined.*same way.*single-valued/);assert.match(d.practiceQuiz[12].options[1].text,/not require a second separately/);assert.match(d.practiceQuiz[1].rationale,/start condition/);
  assert.doesNotMatch(JSON.stringify(d),/Cannot express OR logic|condition \(When Rule\) is composed of exactly|Stage skip and Process skip are entirely independent|can reference any Case property/);
 });
+
+test('optional-work review distinguishes promotion eligibility from lifecycle effects',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m29_adding_optional_actions_workflow.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M29');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.sourceReviewedOn,'2026-10-04');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[8,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[0].elements[4].description,/first Stage-wide Action other than Edit details/);assert.match(d.studyGuide[0].elements[4].description,/Optional Processes are not supported/);assert.match(d.practiceQuiz[11].rationale,/Change Stage.*cancellation/);assert.match(d.practiceQuiz[9].scenario,/distinct configured Steps/);
+ assert.doesNotMatch(JSON.stringify(d),/required workflow continues uninterrupted|never mandatory.*no|Every Case Type includes two|do NOT interrupt required Case flow/);
+});
