@@ -119,14 +119,14 @@ test('PSA foundation feedback resolves to real sections and preserves the review
  const keys=[{3:['A','B'],5:['B'],6:['A','B','C'],10:['A','B'],16:['A','B','C'],20:['A','B']},{6:['A','B'],15:['A','B','C'],19:['A','B'],20:['A','B'],21:['A','B']},{8:['A','B'],15:['A','B'],16:['A','B'],17:['A','B']}];
  registry.tracks.find(t=>t.trackId==='PSA').modules.slice(0,3).forEach((m,index)=>{
   const d=JSON.parse(fs.readFileSync(m.file)),sections=new Set(d.studyGuide.map(s=>s.sectionId));
-  d.practiceQuiz.forEach((q,i)=>{count++;assert.deepEqual(q.correctOptions,keys[index][i+1]||['A']);assert.ok(sections.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,index<2?'2026-10-04':'2026-10-02');});
+  d.practiceQuiz.forEach((q,i)=>{count++;assert.deepEqual(q.correctOptions,keys[index][i+1]||['A']);assert.ok(sections.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,index<2?'2026-10-04':index===2?'2026-10-05':'2026-10-02');});
  });assert.equal(count,60);
 });
 test('PSA draft, naming and access questions avoid the reviewed misleading claims',()=>{
  const d=JSON.parse(fs.readFileSync('data/system-architect/m02_defining_customer_microjourney.json'));
  const draft=d.practiceQuiz.find(q=>q.questionId==='m02_q20');assert.doesNotMatch(draft.options[0].text,/without.*live application/);assert.match(draft.options[1].text,/before.*production/);assert.match(draft.rationale,/not a deployment isolation/);
  const naming=d.practiceQuiz.find(q=>q.questionId==='m02_q12');assert.match(naming.scenario,/Process = 'Review documents'/);assert.match(naming.rationale,/verb\+noun/);
- const users=JSON.parse(fs.readFileSync('data/system-architect/m03_inviting_users_to_application.json'));assert.match(users.practiceQuiz[15].options[0].text,/configured authentication/);assert.doesNotMatch(users.practiceQuiz[15].options[1].text,/includes.*Persona/);
+ const users=JSON.parse(fs.readFileSync('data/system-architect/m03_inviting_users_to_application.json'));assert.match(users.practiceQuiz[15].options[0].text,/individual user.*People tab/);assert.doesNotMatch(users.practiceQuiz[15].options[1].text,/includes.*Persona/);
 });
 
 test('PSA Center-out, GenAI and Blueprint feedback has complete, real lesson targets',()=>{
@@ -470,4 +470,12 @@ test('Case Life Cycle review separates Process draft mode from designer data pla
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.moduleUrl,'https://academy.pega.com/module/defining-case-lifecycle/v8');assert.equal(d.estTime,'45 min · 4 topics');assert.equal(d.practiceQuiz.length,21);
  assert.match(d.studyGuide[4].elements[1].description,/Merely enabling Process draft mode is not the trigger/);assert.match(d.studyGuide[2].elements[6].html,/Add a Change Stage automation targeting Review/);assert.match(d.studyGuide[2].elements[7].description,/ordinary Process Steps/);assert.match(d.studyGuide[1].elements[4].svg,/named as verb \+ noun/);assert.match(d.practiceQuiz[2].rationale,/does not universally require/);
  assert.doesNotMatch(JSON.stringify(d),/One Microjourney = one Case Type|loops between primary Stages|always placeholders regardless of which studio|It is the outbound\/engagement layer|must start with a capital letter/);
+});
+
+test('user-management review separates business Personas from identity and avoids automatic permission guarantees',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m03_inviting_users_to_application.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M03'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.practiceQuiz.length,17);assert.equal(d.estTime,'10 min · 1 topic');assert.equal(d.topics[0].duration,'5 min');
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,14,15,16].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[7].options[1].text,/default permissions and a Work Queue/);assert.match(d.practiceQuiz[14].optionExplanations.D,/Multiple Personas can share/);assert.match(d.studyGuide[2].elements[3].html,/People, enter Dana/);assert.match(d.studyGuide[2].elements[1].description,/not every role has a Persona/);
+ assert.doesNotMatch(JSON.stringify(d),/Inviting sends credentials|automatically updates the Access Group|Persona assignment IS access assignment|Work is routed to Personas|Assigned 1\+ Personas/);
 });
