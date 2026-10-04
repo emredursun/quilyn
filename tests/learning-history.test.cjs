@@ -355,3 +355,11 @@ test('data-manipulation review restores calculation support and scopes the clipb
  assert.match(d.studyGuide[0].elements[1].description,/calculate values/);assert.match(d.practiceQuiz[0].scenario,/attached to the next form Step itself/);assert.match(d.practiceQuiz[7].scenario,/illustrated.*Clipboard Page/);assert.match(d.practiceQuiz[1].options[2].text,/Either a following/);
  assert.doesNotMatch(JSON.stringify(d),/Does NOT validate or calculate|must register any Data Page|Without this step.*fails at runtime|guardrail violation.*regenerates it on save/);
 });
+
+test('Dev Studio transform review distinguishes class superclassing from Case hierarchy and ordinary invocation',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m37_application_data_manipulation_dev_studio.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M37');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
+ assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===8?['A','B']:i===11?['A','C']:i===12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[1].elements[4].description,/class inheritance, not.*Case instances/);assert.match(d.practiceQuiz[3].scenario,/explicitly invoked.*no other definitions/);assert.match(d.practiceQuiz[11].options[0].text,/not two same-named superclass/);assert.match(d.practiceQuiz[7].scenario,/Clipboard Page/);
+ assert.doesNotMatch(JSON.stringify(d),/Any Data Page.*must be added|runtime cannot resolve the page|Data initialization page does not support expression|auto-enabled.*pySetFieldDefaults transform/);
+});
