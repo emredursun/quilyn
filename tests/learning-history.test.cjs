@@ -347,3 +347,11 @@ test('Dev Studio validation review corrects qualifier diagrams and invocation-de
  assert.match(d.practiceQuiz[6].rationale,/Stage-specific sets/);assert.match(d.practiceQuiz[3].options[0].text,/can also call Edit Validate/);assert.match(d.practiceQuiz[5].scenario,/proposes to apply/);assert.match(d.practiceQuiz[12].options[1].text,/containing Rule runs on submission/);
  assert.doesNotMatch(JSON.stringify(d),/four: Stages, Role, Skill|4 types: Stages, Role|fire on every change|executes every time|custom Java bypasses|client-side in the browser.*no server round-trip/);
 });
+
+test('data-manipulation review restores calculation support and scopes the clipboard declaration example',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m36_application_data_manipulation.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M36');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'15 min');assert.ok(d.topics.every(t=>t.duration==='5 min'));
+ assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===1?['C']:i===8?['A','C']:i>=11?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[0].elements[1].description,/calculate values/);assert.match(d.practiceQuiz[0].scenario,/attached to the next form Step itself/);assert.match(d.practiceQuiz[7].scenario,/illustrated.*Clipboard Page/);assert.match(d.practiceQuiz[1].options[2].text,/Either a following/);
+ assert.doesNotMatch(JSON.stringify(d),/Does NOT validate or calculate|must register any Data Page|Without this step.*fails at runtime|guardrail violation.*regenerates it on save/);
+});
