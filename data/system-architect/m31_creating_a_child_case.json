@@ -11,8 +11,8 @@
   "topics": [
     {
       "title": "Child cases",
-      "url": "https://academy.pega.com/topic/child-cases/v6/in/67016",
-      "duration": "20 min"
+      "url": "https://academy.pega.com/topic/child-cases/v6/in/96211/67016",
+      "duration": "10 min"
     }
   ],
   "studyGuide": [
@@ -30,7 +30,7 @@
         },
         {
           "type": "analogy",
-          "text": "Child cases are like sub-tasks on a project plan: the parent project (case) cannot be marked complete until all sub-tasks (child cases) are done. In Pega, each child case runs its own independent Life Cycle and can be assigned to different teams — but the parent case waits for all children to resolve before it advances. One sub-task delay holds the whole project."
+          "text": "A project can have separate repair and inspection workstreams. Each follows its own plan and reporting needs. In the parallel child-Case model described here, finishing the parent requires the children to finish; this does not mean every intermediate parent Step is blocked. Design the coordination points rather than assuming a universal pause."
         },
         {
           "type": "concept",
@@ -40,21 +40,21 @@
         {
           "type": "concept",
           "term": "Create Case Step",
-          "description": "Add a Create Case Automation Step to the Case Life Cycle to create a child Case. When executed, it creates a child Case of the specified Case Type. Dev Studio provides additional options, including contextual Case creation."
+          "description": "Configure a Create Case automation in the parent Process to instantiate the intended child Case Type. Creation happens when that Step runs. Additional Dev Studio options include top-level creation and multiple children; the shape is not inherently child-only."
         },
         {
           "type": "concept",
           "term": "Data propagation — Copy vs. Data reference",
           "description": "How parent data is shared with child Cases:",
           "items": [
-            "COPY DATA — snapshots parent data at child creation; child is NOT updated if parent changes later",
-            "DATA REFERENCE — child data stays synchronized with the parent; requires advanced configuration in Dev Studio"
+            "COPY DATA — propagates selected values at creation; later parent edits do not synchronize the copy automatically. The child copy can still be edited by its own configured work.",
+            "DATA REFERENCE — use referenced parent data when later parent updates should remain available; advanced Dev Studio configuration is required. Do not infer a specific data-page implementation or write permission from the relationship alone."
           ]
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 420 220\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"400\" height=\"200\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"210\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Parent Case and Child Cases</text><rect x=\"150\" y=\"45\" width=\"120\" height=\"30\" rx=\"8\" fill=\"var(--pa-brand)\" opacity=\"0.25\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"210\" y=\"64\" text-anchor=\"middle\" font-size=\"11\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Parent Case</text><line x1=\"130\" y1=\"75\" x2=\"80\" y2=\"105\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr31)\"/><line x1=\"210\" y1=\"75\" x2=\"210\" y2=\"105\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr31)\"/><line x1=\"290\" y1=\"75\" x2=\"330\" y2=\"105\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\" marker-end=\"url(#arr31)\"/><rect x=\"30\" y=\"108\" width=\"100\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"80\" y=\"126\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Child Case 1</text><rect x=\"160\" y=\"108\" width=\"100\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"210\" y=\"126\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Child Case 2</text><rect x=\"285\" y=\"108\" width=\"100\" height=\"28\" rx=\"6\" fill=\"var(--pa-ok-bg)\" stroke=\"var(--pa-ok-line)\" stroke-width=\"1.5\"/><text x=\"335\" y=\"126\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink)\">Child Case 3</text><text x=\"210\" y=\"158\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Each child runs its own Life Cycle independently.</text><text x=\"210\" y=\"173\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-err)\">Parent waits for ALL children to resolve before advancing.</text><text x=\"210\" y=\"195\" text-anchor=\"middle\" font-size=\"9\" fill=\"var(--pa-ink-2)\">Create child cases using the Create Case automation shape.</text><defs><marker id=\"arr31\" markerWidth=\"6\" markerHeight=\"6\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L6,3 L0,6 Z\" fill=\"var(--pa-ink-3)\"/></marker></defs></svg>",
-          "caption": "Parent case waits for ALL child cases to resolve. Each child runs its own independent Life Cycle."
+          "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 760 190\" role=\"img\" font-family=\"inherit\"><title>Child work and data sharing</title><rect x=\"10\" y=\"10\" width=\"740\" height=\"170\" rx=\"12\" fill=\"var(--pa-surface)\" stroke=\"var(--pa-brand)\"/><text x=\"30\" y=\"42\" font-size=\"16\" font-weight=\"bold\" fill=\"var(--pa-brand)\">One parent, separate child workstreams</text><g font-size=\"14\" fill=\"var(--pa-ink-2)\"><text x=\"30\" y=\"78\">Configured Create Case Step → child instance and its own workflow.</text><text x=\"30\" y=\"110\">Copy for a creation snapshot; reference for changing parent information.</text><text x=\"30\" y=\"142\">Parallel-child completion gates parent resolution, not every parent Step.</text></g></svg>",
+          "caption": "Separate child workflows support decomposition and reuse. In the described parallel model, children complete before parent resolution."
         }
       ],
       "sectionId": "section-c683e78df0e4"
@@ -69,12 +69,12 @@
     {
       "title": "Create Case is an AUTOMATION Step — not a Process or manual Step",
       "trapDescription": "Questions ask what type of element creates a child case in the Case Life Cycle. Candidates say 'a Process' or 'a manual Step.' Creating a child case is configured as an Automation Step — specifically the 'Create Case' automation shape in the Case Life Cycle.",
-      "bestPractice": "Child Cases are created using a Create Case AUTOMATION Step added to the Case Life Cycle. It executes automatically when the Case reaches that point — no user action required."
+      "bestPractice": "Configure the Create Case automation to create the intended child when the Process reaches that Step. Other creation options exist in Dev Studio."
     },
     {
       "title": "Copy data = snapshot, NOT synchronized",
       "trapDescription": "A question asks whether the copied data in a child case updates when the parent case data changes. Candidates say yes. The 'Copy data' option takes a snapshot at child creation time — subsequent changes to the parent are NOT reflected in the child.",
-      "bestPractice": "Copy data captures a SNAPSHOT at the time of child Case creation. If the parent data changes afterward, the child Case data does NOT update — it stays frozen at the copied value."
+      "bestPractice": "A propagated value is not automatically refreshed by later parent edits. This is a copy, not a live link, but it is not an immutable field."
     },
     {
       "title": "Data reference = synchronized — but requires Dev Studio",
@@ -84,12 +84,12 @@
     {
       "title": "Child Cases have their own independent lifecycle",
       "trapDescription": "A question asks whether the child case follows the parent case's stages. Candidates say yes. Child Cases have a completely independent Case Life Cycle — they can be configured with different stages, processes, and SLAs from the parent.",
-      "bestPractice": "Child Cases are separate Case Types with their own independent lifecycle, Stages, Processes, and Steps. They may have different time frames, reporting options, and parties involved."
+      "bestPractice": "A child is an instance of its configured Case Type, whose workflow can differ from the parent. Relationship hierarchy does not copy the parent lifecycle."
     },
     {
       "title": "Case Type reuse is a key benefit of child Cases",
-      "trapDescription": "Questions ask why child cases are used instead of adding more processes to the parent. Candidates say 'for parallel processing.' Case Type reuse is the primary benefit — an existing Case Type can be reused as a child case without duplicating logic, enabling modular design.",
-      "bestPractice": "One of the four key benefits: implementing a business process in a separate Case Type allows REUSE of that Case Type across multiple parent Case Types — not just within one parent."
+      "trapDescription": "Do not declare reuse the single primary benefit for every design. Parallel work, specialist ownership, separate reporting and timing can also motivate decomposition.",
+      "bestPractice": "An existing child Case Type can serve several parent Case Types. Choose decomposition for the actual work requirements rather than a universal ranking of benefits."
     },
     {
       "title": "Four specific situations where child Cases are beneficial",
@@ -123,8 +123,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "One of the four child Case use cases is work performed by different parties.",
-      "rationale": "Different parties performing different work is a primary use case for child Cases. Each party (repair shop, clinic) manages their own Case independently. B, C, and D describe incorrect or fabricated reasons."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "Separate specialist work can use independent workflows while retaining the parent relationship.",
+      "optionExplanations": {
+        "A": "Separate specialist work can use independent workflows while retaining the parent relationship.",
+        "B": "This scenario does not require separate applications for the two specialists.",
+        "C": "A Stage count does not determine whether work needs a separate Case.",
+        "D": "A hierarchy does not by itself configure outbound notifications."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q02",
@@ -152,9 +160,17 @@
         "A",
         "B"
       ],
-      "hint": "Four valid reasons: different parties, different reporting, different time frames, reuse across Case Types.",
-      "rationale": "Different time frames and common work across Case Types are both documented reasons for using child Cases. C (Step count) and D (hiding work) are not documented use cases.",
-      "selectCount": 2
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "Distinct schedules can justify separately managed child workflows. A reusable Case Type can provide common work for more than one parent design.",
+      "selectCount": 2,
+      "optionExplanations": {
+        "A": "Distinct schedules can justify separately managed child workflows.",
+        "B": "A reusable Case Type can provide common work for more than one parent design.",
+        "C": "An arbitrary Step count is not the business decomposition criterion here.",
+        "D": "A child relationship does not by itself restrict the parent owner’s access."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q03",
@@ -181,8 +197,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Child Cases are created using a specific Automation Step type.",
-      "rationale": "The Create Case Automation Step is the mechanism for creating child Cases within the Case Life Cycle. B, C, and D describe incorrect or non-existent configuration paths."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "Place and configure the creation automation in the parent workflow for the desired child type.",
+      "optionExplanations": {
+        "A": "Place and configure the creation automation in the parent workflow for the desired child type.",
+        "B": "A Stage-property entry is not the creation Step requested in this question.",
+        "C": "A hierarchy description alone does not instantiate the child at the intended Process point.",
+        "D": "A Boolean test alone is not the creation automation; it can express a condition but does not create work by itself."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q04",
@@ -209,13 +233,21 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Top-level = no parent above it, but it CAN be a parent.",
-      "rationale": "A top-level Case has no parent but can become a parent by creating child Cases. B is wrong because top-level Cases can create children. C and D describe incorrect characteristics."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "The term describes the absence of a parent above the current Case, not a prohibition on descendants.",
+      "optionExplanations": {
+        "A": "The term describes the absence of a parent above the current Case, not a prohibition on descendants.",
+        "B": "Having no parent does not prevent creating children below it.",
+        "C": "Hierarchy does not automatically aggregate every child field.",
+        "D": "A relationship role is not an application-wide Case Type template."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q05",
       "type": "single-select",
-      "scenario": "An SA needs the child Case to always display the most current address from the parent Case, even if the address is updated after child Case creation. Which data propagation method is correct?",
+      "scenario": "A child Case should read changing parent address information rather than retain only the creation-time value. Which approach fits this requirement?",
       "options": [
         {
           "id": "A",
@@ -237,13 +269,21 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Synchronized = data reference. Copy = frozen snapshot.",
-      "rationale": "Data references keep child Case data synchronized with the parent — if the parent address changes, the child Case reflects the update. B is wrong because copied data is a snapshot and does NOT auto-update. C is wrong because data references require Dev Studio, not App Studio. D is wrong because copied data is never automatically re-copied."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "A reference fits changing parent information; creation-time copying alone cannot meet this need.",
+      "optionExplanations": {
+        "A": "A reference fits changing parent information; creation-time copying alone cannot meet this need.",
+        "B": "The copy is not automatically refreshed by later parent edits.",
+        "C": "This incorrectly locates the advanced reference configuration in App Studio alone.",
+        "D": "Automatic copying on every parent update is not inherent in propagation."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q06",
       "type": "single-select",
-      "scenario": "An SA configures a child Case using 'Copy data' for the customer's phone number. After the child Case is created, the customer updates their phone number in the parent Case. What happens to the phone number in the child Case?",
+      "scenario": "Only 'Copy data' propagation is configured for a phone number; no later synchronization logic exists. After creation, the parent number changes. What happens to the child copy?",
       "options": [
         {
           "id": "A",
@@ -265,8 +305,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Copy = frozen snapshot at creation. Not synchronized after.",
-      "rationale": "Copy data creates a snapshot at the time of child Case creation. Changes to the parent after creation do NOT propagate to the child. B, C, and D all describe synchronized behavior that belongs to data references."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "Without additional synchronization logic, the propagated phone value remains the original copy.",
+      "optionExplanations": {
+        "A": "Without additional synchronization logic, the propagated phone value remains the original copy.",
+        "B": "Propagation does not turn the copied field into a live reference.",
+        "C": "Opening a child does not itself refresh a copied parent value.",
+        "D": "No automatic stale-data warning or refresh prompt follows merely from using a copy."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q07",
@@ -293,8 +341,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Data references = advanced configuration = Dev Studio.",
-      "rationale": "Data references require advanced configuration in Dev Studio — this is explicitly noted in the Pega Academy content. B, C, and D describe incorrect locations."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "Advanced reference configuration belongs in Dev Studio in this lesson.",
+      "optionExplanations": {
+        "A": "Advanced reference configuration belongs in Dev Studio in this lesson.",
+        "B": "This invents a Synchronize toggle for the described App Studio creation setup.",
+        "C": "A system administration setting is not the documented reference setup.",
+        "D": "A child workflow Stage does not provide the proposed Inherit parent data switch."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q08",
@@ -321,13 +377,21 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Reuse across multiple Case Types is a specific child Case benefit.",
-      "rationale": "Implementing the Background Check as a separate Case Type and reusing it as a child Case in both 'New Account Onboarding' and 'Job Application' is the documented reuse benefit. B, C, and D may be partially true but don't capture the PRIMARY benefit described here."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "Using one Background Check Case Type in both parent designs illustrates reuse directly.",
+      "optionExplanations": {
+        "A": "Using one Background Check Case Type in both parent designs illustrates reuse directly.",
+        "B": "External-vendor ownership is not established by the question; it is a separate possible motivation.",
+        "C": "The question does not state how long either workflow takes.",
+        "D": "A separate reporting requirement is not supplied in this scenario."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q09",
       "type": "single-select",
-      "scenario": "When the Create Case Automation Step executes in a parent Case, what happens?",
+      "scenario": "A Create Case automation is configured to create a child of a specified Case Type. What happens when the parent Process reaches this Step?",
       "options": [
         {
           "id": "A",
@@ -349,8 +413,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Automation Step = executes automatically, no user input required.",
-      "rationale": "The Create Case Step is an Automation — it executes automatically when the Case reaches it, creating the child Case without user interaction. B, C, and D describe user-initiated or manual behaviors that don't apply to Automation Steps."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "The configured creation Step instantiates the chosen child; its later workflow can still involve users.",
+      "optionExplanations": {
+        "A": "The configured creation Step instantiates the chosen child; its later workflow can still involve users.",
+        "B": "This assumes a confirmation assignment that is not part of the described creation automation.",
+        "C": "The automation creates the child rather than waiting for a manager to create it manually.",
+        "D": "This invents an obligatory draft-submission phase for every created child."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q10",
@@ -359,7 +431,7 @@
       "options": [
         {
           "id": "A",
-          "text": "No — a child Case is a separate Case Type with its own independent lifecycle"
+          "text": "No — the child instance follows its configured Case Type lifecycle, which can differ from the parent"
         },
         {
           "id": "B",
@@ -377,8 +449,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Child Cases are separate Case Types — independent everything.",
-      "rationale": "A child Case is a fully independent Case Type with its own Stages, Processes, Steps, and lifecycle. B and C are wrong because child Cases don't inherit the parent lifecycle. D is wrong because child Cases have their own complete lifecycle."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "The child uses its configured workflow, rather than inheriting Stages through the parent relationship.",
+      "optionExplanations": {
+        "A": "The child uses its configured workflow, rather than inheriting Stages through the parent relationship.",
+        "B": "A parent link does not automatically copy the parent workflow definition.",
+        "C": "The relationship does not impose Stage inheritance while leaving only the smaller elements independent.",
+        "D": "A child has a workflow; it is not restricted to arbitrary status edits."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q11",
@@ -387,7 +467,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Creating the child Case as a contextual Case"
+          "text": "Additional contextual creation options, including creating a top-level Case or multiple child Cases"
         },
         {
           "id": "B",
@@ -395,7 +475,7 @@
         },
         {
           "id": "C",
-          "text": "Selecting whether to copy or reference parent data"
+          "text": "Mapping selected parent fields to child fields for copy propagation"
         },
         {
           "id": "D",
@@ -405,8 +485,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Dev Studio provides 'additional configuration options' — the specific one mentioned is contextual Cases.",
-      "rationale": "Dev Studio provides additional options for the Create Case Step, specifically creating the child as a contextual Case. B and C are available in App Studio as well. D is not mentioned in the Academy content."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "Dev Studio exposes additional creation options; this describes more than the ordinary selected child creation.",
+      "optionExplanations": {
+        "A": "Dev Studio exposes additional creation options; this describes more than the ordinary selected child creation.",
+        "B": "Selecting the child type is already part of the described App Studio Step configuration.",
+        "C": "App Studio can map copied field values, so this is not the additional Dev Studio capability.",
+        "D": "Priority is not the additional creation capability established by this source; the answer does not explain the documented distinction."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q12",
@@ -434,9 +522,17 @@
         "A",
         "B"
       ],
-      "hint": "Copy = snapshot (frozen). Reference = synchronized (Dev Studio required).",
-      "rationale": "A and B are both correct and directly from the Academy content. C is wrong — copy data never auto-re-syncs. D is wrong — data references require Dev Studio.",
-      "selectCount": 2
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "Copy propagation captures selected creation-time values and does not synchronize later parent changes by itself. Referenced parent information fits ongoing changes and requires advanced configuration.",
+      "selectCount": 2,
+      "optionExplanations": {
+        "A": "Copy propagation captures selected creation-time values and does not synchronize later parent changes by itself.",
+        "B": "Referenced parent information fits ongoing changes and requires advanced configuration.",
+        "C": "Submitting the parent does not inherently refresh a propagated child copy.",
+        "D": "This incorrectly removes the advanced Dev Studio work required for the reference."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m31_q13",
@@ -449,7 +545,7 @@
         },
         {
           "id": "B",
-          "text": "Using a data reference passes the parent's data page to the child, so the child always reflects the current state of the parent's data"
+          "text": "Use referenced parent data when parent updates should remain available to the child; configure the reference in Dev Studio"
         },
         {
           "id": "C",
@@ -464,8 +560,16 @@
         "A",
         "B"
       ],
-      "hint": "Copying creates an independent snapshot; a data reference shares a live pointer to the parent's data.",
-      "rationale": "When data is copied from parent to child, the child receives an independent copy — subsequent changes in the parent do not update the child and vice versa. A data reference passes a pointer to the parent's data page, so the child always reads the current parent data without duplication. References do not enable the child to overwrite parent data."
+      "hint": "Separate the relationship, creation configuration and data-sharing behavior.",
+      "rationale": "The copies are separate values; later edits do not inherently synchronize the two Cases. Reference the changing information rather than promising a permanently current copied value.",
+      "optionExplanations": {
+        "A": "The copies are separate values; later edits do not inherently synchronize the two Cases.",
+        "B": "Reference the changing information rather than promising a permanently current copied value.",
+        "C": "This attributes two-way synchronization to a one-time copy operation.",
+        "D": "A reference alone does not establish write-back behavior or authority to overwrite the parent."
+      },
+      "lessonSection": "section-c683e78df0e4",
+      "explanationReviewedOn": "2026-10-04"
     }
   ],
   "quickRecap": [
@@ -479,7 +583,7 @@
     },
     {
       "key": "Create Case Step",
-      "value": "Automation Step added to the Case Life Cycle. Executes automatically — no user action required. Dev Studio adds contextual Case option."
+      "value": "Configured automation instantiates the intended Case when reached. Dev Studio exposes additional creation options."
     },
     {
       "key": "Copy data",
@@ -491,11 +595,13 @@
     },
     {
       "key": "Independent lifecycle",
-      "value": "Child Cases are separate Case Types with their own Stages, Processes, Steps, and time frames."
+      "value": "Child instances follow their configured Case Type workflow; a parent relationship does not copy the parent lifecycle."
     },
     {
       "key": "Reuse benefit",
       "value": "Implementing work in a separate Case Type allows it to be reused as a child Case across multiple parent Case Types."
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-04",
+  "platformVersion": "Pega Platform '24.2 / '25"
 }

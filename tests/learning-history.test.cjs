@@ -307,3 +307,11 @@ test('duplicate-search review preserves inclusive threshold and user resolution 
  assert.match(d.practiceQuiz[2].scenario,/All basic conditions pass/);assert.match(d.practiceQuiz[8].options[0].text,/depends.*20 or lower/);assert.match(d.practiceQuiz[2].optionExplanations.A,/threshold of 70 accepts 70/);assert.match(d.studyGuide[0].elements[4].description,/requires customized behavior/);assert.equal(d.topics[0].url,'https://academy.pega.com/topic/duplicate-search/v7/in/96211/67036');
  assert.doesNotMatch(JSON.stringify(d),/ranked list|runs automatically at case creation|all match exactly|cannot be saved without at least one|higher total score = higher likelihood/);
 });
+
+test('child-Case review separates resolution dependency from every-Step blocking and copy from reference',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m31_creating_a_child_case.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M31');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.topics[0].duration,'10 min');
+ assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[1,11,12].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[0].elements[1].text,/not mean every intermediate parent Step is blocked/);assert.match(d.practiceQuiz[8].scenario,/configured to create a child/);assert.match(d.practiceQuiz[10].options[2].text,/copy propagation/);assert.match(d.practiceQuiz[12].optionExplanations.D,/does not establish write-back/);
+ assert.doesNotMatch(JSON.stringify(d),/Parent waits for ALL children.*advancing|parent case waits for all children.*advances|passes a pointer to the parent's data page|B and C are available in App Studio/);
+});
