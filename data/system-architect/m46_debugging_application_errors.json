@@ -1,23 +1,28 @@
 {
   "moduleId": "m46",
   "moduleTitle": "Debugging application errors",
-  "moduleUrl": "https://academy.pega.com/module/debugging-application-errors/v5/in/96211",
-  "moduleQuizUrl": "https://academy.pega.com/module/debugging-application-errors/v5/quiz/in/96211",
+  "moduleUrl": "https://academy.pega.com/module/debugging-application-errors/v8",
+  "moduleQuizUrl": "https://academy.pega.com/module/debugging-application-errors/v8/quiz",
   "learningObjectives": [
     "Use the Tracer tool to identify and isolate errors in Pega application runtime events.",
     "Configure Tracer settings, breakpoints, and use developer tools to debug Constellation UI applications."
   ],
-  "estTime": "~30 min · 2 topics",
+  "estTime": "35 min · 3 topics",
   "topics": [
     {
       "title": "The Tracer",
-      "url": "https://academy.pega.com/topic/tracer/v5/in/96211/38156",
+      "url": "https://academy.pega.com/topic/tracer/v7",
       "duration": "10 min"
     },
     {
       "title": "Tracer settings management",
-      "url": "https://academy.pega.com/topic/tracer-settings-management/v4/in/96211/38156",
+      "url": "https://academy.pega.com/topic/tracer-settings-management/v6",
       "duration": "15 min"
+    },
+    {
+      "title": "Developer tools for examining applications",
+      "url": "https://academy.pega.com/topic/developer-tools-examining-applications/v2",
+      "duration": "5 min"
     }
   ],
   "studyGuide": [
@@ -26,7 +31,7 @@
       "elements": [
         {
           "type": "analogy",
-          "text": "The Tracer is like a flight data recorder (black box) for your Pega application. When something goes wrong, you replay the events in order to see what happened before the crash — but remember: the last recorded event is rarely the cause; it's usually just where the chain reaction became visible."
+          "text": "Like a flight recorder, Tracer records the sequence surrounding a fault. The final failed event may be a symptom, so inspect earlier events rather than assuming the last event is always or rarely the cause."
         },
         {
           "type": "concept",
@@ -41,7 +46,7 @@
         {
           "type": "concept",
           "term": "Status: Good vs Fail",
-          "description": "Two Pega test step result statuses:",
+          "description": "Good and Fail describe processing-step outcomes, not unit-test assertion statuses.",
           "items": [
             "GOOD — step completed successfully",
             "FAIL — error occurred; a failed step may be only the LAST in a chain — trace backwards to find the root cause"
@@ -50,7 +55,12 @@
         {
           "type": "diagram",
           "svg": "<svg viewBox=\"0 0 420 200\" xmlns=\"http://www.w3.org/2000/svg\"><rect x=\"10\" y=\"10\" width=\"400\" height=\"180\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"210\" y=\"32\" text-anchor=\"middle\" font-size=\"13\" font-weight=\"bold\" fill=\"var(--pa-ink)\">Tracer Event Color Codes</text><rect x=\"30\" y=\"50\" width=\"18\" height=\"18\" rx=\"3\" fill=\"#b0b0b0\"/><text x=\"56\" y=\"63\" font-size=\"11\" fill=\"var(--pa-ink)\">Gray — Activity processing</text><rect x=\"30\" y=\"80\" width=\"18\" height=\"18\" rx=\"3\" fill=\"#e8870a\"/><text x=\"56\" y=\"93\" font-size=\"11\" fill=\"var(--pa-ink)\">Orange — Flow / Decision / Declarative Rules</text><rect x=\"30\" y=\"110\" width=\"18\" height=\"18\" rx=\"3\" fill=\"#5bc8f5\"/><text x=\"56\" y=\"123\" font-size=\"11\" fill=\"var(--pa-ink)\">Light blue — Database &amp; cache operations</text><line x1=\"30\" y1=\"145\" x2=\"390\" y2=\"145\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\" stroke-dasharray=\"4,3\"/><text x=\"210\" y=\"162\" text-anchor=\"middle\" font-size=\"10\" fill=\"var(--pa-ink-2)\">Status: Good = success · Fail = error (trace back for root cause)</text></svg>",
-          "caption": "Tracer color codes: Gray = Activities, Orange = Rules/Flows/Decisions, Light blue = Database/Cache. Fail status may be the last event — root cause is earlier."
+          "caption": "Event colors classify Activity, Flow/Decision/declarative and database/cache operations. A failed event may be a downstream symptom; inspect its preceding sequence."
+        },
+        {
+          "type": "concept",
+          "term": "Constellation request IDs",
+          "description": "Constellation uses stateless DX API requests. The Tracer results organize events by request ID to distinguish simultaneously active requests."
         }
       ],
       "sectionId": "section-c6d81d09a260"
@@ -87,7 +97,7 @@
         {
           "type": "concept",
           "term": "Breakpoints",
-          "description": "Stop the Tracer (AND thread processing) at a specific event. Set for a specific activity in a specific class. Click Play to continue processing after a breakpoint is hit. NOT supported for Service Rules and Constellation applications."
+          "description": "In a supported tracing context, a breakpoint pauses tracing and its processing thread at the configured activity event. Resume with Play; the source also describes automatic resumption after an hour. Breakpoints and Watch are unsupported for Service Rules and Constellation applications."
         },
         {
           "type": "concept",
@@ -96,8 +106,8 @@
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 720 270\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">TRACER SETTINGS MANAGEMENT</text><rect x=\"10\" y=\"28\" width=\"215\" height=\"106\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"117\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">One Per Operator/Node</text><text x=\"117\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Only 1 Tracer session allowed</text><text x=\"117\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">per operator per node</text><text x=\"117\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">NEVER run in production</text><text x=\"117\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">(dramatically slows processing)</text><rect x=\"253\" y=\"28\" width=\"215\" height=\"106\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Breakpoints</text><text x=\"360\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Stop at a SPECIFIC STEP</text><text x=\"360\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Stops entire THREAD processing</text><text x=\"360\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Not supported: Service Rules,</text><text x=\"360\" y=\"112\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"10\" font-weight=\"600\">Constellation applications</text><rect x=\"496\" y=\"28\" width=\"215\" height=\"106\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"603\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"12\" font-weight=\"700\">Break Conditions</text><text x=\"603\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Stop when SYSTEM generates error</text><text x=\"603\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Settings-level option (not per-step)</text><text x=\"603\" y=\"98\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"10\">Different from Breakpoints:</text><text x=\"603\" y=\"112\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"10\">trigger is error, not location</text><rect x=\"10\" y=\"152\" width=\"700\" height=\"100\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1\"/><text x=\"360\" y=\"172\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"11\" font-weight=\"700\">Reading Tracer Events — Root Cause Rule</text><text x=\"360\" y=\"194\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\">Error flagged on Step N ≠ root cause</text><text x=\"360\" y=\"212\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"10\">Trace BACKWARDS through earlier steps to find the actual cause</text><text x=\"360\" y=\"234\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Orange = Flow/Decision/Declarative events | Gray = Activity processing steps</text></svg>",
-          "caption": "Tracer settings: session limit, breakpoints vs break conditions, and backward-trace root cause rule."
+          "svg": "<svg viewBox=\"0 0 760 190\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"inherit\"><title>Tracer capture and pause controls</title><rect x=\"8\" y=\"8\" width=\"744\" height=\"174\" rx=\"12\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-brand)\"/><text x=\"28\" y=\"40\" fill=\"var(--pa-brand)\" font-size=\"16\" font-weight=\"700\">Tracer capture and pause controls</text><text x=\"28\" y=\"78\" fill=\"var(--pa-ink-2)\" font-size=\"14\">Capture only needed events; pause until ready. One Tracer per operator per node.</text><text x=\"28\" y=\"110\" fill=\"var(--pa-ink-2)\" font-size=\"14\">Break Conditions: error-triggered stop. Breakpoint: pauses the affected thread.</text><text x=\"28\" y=\"142\" fill=\"var(--pa-ink-2)\" font-size=\"14\">Breakpoints / Watch unsupported for Service Rules and Constellation applications.</text></svg>",
+          "caption": "Scoped capture and pause behavior, without an invented absolute production ban or session-replacement guarantee."
         }
       ],
       "sectionId": "section-9ea60b02d74f"
@@ -118,22 +128,22 @@
         {
           "type": "concept",
           "term": "Client-side Data Pages — NOT in Redux",
-          "description": "Data Pages cached on the client side are stored in the application's datastore, not in Redux. Debug using PCore.getDataPageUtils() in the browser console to list cached pages."
+          "description": "Client-cached Data Pages reside in the application datastore, not Redux. PCore.getDataPageUtils() logs cached-page information. PCore/PConnect APIs are unavailable in the App Studio shell; launch the Portal from Dev Studio for these methods."
         },
         {
           "type": "concept",
           "term": "Xray, DebugPegaAPI, and UI Inspector",
           "description": "Three supplementary debugging tools:",
           "items": [
-            "Xray: debug page instructions and field-level security",
-            "DebugPegaAPI dynamic system setting: saves DX API input values, field errors, error descriptions, and exception numbers to Pega log files",
-            "UI Inspector: explore the application's UI structure"
+            "Xray overlays screen metadata, field metadata and state properties.",
+            "DebugPegaAPI is a dynamic system setting: verbose DX API inputs, actions, error fields/descriptions/codes and exception numbers in Pega logs.",
+            "UI Inspector exposes UI hierarchy, metadata, field properties and View properties."
           ]
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 720 220\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\">DEVELOPER TOOLS FOR EXAMINING APPLICATIONS</text><rect x=\"10\" y=\"28\" width=\"165\" height=\"168\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"92\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">React DevTools</text><text x=\"92\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Browser extension</text><text x=\"92\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Components tab →</text><text x=\"92\" y=\"94\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">inspect any element</text><text x=\"92\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"9\" font-weight=\"600\">Shows props, state</text><text x=\"92\" y=\"130\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Constellation UI only</text><rect x=\"192\" y=\"28\" width=\"165\" height=\"168\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"274\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Property Inspector</text><text x=\"274\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Shows property changes</text><text x=\"274\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">in YELLOW highlight</text><text x=\"274\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Available inside Tracer</text><rect x=\"374\" y=\"28\" width=\"165\" height=\"168\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"456\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">DebugPegaAPI</text><text x=\"456\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">URL parameter flag</text><text x=\"456\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Logs DX API inputs,</text><text x=\"456\" y=\"94\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">actions, full responses</text><text x=\"456\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ok)\" font-size=\"9\" font-weight=\"600\">Constellation debugging</text><rect x=\"556\" y=\"28\" width=\"155\" height=\"168\" rx=\"10\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"633\" y=\"48\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"11\" font-weight=\"700\">Client Data Pages</text><text x=\"633\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Cached on client side</text><text x=\"633\" y=\"80\" text-anchor=\"middle\" fill=\"var(--pa-err)\" font-size=\"9\" font-weight=\"600\">NOT stored in Redux</text><text x=\"633\" y=\"96\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Stored in app cache</text><text x=\"633\" y=\"114\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Verify via React</text><text x=\"633\" y=\"128\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">DevTools / DebugPegaAPI</text></svg>",
-          "caption": "Developer tools: React DevTools, Property Inspector, DebugPegaAPI, and client-side Data Page storage location."
+          "svg": "<svg viewBox=\"0 0 760 190\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"inherit\"><title>Browser and server debugging contexts</title><rect x=\"8\" y=\"8\" width=\"744\" height=\"174\" rx=\"12\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-brand)\"/><text x=\"28\" y=\"40\" fill=\"var(--pa-brand)\" font-size=\"16\" font-weight=\"700\">Browser and server debugging contexts</text><text x=\"28\" y=\"78\" fill=\"var(--pa-ink-2)\" font-size=\"14\">React: component metadata. Redux: actions/state. UI Inspector: UI hierarchy.</text><text x=\"28\" y=\"110\" fill=\"var(--pa-ink-2)\" font-size=\"14\">DebugPegaAPI = dynamic system setting, not URL parameter; verbose API error logs.</text><text x=\"28\" y=\"142\" fill=\"var(--pa-ink-2)\" font-size=\"14\">PCore/PConnect: Portal launched from Dev Studio; unavailable in the App Studio shell.</text></svg>",
+          "caption": "Distinguish browser inspection, client datastore and server API logging; API context is required."
         }
       ],
       "sectionId": "section-8ed3ce1884dd"
@@ -142,13 +152,13 @@
   "examPitfalls": [
     {
       "title": "Tracer dramatically slows performance",
-      "trapDescription": "A question asks whether the Tracer is safe to run in production environments. Candidates say yes because it only observes. The Tracer is resource-intensive and dramatically slows all application processing — never run in production.",
-      "bestPractice": "The Tracer is resource-intensive and DRAMATICALLY slows application performance. Configure it to capture only required information and pause logging until you need it."
+      "trapDescription": "Tracer has substantial capture overhead. The source calls for narrow capture and pausing when unused; do not use it as the performance-analysis tool.",
+      "bestPractice": "Limit capture to relevant events, pause when unused and assess operational impact before tracing."
     },
     {
       "title": "One Tracer per operator, per node",
       "trapDescription": "Questions ask how many simultaneous Tracer sessions an operator can run on a single node. Candidates say 'unlimited' or 'two (primary + debug).' Exactly one Tracer session is allowed per operator per node.",
-      "bestPractice": "Never open a second Tracer session for the same operator on the same node — only one active Tracer session is permitted, and opening a new one closes the previous."
+      "bestPractice": "The source states one Tracer per operator per node; it does not specify which session survives an attempt to open a second one."
     },
     {
       "title": "Failed step ≠ root cause — trace backwards",
@@ -158,7 +168,7 @@
     {
       "title": "Breakpoints stop THREAD processing, not just logging",
       "trapDescription": "Questions ask what happens to other processing when a Tracer breakpoint triggers. Candidates say 'only logging pauses.' A breakpoint stops the entire thread — all processing on that thread halts, not just Tracer output.",
-      "bestPractice": "When a breakpoint stops the Tracer, the processing on that THREAD also stops. Use the Play button to continue processing."
+      "bestPractice": "A supported breakpoint pauses the affected thread. Play resumes it; the source also describes resumption after one hour."
     },
     {
       "title": "Breakpoints and Watch not supported for Constellation or Service Rules",
@@ -173,7 +183,7 @@
     {
       "title": "Break Conditions vs Breakpoints — different triggers",
       "trapDescription": "Questions present both Break Conditions and Breakpoints and ask which stops on a system-generated error. Candidates confuse them. Break Conditions is the settings option that triggers when the system generates an error; Breakpoints trigger at a specific step.",
-      "bestPractice": "Break Conditions = Tracer settings option that stops tracing when the system generates an error (automatic, error-triggered). Breakpoints = manually placed on a specific activity/class to stop at a specific event."
+      "bestPractice": "Break Conditions are error-triggered settings; breakpoints target configured activity events. Respect context restrictions."
     }
   ],
   "practiceQuiz": [
@@ -184,7 +194,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Hover over the lower-right corner → Toggle runtime toolbar"
+          "text": "Hover over the lower-right corner, toggle the Runtime toolbar, then select Tracer"
         },
         {
           "id": "B",
@@ -203,7 +213,15 @@
         "A"
       ],
       "hint": "It's accessed via a toolbar toggle in the lower-right corner.",
-      "rationale": "In App Studio, access the Tracer by hovering over the lower-right corner to see the Toggle runtime toolbar option. In Dev Studio, it's accessible from the Developer toolbar."
+      "rationale": "The Runtime toolbar is the documented App Studio entry point.",
+      "optionExplanations": {
+        "A": "The Runtime toolbar is the documented App Studio entry point.",
+        "B": "The topic does not give this Quality menu path for Tracer.",
+        "C": "Developer toolbar is the described Dev Studio entry point instead.",
+        "D": "This Rule-form command is not the App Studio entry point requested."
+      },
+      "lessonSection": "section-c6d81d09a260",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q02",
@@ -231,7 +249,15 @@
         "A"
       ],
       "hint": "Gray = Activities; Light blue = Database; the third color is for Rules-based events.",
-      "rationale": "In Pega's Tracer, event color coding identifies the source of each traced event: Orange events originate from flow processing, Decision Rules, or declarative Rules. Gray events represent Activity processing steps. Light blue events indicate PegaRULES database operations and cache interactions. Recognizing these color codes is essential for quickly locating the relevant portion of a Tracer log during debugging."
+      "rationale": "Orange identifies these Flow, Decision and declarative events.",
+      "optionExplanations": {
+        "A": "Orange identifies these Flow, Decision and declarative events.",
+        "B": "Gray identifies Activity processing instead.",
+        "C": "Light blue identifies database and cache operations.",
+        "D": "Yellow is the Watch property-change highlight, not this event category."
+      },
+      "lessonSection": "section-c6d81d09a260",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q03",
@@ -259,7 +285,15 @@
         "A"
       ],
       "hint": "A Fail status may only indicate the last step in a sequence.",
-      "rationale": "An error in the Tracer may only indicate the LAST step in a sequence of events. Trace backwards through earlier events in the log to find the actual root cause."
+      "rationale": "Earlier events can reveal the cause behind the failed symptom.",
+      "optionExplanations": {
+        "A": "Earlier events can reveal the cause behind the failed symptom.",
+        "B": "The failed step is not guaranteed to be the root cause.",
+        "C": "Clearing first can discard the preceding diagnostic sequence.",
+        "D": "A breakpoint alone does not replace examining the earlier events."
+      },
+      "lessonSection": "section-c6d81d09a260",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q04",
@@ -268,7 +302,7 @@
       "options": [
         {
           "id": "A",
-          "text": "It dramatically slows application performance"
+          "text": "It significantly slows processing; capture only required events and pause when unused"
         },
         {
           "id": "B",
@@ -286,8 +320,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "The Tracer is documented as a resource-intensive tool — avoid running it in production.",
-      "rationale": "Running the Pega Tracer significantly degrades application performance because it intercepts and logs every Rule execution event. Best practices require configuring the Tracer to capture only the specific Rule types and events relevant to the problem, and to pause or stop it immediately when not actively monitoring. Never leave the Tracer running in a production or shared environment."
+      "hint": "Distinguish execution-event debugging from performance analysis.",
+      "rationale": "Capture overhead is significant; narrow events and pause when unused.",
+      "optionExplanations": {
+        "A": "Capture overhead is significant; narrow events and pause when unused.",
+        "B": "Minimal impact is not the source’s performance warning.",
+        "C": "Capture overhead exists without breakpoints too.",
+        "D": "Ordinary tracing does not inherently pause all application processing."
+      },
+      "lessonSection": "section-9ea60b02d74f",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q05",
@@ -314,17 +356,25 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "There is a per-operator, per-node limit on Tracer events that can be stored.",
-      "rationale": "Pega enforces a one-Tracer-per-operator-per-node limit. Running two Tracer sessions simultaneously on the same node as the same operator is not permitted — only the most recently opened session remains active."
+      "hint": "This is a concurrent Tracer limit, not a stored-event-count limit.",
+      "rationale": "The documented limit is one per operator per node.",
+      "optionExplanations": {
+        "A": "The documented limit is one per operator per node.",
+        "B": "The two-studio distinction does not double the stated limit.",
+        "C": "Unlimited simultaneous Tracers contradict the stated limit.",
+        "D": "The source does not provide one Tracer per thread instead."
+      },
+      "lessonSection": "section-9ea60b02d74f",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q06",
       "type": "single-select",
-      "scenario": "You set a breakpoint on the SendSimpleEmail activity. When the Tracer hits the breakpoint, what else happens?",
+      "scenario": "In a non-Constellation, non-Service tracing context, a SendSimpleEmail activity breakpoint is reached. What happens to its processing thread?",
       "options": [
         {
           "id": "A",
-          "text": "Thread processing also stops — click Play to continue"
+          "text": "The affected thread pauses; use Play to resume (the source also describes resumption after an hour)"
         },
         {
           "id": "B",
@@ -343,7 +393,15 @@
         "A"
       ],
       "hint": "Setting a Tracer breakpoint affects more than just logging — it pauses Case execution.",
-      "rationale": "When a Tracer breakpoint is triggered in Pega, execution of the processing thread that hit the breakpoint is suspended until explicitly resumed. The rest of the application continues to function normally, but that specific thread's Case or Rule execution halts. To continue processing from the breakpoint, click the Play button in the Tracer interface to resume execution."
+      "rationale": "The affected thread pauses; Play resumes, with the source’s one-hour timeout.",
+      "optionExplanations": {
+        "A": "The affected thread pauses; Play resumes, with the source’s one-hour timeout.",
+        "B": "The breakpoint pauses thread execution as well as tracing.",
+        "C": "Clearing recorded events is not the stated breakpoint effect.",
+        "D": "An administrator notification is not the effect described here."
+      },
+      "lessonSection": "section-9ea60b02d74f",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q07",
@@ -371,7 +429,15 @@
         "A"
       ],
       "hint": "Two specific debugging features are restricted for Constellation.",
-      "rationale": "Breakpoints and Watch Functions are not supported for Service Rules or for applications that use the Constellation design system. Use alternative debugging tools (Xray, UI Inspector) for Constellation apps."
+      "rationale": "Breakpoints and Watch are the explicitly restricted features.",
+      "optionExplanations": {
+        "A": "Breakpoints and Watch are the explicitly restricted features.",
+        "B": "Pause and Clear are not the features excluded by this caution.",
+        "C": "Event filtering is not the excluded feature named here.",
+        "D": "Ruleset filtering is not the excluded feature named here."
+      },
+      "lessonSection": "section-9ea60b02d74f",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q08",
@@ -399,12 +465,20 @@
         "A"
       ],
       "hint": "A distinct highlight color is used to flag changes.",
-      "rationale": "The Tracer highlights property value changes in YELLOW and displays a Property Inspector tool showing how each value changed step by step. Blue highlights are used for a different indicator in the Tracer."
+      "rationale": "Yellow is the stated property-change highlight.",
+      "optionExplanations": {
+        "A": "Yellow is the stated property-change highlight.",
+        "B": "Orange classifies a different event category.",
+        "C": "Green is not the Watch highlight specified by the source.",
+        "D": "Red is not the Watch highlight specified by the source."
+      },
+      "lessonSection": "section-9ea60b02d74f",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q09",
       "type": "single-select",
-      "scenario": "You need to see which React component is rendering a specific UI element in a Constellation application. Which tool and command should you use?",
+      "scenario": "In a Constellation Portal launched from Dev Studio, which tool and command inspect a selected React component’s metadata?",
       "options": [
         {
           "id": "A",
@@ -427,12 +501,20 @@
         "A"
       ],
       "hint": "React DevTools has a specific command for component metadata.",
-      "rationale": "To inspect Constellation UI components in a browser, install the React DevTools extension, which adds a Components tab to the browser developer tools. Click on any element in the Components panel to highlight it in the running application. Then execute $r.props.getPConnect() in the browser console to retrieve the component's Pega connection metadata and property data."
+      "rationale": "React DevTools and this component command expose the metadata.",
+      "optionExplanations": {
+        "A": "React DevTools and this component command expose the metadata.",
+        "B": "Redux inspects actions and state rather than this component command.",
+        "C": "Xray overlays metadata but is not the requested React command.",
+        "D": "Watch is restricted in Constellation and is not component inspection."
+      },
+      "lessonSection": "section-8ed3ce1884dd",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q10",
       "type": "single-select",
-      "scenario": "You want to inspect client-side cached Data Pages in a Constellation application. Where are they stored and how do you list them?",
+      "scenario": "In a Constellation Portal launched from Dev Studio, where are client-cached Data Pages stored, and how can you log them?",
       "options": [
         {
           "id": "A",
@@ -455,7 +537,15 @@
         "A"
       ],
       "hint": "Client-side Data Pages are managed in the browser directly, not stored in Redux state.",
-      "rationale": "Data Pages cached on the client side are NOT stored in Redux — they are in the application's datastore. Use PCore.getDataPageUtils() in the browser console to list them."
+      "rationale": "The application datastore and PCore utility are the source’s answer.",
+      "optionExplanations": {
+        "A": "The application datastore and PCore utility are the source’s answer.",
+        "B": "These cached Data Pages are explicitly not stored in Redux.",
+        "C": "Server Clipboard is not this client-side datastore.",
+        "D": "Tracer events do not list the browser’s cached-page datastore."
+      },
+      "lessonSection": "section-8ed3ce1884dd",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q11",
@@ -483,7 +573,15 @@
         "A"
       ],
       "hint": "DebugPegaAPI dynamic system setting logs DX API call details to the Pega log files.",
-      "rationale": "Enabling DebugPegaAPI in Pega generates detailed DX API debug output that includes: input values submitted to the API, the actions performed by the server, the specific fields that contain errors, human-readable error descriptions, error codes, and exception numbers. This level of detail makes it significantly easier to diagnose complex form submission or API integration errors in Constellation applications."
+      "rationale": "These inputs, actions and error details are logged by the dynamic setting.",
+      "optionExplanations": {
+        "A": "These inputs, actions and error details are logged by the dynamic setting.",
+        "B": "React and Redux inspection is a separate browser concern.",
+        "C": "This setting does not represent Tracer breakpoint-event logging.",
+        "D": "Unit assertion results are not the API debug fields described here."
+      },
+      "lessonSection": "section-8ed3ce1884dd",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q12",
@@ -511,7 +609,15 @@
         "A"
       ],
       "hint": "This is a settings option, not a toolbar feature.",
-      "rationale": "DebugPegaAPI logs DX API call details including input values, actions, fields with errors, error codes, and exception numbers to the Pega log files for debugging Constellation UI issues."
+      "rationale": "Break Conditions stop tracing on the selected system errors.",
+      "optionExplanations": {
+        "A": "Break Conditions stop tracing on the selected system errors.",
+        "B": "Breakpoints stop at configured activity events instead.",
+        "C": "Ruleset selection narrows capture, not this error trigger.",
+        "D": "Event-type selection narrows capture, not this error trigger."
+      },
+      "lessonSection": "section-9ea60b02d74f",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q13",
@@ -532,7 +638,7 @@
         },
         {
           "id": "D",
-          "text": "External API response times for third-party integration calls"
+          "text": "Browser paint and layout timing from the browser Performance panel"
         }
       ],
       "correctOptions": [
@@ -540,12 +646,20 @@
         "B"
       ],
       "hint": "Tracer captures server-side rule execution and database activity — not front-end UI interactions.",
-      "rationale": "The Pega Tracer monitors server-side Rule executions (Data Transforms, Decision Tables, Activities, etc.) and database queries generated during processing. It does not capture front-end user interface events like mouse clicks, nor does it measure external API response times."
+      "rationale": "Server Rule executions are captured as processing events. Database processing is one of the captured event categories.",
+      "optionExplanations": {
+        "A": "Server Rule executions are captured as processing events.",
+        "B": "Database processing is one of the captured event categories.",
+        "C": "Browser mouse-click logs are not these server processing events.",
+        "D": "Browser paint/layout timing belongs to browser performance inspection."
+      },
+      "lessonSection": "section-c6d81d09a260",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q14",
       "type": "multi-select",
-      "scenario": "An SA is configuring the Pega Tracer to debug a complex workflow issue. Which TWO statements are true about Tracer settings and capabilities?",
+      "scenario": "For a non-Constellation, non-Service tracing context, which TWO statements match the documented Tracer capabilities?",
       "options": [
         {
           "id": "A",
@@ -557,7 +671,7 @@
         },
         {
           "id": "C",
-          "text": "Multiple operators can share and view the same Tracer session simultaneously on the same node"
+          "text": "One operator can run unlimited concurrent Tracers on one node"
         },
         {
           "id": "D",
@@ -569,7 +683,15 @@
         "B"
       ],
       "hint": "Tracer offers breakpoints and event filtering — recall the operator-per-session restriction.",
-      "rationale": "Tracer supports breakpoints that pause execution at a specified Rule event for real-time inspection, and event type filtering to limit trace output to relevant events. Each Tracer session is tied to a single operator per node — sessions cannot be shared. The Tracer identifies errors but does not auto-fix them."
+      "rationale": "Supported breakpoints pause the affected execution thread. Event filtering reduces capture to relevant events.",
+      "optionExplanations": {
+        "A": "Supported breakpoints pause the affected execution thread.",
+        "B": "Event filtering reduces capture to relevant events.",
+        "C": "Unlimited concurrent Tracers violate the operator/node limit.",
+        "D": "Tracer helps diagnose events; it does not automatically repair Rules."
+      },
+      "lessonSection": "section-9ea60b02d74f",
+      "explanationReviewedOn": "2026-10-04"
     },
     {
       "questionId": "m46_q15",
@@ -582,7 +704,7 @@
         },
         {
           "id": "B",
-          "text": "Developer Tools (Inspect / clipboard icon in Constellation) — to examine the live data model bound to the UI"
+          "text": "UI Inspector — to inspect UI hierarchy, component metadata, field properties and View properties"
         },
         {
           "id": "C",
@@ -597,8 +719,16 @@
         "A",
         "B"
       ],
-      "hint": "Use server-side tracing for the rule execution and the Constellation developer toolbar for the UI data model.",
-      "rationale": "The Tracer is the correct tool for tracing Data Transform execution and inspecting property values mid-execution. The Constellation Developer Tools (accessed via the inspect/clipboard icon in the toolbar) reveal the live data model bound to the UI components. Pulse is a collaboration tool and Report Builder is for reporting, not debugging."
+      "hint": "Pair server-side event tracing with documented UI metadata inspection; Watch/breakpoints are restricted in Constellation.",
+      "rationale": "Trace server execution events and inspect their property snapshots. UI Inspector supplies the stated UI metadata and property context.",
+      "optionExplanations": {
+        "A": "Trace server execution events and inspect their property snapshots.",
+        "B": "UI Inspector supplies the stated UI metadata and property context.",
+        "C": "Pulse collaboration does not inspect these execution or metadata details.",
+        "D": "Report Builder is not the tool for this live execution/metadata diagnosis."
+      },
+      "lessonSection": "section-8ed3ce1884dd",
+      "explanationReviewedOn": "2026-10-04"
     }
   ],
   "quickRecap": [
@@ -620,7 +750,7 @@
     },
     {
       "key": "Breakpoints vs Break Conditions",
-      "value": "Breakpoint: manually placed on specific activity; stops thread + logging; Play to continue. Break Conditions: settings option; auto-stops when system error occurs."
+      "value": "Supported breakpoint pauses its thread; Play or one-hour timeout resumes. Break Conditions stop on selected system errors."
     },
     {
       "key": "Watch Function",
@@ -628,7 +758,9 @@
     },
     {
       "key": "Constellation debug tools",
-      "value": "React DevTools ($r.props.getPConnect()), Redux DevTools (state/actions), PCore.getDataPageUtils() for client-side Data Pages, DebugPegaAPI, Xray, UI Inspector."
+      "value": "React metadata, Redux actions/state, client datastore via PCore, UI Inspector and verbose DebugPegaAPI dynamic setting. Launch Portal from Dev Studio for PCore/PConnect."
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-04",
+  "platformVersion": "Pega Platform '25"
 }
