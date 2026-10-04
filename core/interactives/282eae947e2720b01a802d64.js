@@ -3,7 +3,7 @@
 (function(){
   var root=document.documentElement;
   function apply(t){root.setAttribute('data-theme',t);}
-  apply('dark');
+  apply('light');
   window.addEventListener('message',function(e){
     if(e.data&&e.data.type==='pa-theme') apply(e.data.theme);
   });
@@ -30,7 +30,7 @@ var scenarios = [
   },
   {
     label: "Advanced SLA",
-    scenario: "An SA must configure an SLA with a business-hours-only timer and a custom escalation that reassigns the task to a backup team after 4 hours. App Studio's SLA panel only shows basic goal/deadline fields. Where should the SA configure the advanced options?",
+    scenario: "An SA must configure an SLA with a timer excluding non-business days and a custom escalation that reassigns the task to a backup team after 4 hours. App Studio's SLA panel only shows basic goal/deadline fields. Where should the SA configure the advanced options?",
     opts: [
       "Dev Studio — advanced SLA options (initialization, business-day calendars, multi-action escalations) are only accessible in Dev Studio",
       "App Studio — scroll down in the SLA panel; the advanced options are hidden below the fold",
@@ -42,7 +42,7 @@ var scenarios = [
       "✓ Correct. When App Studio's UI doesn't expose the needed capability, the SA moves to Dev Studio. Advanced SLA options — initialization behavior, business-day calendars, and multi-action escalation chains — live in the SLA rule in Dev Studio.",
       "✗ Incorrect. If App Studio's SLA panel doesn't show the option, it's not hidden — it genuinely isn't available in App Studio. The feature requires Dev Studio.",
       "✗ Incorrect. Admin Studio handles runtime administration (users, logs, system settings), not application rule configuration like SLAs.",
-      "✗ Incorrect. A Wait Step with a Timer handles pause-and-continue logic, not business-hours SLA enforcement with escalation actions. These are different mechanisms with different purposes."
+      "✗ Incorrect. A Wait Step with a Timer handles pause-and-continue logic, not business-day SLA intervals with escalation actions. These are different mechanisms with different purposes."
     ]
   },
   {
@@ -66,7 +66,7 @@ var scenarios = [
     label: "Rule Scope Extension",
     scenario: "An approval process rule was built for the Property Insurance Case Type. The same rule must now apply to Auto Insurance and Travel Insurance — all three share the same Pega application. How do you extend the rule's scope for reuse?",
     opts: [
-      "In Dev Studio, extend the rule's scope from the Case Type level to the application level so all Case Types in the application inherit it",
+      "In Dev Studio, extend the rule's scope from the Case Type level to the application level for reuse by Case Types in the configured application hierarchy",
       "In App Studio, copy-paste the rule into each Case Type's configuration — App Studio supports cross-Case-Type rule sharing via copy",
       "Create three separate rules (one per Case Type) — Pega does not support single-rule reuse across multiple Case Types in the same application",
       "In Admin Studio, set the rule's visibility flag to 'All Case Types' in the runtime rule management screen"
@@ -76,7 +76,7 @@ var scenarios = [
       "✓ Correct. Dev Studio exposes the full rule hierarchy, including the ability to change a rule's Applies-To class from a specific Case Type to a higher-level class (application or division), enabling reuse across Case Types.",
       "✗ Incorrect. App Studio does not expose scope/Applies-To controls. Copying creates maintenance debt — three copies of the same rule that must all be updated when the approval logic changes.",
       "✗ Incorrect. Pega explicitly supports rule inheritance across Case Types. Extending scope is the documented best practice for exactly this scenario.",
-      "✗ Incorrect. Admin Studio manages runtime system configuration (users, logs, system resources) — it has no rule-authoring or scope-configuration capability."
+      "✗ Incorrect. Admin Studio manages runtime system configuration (users, logs, system resources) — it is not the Rule-authoring workspace for this task."
     ]
   }
 ];

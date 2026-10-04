@@ -119,7 +119,7 @@ test('PSA foundation feedback resolves to real sections and preserves the review
  const keys=[{3:['A','B'],5:['B'],6:['A','B','C'],10:['A','B'],16:['A','B','C'],20:['A','B']},{6:['A','B'],15:['A','B','C'],19:['A','B'],20:['A','B'],21:['A','B']},{8:['A','B'],15:['A','B'],16:['A','B'],17:['A','B']}];
  registry.tracks.find(t=>t.trackId==='PSA').modules.slice(0,3).forEach((m,index)=>{
   const d=JSON.parse(fs.readFileSync(m.file)),sections=new Set(d.studyGuide.map(s=>s.sectionId));
-  d.practiceQuiz.forEach((q,i)=>{count++;assert.deepEqual(q.correctOptions,keys[index][i+1]||['A']);assert.ok(sections.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,'2026-10-02');});
+  d.practiceQuiz.forEach((q,i)=>{count++;assert.deepEqual(q.correctOptions,keys[index][i+1]||['A']);assert.ok(sections.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,index===0?'2026-10-04':'2026-10-02');});
  });assert.equal(count,60);
 });
 test('PSA draft, naming and access questions avoid the reviewed misleading claims',()=>{
@@ -450,4 +450,11 @@ test('localization review distinguishes packaged Paragraph translation from Data
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===6?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
  assert.match(d.studyGuide[1].elements[2].description,/included in the ZIP.*paragraph\/base/);assert.match(d.studyGuide[1].elements[3].description,/rebuild and import/);assert.match(d.studyGuide[1].elements[4].svg,/Radio\/drop-down in tables/);assert.match(d.practiceQuiz[4].rationale,/fresh login/);assert.match(d.practiceQuiz[13].options[1].text,/Manually prepare/);assert.match(d.studyGuide[0].elements[7].description,/not fully localized/);
  assert.doesNotMatch(JSON.stringify(d),/NOT automatically extracted|Cannot be localized at all|manual translation outside the standard package|✗ Data Page controls|ensures dropdown options are locale-aware/);
+});
+
+test('low-code review separates configured studio default from recommended authoring and business days from hours',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m01_low_code_defined.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M01');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.practiceQuiz.length,22);
+ assert.deepEqual(d.practiceQuiz[4].correctOptions,['B']);assert.deepEqual(d.practiceQuiz[5].correctOptions,['A','B','C']);assert.match(d.examPitfalls[1].trapDescription,/configured default/);assert.match(d.studyGuide[0].elements[6].svg,/pxPredictionStudio access/);assert.match(d.practiceQuiz[16].rationale,/not the same.*office opening hours/);assert.match(d.practiceQuiz[18].rationale,/high-level layer overview/);
+ assert.doesNotMatch(JSON.stringify(d),/Technical members default to Dev Studio|Requires separate license|SA\/LSA roles|business-hours-only timer|Agile Workbench both live in Dev Studio/);
 });
