@@ -119,7 +119,7 @@ test('PSA foundation feedback resolves to real sections and preserves the review
  const keys=[{3:['A','B'],5:['B'],6:['A','B','C'],10:['A','B'],16:['A','B','C'],20:['A','B']},{6:['A','B'],15:['A','B','C'],19:['A','B'],20:['A','B'],21:['A','B']},{8:['A','B'],15:['A','B'],16:['A','B'],17:['A','B']}];
  registry.tracks.find(t=>t.trackId==='PSA').modules.slice(0,3).forEach((m,index)=>{
   const d=JSON.parse(fs.readFileSync(m.file)),sections=new Set(d.studyGuide.map(s=>s.sectionId));
-  d.practiceQuiz.forEach((q,i)=>{count++;assert.deepEqual(q.correctOptions,keys[index][i+1]||['A']);assert.ok(sections.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,index===0?'2026-10-04':'2026-10-02');});
+  d.practiceQuiz.forEach((q,i)=>{count++;assert.deepEqual(q.correctOptions,keys[index][i+1]||['A']);assert.ok(sections.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,index<2?'2026-10-04':'2026-10-02');});
  });assert.equal(count,60);
 });
 test('PSA draft, naming and access questions avoid the reviewed misleading claims',()=>{
@@ -463,4 +463,11 @@ test('BA low-code review scopes co-development and integration replacement while
  const crypto=require('node:crypto'),file='data/business-architect/m02_low_code_defined.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M02'),q=Object.fromEntries(d.practiceQuiz.map(q=>[q.questionId,q]));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,21);assert.equal(q.Q4,undefined);assert.deepEqual(q.Q1.correctOptions,['C']);assert.deepEqual(q.Q5.correctOptions,['B']);assert.deepEqual(q.Q10.correctOptions,['A','B']);
  assert.match(q.Q10.options[1].text,/technical members also use App Studio/);assert.match(q.Q12.optionExplanations.D,/UI Ruleset/);assert.match(q.Q18.rationale,/configuration and testing/);assert.match(d.studyGuide[3].elements[3].description,/except the base Pega Platform layer/);assert.match(q.Q17.rationale,/distinct from.*office opening hours/);
+});
+
+test('Case Life Cycle review separates Process draft mode from designer data placeholders and permits explicit Stage returns',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m02_defining_customer_microjourney.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M02');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.moduleUrl,'https://academy.pega.com/module/defining-case-lifecycle/v8');assert.equal(d.estTime,'45 min · 4 topics');assert.equal(d.practiceQuiz.length,21);
+ assert.match(d.studyGuide[4].elements[1].description,/Merely enabling Process draft mode is not the trigger/);assert.match(d.studyGuide[2].elements[6].html,/Add a Change Stage automation targeting Review/);assert.match(d.studyGuide[2].elements[7].description,/ordinary Process Steps/);assert.match(d.studyGuide[1].elements[4].svg,/named as verb \+ noun/);assert.match(d.practiceQuiz[2].rationale,/does not universally require/);
+ assert.doesNotMatch(JSON.stringify(d),/One Microjourney = one Case Type|loops between primary Stages|always placeholders regardless of which studio|It is the outbound\/engagement layer|must start with a capital letter/);
 });
