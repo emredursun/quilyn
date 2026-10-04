@@ -387,3 +387,11 @@ test('application security review uses client-based CBAC and version-scoped poli
  assert.match(d.practiceQuiz[11].rationale,/Client-based access.*requests/);assert.match(d.practiceQuiz[6].scenario,/configured failed-attempt threshold/);assert.match(d.studyGuide[1].elements[1].description,/earlier.*v5/);assert.match(d.studyGuide[0].elements[3].description,/not every listed task applies/);
  assert.doesNotMatch(JSON.stringify(d),/CBAC \(Claim-Based|CBAC controls access to entire rule classes|Ranks above MFA|distinction frequently tested|not a soft warning that can be overridden|until every item on the checklist/);
 });
+
+test('application access review restores production scale and permits intermediate Rule values',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m41_managing_application_access.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M41');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
+ assert.equal(d.practiceQuiz.length,15);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[1].elements[3].description,/5 Production.*4 Staging.*3 Quality assurance.*2 Development.*1 Sandbox/);assert.match(d.studyGuide[1].elements[2].bulletPoints[0],/other than.*0\/5/);assert.match(d.practiceQuiz[6].rationale,/five to Production/);assert.match(d.practiceQuiz[8].rationale,/one application.*different role sets/);assert.match(d.practiceQuiz[1].scenario,/no applicable Access Deny/);assert.match(d.practiceQuiz[14].options[0].text,/Access Groups/);
+ assert.doesNotMatch(JSON.stringify(d),/1 = Production|1=Production|5 = Sandbox|5=Sandbox|ARO records.*they do not deny|Access Role Objects|ALWAYS overrides ARO|Lower = More Restrictive/);
+});
