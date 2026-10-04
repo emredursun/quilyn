@@ -403,3 +403,11 @@ test('UI-element review scopes control examples and resolves hidden-input and di
  assert.match(d.practiceQuiz[3].scenario,/confirmation View.*selected earlier/);assert.match(d.practiceQuiz[4].scenario,/After account creation.*confirmation View/);assert.match(d.practiceQuiz[7].scenario,/not whether the control is supported/);assert.match(d.practiceQuiz[10].scenario,/pair of conditional settings/);assert.match(d.studyGuide[2].elements[1].description,/does not replace server-side authorization/);
  assert.doesNotMatch(JSON.stringify(d),/only for Visible\/Disabled|Autocomplete, Button, Checkbox, Date, Grid, Text|frequently tested exam|require custom configuration|no page reload needed|Settings → Themes/);
 });
+
+test('Portal-content review separates theme sharing from inheritance and corrects widget diagrams',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m43_configuring_portal_content.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M43');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'40 min · 5 topics');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===6?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.studyGuide[4].elements[1].description,/themes do not support inheritance/);assert.match(d.practiceQuiz[13].options[0].text,/higher Ruleset/);assert.match(d.studyGuide[1].elements[3].svg,/Portal = a web Channel/);assert.match(d.studyGuide[3].elements[4].svg,/App announcement/);assert.match(d.practiceQuiz[7].hint,/configured Widgets.*data.*empty/);assert.match(d.practiceQuiz[4].hint,/copied dashboard.*source visibility/);
+ assert.doesNotMatch(JSON.stringify(d),/Amazon Connect|App analytics|all Portals inherit|all pages and portals|auto-generates platform-specific tokens|brand-new themes default to Private/);
+});
