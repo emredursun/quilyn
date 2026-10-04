@@ -315,3 +315,11 @@ test('child-Case review separates resolution dependency from every-Step blocking
  assert.match(d.studyGuide[0].elements[1].text,/not mean every intermediate parent Step is blocked/);assert.match(d.practiceQuiz[8].scenario,/configured to create a child/);assert.match(d.practiceQuiz[10].options[2].text,/copy propagation/);assert.match(d.practiceQuiz[12].optionExplanations.D,/does not establish write-back/);
  assert.doesNotMatch(JSON.stringify(d),/Parent waits for ALL children.*advancing|parent case waits for all children.*advances|passes a pointer to the parent's data page|B and C are available in App Studio/);
 });
+
+test('Wait review supports custom statuses and resolves prefix semantics without business-day assumptions',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m32_pausing_resuming_case_processing.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M32');
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
+ assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[8,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
+ assert.match(d.practiceQuiz[2].options[0].text,/custom target status.*Resolved-prefixed/);assert.match(d.studyGuide[1].elements[0].description,/any or all.*already exist/);assert.match(d.practiceQuiz[4].options[3].text,/72 minutes/);assert.match(d.practiceQuiz[13].scenario,/48-hour/);
+ assert.doesNotMatch(JSON.stringify(d),/No custom status values allowed|exactly 2\).*Trigger|To be resolved.*child still open|5 business days|only two statuses that trigger/);
+});
