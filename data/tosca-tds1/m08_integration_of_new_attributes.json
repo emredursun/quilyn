@@ -5,8 +5,8 @@
   "learningObjectives": [
     "Integrate a new feature of the system under test into an existing TestSheet.",
     "Determine when a new Attribute only needs a value added to existing combinations, versus when it needs entirely new combinations.",
-    "Update combinations consistently at every level, from the lowest Attribute up to the TestSheet.",
-    "Remember to manually re-link newly created Instances back to Requirements."
+    "Inspect affected lower and upper combinations after a data-model change and use the selected coverage method consistently.",
+    "Inspect Requirement links, add missing links and recalculate coverage after extending the design."
   ],
   "estTime": "20 min",
   "studyGuide": [
@@ -32,19 +32,19 @@
         {
           "type": "concept",
           "term": "The core rule",
-          "description": "After adding the new Attribute and its Instances, combinations must be completed at every level, from the lowest Attribute up to the TestSheet. Depending on the case, this can mean two different things."
+          "description": "Inspect combinations at every affected level. Fill missing baseline values where appropriate, then complete or propagate uncovered variations according to the chosen method and constraints. The documented Complete Instances command adds uncombined combinations without duplicating existing ones; Propagate Instance(s) adds chosen combinations without applying a combinatorial method."
         },
         {
           "type": "list",
           "title": "Two possible updates",
           "items": [
-            "Selecting the new Attribute's Instance value inside combinations that already exist — no new TestCase needed, just a new column of data filled in for existing rows.",
-            "Adding entirely new Instances/combinations, if the combinatorial method in use (e.g. Linear Expansion) requires a dedicated TestCase for the new option — following the same rules used when the TestSheet was first built."
+            "Fill the new baseline value in an existing baseline row when it represents the same scenario. This alone does not cover the new alternatives.",
+            "Reassess coverage using All Combinations, Orthogonal, Pairwise or Linear Expansion as appropriate. Additional rows depend on the method, existing coverage and Relations; there is no universal one-row-per-new-value rule."
           ]
         },
         {
           "type": "note",
-          "text": "At every level touched, double-check there are no missing values — this applies to lower Attribute levels and the TestSheet level alike."
+          "text": "Inspect missing values and Instance Usage at the affected levels. For explicit propagation, select the source Instance(s), Ctrl-select the higher-level Instances object, and use Propagate Instance(s). Inspect the result; propagation is not a claim that all coverage requirements are satisfied."
         }
       ],
       "bulletPoints": [
@@ -53,39 +53,39 @@
       "sectionId": "section-e20a7097e969"
     },
     {
-      "sectionTitle": "Worked example: adding a Shipping Method",
+      "sectionTitle": "Independent worked example: extending shipping choices",
       "elements": [
         {
           "type": "concept",
           "term": "The change",
-          "description": "A WebShop adds a new 'Shipping Method' choice at checkout, affecting shipping cost. This requires a new 'Shipping Method' Attribute with Instances for each option: Ground Shipping (the default/StraightThrough — 'Standard'), Next Day Air, Second Day Air, and an 'N/A' Instance for cases where shipping doesn't apply (e.g. In-Store Pickup, No Shipping)."
+          "description": "Independent Quilyn example, not a verified Academy exercise: assume an unconstrained Linear Expansion design with Ground as the shipping baseline and two previously uncovered alternatives, Next Day Air and Second Day Air. Pickup has N/A shipping. Real business constraints must be modeled rather than inferred from these labels."
         },
         {
           "type": "concept",
           "term": "Updating the lower (Checkout) level",
-          "description": "Existing Checkout-level Instances need the new Attribute's value filled in: the existing 'Standard'/StraightThrough Instance gets 'Ground', and the existing In-Store Pickup / No Shipping Instances get 'N/A'. Because Next Day Air and Second Day Air don't correspond to any existing Checkout Instance, two brand-new Checkout-level Instances are created for them — populated with StraightThrough values everywhere except the new Shipping Method field, which takes the respective new value."
+          "description": "Fill Ground in the existing checkout baseline and N/A where shipping does not apply. In this example, neither air-shipping alternative is represented yet. Add two checkout scenarios, each varying only the shipping choice while keeping the other fields at their valid StraightThrough baselines."
         },
         {
           "type": "concept",
           "term": "Updating the TestSheet level",
-          "description": "The existing 9 TestSheet-level Instances each need the correct Checkout Instance selected for their row. Then, matching the two new Checkout-level Instances, two new TestSheet-level Instances are added — all StraightThrough values, except the Checkout Attribute, where each selects its corresponding new Checkout Instance (Next Day Air / Second Day Air)."
+          "description": "At the TestSheet level, inspect existing rows and select appropriate checkout data. Assume the two new checkout alternatives are not represented there either: this simple Linear Expansion example adds two upper-level baseline variations, one for each checkout alternative. Other methods or Relations can require different combinations; there is no fixed original count of nine rows."
         }
       ],
       "bulletPoints": [
-        "Update the lower level first (fill in existing rows + add new rows for genuinely new options), then propagate up to the TestSheet level the same way."
+        "Check affected lower-level combinations before upper-level coverage; retain existing valid scenarios and add only the combinations required by the selected method."
       ],
       "sectionId": "section-cdc50b7af638"
     },
     {
-      "sectionTitle": "Don't forget: re-link to Requirements",
+      "sectionTitle": "Inspect Requirement coverage and refresh calculations",
       "elements": [
         {
           "type": "note",
-          "text": "Newly created Instances are NOT automatically linked to Requirements. After integrating a new Attribute, manually link the new Instances to the Requirement(s) they test, so the corresponding TestCase-Substitute links are created (see Lesson 7)."
+          "text": "Inspect the links for new Instances rather than assuming coverage from a previously linked TestSheet. Drag any missing design Instances to their relevant Requirements to create substitutes. After adding executable tests and execution links, replace substitutes as appropriate and use Update Outdated Values when automatic calculation is disabled."
         },
         {
           "type": "note",
-          "text": "📄 Exercise 08 (Integrate New Attribute) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+          "text": "The Academy video and exercise files require access and have not been verified. Practice this documented workflow in your own workspace; independently inspect the resulting combinations, links and calculations."
         }
       ],
       "sectionId": "section-a6fd5d02789e"
@@ -95,24 +95,24 @@
     {
       "title": "Updating only the TestSheet level",
       "trapDescription": "Adding new Instances at the TestSheet level but forgetting the lower Attribute level (or vice versa) still has missing values for the new Attribute.",
-      "bestPractice": "Combinations must be completed at every level touched by the new Attribute — both the lower Attribute level and the TestSheet level need to be checked for missing values."
+      "bestPractice": "Check missing values and usage at every affected level. Complete or propagate combinations and inspect resulting coverage; do not assume only the top-level design needs attention."
     },
     {
       "title": "Assuming every new option automatically needs a new TestCase",
       "trapDescription": "Creating a brand-new Instance combination for every new option, even when it just fits into an existing row.",
-      "bestPractice": "If a new option maps cleanly onto an Instance that already exists (e.g. the new Attribute's value for the current StraightThrough row), just fill in that value — a new combination/TestCase is only needed when the combinatorial method requires a dedicated case for that option."
+      "bestPractice": "Filling the existing baseline can preserve that scenario. Reassess alternative coverage separately; the method and constraints determine whether additional combinations are necessary."
     },
     {
       "title": "Forgetting to re-link new Instances to Requirements",
       "trapDescription": "Assuming new Instances automatically inherit the Requirement links their TestSheet already had.",
-      "bestPractice": "Requirement links must be created manually for newly added Instances — they don't inherit existing TestCase-Substitute links automatically."
+      "bestPractice": "Inspect actual links and add missing Instance-to-Requirement links. Refresh outdated calculations; a prior TestSheet link alone is not evidence that the new scope is currently reflected."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "A new Attribute is added to a TestSheet, and its value for the existing StraightThrough row simply needs to be set to the new default option. Is a brand-new TestCase combination required?",
+      "scenario": "For the existing StraightThrough scenario only, a new Attribute needs its default value filled in. Must this baseline scenario be duplicated solely because the Attribute was added?",
       "options": [
         {
           "id": "A",
@@ -134,13 +134,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "New Attribute ≠ automatically new TestCase — it depends on whether the value fits an existing row.",
-      "rationale": "If the new Attribute's value for a given case maps onto an Instance combination that already exists, it can simply be filled in — new combinations are only needed for genuinely new options that the combinatorial method requires as their own TestCase."
+      "hint": "Separate maintaining the existing baseline from covering the new alternatives.",
+      "rationale": "The existing baseline row can be completed with its new default. This does not establish coverage of other values; those must be assessed using the chosen method and constraints.",
+      "lessonSection": "section-e20a7097e969",
+      "optionExplanations": {
+        "A": "A new column does not by itself require duplicating a valid baseline row.",
+        "B": "The existing baseline can be completed; alternative coverage remains a separate task.",
+        "C": "Business relevance is not a rule requiring duplication of the baseline.",
+        "D": "An Attribute without values does not provide the specified default for this scenario."
+      },
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "After integrating a new 'Shipping Method' Attribute and adding two new Checkout-level Instances for Next Day Air and Second Day Air, what must also happen at the TestSheet level?",
+      "scenario": "In the independent unconstrained Linear Expansion example, two new Checkout alternatives are not covered by any current TestSheet row. To extend upper-level coverage while keeping all other Attributes at baseline, what should you add?",
       "options": [
         {
           "id": "A",
@@ -162,8 +170,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Changes at a lower level need to be propagated up to the TestSheet level manually.",
-      "rationale": "New combinations at a lower (Checkout) level must be reflected at the TestSheet level too — new TestSheet-level Instances are added, all StraightThrough except the Checkout Attribute, which selects the new Checkout Instance."
+      "hint": "There are two uncovered checkout alternatives and this example varies one choice at a time.",
+      "rationale": "Under these stated assumptions, add one upper-level row per uncovered Checkout alternative, retaining the other baseline selections. This count is not a rule for every method or relation-constrained design.",
+      "lessonSection": "section-cdc50b7af638",
+      "optionExplanations": {
+        "A": "The question states that no current upper-level row covers these alternatives; inspect and extend that coverage.",
+        "B": "Two baseline variations cover the two missing Checkout choices under this simple Linear Expansion assumption.",
+        "C": "The existing valid design can be extended without deleting the TestSheet.",
+        "D": "Classes enable reuse; converting the Attribute does not establish the missing upper-level coverage."
+      },
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
@@ -176,7 +192,7 @@
         },
         {
           "id": "B",
-          "text": "Manually link the new Instances to the relevant Requirement(s) to create TestCase-Substitute links."
+          "text": "Inspect Requirement links, add any missing Instance links, and refresh outdated coverage calculations."
         },
         {
           "id": "C",
@@ -190,8 +206,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Recall how the Requirements dashboard gets populated — from Lesson 7.",
-      "rationale": "New Instances are not automatically linked to Requirements. They must be manually dragged onto the relevant Requirement(s) to create TestCase-Substitute links, so the new coverage is reflected in the Requirements dashboard."
+      "hint": "Design data, Requirement links and current calculated values are separate parts of the dashboard.",
+      "rationale": "Check the actual Requirement links and add missing ones. Recalculate outdated values with Update Outdated Values when automatic calculation is off. Adding data alone is not evidence of a current coverage dashboard.",
+      "lessonSection": "section-a6fd5d02789e",
+      "optionExplanations": {
+        "A": "New design data alone does not demonstrate that links and calculated dashboard values are current.",
+        "B": "This checks traceability and updates stale calculations instead of assuming inherited coverage.",
+        "C": "Class conversion supports shared data structures, not Requirement linking or recalculation.",
+        "D": "Arrange Instances reorganizes design data; it does not establish Requirement links or refresh coverage."
+      },
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
@@ -201,22 +225,34 @@
     },
     {
       "key": "Fill vs new combination",
-      "value": "Fill an existing row's value if the option maps to it; create a new Instance/combination only if the method requires a dedicated TestCase."
+      "value": "Complete the existing baseline, then reassess alternative coverage using the method, existing combinations and Relations."
     },
     {
       "key": "Update order",
-      "value": "Update the lowest affected level first, then propagate the same logic up to the TestSheet level."
+      "value": "Inspect all affected levels; Complete Instances or Propagate Instance(s) serve different purposes."
     },
     {
       "key": "Don't forget",
-      "value": "Newly created Instances must be manually linked to Requirements — this does not happen automatically."
+      "value": "Inspect links, add missing Instance-to-Requirement links and update outdated calculated values."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 08 - Integration of New Attributes (video)",
-      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
-      "duration": "video"
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/testcase_design/instance_combinatorics.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Additional primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/requirements/link_reqs_with_tcd_instances.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Additional primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/requirements/requirements.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }

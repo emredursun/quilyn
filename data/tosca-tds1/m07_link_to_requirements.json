@@ -15,7 +15,7 @@
         {
           "type": "concept",
           "term": "Purpose",
-          "description": "Linking gives an early-stage overview of how much of the planned test design work maps onto the defined Requirements — how much of the project has actually been thought through and structured, before a single physical TestCase is built."
+          "description": "Requirement links distinguish planned design data from physical TestCases and execution evidence. A TestSheet or selected Instances can establish planned coverage before executable tests exist; this is not proof that the application was tested successfully."
         }
       ],
       "sectionId": "section-581438145ec2"
@@ -31,17 +31,17 @@
         {
           "type": "concept",
           "term": "TestCase-Substitute link",
-          "description": "The result of linking Instances to a Requirement before any physical TestCase exists. It's a placeholder link showing how many TestCases will eventually need to be built in the TestCase section to cover that Requirement."
+          "description": "Linking TestSheet, Class or Instance data creates a substitute for each linked Instance. A substitute represents planned test data, not an executed or passed test."
         },
         {
           "type": "concept",
           "term": "TestCase link",
-          "description": "Once the physical TestCases are actually built (in the blue TestCase section) and linked to the same Requirements, the earlier TestCase-Substitute links become full TestCase links — reflecting real, executable TestCases instead of a planning placeholder."
+          "description": "Creating a physical TestCase does not by itself replace its substitute. Drag the TestCase onto the corresponding substitute link. Alternatively, use Replace Substitutes by Testcases on the RequirementSet; the required TestCases must be used in an ExecutionList and that ExecutionList must be linked to the RequirementSet."
         }
       ],
       "bulletPoints": [
         "Drag the whole TestSheet when all its Instances belong to one Requirement; drag individual Instances when only a subset does (e.g. this sprint's data).",
-        "TestCase-Substitute link = planned but not yet built. TestCase link = the real, physical TestCase, now linked."
+        "Replace substitutes explicitly; keep the source Instance, physical TestCase and execution links aligned."
       ],
       "sectionId": "section-b9154135c13f"
     },
@@ -50,8 +50,8 @@
       "elements": [
         {
           "type": "concept",
-          "term": "Rule of thumb: one TestSheet per Requirement",
-          "description": "A TestSheet should contain all the TestCases needed to cover its Requirement. In sprint-based projects this can differ slightly — one TestSheet might accumulate TestCases created across multiple sprints for the same Requirement, rather than being rebuilt each sprint."
+          "term": "Organize coverage around Requirements",
+          "description": "The documentation recommends TestSheet coverage for application Requirements. Choose a structure that keeps each Requirement traceable; the same Requirement can receive selected Instances or Class data. One TestSheet per Requirement is a useful organizational choice, not a prohibition on other documented link scopes."
         }
       ],
       "sectionId": "section-baf905e0bda7"
@@ -61,16 +61,17 @@
       "elements": [
         {
           "type": "concept",
-          "term": "ExecutionLists link to RequirementSets, not individual Requirements",
-          "description": "When ExecutionLists are created, they are linked to the whole RequirementSet rather than to a single Requirement. This rolls up progress across the entire set: which TestCases have been defined, which Requirements are actively being worked on, how far along the project is, and — once executions have actually run — which passed and which failed."
+          "term": "Link an ExecutionList to a RequirementSet",
+          "description": "Drag an ExecutionList onto a RequirementSet to create its link. Merely creating the list does not establish this relationship. An ExecutionEntry can separately be dragged onto an individual Requirement to create a TestCase link. Its LinkExecutionEntryHandleExecutionList setting controls whether the associated ExecutionList is added to the set: AlwaysAdd, AskUser or NeverAdd."
         },
         {
           "type": "note",
-          "text": "Together, this chain (TestSheet → Requirement → TestCase → ExecutionList → RequirementSet) is what turns the Requirements section into a live project dashboard inside Tosca Commander."
+          "text": "The dashboard also needs current calculations. AutoCalculateRequirements is off by default. Use Update Outdated Values on a RequirementSet (or the Requirements menu for all sets), or enable automatic calculation in Commander > General > Advanced and restart Tosca. A blue exclamation mark indicates outdated values."
         }
       ],
       "bulletPoints": [
-        "ExecutionList links to the RequirementSet level — giving whole-project visibility, not just one Requirement's status."
+        "ExecutionList → RequirementSet and ExecutionEntry → individual Requirement are distinct operations.",
+        "Inspect TestCase and execution evidence separately from planned coverage; recalculate outdated values."
       ],
       "sectionId": "section-c3e235746892"
     },
@@ -79,7 +80,7 @@
       "elements": [
         {
           "type": "note",
-          "text": "📄 Exercise 07 (Link the Values) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+          "text": "Independent Quilyn exercise: link only the Instances in scope, inspect their substitutes, create physical tests and replace the substitutes explicitly, then link the ExecutionList to the set and recalculate. The original Academy video and exercise files require access and have not been verified here."
         }
       ],
       "sectionId": "section-9376adb9c39d"
@@ -89,12 +90,12 @@
     {
       "title": "Confusing TestCase-Substitute links with TestCase links",
       "trapDescription": "Assuming both terms describe the same thing at different points in the process.",
-      "bestPractice": "A TestCase-Substitute link exists before the physical TestCase is built — it's a placeholder showing planned coverage. Once the physical TestCase is built and linked, it becomes a full TestCase link."
+      "bestPractice": "A substitute is planned data. Replace it by dragging the physical TestCase onto it or by the documented RequirementSet command with its ExecutionList prerequisites."
     },
     {
-      "title": "Assuming ExecutionLists link to individual Requirements",
+      "title": "Confusing ExecutionList and ExecutionEntry links",
       "trapDescription": "Expecting to link an ExecutionList directly to one Requirement for granular tracking.",
-      "bestPractice": "ExecutionLists link to the whole RequirementSet, giving a rolled-up view of progress and execution results across every Requirement in that set."
+      "bestPractice": "A list links to a RequirementSet; an entry can link its TestCase to an individual Requirement. Do not infer either link from list creation alone."
     },
     {
       "title": "Always dragging the entire TestSheet onto a Requirement",
@@ -129,12 +130,20 @@
         "B"
       ],
       "hint": "This link is a planning placeholder, not the real thing yet.",
-      "rationale": "Linking Instances to a Requirement before the physical TestCase exists creates a TestCase-Substitute link — showing how many TestCases will eventually need to be built to cover that Requirement."
+      "rationale": "The linked design Instance creates a substitute for planned coverage; it does not establish an executable TestCase or a successful execution.",
+      "lessonSection": "section-b9154135c13f",
+      "optionExplanations": {
+        "A": "A physical TestCase link requires linking the real test; design data alone creates a substitute.",
+        "B": "The substitute represents the linked Instance before the physical test is linked.",
+        "C": "This operation links design data to a Requirement, not an ExecutionList to a set.",
+        "D": "A Class reference reuses design structure; it is not a Requirement coverage link."
+      },
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "At what level does an ExecutionList link, in order to show overall project progress?",
+      "scenario": "You drag an ExecutionList itself to establish execution coverage for a group of Requirements. Which object is its documented link target (distinct from dragging an individual ExecutionEntry)?",
       "options": [
         {
           "id": "A",
@@ -156,8 +165,16 @@
       "correctOptions": [
         "C"
       ],
-      "hint": "This is what makes it a project-wide dashboard rather than a one-Requirement view.",
-      "rationale": "ExecutionLists link to the entire RequirementSet, rolling up execution results and coverage across all of its Requirements — giving whole-project visibility."
+      "hint": "Distinguish the entire list from an individual execution entry.",
+      "rationale": "Drag the ExecutionList to the RequirementSet. A separate ExecutionEntry operation can link a TestCase to an individual Requirement; calculation must still be current.",
+      "lessonSection": "section-c3e235746892",
+      "optionExplanations": {
+        "A": "An ExecutionEntry can target an individual Requirement; the question asks about the list itself.",
+        "B": "The list contains execution entries referencing tests, but this is not the Requirement coverage target.",
+        "C": "The documented direct link is ExecutionList to RequirementSet.",
+        "D": "An Instance is design data, not the target for linking the list to Requirements."
+      },
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
@@ -185,7 +202,15 @@
         "B"
       ],
       "hint": "Drag-and-drop linking works at the Instance level, not only the whole-TestSheet level.",
-      "rationale": "Individual Instances can be selected and dragged onto a Requirement when only a subset is currently in scope — there's no need to link the whole TestSheet or wait for every Instance to be ready."
+      "rationale": "Individual Instances can be selected and dragged onto a Requirement when only a subset is currently in scope — there's no need to link the whole TestSheet or wait for every Instance to be ready.",
+      "lessonSection": "section-b9154135c13f",
+      "optionExplanations": {
+        "A": "The whole sheet would also link the eight out-of-scope Instances; selected linking is supported.",
+        "B": "Selecting the four Instances links only the planned scope without changing the source sheet.",
+        "C": "Individual Instances can be linked before the remaining eight are ready.",
+        "D": "Copying and deleting data is unnecessary; the operation accepts selected Instances."
+      },
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
@@ -199,22 +224,39 @@
     },
     {
       "key": "TestCase link",
-      "value": "Replaces the Substitute link once the real TestCase is built and linked."
+      "value": "Replace explicitly by dragging a TestCase onto its substitute, or use Replace Substitutes by Testcases with the documented ExecutionList links."
     },
     {
       "key": "TestSheet : Requirement ratio",
-      "value": "Rule of thumb — one TestSheet per Requirement, containing all its TestCases."
+      "value": "Keep each Requirement traceable; the documented linking scopes include a TestSheet, Class or selected Instances."
     },
     {
       "key": "ExecutionList linking",
-      "value": "Links to the whole RequirementSet — giving a rolled-up, project-wide progress dashboard."
+      "value": "Explicitly link lists to sets; entries can link individual Requirements. Recalculate outdated dashboard values."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 07 - Link to Requirements (video)",
-      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
-      "duration": "video"
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/requirements/link_reqs_with_tcd_instances.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Additional primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/requirements/requirement_sets_in_execution_section.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Additional primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/requirements/link_reqs_with_execution_entries.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Additional primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/requirements/requirements.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }

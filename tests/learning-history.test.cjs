@@ -655,3 +655,27 @@ test('TDS1 Class review warns about bidirectional edits and uses documented Rele
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
  assert.match(d.studyGuide[0].elements[1].description,/editing an unresolved reference changes/);assert.match(d.practiceQuiz[1].scenario,/no child elements/);assert.match(d.practiceQuiz[2].rationale,/Other consumers may still reference/);assert.match(d.practiceQuiz[3].options[1].text,/Relevance checkbox/);assert.doesNotMatch(JSON.stringify(d),/auto-generates Instance combinations|Relevant column\/F11|4 creation methods exist/);
 });
+
+test('TDS1 Requirement links require explicit substitute replacement and distinguish execution entry scope',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-tds1/m07_link_to_requirements.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[i===1?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[1].elements[2].description,/does not by itself replace/);assert.match(d.studyGuide[1].elements[2].description,/must be used in an ExecutionList/);assert.match(d.studyGuide[3].elements[0].description,/AlwaysAdd, AskUser or NeverAdd/);assert.match(d.studyGuide[3].elements[1].text,/off by default/);assert.match(d.practiceQuiz[1].scenario,/distinct from dragging an individual ExecutionEntry/);
+ assert.doesNotMatch(JSON.stringify(d),/When ExecutionLists are created, they are linked|earlier TestCase-Substitute links become full/);
+});
+
+test('TDS1 added Attribute example scopes Linear Expansion counts and checks stale Requirement values',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-tds1/m08_integration_of_new_attributes.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.practiceQuiz[0].rationale,/does not establish coverage of other values/);assert.match(d.practiceQuiz[1].scenario,/unconstrained Linear Expansion/);assert.match(d.practiceQuiz[2].options[1].text,/refresh outdated/);assert.match(d.studyGuide[1].elements[0].description,/Propagate Instance\(s\)/);
+ assert.doesNotMatch(JSON.stringify(d),/existing 9 TestSheet-level|Instances are NOT automatically|don't inherit existing TestCase-Substitute links automatically/);
+});
+
+test('TDS1 maintenance review preserves boundary coverage and removes unsupported vendor thresholds',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-tds1/m09_best_practices.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[i===2?'A':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[0].elements[0].description,/editing the reference also changes the Class/);assert.match(d.practiceQuiz[1].options[1].text,/Create Element Structure from Clipboard/);assert.match(d.examPitfalls[3].bestPractice,/Retain boundary coverage/);assert.match(d.studyGuide[1].elements[2].text,/does not automatically execute Gherkin/);
+ assert.doesNotMatch(JSON.stringify(d),/Tricentis recommends using Classes only|Usually one-time tests|Notepad uses Tab indentation|backbone of every TestSheet/);
+});
