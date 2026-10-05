@@ -2,6 +2,8 @@
 
 **Status: NOT EXECUTED.** No accessible physical iPhone/Android or VoiceOver/TalkBack session has been supplied. Desktop emulation, accessibility-tree inspection and automated tests do not satisfy this gate. Record actual results; do not prefill Pass.
 
+2026-10-05: the user confirmed that no connected device or accessible device-testing service is available. The physical-device and assistive-technology gate remains blocked by this access limitation; no result is marked Pass.
+
 ## Required environments
 
 | Environment | Device / OS / browser / AT version | Build / asset token | Result |
