@@ -3,80 +3,61 @@
   "moduleTitle": "Lesson 12 - XML Data",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
   "learningObjectives": [
-    "Use the Tricentis Standard Modules Open/Create XML File and Save XML File to steer an XML file.",
-    "Insert new structural data into an XML file using Select and Insert ActionModes correctly.",
-    "Verify inserted XML data using Select and Constraint before Verifying leaf values.",
-    "Complete the course by running a full Insert-then-Verify XML TestCase in the Scratchbook."
+    "Load and persist named XML resources.",
+    "Select an existing container and insert new elements.",
+    "Identify intended records and verify independent expected values.",
+    "Distinguish resource assertions from persisted-file verification."
   ],
   "estTime": "40 min",
   "studyGuide": [
     {
-      "sectionTitle": "Inserting Data Into an XML File",
+      "sectionTitle": "Load, modify and save",
       "elements": [
         {
-          "type": "concept",
-          "term": "Open/Create XML File and Save XML File",
-          "description": "Tricentis Standard Modules used for common XML steering operations across any XML file. Open/Create XML File loads the Resource from a given file path; Save XML File writes the in-memory Resource back out — either overwriting the original file (leave the file path empty) or creating a new file (specify a new name). Tosca can only save into an existing folder."
+          "type": "note",
+          "text": "Open/Create XML file loads data into a resource. Use its name consistently for each step operating on that resource. Select the intended existing container; Insert creates the new element and its structure. Input can modify existing XML elements; it is not restricted to configuration fields such as Filepath."
         },
         {
-          "type": "steps",
-          "title": "Building the Insert TestCase",
-          "items": [
-            "Add the Open/Create XML File Module; set Resource (e.g. \"Products\") and Filepath (Input ActionMode) to point at the real XML file on disk.",
-            "Add the XML Module (e.g. \"Products\") again; the Resource value here must exactly match the Resource used in the Open step.",
-            "Set the parent container node (e.g. \"Products\") to ActionMode Select — telling Tosca to select this node for inserting into.",
-            "Set the new structural element (e.g. \"Product\") to ActionMode Insert, since a brand-new node is being created.",
-            "Fill in the new node's field values (e.g. ProductId, Name, ShortDescription) using ActionMode Insert.",
-            "Add Save XML File; set its Resource to match, and either leave Filepath empty to overwrite the original, or give it a new filename to create a separate file.",
-            "Run the TestCase in the Scratchbook."
-          ]
+          "type": "note",
+          "text": "Save XML file writes a resource to disk. Its optional Filepath selects a different destination from the connected source; if omitted for a resource loaded from a file, saving targets that connected file. For a newly created resource without a connected file, do not assume there is an original path to overwrite."
         },
         {
-          "type": "warning",
-          "text": "Resource must match EXACTLY across every TestStep in the TestCase — Open, Insert, and Save all need to reference the same Resource value, or Tosca won't know they're working on the same in-memory data."
+          "type": "note",
+          "text": "Independent guidance: use a full disposable output path and inspect the intended destination, permissions and overwrite risk. A different filename is not an absolute preservation guarantee if another file already occupies that destination. Do not infer directory-creation behavior from an unverified claim."
         }
-      ],
-      "bulletPoints": [
-        "ActionMode Select = \"focus here\", Insert = \"create new here\", Input = \"used for TestStepValues like Filepath, modifying existing configuration data rather than XML node content\".",
-        "Leaving the Save step's file path empty overwrites the original file; giving it a new name preserves the original and creates a fresh copy."
       ],
       "sectionId": "section-40560c0fc339"
     },
     {
-      "sectionTitle": "Verifying Data in an XML File",
+      "sectionTitle": "Identify and verify intended data",
       "elements": [
         {
-          "type": "concept",
-          "term": "Select → Constraint → Verify",
-          "description": "To check that inserted data landed correctly: Select on the outer container nodes (e.g. Contacts, Product) tells Tosca where to look. Constraint on a unique identifying field (e.g. an Id or Email) narrows the search down to exactly the one entry just created. Verify on every other field then checks the actual stored values against what you expect."
+          "type": "note",
+          "text": "Independent example: among repeated Product elements, select the intended parent and use a unique Id constraint to identify Product 635 before checking its expected fields. Inspect uniqueness; a Constraint is not guaranteed to make duplicate IDs unique. Other supported selection mechanisms may also apply."
         },
         {
           "type": "note",
-          "text": "The same Module used for the Insert TestStep is reused again, unmodified, for a Verify TestStep — only the ActionModes and values on each TestStepValue change between the two."
+          "text": "Verify XML can check resource content with XPath and explicit expected results. Configure namespaces when the expression needs them. A resource check proves the current resource state; to check persistence, save to a disposable output and reload that file into a separately named resource before asserting."
         }
-      ],
-      "bulletPoints": [
-        "Constraint narrows the search to one specific record — without it, Verify wouldn't know which of many similar entries to check.",
-        "This Select/Constraint/Verify pattern for XML mirrors the same pattern used for tables and lists in UI automation."
       ],
       "sectionId": "section-f0e94e1901ed"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 12a - Insert Data into an XML File",
+      "sectionTitle": "Independent insertion exercise",
       "elements": [
         {
           "type": "note",
-          "text": "📄 API Exercise 12a - Insert Data into an XML File — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+          "text": "Load a disposable XML copy, insert one new record, inspect resource values and save to a deliberate output path. Academy Exercise 12a was inaccessible; no local Tosca execution was performed."
         }
       ],
       "sectionId": "section-0d22222701c6"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 12b - Verify Data in an XML File",
+      "sectionTitle": "Independent verification exercise",
       "elements": [
         {
           "type": "note",
-          "text": "📄 API Exercise 12b - Verify Data in an XML File — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+          "text": "Reload the saved output, locate the intended unique record and assert independent expected values. Add checks for duplicates, namespaces and malformed input appropriate to the contract. Academy Exercise 12b and course examination coverage are not certified."
         }
       ],
       "sectionId": "section-c6b9950a4203"
@@ -84,31 +65,31 @@
   ],
   "examPitfalls": [
     {
-      "title": "Using mismatched Resource values across TestSteps",
-      "trapDescription": "Candidates set slightly different Resource values on the Open, Insert, and Save TestSteps of the same XML TestCase.",
-      "bestPractice": "Every TestStep working on the same XML file must reference the exact same Resource value throughout the TestCase — Open, Insert/Verify, and Save all need to match."
+      "title": "Mismatching resource identity",
+      "trapDescription": "Editing one resource but saving or checking another.",
+      "bestPractice": "Use the intended name consistently across related steps."
     },
     {
-      "title": "Using Insert where Select was needed (or vice versa)",
-      "trapDescription": "Candidates set the parent container node to Insert instead of Select, accidentally creating an extra container instead of just navigating into the existing one.",
-      "bestPractice": "Select = focus on/navigate into an existing node. Insert = create a brand-new node. Only the actual new structural element (e.g. a new \"Product\") should use Insert; its parent container uses Select."
+      "title": "Confusing existing and new elements",
+      "trapDescription": "Inserting a second parent instead of selecting the existing container.",
+      "bestPractice": "Select the existing target; Insert adds new elements; Input modifies existing ones."
     },
     {
-      "title": "Verifying without first Constraining",
-      "trapDescription": "Candidates set every field to Verify without first narrowing down to the one record just inserted, leaving Tosca unsure which of several similar entries to check.",
-      "bestPractice": "Use Constraint on a unique identifying field (like Id or Email) to narrow the search down to exactly the intended record before Verifying its other fields."
+      "title": "Assuming identification is unique",
+      "trapDescription": "Using a duplicated Id constraint without inspecting results.",
+      "bestPractice": "Define and verify uniqueness rather than relying on the name of the field."
     },
     {
-      "title": "Assuming Save XML File always overwrites the original",
-      "trapDescription": "Candidates leave the Filepath on Save XML File empty by accident and are surprised the original file changed.",
-      "bestPractice": "Leaving Filepath empty on Save XML File overwrites the original file. To keep the original intact, give Filepath a new file name so Tosca creates a separate file instead."
+      "title": "Checking only the resource after saving",
+      "trapDescription": "Assuming in-memory assertions prove persisted output.",
+      "bestPractice": "Save explicitly, reload the destination and assert its content."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "In an Insert TestStep, what ActionMode should be set on the existing parent container node (e.g. \"Products\") that the new element will be added under?",
+      "scenario": "In this insertion scenario, which mode selects an existing parent container before adding a new child?",
       "options": [
         {
           "id": "A",
@@ -124,131 +105,195 @@
         },
         {
           "id": "D",
-          "text": "Constraint"
+          "text": "Buffer"
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "The parent already exists — you're navigating into it, not creating it.",
-      "rationale": "Select tells Tosca to focus on/navigate into the existing parent node so the new element can be inserted under it. Insert is reserved for the actual new structural element being created."
+      "hint": "The parent already exists.",
+      "rationale": "Select identifies the existing target; Insert adds the new child.",
+      "optionExplanations": {
+        "A": "Insert would add a new element rather than select the existing parent.",
+        "B": "Select addresses the existing target.",
+        "C": "Verify checks a value rather than choosing this insertion target.",
+        "D": "Buffer captures data instead of selecting the intended container."
+      },
+      "lessonSection": "section-40560c0fc339",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "What happens if the Filepath TestStepValue on \"Save XML File\" is left empty?",
+      "scenario": "A resource was loaded from an XML file and remains connected to it. What does Save XML file target when optional Filepath is omitted?",
       "options": [
         {
           "id": "A",
-          "text": "Tosca throws an error and refuses to save."
+          "text": "It always refuses to save."
         },
         {
           "id": "B",
-          "text": "The original XML file is overwritten with the current in-memory Resource."
+          "text": "The connected source file."
         },
         {
           "id": "C",
-          "text": "A new file is created automatically with a random name."
+          "text": "A randomly named file."
         },
         {
           "id": "D",
-          "text": "Nothing is saved at all."
+          "text": "It never persists anything."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Empty means \"use the same place it came from\".",
-      "rationale": "Leaving the Filepath empty on Save XML File overwrites the original file that was opened. To preserve the original and create a separate file instead, provide a new file name."
+      "hint": "This scenario explicitly has a connected file.",
+      "rationale": "The optional path chooses a different destination; omission uses the connected file.",
+      "optionExplanations": {
+        "A": "The optional path is not always mandatory in this scenario.",
+        "B": "This is the documented connected-file target.",
+        "C": "No random filename behavior is established.",
+        "D": "Save transfers changes to disk."
+      },
+      "lessonSection": "section-40560c0fc339",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "After inserting a new Product with Id 635 into an XML file, how should the Verify TestStep locate exactly that record before checking its other fields?",
+      "scenario": "Products have unique Id values. How can a verification target Product 635 among repeated Products?",
       "options": [
         {
           "id": "A",
-          "text": "Set every field, including Id, to Verify — Tosca will automatically find the right record."
+          "text": "Verify every field and assume automatic identity selection."
         },
         {
           "id": "B",
-          "text": "Use Constraint on the Id field to narrow the search to that specific Product before Verifying the other fields."
+          "text": "Constrain Id to 635, then Verify the intended remaining fields."
         },
         {
           "id": "C",
-          "text": "Delete all other Products first so only one remains."
+          "text": "Delete other Products."
         },
         {
           "id": "D",
-          "text": "Use the Buffer ActionMode on the Id field."
+          "text": "Buffer the Id and assume that selects the record."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Think about how a single row is identified in a table full of similar rows.",
-      "rationale": "Constraint on a unique field like Id narrows the search down to exactly one record. Only after that narrowing should the other fields be checked with Verify."
+      "hint": "Use the stated unique identifier.",
+      "rationale": "A constraint identifies the intended record under the uniqueness assumption.",
+      "optionExplanations": {
+        "A": "Assertions alone do not establish this selection.",
+        "B": "This scopes selection to the stated unique identity.",
+        "C": "Deleting unrelated data is unnecessary.",
+        "D": "Capturing a value alone does not constrain the search."
+      },
+      "lessonSection": "section-f0e94e1901ed",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "Across the Open, Insert, and Save TestSteps of the same XML TestCase, what must be true of the Resource TestStepValue?",
+      "scenario": "Related steps must edit and persist the same named XML resource. What must their resource references do?",
       "options": [
         {
           "id": "A",
-          "text": "It must be exactly the same value in every TestStep referencing that XML data."
+          "text": "Identify that same resource consistently."
         },
         {
           "id": "B",
-          "text": "It should be different in each TestStep to avoid conflicts."
+          "text": "Use a different name in every step."
         },
         {
           "id": "C",
-          "text": "Only the Save TestStep needs a Resource value."
+          "text": "Appear only in the Save step."
         },
         {
           "id": "D",
-          "text": "Resource is optional and can be left blank throughout."
+          "text": "Always remain blank."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Resource is how Tosca tracks which in-memory copy of the XML data each TestStep is working on.",
-      "rationale": "The Resource value must match exactly across every TestStep operating on the same XML data — Open, Insert/Verify, and Save all need to reference the identical Resource name."
+      "hint": "Resource names identify the working data.",
+      "rationale": "Consistent references ensure the steps target the intended resource; deliberate copying can use different named resources.",
+      "optionExplanations": {
+        "A": "This preserves the intended identity across these steps.",
+        "B": "Different names identify different resources.",
+        "C": "Load and manipulation also need the intended resource identity.",
+        "D": "Blank names do not specify this intended resource."
+      },
+      "lessonSection": "section-40560c0fc339",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
-      "key": "Open/Create XML File",
-      "value": "Standard Module; loads the Resource from a given Filepath into memory."
+      "key": "Load",
+      "value": "Open/Create XML file uses a named resource."
     },
     {
-      "key": "Save XML File",
-      "value": "Standard Module; empty Filepath overwrites the original, a new name creates a separate file."
+      "key": "Save",
+      "value": "Omitted path uses a connected source; explicit path selects a destination."
     },
     {
-      "key": "Insert pattern",
-      "value": "Select on the existing parent container, Insert on the brand-new node and its fields."
+      "key": "Modes",
+      "value": "Select existing target; Insert new elements; Input existing elements."
     },
     {
-      "key": "Verify pattern",
-      "value": "Select on containers → Constraint on a unique field → Verify on the remaining fields."
+      "key": "Verify",
+      "value": "Identify intended records and assert explicit expected values."
     },
     {
-      "key": "Resource consistency",
-      "value": "Every TestStep touching the same XML data must use the identical Resource value."
+      "key": "Resource identity",
+      "value": "Related operations reference the same intended resource."
     },
     {
-      "key": "Course complete",
-      "value": "All 12 lessons (REST, SOAP, self-created SOAP, XML) are now covered — proceed to the remaining review exercises and the Final Exam."
+      "key": "Persistence",
+      "value": "Reload the output to verify saved content; course completion is not certified here."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 12 - XML Data (video)",
-      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
-      "duration": "video"
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/xml/xml_resources.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/engines_3.0/xml.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/xml/xml_file_save.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/xml/xml_elements_add.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/xml/xml_testcases.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/xml/xml_verify_ressource.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/teststepvalue_xteststepvalue.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }

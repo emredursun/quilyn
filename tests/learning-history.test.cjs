@@ -759,3 +759,15 @@ test('SOAP review scopes HTTP bindings, authentication, month coverage and prede
   else{assert.match(d.practiceQuiz[0].options[0].text,/requires an endpoint/);assert.match(d.studyGuide[1].elements[1].text,/SOAPAction header is universally required/);assert.match(d.studyGuide[1].elements[2].text,/whitespace-sensitive/);}
  });
 });
+
+test('XML review separates transport, resource persistence and existing element modification',()=>{
+ const crypto=require('node:crypto'),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ ['m12_xml_modules.json','m13_xml_data.json'].forEach((name,n)=>{
+  const bytes=fs.readFileSync('data/tosca-api/'+name),d=JSON.parse(bytes),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[[['B','A','A'],['B','B','B','A']][n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+  assert.doesNotMatch(JSON.stringify(d),/Response view is always completely blank|original file on disk is never overwritten|All 12 lessons.*now covered/);
+  if(!n){assert.match(d.practiceQuiz[0].options[1].text,/transport must be configured/);assert.equal(d.practiceQuiz[1].options[0].text,'Input');}
+  else{assert.match(d.practiceQuiz[1].scenario,/remains connected/);assert.match(d.studyGuide[0].elements[0].text,/Input can modify existing XML/);assert.match(d.studyGuide[1].elements[1].text,/reload that file/);assert.match(d.studyGuide[1].elements[0].text,/duplicate IDs/);}
+ });
+});

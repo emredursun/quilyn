@@ -3,70 +3,51 @@
   "moduleTitle": "Lesson 11 - XML Modules",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
   "learningObjectives": [
-    "Scan a local XML file in the API Scan and export it as an XML/JSON Test Case.",
-    "Explain why an XML Module's Response view is always blank.",
-    "Understand how Tosca's Resource attribute protects the original XML file during test runs.",
-    "Locate and use the Tricentis Standard Modules for steering XML files."
+    "Distinguish local XML data from a network API request.",
+    "Scan a local file and choose XML/JSON export.",
+    "Use XML resources and explicit persistence.",
+    "Inspect XML structure and affected TestStep references."
   ],
   "estTime": "35 min",
   "studyGuide": [
     {
-      "sectionTitle": "Scanning a Local XML File",
+      "sectionTitle": "Local XML data and export",
       "elements": [
         {
-          "type": "concept",
-          "term": "XML as a table-like data source",
-          "description": "An XML file has a table-like structure and is effectively scanned much like a database. This lesson uses AddressBook.xml, containing pre-populated contacts (Name, Company, Email, Telephone, Address) — representing, for example, an internal HR system's offline employee contact list that needs its add/remove/verify operations tested."
+          "type": "note",
+          "text": "API Scan File supports local message/definition files; the documented XSD workflow scans a schema and exports XML/JSON TestCases. Inspect whether your input is a data document or a schema; XML is hierarchical data, not inherently a relational database table."
         },
         {
-          "type": "steps",
-          "title": "Scanning and exporting an XML file",
-          "items": [
-            "In the API Scan, use the File button (instead of the URI button) and select the XML file to import it as a new message.",
-            "The Payload now shows the XML file's own content, exactly as written in the file.",
-            "Click the arrow next to the API Test Case button and choose \"XML/JSON Test Case\" to export — this produces both a Module and a TestCase, just like a REST/SOAP export."
-          ]
-        },
-        {
-          "type": "warning",
-          "text": "Sending a Request on an XML scan returns an error, and the Response view is always completely blank. Unlike SOAP or REST, an XML scan isn't sending data anywhere — there's no server to respond, so there's nothing to populate a Response with."
+          "type": "note",
+          "text": "Loading local XML does not by itself configure a network endpoint. Do not infer that every XML message must always fail or have an empty response: XML can also be used as a network API payload when transport is configured. A local file workflow and sending an HTTP request are different operations."
         }
-      ],
-      "bulletPoints": [
-        "XML Standard Modules (used later) come bundled in the standard subset imported at the start of this course — if missing, import it via the Tosca project folder > Import Subset in the ribbon."
       ],
       "sectionId": "section-eaf0c56f9887"
     },
     {
-      "sectionTitle": "Inside the XML Module",
+      "sectionTitle": "XML resources and structures",
       "elements": [
         {
-          "type": "concept",
-          "term": "No Technical View for XML Modules",
-          "description": "Unlike REST/SOAP Modules, an XML Module has no Technical View tab — instead, the XML elements are stored directly within the Module itself."
-        },
-        {
-          "type": "concept",
-          "term": "Resource attribute",
-          "description": "Rather than manipulating the XML file directly on disk, Tosca Commander uses the Resource key to load the XML file temporarily into RAM. If a mistake happens during a test run, the original file on disk is never overwritten and no data is lost — the working copy lives only in memory until explicitly saved."
+          "type": "note",
+          "text": "Open/Create XML file loads a file into a named resource. XML operations modify resources; Save XML file persists changes. Independent guidance: inspect the complete test, because a Save step can write to disk and resource-based editing is not a universal guarantee against data loss. Work with disposable copies and an explicit output path."
         },
         {
           "type": "note",
-          "text": "The top-level container element (e.g. \"AddressBook\") holds every XML element and sub-element. Irrelevant elements (e.g. an unused \"Fax\" field) can simply be deleted from the Module — but remember to also update/synchronize any TestCase values already pointing at a deleted element."
+          "text": "XML TestCases expose document, element, attribute, value, comment, declaration and CDATA control types. Insert adds new elements, Input changes existing ones and Verify checks values. Inspect generated structure and references rather than rely on an unverified universal Technical View absence claim."
+        },
+        {
+          "type": "note",
+          "text": "Independent guidance: removing a Module element can affect its existing TestSteps. Inspect and synchronize affected references, then execute the relevant assertions."
         }
-      ],
-      "bulletPoints": [
-        "Resource = the in-memory working copy of the XML data; the file on disk is untouched until you explicitly Save.",
-        "Deleting an irrelevant Module element requires re-checking (and re-syncing) any TestCase that already referenced it."
       ],
       "sectionId": "section-43c3888fa343"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 11 - Create XML Modules",
+      "sectionTitle": "Independent exercise",
       "elements": [
         {
           "type": "note",
-          "text": "📄 API Exercise 11 - Create XML Modules — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+          "text": "Scan a disposable schema or file and inspect exported structure. Load a copy into a named resource and modify it without saving; separately test an explicit save to a disposable destination. Original Academy exercise files were inaccessible and no Tosca execution was performed."
         }
       ],
       "sectionId": "section-28f0c0739438"
@@ -74,134 +55,190 @@
   ],
   "examPitfalls": [
     {
-      "title": "Expecting a populated Response after sending an XML scan request",
-      "trapDescription": "Candidates click Send/Run on an XML message and expect a normal Response, as with SOAP/REST.",
-      "bestPractice": "An XML scan isn't sending data to any server — there is nothing to respond. The Response view for an XML Message is always blank, and attempting to send returns an error."
+      "title": "Confusing XML format and network transport",
+      "trapDescription": "Assuming XML always means a local file with no response.",
+      "bestPractice": "Determine whether the workflow is resource editing or a configured network message."
     },
     {
-      "title": "Assuming XML Modules have a Technical View tab",
-      "trapDescription": "Candidates look for the familiar Technical View tab to add Business Parameters to an XML Module, as they would for REST/SOAP.",
-      "bestPractice": "XML Modules have no Technical View — the XML elements are stored directly inside the Module itself, without that intermediate tab."
+      "title": "Treating XML as a flat table",
+      "trapDescription": "Ignoring hierarchy, namespaces and attributes.",
+      "bestPractice": "Inspect the XML control structure and intended element identity."
     },
     {
-      "title": "Fearing the original XML file will be corrupted during testing",
-      "trapDescription": "Candidates worry that running a TestCase against an XML file risks permanently damaging the source file on disk.",
-      "bestPractice": "Tosca uses the Resource attribute to load the XML data into RAM temporarily. The file on disk is only overwritten if you explicitly choose to save to it — mistakes during a test run don't touch the original file."
+      "title": "Promising disk safety for every test",
+      "trapDescription": "Ignoring Save or other disk-writing steps.",
+      "bestPractice": "Use disposable files and explicit persistence review."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "A tester sends a Request on a scanned XML file Message in the API Scan. What happens?",
+      "scenario": "What follows from loading a local XML document alone?",
       "options": [
         {
           "id": "A",
-          "text": "A normal Response is returned, just like SOAP or REST."
+          "text": "A server always returns a response."
         },
         {
           "id": "B",
-          "text": "An error is returned and the Response view remains completely blank, since there is no server to respond."
+          "text": "No network endpoint is configured merely by loading that file; transport must be configured separately for a request."
         },
         {
           "id": "C",
-          "text": "The XML file on disk is immediately overwritten."
+          "text": "The source is immediately overwritten."
         },
         {
           "id": "D",
-          "text": "The Message is automatically converted to a REST call."
+          "text": "XML is automatically converted to REST."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Think about what's actually different: is there anything on the other end to reply?",
-      "rationale": "Unlike SOAP or REST, an XML scan isn't sending data anywhere — there's no server involved, so the Response view stays blank and sending a Request returns an error."
+      "hint": "Separate format from transport.",
+      "rationale": "XML data loading does not establish a service connection.",
+      "optionExplanations": {
+        "A": "A response needs an applicable network operation.",
+        "B": "This correctly separates local data and network configuration.",
+        "C": "Loading does not imply immediate persistence.",
+        "D": "XML format does not determine REST architecture."
+      },
+      "lessonSection": "section-eaf0c56f9887",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "How does an XML Module differ structurally from a REST or SOAP Module in Tosca?",
+      "scenario": "Which ActionMode changes an existing XML element?",
       "options": [
         {
           "id": "A",
-          "text": "An XML Module has no Technical View — its elements are stored directly inside the Module."
+          "text": "Input"
         },
         {
           "id": "B",
-          "text": "An XML Module cannot be exported as a TestCase."
+          "text": "Insert"
         },
         {
           "id": "C",
-          "text": "An XML Module always requires a Service Access Key."
+          "text": "Only Buffer"
         },
         {
           "id": "D",
-          "text": "There is no structural difference at all."
+          "text": "Only folder Rename"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "REST/SOAP Modules have a dedicated tab that mirrors the API Scan's Message section — XML Modules skip it.",
-      "rationale": "Unlike REST/SOAP Modules, an XML Module has no Technical View tab; instead, the XML elements are stored directly within the Module itself."
+      "hint": "Existing and new elements differ.",
+      "rationale": "The XML TestCase structure documents Input for modifying existing elements.",
+      "optionExplanations": {
+        "A": "Input modifies the existing element.",
+        "B": "Insert adds new elements.",
+        "C": "Buffer is not the documented modification mode.",
+        "D": "Folder renaming is not XML element editing."
+      },
+      "lessonSection": "section-43c3888fa343",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "Why doesn't running a TestCase against an XML file risk corrupting the original file on disk?",
+      "scenario": "What is the persistence model for resource-based XML editing?",
       "options": [
         {
           "id": "A",
-          "text": "Because Tosca uses the Resource attribute to load the XML data into RAM — the disk file is untouched unless explicitly saved."
+          "text": "Changes affect the resource; an explicit Save step transfers changes to disk, so inspect that step."
         },
         {
           "id": "B",
-          "text": "Because Tosca makes the file read-only automatically."
+          "text": "Every source is automatically read-only."
         },
         {
           "id": "C",
-          "text": "Because XML files cannot be modified by Tosca at all."
+          "text": "XML cannot be changed."
         },
         {
           "id": "D",
-          "text": "Because every test run creates a brand-new file automatically."
+          "text": "Every run always creates a new source file."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "This is the Resource key's specific purpose.",
-      "rationale": "The Resource attribute holds the XML data temporarily in RAM rather than manipulating the file on disk directly, so an error during testing doesn't overwrite or lose data in the original file — only an explicit save does that."
+      "hint": "Resource manipulation and saving are distinct.",
+      "rationale": "Resource-based edits require explicit persistence but do not prevent a configured Save from overwriting data.",
+      "optionExplanations": {
+        "A": "This states both the resource model and the persistence risk.",
+        "B": "Automatic read-only protection is not established.",
+        "C": "XML editing is supported.",
+        "D": "Automatic new-file creation is not guaranteed."
+      },
+      "lessonSection": "section-43c3888fa343",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
-      "key": "Scanning XML",
-      "value": "Use the File button (not URI) in the API Scan to import a local XML file as a message."
+      "key": "Input types",
+      "value": "Distinguish a data document from an XSD schema."
     },
     {
-      "key": "Export type",
-      "value": "XML/JSON Test Case — produces a Module + TestCase, same as REST/SOAP exports."
+      "key": "Export",
+      "value": "XML/JSON TestCase is a documented file/schema export target."
     },
     {
-      "key": "Response is always blank",
-      "value": "No server is involved in an XML scan, so sending returns an error and the Response view stays empty."
+      "key": "Transport",
+      "value": "XML format alone neither configures nor prohibits a server request."
     },
     {
-      "key": "No Technical View",
-      "value": "XML Modules store elements directly, without a Technical View tab."
+      "key": "Structure",
+      "value": "Inspect hierarchy, namespaces and control types."
     },
     {
-      "key": "Resource attribute",
-      "value": "Loads the XML data into RAM — the file on disk is safe until an explicit save."
+      "key": "Resources",
+      "value": "Modify resources; explicitly review disk persistence."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 11 - XML Modules (video)",
-      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
-      "duration": "video"
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_file.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_export.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/xml/xsd_scan.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/xml/xml_resources.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/engines_3.0/xml.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/xml/xml_file_save.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/xml/xml_testcases.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }
