@@ -529,3 +529,10 @@ test('BA Center-out review keeps stable answer keys and scopes architectural gua
  assert.match(d.practiceQuiz[14].hint,/Three options/);assert.match(d.practiceQuiz[6].options[0].text,/Case Lifecycles/);assert.match(d.studyGuide[4].elements[1].description,/select and configure/);assert.match(d.studyGuide[5].elements[7].description,/Accessibility Inspector is not supported/);
  assert.doesNotMatch(JSON.stringify(d),/Four real principles|instantly reaches|logic never has to be rebuilt|neither can break/);
 });
+
+test('TDS Expert review separates non-locking reads from unlocking and preserves keys',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds2/m05_expert_module.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS2-M05'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.match(d.platformVersion,/2026.1 LTS.*video version unverified/);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[i===2?'B':'C']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);assert.equal(q.explanationReviewedOn,'2026-10-05');});
+ assert.match(d.studyGuide[2].elements[0].description,/not the UnlockItem operation/);assert.match(d.studyGuide[1].bulletPoints[0],/First, Random or a positive index/);assert.match(d.quickRecap[1].value,/DeleteItem.*UnlockItem/);assert.doesNotMatch(JSON.stringify(d),/DeleteRecord|automatically unlocks that record|Every task locks by default|FIRST match only|seven Test data task/);
+});

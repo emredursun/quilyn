@@ -4,9 +4,9 @@
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
   "learningObjectives": [
     "Explain how the TestData - Expert Module consolidates Create, Find, Update, and more into a single module.",
-    "List the seven Test data task options and what each one does.",
-    "Explain why ReadOnly is the one function that does NOT lock its record, and when that matters.",
-    "Trace a multi-step order/cancel scenario built entirely with the Expert Module."
+    "Choose documented Test data task options for item, type and lock operations.",
+    "Distinguish non-locking ReadOnly from explicit unlocking.",
+    "Configure a synthetic create, read, find and update workflow with the Expert Module."
   ],
   "estTime": "20 min",
   "studyGuide": [
@@ -16,30 +16,32 @@
         {
           "type": "concept",
           "term": "TestData - Expert Module",
-          "description": "Rather than assembling a TestCase from several separate Standard Modules (Create, Find, Update...), the Expert Module performs all of those functions itself, plus extra ones the standalone modules don't offer — ReadOnly, deleting individual records, and deleting entire types. It's included in the Standard.tsu subset, under Standard modules → Test Data Management → Test Data Service."
+          "description": "Combines operations offered by dedicated TestData modules and adds reading and lock-management tasks. It belongs to the Standard subset under Test Data Management → Test Data Service. Security-enabled installations may restrict operations by user group."
         },
         {
           "type": "concept",
           "term": "Test data task*",
-          "description": "The Expert Module's key TestStepValue is a dropdown listing every supported function: Create, ReadOnly, Find, Update, DeleteType, DeleteRecord, DeleteAll. Whichever is selected tells Tosca exactly what to do with the data in that TestStep."
+          "description": "Select the operation through Test data task. Tosca 2026.1 LTS documents Create, ReadOnly, Find, Update, DeleteItem, DeleteType, DeleteAll, LockItem, UnlockItem, LockType and UnlockType. Check the module shipped with your installed version."
         }
       ],
       "sectionId": "section-62ef5b1c6804"
     },
     {
-      "sectionTitle": "The seven Test data task options",
+      "sectionTitle": "Choose the task and its scope",
       "elements": [
         {
           "type": "list",
           "title": "What each function does",
           "items": [
-            "Create — creates a new TDS type, or adds values to an existing one.",
-            "ReadOnly — reads the record and unlocks it (does NOT lock).",
-            "Find — searches for the FIRST existing record matching the given criteria.",
-            "Update — edits a single record's values.",
-            "DeleteRecord — deletes one record from a TDS type.",
+            "Create — adds an item to a specified existing or new type.",
+            "ReadOnly — reads an item without acquiring an exclusive lock.",
+            "Find — retrieves one item selected by criteria, sorting and Position.",
+            "Update — changes an item or moves it to another type.",
+            "DeleteItem — removes an item; acquire its lock first.",
             "DeleteType — deletes the entire TDS type from the repository.",
-            "DeleteAll — deletes everything in the repository."
+            "DeleteAll — deletes all repository contents; this operation cannot be cancelled.",
+            "LockItem / UnlockItem — explicitly manage an identified item's lock through its alias.",
+            "LockType / UnlockType — manage locks across a type."
           ]
         },
         {
@@ -48,62 +50,60 @@
         }
       ],
       "bulletPoints": [
-        "Find returns the FIRST match only — if precision matters, narrow the search criteria rather than expecting multiple results."
+        "Find retrieves one item, not all matches. Position supports First, Random or a positive index; verify Start index and Sorting when choosing by index."
       ],
       "sectionId": "section-52763c1ad78b"
     },
     {
-      "sectionTitle": "ReadOnly: the one function that doesn't lock",
+      "sectionTitle": "ReadOnly does not reserve an item",
       "elements": [
         {
           "type": "concept",
           "term": "What makes it different",
-          "description": "Every other Test data task locks the record it touches by default. ReadOnly is the exception: it reads the data without modifying it, and explicitly does NOT lock the record — leaving it free for others to use."
+          "description": "ReadOnly reads without acquiring an item lock. It is not the UnlockItem operation and should not be used to release a lock acquired earlier. Find reserves the retrieved item for exclusive use; documented automatic release occurs after execution or at a new loop iteration, including failure."
         },
         {
           "type": "concept",
           "term": "When to reach for it",
-          "description": "ReadOnly fits data meant to be reused across many TestCases at once — contract data, user ID numbers, reference data, or credit card numbers. For example, a bank transaction test might just need 'any' valid Visa card number, with no requirement that it be unique to that test. In a distributed environment, several testers on different workspaces need to be able to borrow that same reference record simultaneously."
+          "description": "Use non-locking reads for shared reference values when the test does not require exclusive consumption. For example, several tests may read the same synthetic product-category record. Reading without reservation does not guarantee the data remains unchanged by other tests."
         },
         {
           "type": "warning",
-          "text": "If reusable reference data like this were locked by default, concurrent TestCases could fail simply because they collided over the same record — ReadOnly exists specifically to avoid that."
+          "text": "Choose Find when the test needs an exclusive item. Use explicit UnlockItem when releasing a known lock; do not assume ReadOnly releases it."
         }
       ],
       "bulletPoints": [
-        "Every task locks by default EXCEPT ReadOnly.",
-        "Use ReadOnly for shared, non-unique reference data — not for data a TestCase is meant to consume exclusively."
+        "ReadOnly does not acquire an exclusive item lock.",
+        "Select a locking or non-locking operation according to the test's data ownership requirement."
       ],
       "sectionId": "section-701ff74b1274"
     },
     {
-      "sectionTitle": "Worked example: order Hoodies, then cancel",
+      "sectionTitle": "Independent synthetic order example",
       "elements": [
         {
           "type": "list",
-          "title": "The full TestStep flow",
+          "title": "A practice workflow, not a verified Academy exercise",
           "items": [
-            "1. Create Multiple Orders",
-            "2. Read the Created Order",
-            "3. Find and Update the First Order to Cancelled State",
-            "4. Find and Update the Subsequent Orders to Cancelled State",
-            "5. Find and Delete the Cancelled Order",
-            "6. Delete the Entire TDS type"
+            "1. Create a synthetic SampleOrders item with an OrderID and Pending status.",
+            "2. In a separate run, ReadOnly can inspect its attributes without reservation.",
+            "3. Find the intended item using an OrderID constraint and an alias.",
+            "4. Update its status through that alias."
           ]
         },
         {
           "type": "concept",
           "term": "Step 1 — Create",
-          "description": "Add the Expert Module, select 'Create' as the Test data task*, name the TDS type 'SampleOrders', and set the Alias name (record) to 'order'. Entering the data structure Attributes — OrderID, Product name, quantity, Price, Order Status, Year of Manufacture — creates those as separate columns in the TDS repository."
+          "description": "Set Create, type SampleOrders and alias order. Under Data structure, add OrderID and Status values with ActionMode Input. This creates an item containing those attributes."
         },
         {
           "type": "concept",
           "term": "Step 2 — ReadOnly",
-          "description": "Add another Expert Module, this time selecting 'ReadOnly', to read the order just created. This automatically unlocks that record — meaning, in a real project, the order number could then be picked up and reused by anyone else who needs it, rather than staying locked to this one TestCase."
+          "description": "Set ReadOnly and constrain OrderID to the intended item. Use Verify to check Status or buffer a value for later use. This read does not acquire a lock; it does not automatically unlock a previously reserved order."
         }
       ],
       "bulletPoints": [
-        "The same Expert Module object is reused throughout — only its Test data task* dropdown value changes at each step."
+        "Reuse the module, but configure the task's type, alias, selection criteria and data actions at each TestStep."
       ],
       "sectionId": "section-dedb520c29e1"
     },
@@ -120,9 +120,9 @@
   ],
   "examPitfalls": [
     {
-      "title": "Assuming ReadOnly locks its record like every other task",
-      "trapDescription": "Using ReadOnly to read a record and expecting it to be protected from concurrent access, the way Create/Find/Update are.",
-      "bestPractice": "ReadOnly is the one Test data task that does NOT lock its record by design — it's meant for shared, reusable reference data, not exclusive consumption."
+      "title": "Confusing reading and unlocking",
+      "trapDescription": "Expecting ReadOnly to reserve an item or release a lock held earlier.",
+      "bestPractice": "ReadOnly is non-locking. Use Find for reservation and UnlockItem for explicit release."
     },
     {
       "title": "Confusing DeleteType with DeleteAll",
@@ -132,14 +132,14 @@
     {
       "title": "Expecting Find to return every matching record",
       "trapDescription": "Assuming the Expert Module's Find task returns all records matching the criteria.",
-      "bestPractice": "Find returns only the FIRST matching record. If more precise targeting is needed, tighten the search criteria rather than expecting multiple results back."
+      "bestPractice": "Find retrieves one selected item. Configure criteria, Sorting and Position rather than assuming First is the only supported selection."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "Which Test data task is the ONLY one that does not lock the record it operates on?",
+      "scenario": "Which listed Test data task reads an item without acquiring an exclusive lock?",
       "options": [
         {
           "id": "A",
@@ -162,16 +162,24 @@
         "C"
       ],
       "hint": "This one is designed for data meant to be shared, not consumed exclusively.",
-      "rationale": "ReadOnly reads the record without locking it — every other task (Create, Find, Update, DeleteRecord, DeleteType, DeleteAll) locks by default."
+      "rationale": "ReadOnly reads without acquiring a lock. It does not mean releasing an earlier lock or changing the item.",
+      "optionExplanations": {
+        "A": "Create adds an item rather than performing a non-locking read.",
+        "B": "Find reserves the retrieved item for exclusive use.",
+        "C": "ReadOnly retrieves data without reserving the item.",
+        "D": "Update changes an identified item rather than only reading it."
+      },
+      "lessonSection": "section-701ff74b1274",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A bank-transaction TestCase needs 'any' valid credit card number, and several testers should be able to use the same reference record at once across different workstations. Which Test data task fits this need?",
+      "scenario": "Several tests need to read the same synthetic product-category reference item without changing it or reserving it exclusively. Which task fits this requirement?",
       "options": [
         {
           "id": "A",
-          "text": "DeleteRecord"
+          "text": "DeleteItem"
         },
         {
           "id": "B",
@@ -190,7 +198,15 @@
         "C"
       ],
       "hint": "The record needs to stay available to multiple testers at the same time.",
-      "rationale": "ReadOnly is exactly for this scenario — reusable reference data (like a generic credit card number) that shouldn't lock, so multiple testers can borrow it simultaneously in a distributed environment."
+      "rationale": "ReadOnly meets the non-locking read requirement. It does not modify or delete reference data.",
+      "optionExplanations": {
+        "A": "DeleteItem removes data that the tests need to retain.",
+        "B": "Update changes data; the requirement is to read it.",
+        "C": "ReadOnly does not acquire an exclusive lock while reading.",
+        "D": "DeleteAll removes repository contents instead of reading reference data."
+      },
+      "lessonSection": "section-701ff74b1274",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
@@ -207,7 +223,7 @@
         },
         {
           "id": "C",
-          "text": "DeleteRecord"
+          "text": "DeleteItem"
         },
         {
           "id": "D",
@@ -218,25 +234,33 @@
         "B"
       ],
       "hint": "One option wipes everything; another targets a single record; only one removes a whole type without touching the rest.",
-      "rationale": "DeleteType removes the specified TDS type and its records only. DeleteAll would clear the entire repository, and DeleteRecord only removes a single record within a type."
+      "rationale": "DeleteType removes the specified type and its items. DeleteAll affects the repository, while DeleteItem targets one item.",
+      "optionExplanations": {
+        "A": "DeleteAll also removes data outside SampleOrders.",
+        "B": "DeleteType matches the requested type-level scope.",
+        "C": "DeleteItem targets one item, not its entire type.",
+        "D": "ReadOnly reads data and does not remove the type."
+      },
+      "lessonSection": "section-52763c1ad78b",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
       "key": "Expert Module",
-      "value": "Combines Create/Find/Update/etc. into one module, plus ReadOnly, DeleteRecord, DeleteType, DeleteAll."
+      "value": "One module for item operations, non-locking reads, type/repository deletion and explicit lock management."
     },
     {
       "key": "Test data task* options",
-      "value": "Create, ReadOnly, Find, Update, DeleteType, DeleteRecord, DeleteAll."
+      "value": "Create, ReadOnly, Find, Update, DeleteItem, DeleteType, DeleteAll, LockItem, UnlockItem, LockType, UnlockType (2026.1 LTS)."
     },
     {
       "key": "Find",
-      "value": "Returns only the FIRST matching record."
+      "value": "Retrieves one item using criteria, sorting and Position (First, Random or index)."
     },
     {
       "key": "ReadOnly",
-      "value": "Reads without locking — the only non-locking task. Best for shared reference data."
+      "value": "Reads without acquiring an item lock; not an automatic UnlockItem."
     },
     {
       "key": "DeleteType vs DeleteAll",
@@ -248,6 +272,24 @@
       "title": "Lesson 4 - Introduction to the Standard TestData - Expert Module (video)",
       "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
       "duration": "video"
+    },
+    {
+      "title": "TestData - Expert module (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_expert_module.htm"
+    },
+    {
+      "title": "Test Data Service Module attributes (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/test_data/tds_modules.htm"
+    },
+    {
+      "title": "Find and reserve an item (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_find_item.htm"
+    },
+    {
+      "title": "Create an item (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_create_item.htm"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-05",
+  "platformVersion": "Tosca 2026.1 LTS (documentation baseline; Academy video version unverified)"
 }
