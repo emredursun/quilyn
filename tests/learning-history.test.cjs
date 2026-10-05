@@ -567,3 +567,15 @@ test('TDS preparation review corrects invalid naming answer and separates type r
  assert.equal(d.practiceQuiz[2].options[2].text,'CustomerDetails');assert.match(d.practiceQuiz[2].optionExplanations.B,/square brackets are forbidden/);assert.match(d.studyGuide[3].elements[2].description,/override an inherited/);assert.match(d.studyGuide[3].elements[0].description,/Standard.tsu/);
  assert.doesNotMatch(JSON.stringify(d),/single entry point to every TDS feature|In Memory is the only type that doesn't need|repository\/type name/);
 });
+
+test('TDS introductions scope reuse and require explicit application-state updates',()=>{
+ const crypto=require('node:crypto'),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ ['m00_introduction.json','m01_introduction_to_test_data_service.json'].forEach((name,i)=>{
+  const bytes=fs.readFileSync('data/tosca-tds2/'+name),d=JSON.parse(bytes),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.studyGuide.length,3);assert.equal(d.practiceQuiz.length,3);
+  d.practiceQuiz.forEach((q,j)=>{assert.equal(q.questionId,'Q'+(j+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+  assert.doesNotMatch(JSON.stringify(d),/can generally only be used once|automatically updates each record|TDM Studio handles|can't be tested independently|Every change is reflected back/);
+  if(i===0){assert.equal(d.practiceQuiz[1].options[1].text,'Expert Module ReadOnly');assert.match(d.studyGuide[1].elements[1].description,/not inherently single-use/);}
+  else{assert.match(d.practiceQuiz[2].scenario,/next TDS Update step/);assert.match(d.studyGuide[1].elements[1].description,/does not automatically synchronize/);assert.match(d.studyGuide[2].elements[1].text,/rather than automatic TDS lifecycle rules/);}
+ });
+});
