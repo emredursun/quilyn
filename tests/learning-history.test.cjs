@@ -798,3 +798,18 @@ test('AS1 workspace review distinguishes local workspaces, admin revocation and 
  assert.doesNotMatch(JSON.stringify(d),/Only a check-in by the holder|force-override are not supported|Contains 9 sections|Save disables undo\/redo|shared Google Doc/);
  assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.type==='diagram').length,3);
 });
+
+test('AS1 Modules review corrects control attributes, anchor fallback and same-type conversion',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as1/m02_modules.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D'],['A','B','C'],['A'],['D'],['A'],['B'],['C'],['D'],['B','C','F','G','H'],['A'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.equal(d.practiceQuiz.reduce((n,q)=>n+q.options.length,0),53);
+ assert.match(d.practiceQuiz[2].options[0].text,/ModuleAttribute/);
+ assert.match(d.practiceQuiz[6].options[2].text,/stable unique property combination.*parent/);
+ assert.match(d.studyGuide[5].elements[2].text,/Auto is the default.*then Coordinate/);
+ assert.match(d.studyGuide[6].elements[0].text,/same type.*radio buttons, buttons and links/);
+ assert.match(d.practiceQuiz[11].options[2].text,/Convert to ControlGroup/);
+ assert.match(d.studyGuide[6].elements[1].text,/does not automatically execute every/);
+ assert.doesNotMatch(JSON.stringify(d),/Tosca never auto-fills|Always prefer Shortest Path|Breaks only if the anchor|Attributes describe the Module itself|Ctrl\+Click multi-select → Create ControlGroup/);
+ assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.type==='diagram').length,5);
+});
