@@ -588,3 +588,11 @@ test('BA role review separates import responsibilities from permissions and supp
  assert.match(d.studyGuide[6].elements[0].description,/multiple Workspaces/);assert.match(d.studyGuide[6].elements[1].description,/common strategy, not a mandatory/);assert.match(d.practiceQuiz[1].rationale,/not proof of exclusive platform permissions/);assert.match(d.practiceQuiz[4].optionExplanations.D,/does not mean they are absent/);assert.match(d.studyGuide[6].bulletPoints[1],/Infinity Studio/);
  assert.doesNotMatch(JSON.stringify(d),/One Branch per feature is the standard strategy|not hand-drawn flows|preventing rule conflicts during parallel/);
 });
+
+test('BA GenAI review covers missing procedures and scopes response structures and search examples',()=>{
+ const crypto=require('node:crypto'),file='data/business-architect/m06_pega_genai_pega_platform.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M06'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.studyGuide.length,9);assert.equal(d.practiceQuiz.length,16);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,i===5?['A','B','C']:[2,8,11].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[6].elements[1].description,/technical ID/);assert.match(d.studyGuide[7].elements[1].description,/Personas & Channels/);assert.match(d.studyGuide[8].elements[1].description,/part of the Case data/);assert.match(d.practiceQuiz[7].scenario,/configured with the Unstructured response type/);assert.equal(d.practiceQuiz[12].lessonSection,'section-c649697939ef');assert.equal(d.practiceQuiz[15].lessonSection,'section-ba06-sample-data');
+ assert.doesNotMatch(JSON.stringify(d),/no Pega login for collaboration|no login needed to collaborate|about twice as fast|within ~90 days|consistent AI-enforced outcomes/);
+});
