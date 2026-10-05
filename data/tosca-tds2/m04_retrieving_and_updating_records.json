@@ -3,10 +3,10 @@
   "moduleTitle": "Lesson 3 - Retrieving and Updating Test records through TDS",
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
   "learningObjectives": [
-    "Retrieve a specific test record using 'TestData - Find & provide record' and an ActionMode Constraint.",
-    "Write the {TD[ObjectName.AttributeName]} expression to feed retrieved data into a TestStepValue.",
-    "Update a test record's Status using 'TestData - Update record', understanding that updates always pair with a search.",
-    "Move consumed records into a new TDS type using 'TestData - Move record to TDS type'."
+    "Retrieve a specific item using TestData - Find & provide item and ActionMode Constraint.",
+    "Use {TDS[ResourceName.PropertyName]} with the retrieved item's alias.",
+    "Update a known item through its alias using TestData - Update item.",
+    "Move a retrieved item to another type using TestData - Move item to type."
   ],
   "estTime": "25 min",
   "studyGuide": [
@@ -15,7 +15,7 @@
       "elements": [
         {
           "type": "concept",
-          "term": "TestData - Find & provide record",
+          "term": "TestData - Find & provide item",
           "description": "Retrieves a previously created record via a search query. The 'Existing TDS type*' field defines which dataset to search (e.g. CustomerDetails)."
         },
         {
@@ -25,7 +25,7 @@
         },
         {
           "type": "note",
-          "text": "Because this course's scenario has only one user type (the customer) and no Alias name was set in Lesson 2, Tosca automatically uses the 'Existing TDS type*' value itself to search — it looks in the CustomerDetails dataset for a record with Status = New."
+          "text": "Existing TDS type chooses the search scope. Alias name identifies the retrieved item during the TestCase, not a search condition; if omitted in Find, the type name is used as its default."
         }
       ],
       "bulletPoints": [
@@ -34,21 +34,21 @@
       "sectionId": "section-1e587b911618"
     },
     {
-      "sectionTitle": "Entering retrieved data: the {TD[...]} expression",
+      "sectionTitle": "Entering retrieved data: the {TDS[...]} expression",
       "elements": [
         {
           "type": "concept",
           "term": "Syntax",
-          "description": "Once a record is found, its values are fed into the SUT using the {TD[...]} expression, entered directly in a TestStepValue's Value field — the same style of expression used elsewhere in the Automation Specialist courses. The part right after the opening brace is the command to retrieve a test record from the TDS repository; the part in square brackets identifies exactly which value, as TDSType.AttributeName."
+          "description": "Use {TDS[ResourceName.PropertyName]} in the Value field after finding or creating the item. ResourceName identifies the item by its alias, followed by the attribute name. Do not substitute the repository name or an arbitrary type name."
         },
         {
           "type": "concept",
           "term": "Worked example",
-          "description": "To log a newly registered customer into the DemoWebShop using their retrieved email address, the Value field would contain: {TD[CustomerDetails.Email]} — retrieve a record from the CustomerDetails type and use its Email attribute."
+          "description": "Independent example: Find an item of type CustomerDetails with alias customer, then use {TDS[customer.Email]} to access its Email attribute. If Find instead omitted the alias, the default would be CustomerDetails, making {TDS[CustomerDetails.Email]} valid for that retrieved resource."
         }
       ],
       "bulletPoints": [
-        "{TD[ObjectName.AttributeName]} — TDS type first, then the specific Attribute, separated by a full stop."
+        "{TDS[ResourceName.PropertyName]} — resource alias, then attribute, separated by a dot."
       ],
       "sectionId": "section-82547cfdb0d6"
     },
@@ -57,44 +57,44 @@
       "elements": [
         {
           "type": "concept",
-          "term": "TestData - Update record",
-          "description": "Used whenever a record's data needs to change — e.g. once a newly registered customer adds an address, their Status should move from New to Active. Updating a record in TDS always works together with a search: you must first find the correct record, then apply the update to it."
+          "term": "TestData - Update item",
+          "description": "Changes a known item's attributes through its alias. A usual workflow first finds the intended item, then supplies the alias to Update item; an item created earlier can also have an alias. Define changed attributes under Data structure with ActionMode Input."
         },
         {
           "type": "concept",
           "term": "Matching the search identity",
-          "description": "The TestStepValue 'Existing alias name (record)*' on the Update module must match the value used earlier when the record was searched for — in this example, 'CustomerDetails'. The update itself targets a TDS attribute (Status) and supplies its new value (Active, replacing New)."
+          "description": "Existing alias name (item) must identify the item already available to the TestCase. For an explicit alias customer, pass customer; only an omitted Find alias defaults to the type name. A synthetic Status change from New to Active is an explicit test-data update."
         },
         {
           "type": "note",
-          "text": "Once the TestCase runs, the Status change is immediately visible in the TDS repository."
+          "text": "An application-side change is not itself a TestData Update item operation. Verify the application's expected state and explicitly maintain the repository data when the workflow requires it."
         }
       ],
       "bulletPoints": [
-        "No standalone 'blind update' — every update is preceded by a matching find/search."
+        "Update uses a known item's alias; a type name alone does not identify an arbitrary item."
       ],
       "sectionId": "section-8409e1690b4a"
     },
     {
-      "sectionTitle": "How the repository evolves through the order process",
+      "sectionTitle": "Independent synthetic order workflow",
       "elements": [
         {
           "type": "list",
-          "title": "Status/column changes as the customer journey progresses",
+          "title": "Application state and test-data state are separate",
           "items": [
-            "Adding items to the cart → an 'items' column appears showing the count.",
-            "Purchasing items → creates an OrderNumber column, sets OrderStatus to Pending.",
-            "Processing the purchase order → OrderStatus changes to Processing."
+            "Find a synthetic order item and assign the alias order.",
+            "Perform and verify the intended operation in the application under test.",
+            "If required, explicitly Update the order item's Status in TDS."
           ]
         },
         {
           "type": "concept",
-          "term": "Payment processing — a two-step update",
-          "description": "Step 1 (backend): non-UI Standard Modules search for a record with OrderStatus = Pending, then send non-UI requests carrying that OrderID plus the customer's email and password to the backend. Tosca verifies a 200 OK response, confirming the payment succeeded — this moves the status to Processing in the backend system itself, but NOT yet in TDS. Step 2 (repository sync): Tosca searches again for that same Pending-OrderStatus record, verifies the DemoWebShop now shows it as Processing, and only then updates the TDS repository's copy of that record to Processing."
+          "term": "Explicit state maintenance",
+          "description": "This is an independent practice example, not a verified Academy payment walkthrough. Keep the application's state assertion separate from the repository update, and handle failures before marking test data consumed. A generic successful HTTP response does not prove a business operation completed."
         },
         {
           "type": "warning",
-          "text": "The backend status and the TDS repository status change in two separate steps — don't assume TDS updates itself automatically just because the backend changed."
+          "text": "Do not treat an application response as evidence that TestData - Update item has run."
         }
       ],
       "sectionId": "section-f196b21c1178"
@@ -109,12 +109,12 @@
         },
         {
           "type": "concept",
-          "term": "TestData - Move record to TDS type",
-          "description": "Searches for records under the existing TDS type (e.g. CustomerDetails) and relocates them to a new type under a new name (e.g. CustomerDetails_Used). The TestStepValue 'Existing alias name (record)*' takes the CURRENT type's value (CustomerDetails), while 'Existing or new TDS type*' takes the DESTINATION type's value (CustomerDetails_Used)."
+          "term": "TestData - Move item to type",
+          "description": "Moves a known item identified by Existing alias name (item) into Existing or new TDS type. With alias customer, pass customer and destination CustomerDetails_Used. The alias need not equal the source type. One move targets one known item, not every item in the source type."
         }
       ],
       "bulletPoints": [
-        "'Existing alias name (record)*' = where the record is coming FROM. 'Existing or new TDS type*' = where it's going TO."
+        "Existing alias name (item) identifies the retrieved item; Existing or new TDS type specifies its destination."
       ],
       "sectionId": "section-f53e48ae0f86"
     },
@@ -131,67 +131,70 @@
   ],
   "examPitfalls": [
     {
-      "title": "Trying to update a record without searching for it first",
-      "trapDescription": "Adding a 'TestData - Update record' module and expecting it to know which record to change without a matching search.",
-      "bestPractice": "Updating in TDS always works in conjunction with a search — the 'Existing alias name (record)*' value on the Update module must match how the record was originally found."
+      "title": "Updating without an identified item",
+      "trapDescription": "Expecting Update item to choose an arbitrary target from a type name.",
+      "bestPractice": "Pass the alias of an item found or created earlier; use Input for changed attributes."
     },
     {
-      "title": "Assuming payment status syncs to TDS automatically",
-      "trapDescription": "Believing that once the backend confirms payment (200 OK, status → Processing), the TDS repository is updated at the same moment.",
-      "bestPractice": "Payment processing is a deliberate two-step flow: first the backend status changes via non-UI requests, THEN a separate search+update step syncs that same change into the TDS repository."
+      "title": "Assuming application changes update test data",
+      "trapDescription": "Treating an application-side result as evidence that the test-data update ran.",
+      "bestPractice": "Verify the business result and explicitly update the known test-data item when required."
     },
     {
-      "title": "Mixing up the two TDS type fields on Move record",
-      "trapDescription": "Putting the destination type name into 'Existing alias name (record)*' instead of 'Existing or new TDS type*'.",
-      "bestPractice": "'Existing alias name (record)*' = the CURRENT type the record is being moved FROM. 'Existing or new TDS type*' = the type it's being moved TO."
+      "title": "Confusing item alias and type",
+      "trapDescription": "Putting a source or destination type name into the item alias field when the item has a different alias.",
+      "bestPractice": "Use the known item's alias and configure its destination separately."
     },
     {
-      "title": "Getting the {TD[...]} argument order backwards",
-      "trapDescription": "Writing {TD[Email.CustomerDetails]} instead of {TD[CustomerDetails.Email]}.",
-      "bestPractice": "The syntax is always TDSType.AttributeName — the TDS type comes first, then the specific attribute, separated by a full stop."
+      "title": "Using the wrong resource expression",
+      "trapDescription": "Using TD instead of TDS, reversing alias and attribute, or using a colon separator.",
+      "bestPractice": "Use {TDS[ResourceName.PropertyName]} with the retrieved item's actual alias."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "A tester wants to log a newly registered customer into the DemoWebShop using their stored email address, TDS type 'CustomerDetails'. What expression goes in the TestStepValue's Value field?",
+      "scenario": "A test has retrieved a CustomerDetails item with the explicit alias customer. Which expression accesses its Email attribute?",
       "options": [
         {
           "id": "A",
-          "text": "{TD[Email.CustomerDetails]}"
+          "text": "{TDS[Email.customer]}"
         },
         {
           "id": "B",
-          "text": "{TD[CustomerDetails.Email]}"
+          "text": "{TDS[customer.Email]}"
         },
         {
           "id": "C",
-          "text": "{TDS[CustomerDetails:Email]}"
+          "text": "{TDS[customer:Email]}"
         },
         {
           "id": "D",
-          "text": "{TD.CustomerDetails.Email}"
+          "text": "{TD[customer.Email]}"
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "TDS type comes first, then the attribute, joined by a period.",
-      "rationale": "The correct syntax is {TD[ObjectName.AttributeName]} — TDS type first, then the Attribute, separated by a full stop: {TD[CustomerDetails.Email]}."
+      "hint": "Use TDS, the resource alias, a dot and the attribute name.",
+      "rationale": "The explicit alias is customer, so the documented expression is {TDS[customer.Email]}.",
+      "optionExplanations": {"A":"The resource alias must precede the attribute; Email is not this item's alias.","B":"TDS accesses the Email attribute of the resource identified by customer.","C":"The syntax separates resource and attribute with a dot, not a colon.","D":"The documented Test Data Service command is TDS, not TD."},
+      "lessonSection": "section-82547cfdb0d6",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A tester adds 'TestData - Update record' to change a customer's Status from New to Active, but the module has no way to know which specific record to change. What's missing?",
+      "scenario": "A tester adds TestData - Update item to change Status, but has not identified an item or supplied its alias. What is missing?",
       "options": [
         {
           "id": "A",
-          "text": "Nothing — Update record works standalone."
+          "text": "Nothing — Update item chooses a target automatically."
         },
         {
           "id": "B",
-          "text": "A preceding search/find step that identifies the target record, matched via 'Existing alias name (record)*'."
+          "text": "A known item found or created earlier, identified by Existing alias name (item)."
         },
         {
           "id": "C",
@@ -205,13 +208,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Updating in TDS is never a standalone action.",
-      "rationale": "Updating a TDS record always pairs with a search — the Update module's 'Existing alias name (record)*' must match the identity used when the record was originally found, so Tosca knows exactly which record to change."
+      "hint": "The update needs a known item, not just a type name.",
+      "rationale": "Existing alias name (item) identifies an item already available to the TestCase. Changed attributes use Input.",
+      "optionExplanations": {"A":"The module needs the target item's alias; it does not choose an arbitrary item.","B":"Finding or creating an item supplies the alias required to address it later.","C":"Constraint filters a search; it is not an Update task value.","D":"Repetitions changes execution count, not the identity of the target item."},
+      "lessonSection": "section-8409e1690b4a",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "During payment processing, Tosca gets a 200 OK response from the backend and the payment status becomes Processing there. Is the TDS repository automatically updated at this point?",
+      "scenario": "A synthetic order test verifies that the application has changed the order's state. Does that assertion alone prove that the separate TDS item's Status was updated?",
       "options": [
         {
           "id": "A",
@@ -219,7 +225,7 @@
         },
         {
           "id": "B",
-          "text": "No — a separate step must search for the same Pending record, confirm it now shows Processing in the DemoWebShop, and then explicitly update the TDS repository."
+          "text": "No — explicitly update the identified TDS item if the test-data workflow requires the new state."
         },
         {
           "id": "C",
@@ -233,13 +239,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Payment processing is described as a deliberate two-step flow.",
-      "rationale": "The backend status change and the TDS repository update are two distinct steps — TDS is only updated once Tosca separately searches for the record, confirms the new state, and applies the update."
+      "hint": "Application verification and a TestData update are different operations.",
+      "rationale": "A successful application assertion does not execute TestData - Update item. Maintaining the separate item's state requires the appropriate explicit test step.",
+      "optionExplanations": {"A":"There is no automatic mirroring implied by verifying an application result.","B":"An explicit update maintains the known test-data item's attributes.","C":"Execution count does not configure state synchronization.","D":"Processing can be stored as a Status attribute value; it is not forbidden by TDS."},
+      "lessonSection": "section-f196b21c1178",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "A tester wants to move all fully-processed records from 'CustomerDetails' into a new type called 'CustomerDetails_Used'. Which value goes into 'Existing or new TDS type*' on the Move record module?",
+      "scenario": "A tester has found one CustomerDetails item with alias customer and wants to move it into CustomerDetails_Used. Which value goes in Existing or new TDS type on Move item to type?",
       "options": [
         {
           "id": "A",
@@ -261,30 +270,33 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "One field is the source type, the other is the destination.",
-      "rationale": "'Existing alias name (record)*' takes the CURRENT type (CustomerDetails); 'Existing or new TDS type*' takes the DESTINATION type — CustomerDetails_Used."
+      "hint": "Configure the destination type separately from the item alias.",
+      "rationale": "The destination is CustomerDetails_Used. Existing alias name (item) is customer, not the source type CustomerDetails.",
+      "optionExplanations": {"A":"CustomerDetails is the source type, not the requested destination.","B":"CustomerDetails_Used is the destination configured for this move.","C":"New is a sample status value, not the destination type.","D":"Processing is a sample status value, not the destination type."},
+      "lessonSection": "section-f53e48ae0f86",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
       "key": "Find module",
-      "value": "TestData - Find & provide record; Existing TDS type* + ActionMode Constraint narrow the search."
+      "value": "TestData - Find & provide item; type and Constraint scope the search; alias identifies the retrieved resource."
     },
     {
-      "key": "TD expression",
-      "value": "{TD[ObjectName.AttributeName]} — TDS type, then Attribute, separated by a full stop."
+      "key": "TDS expression",
+      "value": "{TDS[ResourceName.PropertyName]} — item alias, then attribute."
     },
     {
       "key": "Update module",
-      "value": "TestData - Update record — always paired with a matching search (Existing alias name (record)*)."
+      "value": "TestData - Update item — known item alias, changed attributes with Input."
     },
     {
-      "key": "Payment sync",
-      "value": "Backend status change (non-UI, 200 OK) happens first; TDS repository update is a separate, later step."
+      "key": "Separate state maintenance",
+      "value": "Application verification is not a test-data update; explicitly maintain TDS state when required."
     },
     {
       "key": "Move module",
-      "value": "TestData - Move record to TDS type — 'Existing alias name (record)*' = FROM, 'Existing or new TDS type*' = TO."
+      "value": "Move item to type — known item alias identifies the item; Existing or new TDS type specifies the destination."
     }
   ],
   "topics": [
@@ -292,6 +304,28 @@
       "title": "Lesson 3 - Retrieving and Updating Test records through TDS (video)",
       "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
       "duration": "video"
+    },
+    {
+      "title": "Test Data Service expressions (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_expressions.htm"
+    },
+    {
+      "title": "Find an item (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_find_item.htm"
+    },
+    {
+      "title": "Update an item (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_update_item.htm"
+    },
+    {
+      "title": "Move an item (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_move_item.htm"
+    },
+    {
+      "title": "Module attributes (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/test_data/tds_modules.htm"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-05",
+  "platformVersion": "Tosca 2026.1 LTS (documentation baseline; Academy video version unverified)"
 }

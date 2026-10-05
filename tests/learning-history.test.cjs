@@ -536,3 +536,11 @@ test('TDS Expert review separates non-locking reads from unlocking and preserves
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[i===2?'B':'C']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);assert.equal(q.explanationReviewedOn,'2026-10-05');});
  assert.match(d.studyGuide[2].elements[0].description,/not the UnlockItem operation/);assert.match(d.studyGuide[1].bulletPoints[0],/First, Random or a positive index/);assert.match(d.quickRecap[1].value,/DeleteItem.*UnlockItem/);assert.doesNotMatch(JSON.stringify(d),/DeleteRecord|automatically unlocks that record|Every task locks by default|FIRST match only|seven Test data task/);
 });
+
+test('TDS retrieval review uses resource aliases and the TDS expression command',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds2/m04_retrieving_and_updating_records.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS2-M04'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.equal(d.practiceQuiz[0].options[1].text,'{TDS[customer.Email]}');assert.match(d.practiceQuiz[0].options[3].text,/^\{TD\[/);assert.match(d.practiceQuiz[3].rationale,/alias name.*customer, not the source type/);assert.match(d.studyGuide[4].elements[1].description,/One move targets one known item/);
+ assert.doesNotMatch(JSON.stringify(d.studyGuide),/\{TD\[|always works together with a search|200 OK response, confirming/);
+});

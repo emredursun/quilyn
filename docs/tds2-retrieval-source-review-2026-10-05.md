@@ -1,0 +1,11 @@
+# TDS2-M04 retrieval/update review — 2026-10-05
+
+Reviewed all six guide sections, four pitfalls, five recaps and four complete questions against the full bodies of the official Tosca 2026.1 LTS [expressions](https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_expressions.htm), [Find](https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_find_item.htm), [Update](https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_update_item.htm), [Move](https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_move_item.htm) and [module attributes](https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/test_data/tds_modules.htm) pages.
+
+Fixed the taught expression command from TD to TDS, and the argument from always-the-type to the actual resource alias. Q1 now explicitly uses a different alias to prevent accidental type-name assumptions. Updated module names to item terminology. Update and Move address known items by alias; Move is not a bulk operation over every source item. Removed the claim that every Update must follow a new search, since an earlier created item can also supply its alias.
+
+Replaced the unverifiable Academy payment walkthrough with a labeled independent synthetic state-maintenance example. Removed the inference that an HTTP success code certifies a business operation. Academy video/version/exercises were inaccessible and remain uncertified; the displayed baseline is documentation 2026.1 LTS. No Tosca runtime was executed. This module has no local diagrams or interactive exercises.
+
+Added 16 specific option explanations; kept Q1–Q4, their B/B/B/B keys and stable section IDs. Q4 now asks about one identified item rather than suggesting a single Move handles all processed records. Original queue remaining: 629 questions and 134 modules. Physical-device and final all-scope review remain open.
+
+Validation: `npm run manifest:content`, `npm run check` (147/147 passed), and `git diff --check` passed. Regression checks reviewed hash, keys, section links, the explicit alias expression and single-item move scope. Token 20261005j / quilyn-v125. Local commit only; no push.
