@@ -3,84 +3,51 @@
   "moduleTitle": "Lesson 4 - Tosca Export",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
   "learningObjectives": [
-    "Explain why every exported Message becomes two Modules and two TestSteps (Request + Response).",
-    "Choose the correct export option among API Test Case, OSV Scenario, WSE Test Case, and XML/JSON Test Case.",
-    "Select multiple Messages in the API Scan using Ctrl+click and export them together.",
-    "Locate the exported Component Folder in Tosca Commander and rename it appropriately."
+    "Choose an export target for API testing or service virtualization.",
+    "Export messages or project-tree containers.",
+    "Control the destination ComponentFolder.",
+    "Inspect generated request and response test steps instead of assuming universal counts."
   ],
   "estTime": "30 min",
   "studyGuide": [
     {
-      "sectionTitle": "One Message In, Two Modules and Two TestSteps Out",
+      "sectionTitle": "Inspect the generated test structure",
       "elements": [
         {
-          "type": "concept",
-          "term": "Request/Response pairing",
-          "description": "Every Message exported from the API Scan becomes TWO Modules and TWO TestSteps: one pair for the Request, one pair for the Response. This lets Tosca both steer the SUT (send the request) and set/verify dynamic parameters (read the response). The Modules hold the technical information needed to steer the system under test."
+          "type": "note",
+          "text": "API TestCases have request and response XTestStep types. Execution modifies and sends a request, then transfers response data to response Module Attributes. Inspect the generated structure and configure meaningful assertions; an observed response alone is not proof of correctness."
         },
         {
-          "type": "warning",
-          "text": "This Request+Response pairing is the single biggest structural difference between an API TestCase and a UI TestCase — every function-performing Message needs both halves present to be complete."
+          "type": "note",
+          "text": "Independent guidance: avoid relying on a universal two-Modules/two-steps rule across every export mode and message type. Verify actual artifacts and references before execution."
         }
-      ],
-      "bulletPoints": [
-        "1 exported Message = 2 Modules + 2 TestSteps (Request pair + Response pair).",
-        "A Request without its matching Response (or vice versa) is an incomplete TestCase."
       ],
       "sectionId": "section-634dc6ecf855"
     },
     {
-      "sectionTitle": "The Four Export Options",
+      "sectionTitle": "Export targets and destinations",
       "elements": [
         {
-          "type": "table",
-          "headers": [
-            "Export option",
-            "When to use it"
-          ],
-          "rows": [
-            [
-              "API Test Case",
-              "The standard option used throughout this course for REST and SOAP messages."
-            ],
-            [
-              "OSV Scenario",
-              "Covered separately in the dedicated OSV (Orchestrated Service Virtualization) course."
-            ],
-            [
-              "WSE Test Case",
-              "Legacy option — WSE Scenarios will no longer be supported in future versions of the API Scan and Tosca, so it is not covered in this course."
-            ],
-            [
-              "XML/JSON Test Case",
-              "Used specifically for XML/JSON file scans — covered later in the XML TestCases section of this course."
-            ]
-          ]
+          "type": "note",
+          "text": "API Scan offers API TestCase, OSV Scenario and XML/JSON Test Case exports. Select messages or containers including subordinate messages. Choose the target that matches the intended test."
         },
         {
-          "type": "steps",
-          "title": "Exporting selected Messages",
-          "items": [
-            "In Tosca Commander, select or create the destination Component Folder. If none is selected, the export lands in the root element, inside an auto-created folder.",
-            "In the API Scan, select the Messages to export. Shift+click does NOT work here — hold Ctrl and click each Message individually to multi-select.",
-            "Click the \"API Test Case\" button in the ribbon to export.",
-            "By default the new Component Folder is named \"ApiScan_Import\" — rename it to something identifiable."
-          ]
+          "type": "note",
+          "text": "Selecting an existing ComponentFolder exports into it without creating another. Otherwise a new ComponentFolder is created. Export to Component Folders mirrors the project-tree structure using multiple folders."
+        },
+        {
+          "type": "note",
+          "text": "Standalone API Scan exports a separate subset with a chosen path and name. This differs from saving the API Scan project. Current documentation does not establish the former fixed default-folder name or exclusive Ctrl-versus-Shift shortcut claim."
         }
-      ],
-      "bulletPoints": [
-        "Use Ctrl+click (not Shift+click) to multi-select Messages before exporting.",
-        "Rename the default \"ApiScan_Import\" folder immediately so your project stays organized.",
-        "WSE is being phased out; OSV and XML/JSON exports serve different, specific purposes."
       ],
       "sectionId": "section-292d9b46eaab"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 05 - Exporting from the API Scan to Tricentis Tosca",
+      "sectionTitle": "Independent export inspection",
       "elements": [
         {
           "type": "note",
-          "text": "📄 API Exercise 05 - Exporting from the API Scan to Tricentis Tosca — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+          "text": "Export disposable messages to a selected folder; inspect generated artifacts, references and expected assertions. Repeat with structured-folder export. Academy exercise files were not accessed; this is an independent verification task."
         }
       ],
       "sectionId": "section-e2cb95587682"
@@ -88,86 +55,102 @@
   ],
   "examPitfalls": [
     {
-      "title": "Expecting one Module per exported Message",
-      "trapDescription": "Candidates assume exporting a single Message produces a single Module and a single TestStep.",
-      "bestPractice": "Every exported Message produces TWO Modules and TWO TestSteps — one Request pair and one Response pair — because Tosca needs both halves to steer the SUT and verify/set dynamic parameters."
+      "title": "Assuming identical artifacts for every export",
+      "trapDescription": "Applying a fixed count to every message and target.",
+      "bestPractice": "Inspect generated request/response steps and Modules for the chosen export."
     },
     {
-      "title": "Using Shift+click to multi-select Messages",
-      "trapDescription": "Candidates try Shift+click to select a range of Messages in the API Scan, as they might in Windows Explorer.",
-      "bestPractice": "Shift+click does not work in the API Scan for multi-selection. Hold Ctrl and click each Message individually instead."
+      "title": "Ignoring the destination",
+      "trapDescription": "Expecting a new folder even when a destination is selected.",
+      "bestPractice": "An existing selected ComponentFolder receives the objects; structured export creates multiple folders."
     },
     {
-      "title": "Choosing WSE Test Case for new work",
-      "trapDescription": "Candidates pick the WSE Test Case export option out of habit or because it appears first in a list.",
-      "bestPractice": "WSE Scenarios will no longer be supported in future versions of the API Scan and Tosca. Use API Test Case (REST/SOAP), OSV Scenario, or XML/JSON Test Case depending on the use case."
+      "title": "Treating historical UI as current",
+      "trapDescription": "Memorizing unsupported default names or future deprecation predictions.",
+      "bestPractice": "Use documented current targets and inspect your installed version."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "How many Modules and TestSteps does Tosca create when a single Message is exported from the API Scan as an API Test Case?",
+      "scenario": "Which generated XTestStep types are documented for API TestCases?",
       "options": [
         {
           "id": "A",
-          "text": "One Module and one TestStep."
+          "text": "Only mouse clicks."
         },
         {
           "id": "B",
-          "text": "Two Modules and two TestSteps — one Request pair, one Response pair."
+          "text": "Request messages and response messages."
         },
         {
           "id": "C",
-          "text": "Four Modules and no TestSteps."
+          "text": "Only screenshots."
         },
         {
           "id": "D",
-          "text": "It depends entirely on the HTTP Method used."
+          "text": "Only folder rename steps."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Think about what Tosca needs to both send a request and check what comes back.",
-      "rationale": "Every exported Message becomes two Modules and two TestSteps: one pair for the Request, one pair for the Response — letting Tosca both steer the SUT and set/verify dynamic parameters."
+      "hint": "Consider the API exchange.",
+      "rationale": "The documented structure separates sending and response processing.",
+      "optionExplanations": {
+        "A": "UI clicks do not describe API message steps.",
+        "B": "These are the documented API step types.",
+        "C": "Screenshots do not constitute API message steps.",
+        "D": "Renaming folders is not API execution."
+      },
+      "lessonSection": "section-634dc6ecf855",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "How does a tester select multiple Messages in the API Scan before exporting them together?",
+      "scenario": "What can be selected for export from API Scan?",
       "options": [
         {
           "id": "A",
-          "text": "Hold Shift and click the first and last Message."
+          "text": "Only one message at a time."
         },
         {
           "id": "B",
-          "text": "Hold Ctrl and click each Message individually."
+          "text": "Messages or containers with their subordinate messages."
         },
         {
           "id": "C",
-          "text": "Right-click and choose \"Select All Messages\"."
+          "text": "Only already executed TestCases."
         },
         {
           "id": "D",
-          "text": "Messages can only be exported one at a time."
+          "text": "Only desktop screenshots."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Shift+click, which works in many file explorers, does NOT work here.",
-      "rationale": "The Shift+click range-selection shortcut does not work in the API Scan. Ctrl+click is used to select multiple Messages or Operations individually before exporting."
+      "hint": "Selection can include a project-tree container.",
+      "rationale": "Export accepts individual messages and containers.",
+      "optionExplanations": {
+        "A": "Export is not limited to one message.",
+        "B": "Both scopes are supported.",
+        "C": "Export does not require selecting a Commander execution result.",
+        "D": "Screenshots are not the message export input."
+      },
+      "lessonSection": "section-292d9b46eaab",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "Which export option will Tricentis Tosca and the API Scan stop supporting in future versions?",
+      "scenario": "Which export target creates service-virtualization scenarios?",
       "options": [
         {
           "id": "A",
-          "text": "API Test Case"
+          "text": "API TestCase"
         },
         {
           "id": "B",
@@ -175,83 +158,106 @@
         },
         {
           "id": "C",
-          "text": "WSE Test Case"
+          "text": "OSV Scenario"
         },
         {
           "id": "D",
-          "text": "OSV Scenario"
+          "text": "Payload Save"
         }
       ],
       "correctOptions": [
         "C"
       ],
-      "hint": "This is explicitly called out as being phased out.",
-      "rationale": "WSE Scenarios will no longer be supported in future versions of the API Scan and Tosca, which is why they are not covered in this course. API Test Case, OSV Scenario, and XML/JSON Test Case remain supported."
+      "hint": "Choose the virtualization target.",
+      "rationale": "OSV Scenario is the appropriate export target; verify its prerequisites separately.",
+      "optionExplanations": {
+        "A": "This targets API test execution.",
+        "B": "This targets XML/JSON tests.",
+        "C": "OSV is the service-virtualization scenario target.",
+        "D": "Payload saving is not scenario export."
+      },
+      "lessonSection": "section-292d9b46eaab",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "What is the default name of the Component Folder created in Tosca Commander when you export Messages without first selecting a destination folder?",
+      "scenario": "An existing ComponentFolder is selected before the ordinary export. Where are exported objects placed?",
       "options": [
         {
           "id": "A",
-          "text": "New_API_Folder"
+          "text": "Always in a second new folder."
         },
         {
           "id": "B",
-          "text": "ApiScan_Import"
+          "text": "In the selected ComponentFolder without creating a new one."
         },
         {
           "id": "C",
-          "text": "TestCase_Root"
+          "text": "Only in a text payload file."
         },
         {
           "id": "D",
-          "text": "Import_Default"
+          "text": "They are discarded."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "It's descriptive of what just happened — an import from the API Scan.",
-      "rationale": "If no Component Folder is selected before exporting, Tosca creates one by default named \"ApiScan_Import\", which should be renamed to something more identifiable."
+      "hint": "An explicit destination changes default behavior.",
+      "rationale": "The selected folder receives the exported objects.",
+      "optionExplanations": {
+        "A": "A new folder is not mandatory with this destination.",
+        "B": "This is the documented selected-folder behavior.",
+        "C": "Payload persistence is a different operation.",
+        "D": "Selection does not discard the export."
+      },
+      "lessonSection": "section-292d9b46eaab",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
-      "key": "Export result",
-      "value": "1 Message → 2 Modules + 2 TestSteps (Request pair + Response pair)."
+      "key": "API steps",
+      "value": "Request and response message types; inspect actual generated artifacts."
     },
     {
-      "key": "API Test Case",
-      "value": "The standard export option for REST/SOAP messages used in this course."
+      "key": "Export targets",
+      "value": "API TestCase, OSV Scenario and XML/JSON Test Case."
     },
     {
-      "key": "WSE Test Case",
-      "value": "Being phased out — not covered in this course."
+      "key": "Selection",
+      "value": "Messages or containers with subordinate messages."
     },
     {
-      "key": "OSV Scenario",
-      "value": "Covered in a separate, dedicated OSV course."
+      "key": "Destination",
+      "value": "Existing selected folder or a newly created ComponentFolder."
     },
     {
-      "key": "XML/JSON Test Case",
-      "value": "Used for XML/JSON file scans — covered later in this course."
+      "key": "Structured export",
+      "value": "Export to Component Folders reflects project-tree structure."
     },
     {
-      "key": "Multi-select",
-      "value": "Ctrl+click each Message individually; Shift+click does not work."
+      "key": "Standalone",
+      "value": "Produces a subset, distinct from project saving."
     },
     {
-      "key": "Default folder name",
-      "value": "\"ApiScan_Import\" — rename it right after exporting."
+      "key": "Independent assertions",
+      "value": "Define correctness before accepting observed server output."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 04 - Tosca Export (video)",
-      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
-      "duration": "video"
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_export.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/api/api_tc_edit.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }

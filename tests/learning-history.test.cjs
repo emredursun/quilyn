@@ -722,3 +722,15 @@ test('API project and result review preserves payload scope, explicit recovery a
   else{assert.match(d.studyGuide[0].elements[1].items[1],/Add Files is disabled/);assert.match(d.practiceQuiz[1].options[2].text,/Add Files > Attachment/);assert.match(d.studyGuide[1].elements[0].items[2],/200 alone does not prove persistence/);assert.match(d.practiceQuiz[2].rationale,/every observed value/);}
  });
 });
+
+test('API export and Module review separates destinations, request buffer defaults and mapping updates',()=>{
+ const crypto=require('node:crypto'),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ ['m05_tosca_export.json','m06_api_modules.json'].forEach((name,n)=>{
+  const bytes=fs.readFileSync('data/tosca-api/'+name),d=JSON.parse(bytes),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[!n&&i===2?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+  assert.doesNotMatch(JSON.stringify(d),/Buffer only applies to Response|fully independent once|verbatim from the course|Shift\+click does NOT work|named.*ApiScan_Import/);
+  if(!n){assert.match(d.practiceQuiz[3].options[1].text,/without creating a new/);assert.match(d.studyGuide[1].elements[1].text,/multiple folders/);}
+  else{assert.match(d.practiceQuiz[3].options[1].text,/Insert.*buffer reference/);assert.match(d.studyGuide[3].elements[1].text,/automatically applied to corresponding messages/);assert.match(d.practiceQuiz[4].options[1].text,/validate/);assert.match(d.studyGuide[4].elements[0].text,/not proof of server behavior/);}
+ });
+});
