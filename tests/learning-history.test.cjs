@@ -611,3 +611,33 @@ test('TDS1 introduction requires recalculation and avoids guaranteed test comple
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
  assert.match(d.practiceQuiz[2].options[1].text,/recalculate.*restart Tosca/);assert.match(d.studyGuide[0].elements[0].text,/not a transcript/);assert.doesNotMatch(JSON.stringify(d),/only fails for one reason|roll up automatically|10 lessons, using the DemoWebShop/);
 });
+
+test('TDS1 Requirements review separates class inputs, risk weight and executed coverage',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds1/m01_requirements.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M01'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[i===2?'A':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[1].elements[0].description,/Do not confuse direct weights/);assert.match(d.studyGuide[3].bulletPoints[0],/both passed and failed/);assert.match(d.practiceQuiz[2].rationale,/values can coincide/);assert.match(d.practiceQuiz[3].options[1].text,/restart/);assert.equal(d.practiceQuiz[1].options[1].text,'2^3 × 2^2 = 32');
+ assert.doesNotMatch(JSON.stringify(d),/always sums to 100% per level|10.2 and earlier|base adjustable|press F6/);
+});
+
+test('TDS1 Attributes review scopes the example layout and tests documented nesting',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds1/m02_attributes.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M02'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[i%2?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[2].elements[0].description,/Independent Quilyn/);assert.match(d.practiceQuiz[0].options[1].text,/parent Attribute grouping/);assert.match(d.studyGuide[4].elements[1].items[1],/characters are removed/);assert.doesNotMatch(JSON.stringify(d),/AttrType is calculated automatically|starting every TestSheet|Not user-editable/);
+});
+
+test('TDS1 Instances review requires assertions and retains boundary regression relevance',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds1/m03_instances.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M03'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[i===3?'A':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[1].elements[3].text,/Position to Inner/);assert.match(d.practiceQuiz[0].scenario,/All explicit assertions pass/);assert.match(d.practiceQuiz[3].scenario,/no additional thresholds/);assert.match(d.studyGuide[2].elements[1].description,/reintroduce/);
+ assert.doesNotMatch(JSON.stringify(d),/usually a one-time test|cannot have sub-Instances|F7 cycles Character/);
+});
+
+test('TDS1 combinations review scopes counts and separates arranging, merging and visibility',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds1/m04_combinatorial_methods.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M04'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,5);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[[0,1,4].includes(i)?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.practiceQuiz[0].rationale,/64 datasets/);assert.match(d.practiceQuiz[2].scenario,/no additional relation rules/);assert.match(d.studyGuide[3].elements[1].description,/Character and Position/);assert.match(d.quickRecap[6].value,/F12/);assert.doesNotMatch(JSON.stringify(d),/Tricentis-recommended default|industries mandate|StraightThrough → Valid Inner/);
+});
