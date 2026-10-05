@@ -1,14 +1,15 @@
 {
   "moduleId": "m07",
   "moduleTitle": "Capturing and presenting data",
-  "moduleUrl": "https://academy.pega.com/module/capturing-and-presenting-data/v8/in/96211",
-  "moduleQuizUrl": "https://academy.pega.com/module/capturing-and-presenting-data/v8/quiz/in/96211",
+  "moduleUrl": "https://academy.pega.com/module/capturing-and-presenting-data/v8",
+  "moduleQuizUrl": "https://academy.pega.com/module/capturing-and-presenting-data/v8/quiz",
   "learningObjectives": [
-    "Identify common Field Types and choose the appropriate type for a given scenario",
-    "Configure a Calculated Value using a formula and explain why it should be read-only",
-    "Describe the four View types and when each is used"
+    "Choose Field Types that capture and format Case information correctly",
+    "Configure functions, expressions and Decision tables for calculated values",
+    "Explain how calculation networks update dependent fields",
+    "Configure Views to collect, present and reuse Case information"
   ],
-  "estTime": "20 min",
+  "estTime": "45 min · 3 topics",
   "studyGuide": [
     {
       "sectionTitle": "Fields and Field Types",
@@ -16,30 +17,33 @@
         {
           "type": "concept",
           "term": "Field",
-          "description": "A reusable UI component consisting of a NAME and a FIELD TYPE. Each field captures or presents one value associated with a Case. In Dev Studio a field is implemented as a property."
+          "description": "A named, reusable UI component that stores a value associated with a Case. The field name and stored value form a data element. Its Field Type controls the kind of information stored and its display format."
         },
         {
           "type": "analogy",
-          "text": "Fields and Views in Pega are like a spreadsheet: Fields are the individual cells that store raw data, Calculated values are the formula cells (=SUM(A1:A10)), and Views are the pivot tables — organized presentations of the same underlying data. You enter data once in a cell; multiple Views can present it differently without duplicating it."
+          "text": "Fields and Views work like a spreadsheet: each field is a labelled cell holding one value for the Case, a calculated field is a formula cell, and a View arranges the cells a user needs for one task. The same stored value can appear in several Views without being entered twice."
         },
         {
           "type": "concept",
           "term": "Field Type",
-          "description": "Determines the format/validation of the data and the input control rendered to the user. Choosing the right type (instead of Text for everything) enforces a consistent, valid format across all Case Types and reduces errors."
+          "description": "Determines the information stored and how it is formatted. Pega predicts a type from the field name and defaults to Text (single line), but the author must verify the type before submitting."
         },
         {
           "type": "concept",
-          "term": "Single value vs. data relationship fields",
-          "description": "Two categories of Pega Field Types:",
+          "term": "Simple and specialized Field Types",
+          "description": "Choose the type for the business value, not for its appearance:",
           "items": [
-            "SINGLE VALUE (basic) — captures ONE piece of data (e.g., text, integer, date)",
-            "DATA RELATIONSHIP (Embedded Data, Data reference, Case reference, Query) — connects a field to another data object or Case"
+            "Simple types: Text (single line or paragraph), Boolean, Currency, Date & time, Date only, Time only, Decimal, Integer, Percentage, Email, Phone, URL, Picklist, Address, User reference and Prediction",
+            "Email, Phone and URL are action-oriented: the stored value is displayed as a link that opens mail, a phone call or the browser",
+            "Fancy types: Attachment stores documents or files; Location accepts an address or automatic geolocation",
+            "Prediction requires decision nodes (Pega Process AI); Address shows country-specific fields after the Country selection",
+            "An Integer stores the value from its first non-zero digit. Use Text for numeric-looking values that need no arithmetic, such as identifiers with leading zeros"
           ]
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 780 290\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Pega Field Types Reference</title>\n<desc>Common Pega field types grouped into scalar, selection, and complex categories</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">FIELD TYPES</text>\n<!-- Scalar group -->\n<rect x=\"20\" y=\"44\" width=\"226\" height=\"226\" rx=\"14\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"76\" font-size=\"13\" font-weight=\"700\" fill=\"#0D3560\">Scalar</text>\n<text x=\"40\" y=\"96\" font-size=\"11.5\" fill=\"#185FA5\">Text (single line)</text>\n<text x=\"40\" y=\"114\" font-size=\"11.5\" fill=\"#185FA5\">Text (paragraph)</text>\n<text x=\"40\" y=\"132\" font-size=\"11.5\" fill=\"#185FA5\">Integer</text>\n<text x=\"40\" y=\"150\" font-size=\"11.5\" fill=\"#185FA5\">Decimal / Currency</text>\n<text x=\"40\" y=\"168\" font-size=\"11.5\" fill=\"#185FA5\">Boolean (True/False)</text>\n<text x=\"40\" y=\"186\" font-size=\"11.5\" fill=\"#185FA5\">Date / Date-time</text>\n<text x=\"40\" y=\"204\" font-size=\"11.5\" fill=\"#185FA5\">Phone / Email / URL</text>\n<text x=\"40\" y=\"222\" font-size=\"11.5\" fill=\"#185FA5\">Rich Text</text>\n<!-- Selection group -->\n<rect x=\"262\" y=\"44\" width=\"226\" height=\"226\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"282\" y=\"76\" font-size=\"13\" font-weight=\"700\" fill=\"#0E3D28\">Selection</text>\n<text x=\"282\" y=\"96\" font-size=\"11.5\" fill=\"#1E8A5B\">Picklist</text>\n<text x=\"282\" y=\"114\" font-size=\"11.5\" fill=\"#1E8A5B\">  → dropdown or radio</text>\n<text x=\"282\" y=\"132\" font-size=\"11.5\" fill=\"#1E8A5B\">  → fixed option list</text>\n<text x=\"282\" y=\"160\" font-size=\"11.5\" fill=\"#0E3D28\">Control auto-selected</text>\n<text x=\"282\" y=\"178\" font-size=\"11.5\" fill=\"#0E3D28\">by Field Type at</text>\n<text x=\"282\" y=\"196\" font-size=\"11.5\" fill=\"#0E3D28\">render time</text>\n<!-- Complex group -->\n<rect x=\"504\" y=\"44\" width=\"256\" height=\"226\" rx=\"14\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"524\" y=\"76\" font-size=\"13\" font-weight=\"700\" fill=\"#5A3200\">Complex / Special</text>\n<text x=\"524\" y=\"96\" font-size=\"11.5\" fill=\"#BA7517\">Attachment</text>\n<text x=\"524\" y=\"114\" font-size=\"11.5\" fill=\"#BA7517\">Location</text>\n<text x=\"524\" y=\"132\" font-size=\"11.5\" fill=\"#BA7517\">Calculated value</text>\n<text x=\"524\" y=\"150\" font-size=\"11.5\" fill=\"#BA7517\">  → formula driven</text>\n<text x=\"524\" y=\"168\" font-size=\"11.5\" fill=\"#BA7517\">  → set read-only</text>\n<text x=\"524\" y=\"186\" font-size=\"11.5\" fill=\"#5A3200\">Data relationship</text>\n<text x=\"524\" y=\"204\" font-size=\"11.5\" fill=\"#5A3200\">  → embedded / ref</text>\n</svg>",
-          "caption": "Pega Field Types grouped by category. The engine auto-selects an appropriate UI control based on the chosen Field Type."
+          "svg": "<svg viewBox=\"0 0 780 300\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Pega Field Types from the Fields topic</title>\n<desc>Simple Field Types grouped by kind of value, fancy Field Types, and the rule that Pega predicts a type from the field name</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">FIELD TYPES</text>\n<rect x=\"20\" y=\"44\" width=\"226\" height=\"236\" rx=\"14\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"74\" font-size=\"13\" font-weight=\"700\" fill=\"#0D3560\">Simple: values</text>\n<text x=\"40\" y=\"96\" font-size=\"11.5\" fill=\"#185FA5\">Text (single line / paragraph)</text>\n<text x=\"40\" y=\"116\" font-size=\"11.5\" fill=\"#185FA5\">Integer · Decimal · Percentage</text>\n<text x=\"40\" y=\"136\" font-size=\"11.5\" fill=\"#185FA5\">Currency</text>\n<text x=\"40\" y=\"156\" font-size=\"11.5\" fill=\"#185FA5\">Date &amp; time · Date only · Time only</text>\n<text x=\"40\" y=\"176\" font-size=\"11.5\" fill=\"#185FA5\">Boolean (check box)</text>\n<text x=\"40\" y=\"196\" font-size=\"11.5\" fill=\"#185FA5\">Picklist (predefined values)</text>\n<text x=\"40\" y=\"226\" font-size=\"11.5\" fill=\"#0D3560\">Action-oriented links:</text>\n<text x=\"40\" y=\"246\" font-size=\"11.5\" fill=\"#185FA5\">Email · Phone · URL</text>\n<rect x=\"262\" y=\"44\" width=\"226\" height=\"236\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"282\" y=\"74\" font-size=\"13\" font-weight=\"700\" fill=\"#0E3D28\">Simple: context</text>\n<text x=\"282\" y=\"96\" font-size=\"11.5\" fill=\"#1E8A5B\">Address</text>\n<text x=\"282\" y=\"114\" font-size=\"11.5\" fill=\"#1E8A5B\">  → country-specific fields</text>\n<text x=\"282\" y=\"140\" font-size=\"11.5\" fill=\"#1E8A5B\">User reference</text>\n<text x=\"282\" y=\"158\" font-size=\"11.5\" fill=\"#1E8A5B\">  → existing operator ID</text>\n<text x=\"282\" y=\"184\" font-size=\"11.5\" fill=\"#1E8A5B\">Prediction</text>\n<text x=\"282\" y=\"202\" font-size=\"11.5\" fill=\"#1E8A5B\">  → needs decision nodes</text>\n<rect x=\"504\" y=\"44\" width=\"256\" height=\"112\" rx=\"14\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"524\" y=\"74\" font-size=\"13\" font-weight=\"700\" fill=\"#5A3200\">Fancy</text>\n<text x=\"524\" y=\"98\" font-size=\"11.5\" fill=\"#BA7517\">Attachment → documents or files</text>\n<text x=\"524\" y=\"120\" font-size=\"11.5\" fill=\"#BA7517\">Location → address input or</text>\n<text x=\"524\" y=\"138\" font-size=\"11.5\" fill=\"#BA7517\">  automatic geolocation</text>\n<rect x=\"504\" y=\"168\" width=\"256\" height=\"112\" rx=\"14\" fill=\"#F1ECFB\" stroke=\"#6B4FBB\" stroke-width=\"2\"/>\n<text x=\"524\" y=\"196\" font-size=\"13\" font-weight=\"700\" fill=\"#3B2775\">When you create a field</text>\n<text x=\"524\" y=\"220\" font-size=\"11.5\" fill=\"#6B4FBB\">Pega predicts the type from the name</text>\n<text x=\"524\" y=\"240\" font-size=\"11.5\" fill=\"#6B4FBB\">Default: Text (single line)</text>\n<text x=\"524\" y=\"260\" font-size=\"11.5\" fill=\"#6B4FBB\">Verify the type before Submit</text>\n</svg>",
+          "caption": "Field Types listed in the Fields topic. The type identifies the stored information and its display format; always verify the predicted type before Submit."
         }
       ],
       "sectionId": "section-b4212896ad9b"
@@ -50,12 +54,27 @@
         {
           "type": "concept",
           "term": "Calculated value field",
-          "description": "A field whose value is COMPUTED automatically from an expression/formula that references other fields, rather than entered by a user (e.g., Line total = Quantity × Price per unit). It keeps derived data accurate and consistent."
+          "description": "A calculation sets a field from one or more input fields, for example an item total from unit price and quantity. Calculation occurs whenever a user updates an input, which removes manual arithmetic and reduces errors."
         },
         {
           "type": "concept",
           "term": "Recalculation",
-          "description": "A calculated value can be configured to recalculate as the underlying data changes, so it always reflects current inputs. Calculated fields are typically presented read-only because the system maintains them."
+          "description": "Each calculation joins the application's calculation network. A calculated field can feed another calculation, so one input change (such as item quantity) can update several dependent fields. Whether users may override a result is a separate View design decision."
+        },
+        {
+          "type": "concept",
+          "term": "Three calculation approaches",
+          "description": "App Studio offers three approaches. Functions Sum of, Average of, Maximum of and Minimum of iterate over items in a data relationship and support Decimal, Currency and Integer fields. Expressions combine simple fields, fancy fields and data relationships. Decision tables test field values and return a result."
+        },
+        {
+          "type": "concept",
+          "term": "Expression context",
+          "description": "Reference fields with the dot operator, which lists fields available in the current Case; prefix a field with its data relationship when needed. Operators include + - * /, parentheses, Boolean AND and OR. Text can be concatenated with quoted static text. Expressions are available for every simple type except Email, Phone and Picklist."
+        },
+        {
+          "type": "concept",
+          "term": "Decision tables and where calculations live",
+          "description": "Create a custom decision table in App Studio only in a Constellation application, or reference a Dev Studio decision table that a System Architect has marked as a relevant record. Calculated fields are added on the Data model tab of either a Case Type or a data object, depending on the use case."
         }
       ],
       "sectionId": "section-d68a82cde97b"
@@ -66,23 +85,23 @@
         {
           "type": "concept",
           "term": "View",
-          "description": "A UI component that gathers data from a user OR displays data to a user, showing the fields and instructions needed for the current Step/Assignment. You add fields to Views to tailor the UI for each Step of the workflow."
+          "description": "A reusable configuration of fields and other UI elements that collects or displays information. A View states what users need to see and when; Pega supplies a consistent, responsive presentation. Each field and its value is a data element that can be shown editable or read-only."
         },
         {
           "type": "concept",
-          "term": "View types & editability",
-          "description": "Full Page View (read-only; one per Case/data object), Partial (read-only), List (relies on a data source; enable editing for create/edit/delete), and Form (editable; created per Step via Configure View). Default Form Views = Create and Edit."
+          "term": "Views, forms and field settings",
+          "description": "A form is a View that collects user input and processes work, usually with submit, cancel or navigation actions; not every View is a form. A Multi-step Form splits many fields into several focused Views. Other Views show read-only summaries or confirmations. For each task choose the fields, value types and order, and whether each field is editable or read-only, visible or hidden, required or optional."
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 780 260\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Pega View Types</title>\n<desc>Four view types: Form View, List View, Full Page View, and Partial View</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">VIEW TYPES</text>\n<!-- Form View -->\n<rect x=\"20\" y=\"44\" width=\"172\" height=\"196\" rx=\"14\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"80\" font-size=\"14\" font-weight=\"700\" fill=\"#0E3D28\">Form View</text>\n<text x=\"40\" y=\"100\" font-size=\"11\" fill=\"#1E8A5B\">Collect / display</text>\n<text x=\"40\" y=\"116\" font-size=\"11\" fill=\"#1E8A5B\">fields in one view</text>\n<text x=\"40\" y=\"136\" font-size=\"11\" fill=\"#0E3D28\">Used in Steps</text>\n<text x=\"40\" y=\"152\" font-size=\"11\" fill=\"#0E3D28\">Editable by default</text>\n<text x=\"40\" y=\"172\" font-size=\"11\" fill=\"#1E8A5B\">Reusable across</text>\n<text x=\"40\" y=\"188\" font-size=\"11\" fill=\"#1E8A5B\">Case Types</text>\n<!-- List View -->\n<rect x=\"206\" y=\"44\" width=\"172\" height=\"196\" rx=\"14\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"2\"/>\n<text x=\"226\" y=\"80\" font-size=\"14\" font-weight=\"700\" fill=\"#2B2580\">List View</text>\n<text x=\"226\" y=\"100\" font-size=\"11\" fill=\"#534AB7\">Show multiple records</text>\n<text x=\"226\" y=\"116\" font-size=\"11\" fill=\"#534AB7\">in a table / grid</text>\n<text x=\"226\" y=\"136\" font-size=\"11\" fill=\"#2B2580\">Read-only by default</text>\n<text x=\"226\" y=\"152\" font-size=\"11\" fill=\"#2B2580\">(enable editing</text>\n<text x=\"226\" y=\"168\" font-size=\"11\" fill=\"#2B2580\">explicitly)</text>\n<!-- Full Page View -->\n<rect x=\"392\" y=\"44\" width=\"172\" height=\"196\" rx=\"14\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"412\" y=\"80\" font-size=\"14\" font-weight=\"700\" fill=\"#5A3200\">Full Page View</text>\n<text x=\"412\" y=\"100\" font-size=\"11\" fill=\"#BA7517\">Entire screen layout</text>\n<text x=\"412\" y=\"116\" font-size=\"11\" fill=\"#BA7517\">for a portal page</text>\n<text x=\"412\" y=\"136\" font-size=\"11\" fill=\"#5A3200\">Contains Partial</text>\n<text x=\"412\" y=\"152\" font-size=\"11\" fill=\"#5A3200\">Views as regions</text>\n<!-- Partial View -->\n<rect x=\"578\" y=\"44\" width=\"182\" height=\"196\" rx=\"14\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"598\" y=\"80\" font-size=\"14\" font-weight=\"700\" fill=\"#0D3560\">Partial View</text>\n<text x=\"598\" y=\"100\" font-size=\"11\" fill=\"#185FA5\">Section of a screen</text>\n<text x=\"598\" y=\"116\" font-size=\"11\" fill=\"#185FA5\">embedded in Full</text>\n<text x=\"598\" y=\"136\" font-size=\"11\" fill=\"#0D3560\">Reusable widget-</text>\n<text x=\"598\" y=\"152\" font-size=\"11\" fill=\"#0D3560\">level component</text>\n</svg>",
-          "caption": "The four View types: Form (collect data), List (read-only table of records), Full Page (portal-level layout), and Partial (reusable screen section)."
+          "svg": "<svg viewBox=\"0 0 780 290\" xmlns=\"http://www.w3.org/2000/svg\" role=\"img\" font-family=\"Inter, system-ui, sans-serif\">\n<title>Views and forms</title>\n<desc>A form is one kind of View; other Views display information read-only; each field in a View has editability, visibility and required settings</desc>\n<text x=\"20\" y=\"28\" font-size=\"12\" font-weight=\"700\" fill=\"var(--t)\" opacity=\".55\" letter-spacing=\"1\">VIEWS VERSUS FORMS</text>\n<rect x=\"20\" y=\"44\" width=\"470\" height=\"226\" rx=\"14\" fill=\"#E6F1FB\" stroke=\"#185FA5\" stroke-width=\"2\"/>\n<text x=\"40\" y=\"72\" font-size=\"13\" font-weight=\"700\" fill=\"#0D3560\">View: reusable UI configuration</text>\n<text x=\"40\" y=\"92\" font-size=\"11.5\" fill=\"#185FA5\">Collects or displays Case information</text>\n<rect x=\"40\" y=\"108\" width=\"210\" height=\"146\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/>\n<text x=\"56\" y=\"132\" font-size=\"12.5\" font-weight=\"700\" fill=\"#0E3D28\">Form (a type of View)</text>\n<text x=\"56\" y=\"154\" font-size=\"11.5\" fill=\"#1E8A5B\">Collects user input</text>\n<text x=\"56\" y=\"174\" font-size=\"11.5\" fill=\"#1E8A5B\">Submit / cancel / navigate</text>\n<text x=\"56\" y=\"194\" font-size=\"11.5\" fill=\"#1E8A5B\">Multi-step Form: several</text>\n<text x=\"56\" y=\"212\" font-size=\"11.5\" fill=\"#1E8A5B\">  focused Views</text>\n<rect x=\"266\" y=\"108\" width=\"208\" height=\"146\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/>\n<text x=\"282\" y=\"132\" font-size=\"12.5\" font-weight=\"700\" fill=\"#5A3200\">View that is not a form</text>\n<text x=\"282\" y=\"154\" font-size=\"11.5\" fill=\"#BA7517\">Read-only summary or</text>\n<text x=\"282\" y=\"172\" font-size=\"11.5\" fill=\"#BA7517\">  confirmation after submit</text>\n<text x=\"282\" y=\"196\" font-size=\"11.5\" fill=\"#BA7517\">Loan officer review: applicant</text>\n<text x=\"282\" y=\"214\" font-size=\"11.5\" fill=\"#BA7517\">  data read-only, decision</text>\n<text x=\"282\" y=\"232\" font-size=\"11.5\" fill=\"#BA7517\">  fields editable</text>\n<rect x=\"506\" y=\"44\" width=\"254\" height=\"226\" rx=\"14\" fill=\"#F1ECFB\" stroke=\"#6B4FBB\" stroke-width=\"2\"/>\n<text x=\"524\" y=\"72\" font-size=\"13\" font-weight=\"700\" fill=\"#3B2775\">Per-field decisions</text>\n<text x=\"524\" y=\"100\" font-size=\"11.5\" fill=\"#6B4FBB\">Which fields, which types,</text>\n<text x=\"524\" y=\"118\" font-size=\"11.5\" fill=\"#6B4FBB\">  and in what order</text>\n<text x=\"524\" y=\"146\" font-size=\"11.5\" fill=\"#6B4FBB\">Editable or read-only</text>\n<text x=\"524\" y=\"170\" font-size=\"11.5\" fill=\"#6B4FBB\">Visible or hidden</text>\n<text x=\"524\" y=\"194\" font-size=\"11.5\" fill=\"#6B4FBB\">Required or optional</text>\n<text x=\"524\" y=\"230\" font-size=\"11.5\" fill=\"#3B2775\">One View can mix editable and</text>\n<text x=\"524\" y=\"248\" font-size=\"11.5\" fill=\"#3B2775\">  read-only fields</text>\n</svg>",
+          "caption": "A form is a type of View, but not all Views are forms. Constellation also names View types such as Form, List, Full page and Partial; those categories come from Constellation documentation rather than this module topic."
         },
         {
           "type": "interactive",
           "title": "Field Type & View Design Decisions",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Field Type Selection\", \"scenario\": \"A form captures employee job titles. The company has exactly 8 valid titles (Manager, Analyst, etc.). An SA configures the field as Text (single line). A BA reviews and flags it. What is the problem and the correct field type?\", \"opts\": [\"Text (single line) allows arbitrary input \\u2014 users could type anything. A Picklist enforces the defined set of 8 valid titles and prevents typos\", \"The field type is fine \\u2014 add a validation rule that checks the submitted text against the 8 allowed values on submit\", \"Use a Boolean field with value '0' for unlisted titles and '1' for valid ones; business logic can handle the exact title elsewhere\", \"Text (single line) is correct because Pega's autocomplete feature on text fields retrieves the allowed list automatically without needing a Picklist\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. A Picklist enforces a controlled list, preventing invalid entries and ensuring data consistency.\", \"\\u2717 Incorrect. Validating a text field against a list on submit is a workaround \\u2014 users still see an open text box and may not know what to type. The Picklist is the correct tool that prevents invalid input from the start.\", \"\\u2717 Incorrect. Using Boolean for job title is semantically wrong \\u2014 Boolean is for true/false values. Misusing it creates data quality and readability problems.\", \"\\u2717 Incorrect. Text fields do not have a built-in autocomplete from a Picklist source. The autocomplete pattern requires a Picklist or Autocomplete field type.\"]}, {\"label\": \"Calculated vs Editable\", \"scenario\": \"A shipping form has a 'Shipping fee' field that must equal a flat $5 for Standard, $15 for Express, or $35 for Overnight \\u2014 based on the shipping type Picklist selection. A junior SA makes it a free-text Currency field with instructions to type the correct fee. What is the better design?\", \"opts\": [\"Calculate the field using a Decision Table (Shipping type \\u2192 fee), configured as a calculated read-only value \\u2014 the system auto-populates the correct fee and users cannot override it\", \"Keep it as an editable Currency field but add a validation on submit that checks the value matches the expected fee for the selected shipping type\", \"Use two fields: keep the free-text Currency field for the agent and add a hidden calculated field for reporting \\u2014 both serve different purposes\", \"A Picklist of fees (5/15/35) where the user selects the amount, rather than having the system calculate it\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. The fee is deterministic based on shipping type \\u2014 it should be calculated automatically, not entered manually. A Decision Table + calculated read-only field eliminates data entry errors.\", \"\\u2717 Incorrect. A validation-on-submit approach still lets users enter wrong values during data entry (they only catch it at save). Calculated fields prevent wrong values from ever being entered.\", \"\\u2717 Incorrect. Two fields for the same conceptual value is redundant and creates maintenance confusion. The correct design has one authoritative calculated value.\", \"\\u2717 Incorrect. A Picklist of fees separates the fee selection from the shipping type selection, creating inconsistency \\u2014 a user could select Express shipping but pick the $5 Standard fee.\"]}, {\"label\": \"View Reusability\", \"scenario\": \"An SA builds a 'Customer Summary' view showing Name, Email, and Account Number. This exact combination needs to appear in 3 different Case Types. What is the most maintainable approach?\", \"opts\": [\"Build one reusable View and reference it from all 3 Case Types \\u2014 a single update propagates to all three automatically\", \"Build 3 copies of the View (one per Case Type) so each Case Type can evolve its Customer Summary independently without affecting others\", \"Use a Partial View embedded in the Summary panel of each Case Type \\u2014 Partial Views are the only View type that supports cross-Case-Type reuse\", \"Build the View in Dev Studio as a Section rule, which is the only mechanism for cross-Case-Type UI reuse in Constellation\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Views are designed for reuse across Case Types \\u2014 build once, reference many times. A single update to the View propagates everywhere it is used.\", \"\\u2717 Incorrect. 3 copies create 3 maintenance problems \\u2014 updating the layout or fields requires editing all 3 independently, risking drift and inconsistency.\", \"\\u2717 Incorrect. While Partial Views can be embedded in Summary panels, the general reuse mechanism applies to all View types (Form, List, Partial, Full Page) \\u2014 not just Partial Views.\", \"\\u2717 Incorrect. In Constellation, Views (not Section rules) are the UI authoring unit. Section rules belong to the Traditional UI architecture.\"]}, {\"label\": \"Read-Only Views\", \"scenario\": \"An SA needs a panel that shows Case history details \\u2014 a timestamped audit of previous statuses. It must be display-only (no editing). Which View type and configuration is correct?\", \"opts\": [\"A List View configured to display audit records \\u2014 List Views are read-only by default and display tabular record data without allowing user input\", \"A Form View with all fields locked via the 'Disable editing' property \\u2014 Form Views become read-only when editing is disabled at the View level\", \"A Full Page View showing audit history inline \\u2014 Full Page Views are always read-only and display record data without any editing capability\", \"Either Full Page View or Partial View \\u2014 both are always read-only and suitable for display-only panels\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. A List View is the right choice for displaying a list of audit records (one row per timestamp/status). It is read-only by default and shows tabular data.\", \"\\u2717 Incorrect. Form Views are designed for data collection, not audit display. While you can disable editing, using a Form View for an audit history list is semantically wrong and would render poorly.\", \"\\u2717 Incorrect. Full Page Views display a single record's data, not a list of audit records. An audit history is a list (multiple rows), not a single record detail view.\", \"\\u2717 Incorrect. While Full Page Views and Partial Views are always read-only, neither is designed for displaying a list of records. A List View is the correct type for tabular audit history data.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Field Type Selection\", \"scenario\": \"A form captures employee job titles. The company has exactly 8 valid titles (Manager, Analyst, etc.). An SA configures the field as Text (single line). A BA reviews and flags it. What is the problem and the correct field type?\", \"opts\": [\"Text (single line) allows arbitrary input — users could type anything. A Picklist enforces the defined set of 8 valid titles and prevents typos\", \"The field type is fine — add a validation rule that checks the submitted text against the 8 allowed values on submit\", \"Use a Boolean field with value '0' for unlisted titles and '1' for valid ones; business logic can handle the exact title elsewhere\", \"Text (single line) is correct because Pega's autocomplete feature on text fields retrieves the allowed list automatically without needing a Picklist\"], \"correct\": 0, \"fbs\": [\"✓ Correct. A Picklist enforces a controlled list, preventing invalid entries and ensuring data consistency.\", \"✗ Incorrect. Checking free text on submit catches mistakes late; users still face an open text box. A Picklist offers only the predefined values from the start.\", \"✗ Incorrect. Using Boolean for job title is semantically wrong — Boolean is for true/false values. Misusing it creates data quality and readability problems.\", \"✗ Incorrect. A Text (single line) field accepts any line of text. A fixed set of allowed values is what the Picklist Field Type provides.\"]}, {\"label\": \"Calculated vs Editable\", \"scenario\": \"A shipping form has a 'Shipping fee' field that must equal a flat $5 for Standard, $15 for Express, or $35 for Overnight — based on the shipping type Picklist selection. A junior SA makes it a free-text Currency field with instructions to type the correct fee. What is the better design?\", \"opts\": [\"Calculate the fee with a decision table (shipping type → fee) and present the result read-only, so the system sets the fee and users cannot override it\", \"Keep it as an editable Currency field but add a validation on submit that checks the value matches the expected fee for the selected shipping type\", \"Use two fields: keep the free-text Currency field for the agent and add a hidden calculated field for reporting — both serve different purposes\", \"A Picklist of fees (5/15/35) where the user selects the amount, rather than having the system calculate it\"], \"correct\": 0, \"fbs\": [\"✓ Correct. The fee depends only on the shipping type, so a decision table can return it. Presenting the result read-only meets the no-override requirement.\", \"✗ Incorrect. Validation on submit still lets users type a wrong fee and only rejects it later. A calculation sets the right value whenever the shipping type changes.\", \"✗ Incorrect. Two fields for the same conceptual value is redundant and creates maintenance confusion. The correct design has one authoritative calculated value.\", \"✗ Incorrect. A Picklist of fees separates the fee selection from the shipping type selection, creating inconsistency — a user could select Express shipping but pick the $5 Standard fee.\"]}, {\"label\": \"View Reusability\", \"scenario\": \"An SA builds a 'Customer Summary' view showing Name, Email, and Account Number. This exact combination needs to appear in 3 different Case Types. What is the most maintainable approach?\", \"opts\": [\"Build one reusable View on the shared data object that holds these fields and reference it from all 3 Case Types\", \"Build 3 copies of the View (one per Case Type) so each Case Type can evolve its Customer Summary independently without affecting others\", \"Use a Partial View in each Case Type, because Partial is the only View type that can ever be reused\", \"Build the View in Dev Studio as a Section rule, which is the only mechanism for cross-Case-Type UI reuse in Constellation\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Views are reusable configurations. Defining the View where the shared fields live lets each Case Type reference it, so one change updates every consumer.\", \"✗ Incorrect. 3 copies create 3 maintenance problems — updating the layout or fields requires editing all 3 independently, risking drift and inconsistency.\", \"✗ Incorrect. Reuse is a property of Views in general; it is not limited to one View type.\", \"✗ Incorrect. In Constellation, Views (not Section rules) are the UI authoring unit. Section rules belong to the Traditional UI architecture.\"]}, {\"label\": \"Read-only and editable together\", \"scenario\": \"In a loan Process, applicants enter their details in a form. At the next Step, a loan officer must see that information without changing it and record an approval decision. How should the loan officer View be configured?\", \"opts\": [\"One View with the applicant fields set to read-only and the decision fields (such as approval reason) editable\", \"Reuse the applicant form unchanged, so the officer can correct any applicant field before deciding\", \"Two separate Case Types: one for the applicant data and one for the officer decision\", \"Make every field in the officer View read-only and capture the decision outside the Case\"], \"correct\": 0, \"fbs\": [\"✓ Correct. A View can mix read-only fields for collected data with editable fields for the task at hand, as in the Views topic loan example.\", \"✗ Incorrect. The requirement is that the officer can read but not update the applicant data. Reusing the editable form ignores that.\", \"✗ Incorrect. Both Steps belong to the same loan Process; field editability is configured in the View, not by splitting the Case.\", \"✗ Incorrect. The officer must record the decision in the Case, so the decision fields need to be editable.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-69c404591e99"
@@ -91,38 +110,38 @@
   "examPitfalls": [
     {
       "title": "Pick the Field Type for the data shape",
-      "trapDescription": "The exam tests choosing the correct Field Type. 'Text for everything' is always wrong; the type enforces format/validation and the input control.",
-      "bestPractice": "Match the data: fixed options → Picklist; yes/no → Boolean; money → Currency; a date → Date only/Date & time."
+      "trapDescription": "Text (single line) accepts any line of text. When a value has a known shape, such as a fixed list, a yes/no answer, money or a date, Text loses the validation and display format the matching type provides.",
+      "bestPractice": "Fixed options → Picklist; yes/no → Boolean; money → Currency; calendar date → Date only. Keep Text for numeric-looking identifiers that need no arithmetic, such as values with leading zeros."
     },
     {
       "title": "Calculated value vs. default value",
-      "trapDescription": "A question asks when a field value is set by a formula vs. a default. Candidates treat them identically. A default value is applied once at creation; a calculated value is recomputed every time a referenced property changes.",
-      "bestPractice": "Derived from a formula → calculated value; common starting value to save typing → default value."
+      "trapDescription": "A default value only proposes a starting value. A calculated value is recalculated whenever a user updates one of its input fields, and dependent calculations follow through the calculation network.",
+      "bestPractice": "Derived from other fields → calculation; common starting value that users may change → default value."
     },
     {
       "title": "View editability",
-      "trapDescription": "Questions ask how to make a View read-only. Candidates look for a field-level setting. Editability is a View-level configuration — setting a View to read-only makes ALL fields in it read-only regardless of individual field settings.",
-      "bestPractice": "Need user data entry → Form; shared list with edits → enable editing on a List View."
+      "trapDescription": "A form can mix editable decision fields with read-only information collected earlier. Do not treat every field in a View as having the same editability.",
+      "bestPractice": "Configure field editability, visibility and required status for the user's task."
     },
     {
-      "title": "Field = Property",
-      "trapDescription": "A question uses both 'Field' and 'Property' to describe the same thing and asks candidates to identify the correct term. Candidates think they are different artifacts. In Pega, Field and Property are the same concept — Field is the App Studio label, Property is the Dev Studio term.",
-      "bestPractice": "When an exam question switches between App Studio and Dev Studio terminology, translate immediately: Field → Property, View → Section/Harness, Process → Flow."
+      "title": "Field and property",
+      "trapDescription": "App Studio says field; Dev Studio shows the same definition as a property rule. Treating them as two separate artifacts leads to wrong answers about where a field is defined.",
+      "bestPractice": "App Studio fields correspond to property definitions. Constellation Views are not interchangeable with Traditional UI Section/Harness rules."
     },
     {
-      "title": "Calculated fields are read-only",
-      "trapDescription": "Questions ask whether a calculated field can be edited by the user. Candidates say yes if the View allows editing. Calculated fields are always read-only — their value is derived at runtime and cannot be manually overridden.",
-      "bestPractice": "Configure calculated fields as read-only in the View — they recompute automatically whenever a referenced input property changes, so user edits are neither possible nor needed."
+      "title": "Protect a system-maintained result",
+      "trapDescription": "A requirement may prohibit manual override of a computed result. Configure read-only presentation for that requirement; calculation alone is not a universal editability rule.",
+      "bestPractice": "Make the output read-only where the system must remain authoritative, and test input changes and dependent results."
     },
     {
       "title": "Views are reusable",
-      "trapDescription": "A question asks whether a View configured for one Case Type can be used in another. Candidates say no. Views are reusable across Case Types — they are rule instances that can be shared throughout the application.",
-      "bestPractice": "Design Views for reuse rather than rebuilding the same fields per Case Type."
+      "trapDescription": "Views are reusable configurations. A View defined on a shared data object can be referenced wherever that object is used, instead of rebuilding the same layout per Case Type.",
+      "bestPractice": "Define the View where its fields live and reference it from consumers; rule resolution and context decide which version each consumer gets."
     },
     {
-      "title": "Calculated fields vs. stored fields",
-      "trapDescription": "Questions present a scenario where a value changes daily and ask which field type to use. Candidates pick stored. A field whose value must always reflect the current state should use a calculated (formula-based) approach — stored values only update when explicitly written.",
-      "bestPractice": "A calculated field (derived property) is computed from other property values at runtime using a formula or expression rule. It does not store a separate database value — it is recalculated on demand. Only standard (stored) properties write to the database."
+      "title": "Calculation behavior and persistence are separate",
+      "trapDescription": "The calculation network updates dependent values when an input changes. This does not establish whether a property is persisted or whether elapsed time alone refreshes it.",
+      "bestPractice": "Verify calculation dependencies, triggers and persistence requirements in the actual implementation."
     }
   ],
   "practiceQuiz": [
@@ -152,7 +171,7 @@
         "A"
       ],
       "hint": "Fixed, in-app list + exactly one choice — which type enforces both?",
-      "rationale": "A Picklist enforces a controlled list of allowed values and limits users to a single selection — exactly matching the two requirements. Text and Integer accept freeform input with no predefined options.",
+      "rationale": "A Picklist offers a list of predefined values and the field holds one selection. A Text placeholder only suggests values, a separate data object is unnecessary for three in-app values, and multiple selections break the one-speed rule.",
       "optionExplanations": {
         "A": "A Picklist restricts shipping speed to one of the defined choices.",
         "B": "A placeholder suggests values but does not enforce the permitted list.",
@@ -160,7 +179,7 @@
         "D": "Multiple selections would violate the one-speed requirement."
       },
       "lessonSection": "section-b4212896ad9b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q02",
@@ -188,7 +207,7 @@
         "A"
       ],
       "hint": "The key requirements are: auto-compute, recalculate on change, and prevent editing.",
-      "rationale": "A calculated value (expression: Quantity × Price) recalculates automatically and is inherently read-only — the system owns the value. A text field accepts freeform user input; no formula logic is attached to it.",
+      "rationale": "The expression maintains the total from its inputs, and read-only presentation meets the explicit no-override requirement. A default or submit-time validation alone does not maintain this result as inputs change.",
       "optionExplanations": {
         "A": "The expression recalculates Line Total and read-only presentation prevents manual overrides.",
         "B": "A default zero is not a calculation and does not track changing inputs.",
@@ -196,7 +215,7 @@
         "D": "An editable output still permits an override even if the table computes correctly."
       },
       "lessonSection": "section-d68a82cde97b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q03",
@@ -232,7 +251,7 @@
         "D": "Routing determines the assignee rather than the layout or data displayed."
       },
       "lessonSection": "section-69c404591e99",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q04",
@@ -268,16 +287,16 @@
         "D": "A Data Transform maps or initializes values rather than defining the field."
       },
       "lessonSection": "section-b4212896ad9b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q05",
       "type": "single-select",
-      "scenario": "A 'Total Premium' field is computed by a formula (base × risk factor) and configured as read-only on every form. Why is read-only the correct default for a calculated value?",
+      "scenario": "A 'Total Premium' field is calculated from base premium × risk factor. The business forbids users from changing the result. Why present it read-only?",
       "options": [
         {
           "id": "A",
-          "text": "The system maintains the value from the formula; allowing edits would let a user overwrite the computed result and break data integrity"
+          "text": "The system maintains the value from its inputs; an editable field would let a user overwrite the calculated result"
         },
         {
           "id": "B",
@@ -295,8 +314,8 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "What goes wrong if a user can type over a system-computed value?",
-      "rationale": "Calculated fields are system-maintained and read-only; allowing user edits would overwrite the formula result with inconsistent data. Mark them read-only to keep derived values authoritative.",
+      "hint": "What goes wrong if a user can type over a system-calculated value?",
+      "rationale": "The scenario requires the formula to remain authoritative. Read-only presentation protects that result from manual override; this is a design requirement rather than a claim that every calculated property has the same UI settings.",
       "optionExplanations": {
         "A": "Read-only presentation keeps the formula result authoritative for Total Premium.",
         "B": "Read-only display does not universally exempt data from validation.",
@@ -304,7 +323,7 @@
         "D": "Calculation dependencies do not require every input to be presented read-only."
       },
       "lessonSection": "section-d68a82cde97b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q06",
@@ -340,7 +359,7 @@
         "D": "The asserted platform defect is unsupported; use the type matching the business value."
       },
       "lessonSection": "section-b4212896ad9b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q07",
@@ -353,30 +372,30 @@
         },
         {
           "id": "B",
-          "text": "Partial View — a reusable, read-only subset of fields embedded in a larger View"
+          "text": "Partial View: a reusable fragment that is embedded in other Views"
         },
         {
           "id": "C",
-          "text": "Full Page View — always read-only; displays a Case's data but cannot collect input"
+          "text": "Full Page View: a full-page layout such as a Case summary"
         },
         {
           "id": "D",
-          "text": "List View — displays multiple records in a table and is read-only by default"
+          "text": "List View: displays multiple records in a table"
         }
       ],
       "correctOptions": [
         "A"
       ],
       "hint": "Which View type is for data entry (not display) at a single Step?",
-      "rationale": "Configuring a View on a Step creates a Form View — the input-collecting View type used for Assignments. A Partial View is a reusable read-only fragment; a Full Page View is a read-only display.",
+      "rationale": "A Form View supports the requested input task. It can contain editable and read-only fields; the cited Constellation guidance distinguishes it from display-oriented Views.",
       "optionExplanations": {
         "A": "A Form View provides the input fields required for the Assignment at this Step.",
-        "B": "A reusable display fragment is not the Step form requested here.",
+        "B": "An embedded fragment is not the Step form that collects this input.",
         "C": "A Case summary display does not provide the required Assignment input form.",
-        "D": "A collection of records is not the single-Step data-entry interaction."
+        "D": "A table of many records is not the data entry for this single Step."
       },
       "lessonSection": "section-69c404591e99",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q08",
@@ -385,11 +404,11 @@
       "options": [
         {
           "id": "A",
-          "text": "The Field Type determines the data format/validation and the input control that is rendered"
+          "text": "The Field Type identifies the type of information the system stores for the field"
         },
         {
           "id": "B",
-          "text": "Choosing the correct Field Type enforces a consistent data format across every Case Type that uses the field"
+          "text": "Assigning the right Field Type helps users provide valid information and displays data in the correct format"
         },
         {
           "id": "C",
@@ -405,25 +424,25 @@
         "B"
       ],
       "hint": "Two true statements about what Field Type actually governs.",
-      "rationale": "Field Type drives both input validation/format AND the rendered UI control. Selecting the correct type enforces consistent input automatically and renders the appropriate control without manual wiring.",
+      "rationale": "Field Type identifies the information stored and, through that, supports valid input and correct formatting. It is more than a display setting, and changing the type of a populated field needs a data review.",
       "selectCount": 2,
       "optionExplanations": {
-        "A": "Field Type influences supported values, formatting and the appropriate UI control.",
-        "B": "Reusing the correctly typed field preserves the same data representation in its consumers.",
+        "A": "The Fields topic defines Field Type as identifying the type of information stored.",
+        "B": "The topic states that the type ensures valid input and the correct display format.",
         "C": "Type affects the value representation as well as its presentation.",
         "D": "Changing a populated field type can require conversion and compatibility review."
       },
       "lessonSection": "section-b4212896ad9b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q09",
       "type": "single-select",
-      "scenario": "Users report they can see records in a List View but cannot add new ones. The SA confirms nothing is broken. What explains this default behavior?",
+      "scenario": "The team configured a List View only for displaying records and provided no create action. Users can browse but cannot add records. What explains this behavior?",
       "options": [
         {
           "id": "A",
-          "text": "List Views are read-only by default; the SA must explicitly enable editing/row actions to allow adds"
+          "text": "Displaying a record list does not itself configure the required create interaction and permissions"
         },
         {
           "id": "B",
@@ -441,16 +460,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Default state vs a hard limit vs a security cause — which is it?",
-      "rationale": "List Views are read-only by default; adding rows requires explicitly enabling row-level editing. Seeing records but being unable to add is expected default behavior, not a bug.",
+      "hint": "Look at what the team actually configured for the list.",
+      "rationale": "This scenario explicitly supplies a display-only configuration. A record list does not automatically supply a create workflow, data persistence or permissions; configure and test those capabilities separately.",
       "optionExplanations": {
-        "A": "Adding records requires supported actions/editing to be configured for the list.",
-        "B": "The scenario identifies default configuration, not a confirmed permission failure.",
+        "A": "The stated configuration provides display without the required create interaction.",
+        "B": "The missing create interaction is explicit; the scenario does not establish a privilege failure.",
         "C": "The default display behavior is not a universal prohibition on supported editing.",
-        "D": "A save plan may be part of a persistence design but does not alone explain this default."
+        "D": "A Data Page requirement does not by itself explain the explicitly missing create interaction."
       },
       "lessonSection": "section-69c404591e99",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q10",
@@ -486,48 +505,48 @@
         "D": "Edit Validate tests a field value rather than returning a tier-and-region discount."
       },
       "lessonSection": "section-d68a82cde97b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q11",
       "type": "single-select",
-      "scenario": "An SA needs the complete, read-only summary of one Case, including its Primary Fields. A tabular collection and an embedded reusable fragment are not the requested layout. Which View type fits?",
+      "scenario": "After a customer submits an incident report through a form, the application shows a read-only confirmation of what was reported. Which statement about this design is correct?",
       "options": [
         {
           "id": "A",
-          "text": "Full Page View — displays the summary of one Case or data object"
+          "text": "The confirmation is a View that is not a form: a form is one type of View, and Views can also display read-only information"
         },
         {
           "id": "B",
-          "text": "Form View — reads Primary Fields by default; set it to read-only mode via the View properties panel"
+          "text": "The confirmation must be a form, because every View collects user input"
         },
         {
           "id": "C",
-          "text": "List View — renders a table of records including Primary Fields; enable read-only mode in the List View settings"
+          "text": "A read-only confirmation cannot be a View; it must be built outside the Case"
         },
         {
           "id": "D",
-          "text": "Partial View — always read-only and specifically designed to embed a subset of fields including Primary Fields within a larger View"
+          "text": "The confirmation must reuse the submission form with every field still editable"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Distinguish the complete record summary from a form, a collection and an embedded fragment.",
-      "rationale": "A Full Page View provides the complete summary of an individual Case or data object. A Form View serves an Assignment input interaction, a List View presents a collection, and a Partial View supplies a reusable fragment.",
+      "hint": "Is every View a form?",
+      "rationale": "A form is a View for collecting input and processing work, but not all Views are forms. A View can present a read-only summary or confirmation after submission.",
       "optionExplanations": {
-        "A": "A Full Page View provides the read-only summary of this Case or data object.",
-        "B": "A Step form is intended for Assignment input rather than this summary purpose.",
-        "C": "A List View presents a collection, not this individual Case summary.",
-        "D": "A Partial View is a reusable fragment; the scenario asks for the complete summary."
+        "A": "The Views topic says a form is a type of View but not all Views are forms, citing a read-only confirmation as the example.",
+        "B": "Views both collect and display information; a summary does not have to collect input.",
+        "C": "Displaying a read-only summary is one of the stated purposes of a View.",
+        "D": "A confirmation shows what was submitted; keeping the fields editable does not fit its purpose."
       },
       "lessonSection": "section-69c404591e99",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q12",
       "type": "single-select",
-      "scenario": "An SA designs an 'Address' View once and references it from several Case Types instead of rebuilding it each time. Why is designing Views for reuse considered best practice?",
+      "scenario": "An SA designs an 'Address' View on the shared Address data object and references it from several Case Types instead of rebuilding it each time. Why is designing Views for reuse considered best practice?",
       "options": [
         {
           "id": "A",
@@ -550,7 +569,7 @@
         "A"
       ],
       "hint": "What is the maintenance payoff of one View referenced many times?",
-      "rationale": "Reusing a View means one definition referenced by many Case Types — update it once and every consumer reflects the change. Copying creates independent copies that diverge over time.",
+      "rationale": "Create the reusable View in the appropriate data-object class and embed it in consumers. This reduces duplicate layouts; rule resolution and context still determine which version each consumer uses.",
       "optionExplanations": {
         "A": "Shared View definitions reduce duplication and make updates consistent for consumers.",
         "B": "Reuse alone does not guarantee node-level caching or faster rendering.",
@@ -558,20 +577,20 @@
         "D": "A single-use View still uses the platform presentation model."
       },
       "lessonSection": "section-69c404591e99",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q13",
       "type": "single-select",
-      "scenario": "An order total must be stored as money, displayed with the correct currency symbol and decimal places, and validated as a monetary amount across locales. Which Field Type fits best?",
+      "scenario": "An order total must be stored as money and displayed with the application's default currency symbol. Which Field Type fits best?",
       "options": [
         {
           "id": "A",
-          "text": "Currency — provides monetary formatting, decimal handling, and locale-aware display and validation"
+          "text": "Currency: stores the value and currency symbol based on the default currency type"
         },
         {
           "id": "B",
-          "text": "Decimal — stores the numeric value but lacks currency symbol and locale-aware monetary formatting"
+          "text": "Decimal: stores numbers with a fractional part but does not identify a currency"
         },
         {
           "id": "C",
@@ -585,16 +604,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Which numeric type is purpose-built for money (symbol + decimals + locale)?",
-      "rationale": "Currency expresses monetary values with the configured currency formatting. Decimal supports fractions without itself identifying currency; Text does not provide monetary semantics, and Integer cannot represent fractional cents.",
+      "hint": "Which type is defined specifically for money?",
+      "rationale": "Currency stores currency symbols and values based on the default currency type. Decimal supports fractions without a currency, Text has no numeric semantics, and Integer cannot hold cents.",
       "optionExplanations": {
-        "A": "Currency communicates that the order total is a monetary amount.",
+        "A": "Currency stores the symbol and value based on the default currency type.",
         "B": "Decimal supports fractional numbers but does not by itself identify a currency.",
         "C": "Freeform text lacks the required numeric monetary semantics.",
         "D": "Integer cannot represent a fractional monetary amount such as cents."
       },
       "lessonSection": "section-b4212896ad9b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q14",
@@ -630,7 +649,7 @@
         "D": "Access Roles define permissions rather than the View layout."
       },
       "lessonSection": "section-69c404591e99",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q15",
@@ -643,7 +662,7 @@
         },
         {
           "id": "B",
-          "text": "A Calculated Value field should be read-only to prevent users from manually overriding the computed result"
+          "text": "When users must not override the result, the calculated field should be presented read-only"
         },
         {
           "id": "C",
@@ -658,8 +677,8 @@
         "A",
         "B"
       ],
-      "hint": "Calculated Values compute from a formula and should not allow manual edits — think about why they are read-only.",
-      "rationale": "Calculated Values use formulas (arithmetic expressions, functions, or Decision tables) to compute a field's value based on other Case data. They must be read-only to prevent users from overriding the computed value, which would make the data inconsistent. They do not replace Data Pages, which serve a different purpose.",
+      "hint": "A calculation derives the value; the View decides whether users may change it.",
+      "rationale": "Functions, expressions and Decision tables can calculate values from other data. For this system-maintained total, read-only presentation prevents manual override. Calculations and Data Pages serve different responsibilities.",
       "optionExplanations": {
         "A": "A calculated value derives the total from the configured input relationship.",
         "B": "Read-only presentation protects the system-maintained result from manual override.",
@@ -667,7 +686,7 @@
         "D": "Data Pages source/cache data; a calculation does not replace that responsibility."
       },
       "lessonSection": "section-d68a82cde97b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q16",
@@ -680,7 +699,7 @@
         },
         {
           "id": "B",
-          "text": "Date — for the customer's date of birth"
+          "text": "Date only: for the customer's date of birth"
         },
         {
           "id": "C",
@@ -696,15 +715,15 @@
         "B"
       ],
       "hint": "Match each field type to the nature of the data — text for names, date for calendar values.",
-      "rationale": "Text (Single-line) is the correct field type for a customer's first name because it is a short freeform string. Date is the correct type for date of birth because it stores and validates a calendar date. Integer fields store whole numbers, not names, and URL fields store web addresses, not income figures.",
+      "rationale": "Text (single line) suits a short name. Date only stores a calendar date such as date of birth. Integer stores whole numbers, not names, and URL stores web addresses, not income.",
       "optionExplanations": {
         "A": "A first name is a short string suited to a single-line Text field.",
-        "B": "A date of birth is a calendar value suited to Date only.",
+        "B": "A date of birth is a calendar date, which Date only stores with a localized format.",
         "C": "A numeric length does not preserve the actual customer name.",
         "D": "A web address does not represent the annual income amount."
       },
       "lessonSection": "section-b4212896ad9b",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "m07_q17",
@@ -741,46 +760,48 @@
         "D": "Supported editing must be configured; it is not enabled for every field by default."
       },
       "lessonSection": "section-69c404591e99",
-      "explanationReviewedOn": "2026-10-02"
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
       "key": "Field",
-      "value": "Name + Field Type; stores one value per Case; reusable. Field (App Studio) = Property (Dev Studio)."
+      "value": "Named, reusable UI component; stores one value per Case. Name + value = data element. App Studio field = Dev Studio property."
     },
     {
       "key": "Field Type",
-      "value": "Determines format/validation + input control. Choose by data shape (Picklist, Boolean, Currency, Date, etc.)."
+      "value": "Identifies the stored information and display format. Predicted from the name, default Text (single line); verify before Submit."
     },
     {
       "key": "Calculated value",
-      "value": "Auto-computed from a formula over other fields; recalculates; usually read-only. Can also use a Decision table."
+      "value": "Set from input fields by a function, expression or decision table; recalculates when an input changes, through the calculation network."
     },
     {
       "key": "View",
-      "value": "Captures or presents data for a Step; reusable across Case Types."
+      "value": "Reusable configuration of fields and UI elements that collects or displays information. A form is a View for input; not every View is a form."
     },
     {
-      "key": "View editability",
-      "value": "Full Page + Partial = read-only; List = read-only by default; Form = editable (Create/Edit defaults)."
+      "key": "Field settings in a View",
+      "value": "Per field: editable or read-only, visible or hidden, required or optional. One View can mix read-only and editable fields."
     }
   ],
   "topics": [
     {
       "title": "Fields",
-      "url": "https://academy.pega.com/topic/fields/v7/in/96211/102651",
+      "url": "https://academy.pega.com/topic/fields/v7",
       "duration": "15 min"
     },
     {
       "title": "Calculated values",
-      "url": "https://academy.pega.com/topic/calculated-values/v6/in/72681/66426/66556",
+      "url": "https://academy.pega.com/topic/calculated-values/v6",
       "duration": "20 min"
     },
     {
       "title": "Views",
-      "url": "https://academy.pega.com/topic/views/v6/in/96211/102651",
+      "url": "https://academy.pega.com/topic/views/v6",
       "duration": "5 min"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-05",
+  "platformVersion": "Pega Platform '25"
 }

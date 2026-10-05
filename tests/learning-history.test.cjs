@@ -510,3 +510,13 @@ test('BA Blueprint review retains answers and covers SaaS access and wizard impo
  assert.match(d.studyGuide[2].elements[5].description,/without its own class/);assert.match(d.studyGuide[3].elements[0].description,/Picklist and add it to a View/);assert.match(d.practiceQuiz[11].options[0].text,/saving it as a template/);assert.match(d.practiceQuiz[4].rationale,/does not imply they were not created/);
  assert.doesNotMatch(JSON.stringify(d),/no Pega instance or login is required to collaborate|functional application in minutes|LSA performs the import|The LSA imports the Blueprint file/);
 });
+
+test('Capturing and presenting data review follows the Fields, Calculated values and Views topics',()=>{
+ const crypto=require('node:crypto'),file='data/system-architect/m07_capturing_presenting_data.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M07'),ids=new Set(d.studyGuide.map(s=>s.sectionId)),h=d.studyGuide[2].elements[3].html,a=h.indexOf('var S=')+6,sc=JSON.parse(h.slice(a,h.indexOf(',cur=0,score=0;',a)));
+ assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.sourceReviewedOn,'2026-10-05');assert.equal(d.estTime,'45 min · 3 topics');
+ assert.deepEqual(d.topics.map(t=>t.url),['https://academy.pega.com/topic/fields/v7','https://academy.pega.com/topic/calculated-values/v6','https://academy.pega.com/topic/views/v6']);assert.deepEqual(d.topics.map(t=>t.duration),['15 min','20 min','5 min']);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m07_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[7,14,15,16].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,'2026-10-05');});
+ assert.match(d.practiceQuiz[10].options[0].text,/not a form/);assert.match(d.practiceQuiz[15].options[1].text,/^Date only/);assert.match(d.studyGuide[1].elements[4].description,/relevant record/);assert.match(d.studyGuide[0].elements[3].items[4],/leading zeros/);
+ assert.equal(sc.length,4);assert.match(sc[3].fbs[0],/mix read-only/);assert.doesNotMatch(JSON.stringify(sc),/Autocomplete field type|always read-only|read-only by default/);
+ assert.doesNotMatch(JSON.stringify(d),/Rich Text|Editable by default|Calculated fields are always read-only|Text for everything' is always wrong|List Views are read-only by default|locale-aware/);
+});
