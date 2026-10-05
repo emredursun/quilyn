@@ -830,3 +830,16 @@ test('AS1 TestCases review disambiguates dates and distinguishes progress, waits
  assert.doesNotMatch(JSON.stringify(d),/confirmed exam question|w=weeks|ONLY before saving|completely self-contained|official knowledge check/i);
  assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.svg).length,3);
 });
+
+test('AS1 maintenance review keeps ValueRange suggestions separate from enforcement and covers partial merges',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as1/m04_advanced_module_actions.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['D'],['C'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[2].scenario,/suggestions.*allowing user-specific/);
+ assert.match(d.studyGuide[1].elements[0].text,/not an assertion/);
+ assert.match(d.practiceQuiz[4].scenario,/successful full.*not.*partial/);
+ assert.match(d.studyGuide[2].elements[1].text,/Partial Merge can leave the source/);
+ assert.match(d.studyGuide[0].elements[1].text,/same business type/);
+ assert.doesNotMatch(JSON.stringify(d),/enforced everywhere|flags it as invalid|red cross icon|automatically restricted/i);
+ assert.match(d.studyGuide[2].elements.find(e=>e.svg).svg,/same-technology.*Partial merge can retain/);
+});
