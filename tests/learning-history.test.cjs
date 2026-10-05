@@ -813,3 +813,20 @@ test('AS1 Modules review corrects control attributes, anchor fallback and same-t
  assert.doesNotMatch(JSON.stringify(d),/Tosca never auto-fills|Always prefer Shortest Path|Breaks only if the anchor|Attributes describe the Module itself|Ctrl\+Click multi-select → Create ControlGroup/);
  assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.type==='diagram').length,5);
 });
+
+test('AS1 TestCases review disambiguates dates and distinguishes progress, waits and resolved dependencies',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as1/m03_testcases.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ const keys=[['A','B','C'],['D'],['C'],['D'],['C'],['D'],['C'],['D'],['A'],['E'],['B'],['A','B'],['A','B'],['C'],['B'],['D'],['A'],['B'],['A']];
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,keys[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.equal(q.source,undefined);});
+ assert.equal(d.practiceQuiz.reduce((n,q)=>n+q.options.length,0),75);
+ assert.match(d.practiceQuiz[4].scenario,/including its day/);assert.match(d.practiceQuiz[4].options[2].text,/ddMMMyyyy/);
+ assert.equal(d.practiceQuiz[18].options[2].text,'{DATE[][-4M][MM]}');
+ assert.match(d.studyGuide[15].elements[3].text,/w means workdays, not weeks/);
+ assert.match(d.studyGuide[12].elements[0].text,/Secret and RawString/);
+ assert.match(d.studyGuide[8].elements[0].text,/bounded by Synchronization Timeout/);
+ assert.match(d.studyGuide[19].elements[1].text,/does not remove Module references, TCP/);
+ assert.match(d.practiceQuiz[16].scenario,/moved into a TestStepLibrary/);
+ assert.doesNotMatch(JSON.stringify(d),/confirmed exam question|w=weeks|ONLY before saving|completely self-contained|official knowledge check/i);
+ assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.svg).length,3);
+});

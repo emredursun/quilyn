@@ -3,601 +3,301 @@
   "moduleTitle": "Section 3 - TestCases",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases",
   "learningObjectives": [
-    "Create TestSteps by dragging Modules into TestCases and describe all three creation methods.",
-    "Populate TestSteps with TestStepValues and assign the correct DataType (String, Numeric, Date, Boolean, Password).",
-    "Manage TestCase WorkStates (PLANNED, IN_WORK, COMPLETED) and apply them correctly.",
-    "Use Test Configuration Parameters (TCP) and reference them with the correct syntax.",
-    "Apply ActionModes (Input, Verify, Buffer, WaitOn) to control how Tosca interacts with Controls.",
-    "Run TestCases in the ScratchBook for trial execution and debugging.",
-    "Build dynamic values using Tosca expressions for dates, math, buffers, and random text.",
-    "Create and use Libraries (Reusable TestStepBlocks) and resolve references to build reusable TestCase components."
+    "Create Module-based steps using drag/drop or supported Fuzzy Search contexts.",
+    "Distinguish progress state from approval and execution results.",
+    "Reference inherited configuration parameters correctly.",
+    "Choose value types and bounded waits.",
+    "Use temporary trial runs and inspect prerequisites.",
+    "Calculate, capture and generate values without uniqueness guarantees.",
+    "Maintain shared sequences and understand the limits of resolving references."
   ],
   "estTime": "4 hr",
   "studyGuide": [
     {
-      "sectionTitle": "TestCase Structure",
+      "sectionTitle": "TestCase structure",
       "elements": [
         {
-          "type": "concept",
-          "term": "TestCase",
-          "description": "An ordered sequence of TestSteps that defines a complete test scenario. Stored in the TestCases section; references Modules for its steps."
+          "type": "note",
+          "text": "A TestCase expresses a sequence. A Module-based TestStep uses TestStepValues corresponding to its ModuleAttributes; it is not limited to exactly one control interaction. TestCase folders organize cases; folders inside a case organize its steps."
         },
         {
-          "type": "concept",
-          "term": "TestStep",
-          "description": "A single action or verification within a TestCase, created by referencing a Module or a specific Control. Each TestStep represents one interaction with the SUT."
-        },
-        {
-          "type": "concept",
-          "term": "TestCaseFolder",
-          "description": "A container for organizing TestCases in a hierarchy. Can be nested. Best practice: organize by feature or business process. Inside a TestCase, TestSteps are further grouped using TestStepFolders (e.g., Precondition, Process, Postcondition)."
-        },
-        {
-          "type": "analogy",
-          "text": "A TestCase is a recipe: each TestStep is one instruction ('add flour', 'stir'). The ingredients (Modules/Controls) come from the pantry (Modules section). You follow the steps in order to produce the dish (test result)."
+          "type": "note",
+          "text": "Independent design guidance: separate setup, business actions and cleanup where helpful. Keep expected outcomes explicit rather than assuming a technical model determines correct behavior."
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 720 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">TESTCASE STRUCTURE HIERARCHY</text><rect x=\"160\" y=\"28\" width=\"400\" height=\"50\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">TestCaseFolder</text><text x=\"360\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Organizes TestCases by feature or business process</text><line x1=\"360\" y1=\"78\" x2=\"360\" y2=\"96\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\"/><rect x=\"110\" y=\"96\" width=\"500\" height=\"50\" rx=\"8\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"360\" y=\"118\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"13\" font-weight=\"700\">TestCase</text><text x=\"360\" y=\"134\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Ordered sequence of TestSteps defining a complete test scenario</text><line x1=\"240\" y1=\"146\" x2=\"240\" y2=\"160\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><line x1=\"360\" y1=\"146\" x2=\"360\" y2=\"160\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><line x1=\"480\" y1=\"146\" x2=\"480\" y2=\"160\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><rect x=\"80\" y=\"160\" width=\"320\" height=\"24\" rx=\"6\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/><text x=\"240\" y=\"176\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"10\">TestStep — one action/verification (references a Control)</text><rect x=\"420\" y=\"160\" width=\"220\" height=\"24\" rx=\"6\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/><text x=\"530\" y=\"176\" text-anchor=\"middle\" fill=\"#2B2580\" font-size=\"10\">Library reference (reusable steps)</text></svg>",
-          "caption": "TestCaseFolder → TestCase → TestStep hierarchy. A TestCase can also reference Library sequences instead of individual steps."
+          "svg": "<svg viewBox=\"0 0 720 190\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">TESTCASE STRUCTURE HIERARCHY</text><rect x=\"160\" y=\"28\" width=\"400\" height=\"50\" rx=\"8\" fill=\"rgba(109,139,255,0.1)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"360\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">TestCaseFolder</text><text x=\"360\" y=\"66\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Organizes TestCases by feature or business process</text><line x1=\"360\" y1=\"78\" x2=\"360\" y2=\"96\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\"/><rect x=\"110\" y=\"96\" width=\"500\" height=\"50\" rx=\"8\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"360\" y=\"118\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"13\" font-weight=\"700\">TestCase</text><text x=\"360\" y=\"134\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Ordered sequence of TestSteps defining a complete test scenario</text><line x1=\"240\" y1=\"146\" x2=\"240\" y2=\"160\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><line x1=\"360\" y1=\"146\" x2=\"360\" y2=\"160\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><line x1=\"480\" y1=\"146\" x2=\"480\" y2=\"160\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><rect x=\"80\" y=\"160\" width=\"320\" height=\"24\" rx=\"6\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/><text x=\"240\" y=\"176\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"10\">TestStep — Module reference with values/actions</text><rect x=\"420\" y=\"160\" width=\"220\" height=\"24\" rx=\"6\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/><text x=\"530\" y=\"176\" text-anchor=\"middle\" fill=\"#2B2580\" font-size=\"10\">Library reference (reusable steps)</text></svg>",
+          "caption": "Independent hierarchy: a Module-based TestStep may act on multiple values."
         }
-      ],
-      "bulletPoints": [
-        "TestCases live in the TestCases section; Modules live in the Modules section.",
-        "Best practice: rename each TestStep to describe its specific action (e.g., 'Enter Username', 'Click Login').",
-        "Best practice: ensure TestSteps follow a chronological, logical sequence."
       ],
       "sectionId": "section-92f805fb47ec"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 05 — Create TestCase Structure",
+      "sectionTitle": "Course exercise link: Exercise 05 — Create TestCase Structure",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 05 — Create TestCase Structure — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-42dfc4a49c23"
     },
     {
-      "sectionTitle": "Creating TestSteps — 3 Methods",
+      "sectionTitle": "Create Module-based TestSteps",
       "elements": [
         {
-          "type": "list",
-          "title": "Three ways to add a Module as a TestStep (all achieve the same result):",
-          "items": [
-            "Drag and Drop — drag the Module from the Modules section directly into the TestCase. Most visual and intuitive.",
-            "Ctrl+T (Fuzzy Search) — press Ctrl+T inside a TestCase, type part of the module name, select it, press Enter. Fastest keyboard method.",
-            "Right-Click → Search and Add TestStep — right-click the TestCase folder, select 'Search and Add TestStep' from the context menu."
-          ]
+          "type": "note",
+          "text": "Drag a Module onto an existing TestCase. Alternatively, select a supported object such as a TestCase or a folder within it and use Ctrl+T or Search and Add TestStep. Choose the search result to create a step. These are examples, not an exhaustive count of all creation routes."
+        },
+        {
+          "type": "note",
+          "text": "Independent guidance: choose a method that fits your task and inspect the resulting step. Double-clicking a Module in the Modules tree is not the same as double-clicking a Fuzzy Search result."
         }
-      ],
-      "bulletPoints": [
-        "All three methods produce identical results — choose based on your workflow preference.",
-        "After creation, always rename the TestStep to reflect its specific action."
       ],
       "sectionId": "section-d46a3cb07935"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 06 — Open and Close the Application",
+      "sectionTitle": "Course exercise link: Exercise 06 — Open and Close the Application",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 06 — Open and Close the Application — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-29d16000cb64"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 07 — Create TestSteps",
+      "sectionTitle": "Course exercise link: Exercise 07 — Create TestSteps",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 07 — Create TestSteps — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-6b8e67bb4716"
     },
     {
-      "sectionTitle": "TestCase WorkStates",
+      "sectionTitle": "WorkState describes progress",
       "elements": [
         {
-          "type": "table",
-          "headers": [
-            "WorkState",
-            "Meaning",
-            "Set by"
-          ],
-          "rows": [
-            [
-              "PLANNED",
-              "Defined but not yet started",
-              "System / Tester"
-            ],
-            [
-              "IN_WORK",
-              "Actively being built or modified",
-              "Tester"
-            ],
-            [
-              "COMPLETED",
-              "Done and ready for review",
-              "Tester"
-            ]
-          ]
+          "type": "note",
+          "text": "PLANNED is the initial state for newly created TestCases; IN_WORK indicates progress and COMPLETED indicates completion. The documented states can be selected freely, so the illustrated sequence is an example rather than an enforced workflow."
         },
         {
           "type": "note",
-          "text": "WorkState progression: PLANNED → IN_WORK → COMPLETED. Set COMPLETED when all work is done and the TestCase is ready for a reviewer."
+          "text": "Independent team policy: a team may request review after completion, but WorkState alone does not prove approval or passing execution."
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 720 110\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arr3\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">TESTCASE WORKSTATE PROGRESSION</text><rect x=\"20\" y=\"28\" width=\"175\" height=\"66\" rx=\"8\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"107\" y=\"53\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">PLANNED</text><text x=\"107\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Defined, not yet started</text><text x=\"107\" y=\"83\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Set by: System / Tester</text><path d=\"M 195 61 L 230 61\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#arr3)\"/><text x=\"212\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">tester starts</text><rect x=\"230\" y=\"28\" width=\"175\" height=\"66\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/><text x=\"317\" y=\"53\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"13\" font-weight=\"700\">IN_WORK</text><text x=\"317\" y=\"70\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">Actively building / modifying</text><text x=\"317\" y=\"83\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Set by: Tester</text><path d=\"M 405 61 L 440 61\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#arr3)\"/><text x=\"422\" y=\"54\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">tester done</text><rect x=\"440\" y=\"28\" width=\"175\" height=\"66\" rx=\"8\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"527\" y=\"53\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"13\" font-weight=\"700\">COMPLETED</text><text x=\"527\" y=\"70\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Done — ready for review</text><text x=\"527\" y=\"83\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Set by: Tester</text><rect x=\"635\" y=\"28\" width=\"68\" height=\"66\" rx=\"8\" fill=\"#FEE2E2\" stroke=\"#DC2626\" stroke-width=\"1.5\"/><text x=\"669\" y=\"48\" text-anchor=\"middle\" fill=\"#7F1D1D\" font-size=\"8\" font-weight=\"700\">COMPLETED</text><text x=\"669\" y=\"60\" text-anchor=\"middle\" fill=\"#DC2626\" font-size=\"7\">≠</text><text x=\"669\" y=\"72\" text-anchor=\"middle\" fill=\"#7F1D1D\" font-size=\"8\" font-weight=\"700\">Approved</text><text x=\"669\" y=\"85\" text-anchor=\"middle\" fill=\"#DC2626\" font-size=\"7\">(4-Eye)</text></svg>",
-          "caption": "WorkState flow: PLANNED → IN_WORK → COMPLETED. COMPLETED means ready for review — not the same as the 4-Eye 'Approved' status."
+          "svg": "<svg viewBox=\"0 0 720 110\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arr3\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">TESTCASE WORKSTATE PROGRESSION</text><rect x=\"20\" y=\"28\" width=\"175\" height=\"66\" rx=\"8\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"107\" y=\"53\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"13\" font-weight=\"700\">PLANNED</text><text x=\"107\" y=\"70\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Defined, not yet started</text><text x=\"107\" y=\"83\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Set by: System / Tester</text><path d=\"M 195 61 L 230 61\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#arr3)\"/><rect x=\"230\" y=\"28\" width=\"175\" height=\"66\" rx=\"8\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/><text x=\"317\" y=\"53\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"13\" font-weight=\"700\">IN_WORK</text><text x=\"317\" y=\"70\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">Actively building / modifying</text><text x=\"317\" y=\"83\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Selectable state</text><path d=\"M 405 61 L 440 61\" stroke=\"var(--pa-ink-3)\" stroke-width=\"2\" marker-end=\"url(#arr3)\"/><rect x=\"440\" y=\"28\" width=\"175\" height=\"66\" rx=\"8\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"527\" y=\"53\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"13\" font-weight=\"700\">COMPLETED</text><text x=\"527\" y=\"70\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Completion state</text><text x=\"527\" y=\"83\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Selectable state</text><rect x=\"635\" y=\"28\" width=\"68\" height=\"66\" rx=\"8\" fill=\"#FEE2E2\" stroke=\"#DC2626\" stroke-width=\"1.5\"/><text x=\"669\" y=\"48\" text-anchor=\"middle\" fill=\"#7F1D1D\" font-size=\"8\" font-weight=\"700\">COMPLETED</text><text x=\"669\" y=\"60\" text-anchor=\"middle\" fill=\"#DC2626\" font-size=\"7\">≠</text><text x=\"669\" y=\"72\" text-anchor=\"middle\" fill=\"#7F1D1D\" font-size=\"8\" font-weight=\"700\">Approved</text><text x=\"669\" y=\"85\" text-anchor=\"middle\" fill=\"#DC2626\" font-size=\"7\">(policy)</text></svg>",
+          "caption": "Independent example of progress states; transitions are not enforced and completion is not approval."
         }
-      ],
-      "bulletPoints": [
-        "COMPLETED ≠ Approved. COMPLETED = tester signals readiness. Approved/Completed (4-Eye) = reviewer validation.",
-        "WorkStates help teams coordinate: reviewers scan for COMPLETED state to know what's ready."
       ],
       "sectionId": "section-149e751aad6e"
     },
     {
-      "sectionTitle": "Test Configuration Parameters (TCP)",
+      "sectionTitle": "Configure tests and columns",
       "elements": [
         {
-          "type": "concept",
-          "term": "Test Configuration Parameter (TCP)",
-          "description": "A reusable value defined at TestCase or folder level, referenced across multiple TestSteps. Centralizes test data so changes are made in one place."
+          "type": "note",
+          "text": "Reference a custom parameter as {CP[BaseURL]}: CP is outside the square brackets; the name is inside them, enclosed by outer braces. TCPs can describe environment settings or reusable values. Child objects inherit them and can override values locally."
         },
         {
-          "type": "concept",
-          "term": "TCP Syntax (confirmed exam question)",
-          "description": "To reference a TCP in a TestStep value field, use exactly: {CP[NameOfTheTCP]}",
-          "items": [
-            "Outer curly braces { } are mandatory",
-            "CP prefix in square brackets [ ] is mandatory",
-            "Parameter name goes inside the square brackets"
-          ]
-        },
-        {
-          "type": "warning",
-          "text": "Common wrong formats: CP[Name] (missing braces), {TCP[Name]} (wrong prefix), [CP{Name}] (brackets and braces swapped). Only {CP[NameOfTheTCP]} is valid."
-        },
-        {
-          "type": "concept",
-          "term": "Column Customization",
-          "description": "Right-click the header row in the TestCase view → select 'Column Chooser' → double-click a column to add it to the view."
+          "type": "note",
+          "text": "Use the header context menu or View → Add column to open Column Chooser; drag the available column onto the details header. Available columns depend on the selected object."
         }
-      ],
-      "bulletPoints": [
-        "TCP syntax: {CP[NameOfTheTCP]} — memorize this exactly for the exam.",
-        "Change the parameter value once → all referencing TestSteps update automatically.",
-        "Use TCPs for environment-specific values: base URLs, test user credentials, timeouts."
       ],
       "sectionId": "section-287cec4aea5a"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 09 — Set Predefined Test Configuration Parameters",
+      "sectionTitle": "Course exercise link: Exercise 09 — Set Predefined Test Configuration Parameters",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 09 — Set Predefined Test Configuration Parameters — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-c06b48d44590"
     },
     {
-      "sectionTitle": "ActionModes",
+      "sectionTitle": "ActionMode intent",
       "elements": [
         {
-          "type": "table",
-          "headers": [
-            "ActionMode",
-            "Direction",
-            "What it does"
-          ],
-          "rows": [
-            [
-              "Input",
-              "→ TO SUT",
-              "Enters a value into a Control (types text, selects dropdown option)"
-            ],
-            [
-              "Verify",
-              "← FROM SUT",
-              "Reads a Control's value and compares to expected — fails if mismatch"
-            ],
-            [
-              "Buffer",
-              "← FROM SUT (stored)",
-              "Reads a Control's value and stores it for later reuse in the same TestCase"
-            ],
-            [
-              "WaitOn",
-              "← FROM SUT (waiting)",
-              "Pauses execution until a Control reaches a specified state or value"
-            ]
-          ]
-        },
-        {
-          "type": "analogy",
-          "text": "ActionModes are verbs: Input = write, Verify = check, Buffer = copy, WaitOn = wait. The same Control can be used with different verbs in different TestSteps."
+          "type": "note",
+          "text": "Input changes a control; Verify checks an expected value; Buffer captures data for later use. Available modes depend on the interface. WaitOn waits for a condition, bounded by Synchronization Timeout during WaitOn; it does not wait forever or guarantee every timing issue is solved."
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 720 210\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arrL\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"#1E8A5B\"/></marker><marker id=\"arrR\" markerWidth=\"8\" markerHeight=\"8\" refX=\"2\" refY=\"3\" orient=\"auto\"><path d=\"M8,0 L8,6 L0,3 z\" fill=\"#BA7517\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">ACTIONMODES — DATA FLOW DIRECTION</text><rect x=\"270\" y=\"28\" width=\"180\" height=\"154\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><text x=\"360\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"12\" font-weight=\"700\">SUT Control</text><text x=\"360\" y=\"68\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">(button, field, label)</text><rect x=\"20\" y=\"38\" width=\"190\" height=\"30\" rx=\"6\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/><text x=\"115\" y=\"58\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"11\" font-weight=\"700\">Input — → to SUT</text><path d=\"M 210 53 L 270 53\" stroke=\"#1E8A5B\" stroke-width=\"2\" marker-end=\"url(#arrL)\"/><text x=\"240\" y=\"46\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">types value</text><rect x=\"20\" y=\"90\" width=\"190\" height=\"30\" rx=\"6\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/><text x=\"115\" y=\"110\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"11\" font-weight=\"700\">Verify ← from SUT</text><path d=\"M 270 105 L 210 105\" stroke=\"#BA7517\" stroke-width=\"2\" marker-end=\"url(#arrR)\"/><text x=\"240\" y=\"98\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">reads + compares</text><rect x=\"20\" y=\"142\" width=\"190\" height=\"30\" rx=\"6\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/><text x=\"115\" y=\"162\" text-anchor=\"middle\" fill=\"#2B2580\" font-size=\"11\" font-weight=\"700\">Buffer ← from SUT</text><path d=\"M 270 157 L 210 157\" stroke=\"#534AB7\" stroke-width=\"2\" marker-end=\"url(#arrR)\"/><text x=\"240\" y=\"150\" text-anchor=\"middle\" fill=\"#534AB7\" font-size=\"9\">reads + stores</text><rect x=\"510\" y=\"90\" width=\"190\" height=\"30\" rx=\"6\" fill=\"#FEE2E2\" stroke=\"#DC2626\" stroke-width=\"1.5\"/><text x=\"605\" y=\"110\" text-anchor=\"middle\" fill=\"#7F1D1D\" font-size=\"11\" font-weight=\"700\">WaitOn ← from SUT</text><path d=\"M 450 105 L 510 105\" stroke=\"#DC2626\" stroke-width=\"2\" marker-end=\"url(#arrL)\"/><text x=\"480\" y=\"98\" text-anchor=\"middle\" fill=\"#DC2626\" font-size=\"9\">pauses until state</text><text x=\"360\" y=\"198\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Buffer = read+store for later   |   Verify = read+compare now   |   WaitOn = pause until condition</text></svg>",
-          "caption": "Input writes TO the SUT. Verify, Buffer, and WaitOn all READ from the SUT — with different purposes."
+          "svg": "<svg viewBox=\"0 0 720 210\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arrL\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"#1E8A5B\"/></marker><marker id=\"arrR\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"#BA7517\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">ACTIONMODES — DATA FLOW DIRECTION</text><rect x=\"270\" y=\"28\" width=\"180\" height=\"154\" rx=\"10\" fill=\"var(--pa-surface-2)\" stroke=\"var(--pa-ink-3)\" stroke-width=\"1.5\"/><text x=\"360\" y=\"50\" text-anchor=\"middle\" fill=\"var(--pa-ink)\" font-size=\"12\" font-weight=\"700\">SUT Control</text><text x=\"360\" y=\"68\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">(button, field, label)</text><rect x=\"20\" y=\"38\" width=\"190\" height=\"30\" rx=\"6\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"1.5\"/><text x=\"115\" y=\"58\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"11\" font-weight=\"700\">Input — → to SUT</text><path d=\"M 210 53 L 270 53\" stroke=\"#1E8A5B\" stroke-width=\"2\" marker-end=\"url(#arrL)\"/><text x=\"240\" y=\"46\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">types value</text><rect x=\"20\" y=\"90\" width=\"190\" height=\"30\" rx=\"6\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"1.5\"/><text x=\"115\" y=\"110\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"11\" font-weight=\"700\">Verify ← from SUT</text><path d=\"M 270 105 L 210 105\" stroke=\"#BA7517\" stroke-width=\"2\" marker-end=\"url(#arrR)\"/><text x=\"240\" y=\"98\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">reads + compares</text><rect x=\"20\" y=\"142\" width=\"190\" height=\"30\" rx=\"6\" fill=\"#EEEDFE\" stroke=\"#534AB7\" stroke-width=\"1.5\"/><text x=\"115\" y=\"162\" text-anchor=\"middle\" fill=\"#2B2580\" font-size=\"11\" font-weight=\"700\">Buffer ← from SUT</text><path d=\"M 270 157 L 210 157\" stroke=\"#534AB7\" stroke-width=\"2\" marker-end=\"url(#arrR)\"/><text x=\"240\" y=\"150\" text-anchor=\"middle\" fill=\"#534AB7\" font-size=\"9\">reads + stores</text><rect x=\"510\" y=\"90\" width=\"190\" height=\"30\" rx=\"6\" fill=\"#FEE2E2\" stroke=\"#DC2626\" stroke-width=\"1.5\"/><text x=\"605\" y=\"110\" text-anchor=\"middle\" fill=\"#7F1D1D\" font-size=\"11\" font-weight=\"700\">WaitOn ← from SUT</text><path d=\"M 450 105 L 510 105\" stroke=\"#DC2626\" stroke-width=\"2\" marker-end=\"url(#arrL)\"/><text x=\"480\" y=\"98\" text-anchor=\"middle\" fill=\"#DC2626\" font-size=\"9\">condition / timeout</text><text x=\"360\" y=\"198\" text-anchor=\"middle\" fill=\"var(--pa-ink-3)\" font-size=\"9\">Buffer = read+store for later   |   Verify = read+compare now   |   WaitOn = bounded condition wait</text></svg>",
+          "caption": "Independent GUI action example; applicable modes and properties depend on the engine."
         }
-      ],
-      "bulletPoints": [
-        "Buffer vs. Verify: Buffer = READ and STORE for later. Verify = READ and COMPARE immediately.",
-        "Buffer is essential for capturing dynamic runtime values (e.g., generated order numbers).",
-        "WaitOn prevents timing failures — use when a loading indicator or async process must complete first."
       ],
       "sectionId": "section-ee94c4451f3a"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 10 — Set ActionMode WaitOn",
+      "sectionTitle": "Course exercise link: Exercise 10 — Set ActionMode WaitOn",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 10 — Set ActionMode WaitOn — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-0fc90e3ad77a"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 11 — Set ActionMode Verify & Run Your TestCase",
+      "sectionTitle": "Course exercise link: Exercise 11 — Set ActionMode Verify & Run Your TestCase",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 11 — Set ActionMode Verify & Run Your TestCase — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-0a8816ef52ce"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 12 — Use Buffers",
+      "sectionTitle": "Course exercise link: Exercise 12 — Use Buffers",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 12 — Use Buffers — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-dc085cae0225"
     },
     {
-      "sectionTitle": "Populate Your TestCase — TestStepValues",
+      "sectionTitle": "TestStepValues and DataType",
       "elements": [
         {
-          "type": "concept",
-          "term": "ModuleAttribute",
-          "description": "A representation of a Control (button, text field, label, etc.) selected during scanning. When a Module is dragged into a TestCase, each ModuleAttribute becomes a TestStepValue."
-        },
-        {
-          "type": "concept",
-          "term": "TestStepValue",
-          "description": "The combination of an ActionMode, a Value, and a DataType for a specific Control inside a TestStep. Tells Tosca exactly what to do with that Control during execution."
-        },
-        {
-          "type": "concept",
-          "term": "DataType",
-          "description": "Specifies the type of value being entered. The 5 DataTypes are: String, Date, Numeric, Boolean, Password.",
-          "items": [
-            "String — default; plain text",
-            "Numeric — use for numbers so that 10 and 10.00 are treated as equal",
-            "Date — use for date values",
-            "Boolean — use for True/False values",
-            "Password — masks the value; use for credentials"
-          ]
-        },
-        {
-          "type": "warning",
-          "text": "Always set DataType to Numeric when comparing or verifying number values (prices, quantities). Without it, '10' and '10.00' may not match — causing false test failures."
+          "type": "note",
+          "text": "A TestStepValue defines how its value is used. Current documented types include String, Date, Numeric, Boolean, Password, Secret and RawString. Password values are masked and stored encrypted; Secret is specific to key-vault retrieval. RawString skips parsing and cannot evaluate dynamic expressions."
         },
         {
           "type": "note",
-          "text": "F9 key: toggles between showing all TestStepValues and showing only those with an action specified. Useful for large TestSteps."
+          "text": "For numerical comparison, select Numeric and check number-format configuration. Independent example: 10 and 10.00 can represent the same number but differ as exact strings. F9 is a context-dependent show/hide shortcut, not a universal value editor."
         }
-      ],
-      "bulletPoints": [
-        "TestStep = Module placed in TestCase. TestStepValue = the data + ActionMode for each Control in that TestStep.",
-        "ActionMode color changes visually confirm which mode is selected.",
-        "Use the blue downward arrow (▼) in the Value field to select properties like 'Visible == True'.",
-        "DataType Numeric prevents '10' vs '10.00' mismatches — set it whenever comparing prices or counts."
       ],
       "sectionId": "section-98ab0c43c640"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 08 — Enter TestStepValues in Tosca",
+      "sectionTitle": "Course exercise link: Exercise 08 — Enter TestStepValues in Tosca",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 08 — Enter TestStepValues in Tosca — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-6a884bdb17ad"
     },
     {
-      "sectionTitle": "ScratchBook — Run a Test",
+      "sectionTitle": "Trial runs in ScratchBook",
       "elements": [
         {
-          "type": "concept",
-          "term": "ScratchBook",
-          "description": "A built-in Tosca capability for trial runs of TestSteps and TestCases before final execution. Results are temporary and overwritten with each new ScratchBook run."
-        },
-        {
-          "type": "list",
-          "title": "Two ways to run in the ScratchBook:",
-          "items": [
-            "Select one or more objects and press F6 — runs them immediately in ScratchBook.",
-            "Add and arrange objects in the ScratchBook view, then run them — useful for combining steps from different TestCases."
-          ]
-        },
-        {
-          "type": "warning",
-          "text": "ScratchBook results are NOT saved. Each new run overwrites the previous result. Use ScratchBook for debugging only — final execution goes in ExecutionLists."
+          "type": "note",
+          "text": "Run selected objects with F6 or arrange them in ScratchBook and run there. Its structure and results are not retained like ExecutionList history. Repeating a trial can replace the earlier result. Prepare the SUT state required by the selected steps before starting."
         }
-      ],
-      "bulletPoints": [
-        "F6 = run selected object(s) in ScratchBook.",
-        "ScratchBook = debug mode. Results are temporary — not recorded.",
-        "Also accessible via: right-click TestCase → 'Run in ScratchBook'."
       ],
       "sectionId": "section-a1ed22fc8cc6"
     },
     {
-      "sectionTitle": "Dynamic Values",
+      "sectionTitle": "Dynamic expressions",
       "elements": [
         {
-          "type": "concept",
-          "term": "Dynamic Values",
-          "description": "Expressions evaluated at runtime to generate values dynamically — current date, random text, calculated numbers. Written inside curly braces using Tosca's expression language. Syntax: {COMMAND[parameter1][parameter2]...}"
+          "type": "note",
+          "text": "Recall stored data with {B[ItemPrice]}; it can be set through test actions or Buffer Viewer. If translation reports a missing buffer, inspect the available value and execution order rather than assuming every buffer exists only at runtime."
         },
         {
-          "type": "concept",
-          "term": "Buffer Syntax",
-          "description": "To recall a previously buffered value, use: {B[BufferName]}",
-          "items": [
-            "{B[PriceBlueJeans]} — recalls the value stored under that buffer name",
-            "Buffer name must match exactly (case-sensitive) the name given when the Buffer was set",
-            "XBuffer for dynamic parts: {XB[BufferName]} — reads and buffers only the dynamic portion of a string"
-          ]
+          "type": "note",
+          "text": "Independent arithmetic example: {MATH[{B[ItemPrice]}*3+5.00]} calculates three items plus shipping. Normalize incompatible operand formats before calculating. Translate Value can help inspect expressions that have the required data."
         },
         {
-          "type": "concept",
-          "term": "MATH Functions",
-          "description": "Perform calculations using static values or Buffer references. Syntax: {MATH[expression]}",
-          "items": [
-            "{MATH[{B[PriceBlueJeans]}*25]} — multiplies buffered price by 25",
-            "{MATH[{B[SubTotal]}+10.00]} — adds 10.00 to the SubTotal buffer",
-            "Operators supported: + (add), - (subtract), * (multiply), / (divide)",
-            "Tip: right-click Value field → 'Translate value' to test a MATH expression before running"
-          ]
+          "type": "note",
+          "text": "{RND[10]} produces a ten-digit integer; {RND[3][9]} uses inclusive boundaries. {RANDOMTEXT[10]} generates ten letters/numbers, not guaranteed globally unique data. RANDOMREGEX can constrain generated strings."
         },
         {
-          "type": "concept",
-          "term": "Random Values",
-          "description": "Generate unique random values at runtime to avoid test data collisions.",
-          "items": [
-            "{RND[7]} — 7-digit random integer (max 18 digits)",
-            "{RND[100][999]} — random integer between 100 and 999",
-            "{RANDOMTEXT[10]} — random 10-character string (letters and numbers, max 1024)",
-            "{RANDOMREGEX[\"^[A-Z][a-z]+[0-9]{4}$\"]} — random string matching a regex pattern"
-          ]
+          "type": "note",
+          "text": "Date expressions use {FUNCTION[start][offset][format]}. Empty start uses the current date. Offset w means workdays, not weeks; M means months and m minutes. Independent examples: {DATE[][+4M][MM]} and {MONTHLAST[][-3y][ddMMMyyyy]}. Include the day when checking month-end."
         },
         {
-          "type": "concept",
-          "term": "Date / Time Expressions",
-          "description": "Structure: {FUNCTION[start][offset][format]}",
-          "items": [
-            "FUNCTION: DATE, TIME, DATETIME, DAY, MONTH, YEAR, MONTHFIRST, MONTHLAST",
-            "[start]: leave empty [ ] to use today's date as the reference",
-            "[offset]: d=days, w=weeks, M=months, y=years, h=hours, m=minutes, s=seconds — e.g. [-3y] = 3 years ago, [+4M] = 4 months ahead",
-            "[format]: MM=2-digit month, yyyy=4-digit year, dd=2-digit day, MMM=3-letter month abbreviation",
-            "Confirmed exam example: {MONTHLAST[][-3y][MMMyyyy]} = last day of month, 3 years ago, in format Jun2022",
-            "Exercise 15 example: {DATE[][+4M][MM]} = expiration month +4 months as 2-digit; {DATE[][+3y][yyyy]} = expiration year +3 years as 4-digit"
-          ]
-        },
-        {
-          "type": "table",
-          "headers": [
-            "Expression",
-            "Description",
-            "Example output"
-          ],
-          "rows": [
-            [
-              "{DATE}",
-              "Full date",
-              "30.04.2025"
-            ],
-            [
-              "{TIME}",
-              "Current time",
-              "14:30 PM"
-            ],
-            [
-              "{DATETIME}",
-              "Date + time stamp",
-              "30-04-2025 14:30 PM"
-            ],
-            [
-              "{DAY}",
-              "Current day number",
-              "30"
-            ],
-            [
-              "{MONTH}",
-              "Current month number",
-              "4"
-            ],
-            [
-              "{YEAR}",
-              "2-digit year",
-              "25"
-            ],
-            [
-              "{MONTHFIRST}",
-              "First day of current month",
-              "01.04.2025"
-            ],
-            [
-              "{MONTHLAST}",
-              "Last day of current month",
-              "30.04.2025"
-            ],
-            [
-              "{RND[3][9]}",
-              "Random integer 3–9",
-              "7"
-            ],
-            [
-              "{RANDOMTEXT[10]}",
-              "Random 10-char alphanumeric",
-              "aB3kZ9mR1x"
-            ]
-          ]
+          "type": "note",
+          "text": "Formatting is separate from calculating the date. MM is a two-digit month, MMM a culture-dependent abbreviated month and yyyy the year. {YEAR} normally returns two digits; time/date defaults depend on configuration."
         }
-      ],
-      "bulletPoints": [
-        "Dynamic Values are evaluated fresh at runtime — they are NOT static strings.",
-        "Buffer recall syntax: {B[BufferName]} — name must match exactly.",
-        "MATH syntax: {MATH[expression]} — can nest Buffer references inside.",
-        "Date offset units: d=days, w=weeks, M=months, y=years (capital M = months, lowercase m = minutes).",
-        "Confirmed exam question: {MONTHLAST[][-3y][MMMyyyy]} = last day of month, 3 years ago, MMMyyyy format."
       ],
       "sectionId": "section-9d8646a2fe2d"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 13 — Use MATH Functions",
+      "sectionTitle": "Course exercise link: Exercise 13 — Use MATH Functions",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 13 — Use MATH Functions — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-e18fe05f9d06"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 14 — Generate Dynamic Text",
+      "sectionTitle": "Course exercise link: Exercise 14 — Generate Dynamic Text",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 14 — Generate Dynamic Text — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-cde5da48bd0e"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 15 — Generate Dynamic Dates",
+      "sectionTitle": "Course exercise link: Exercise 15 — Generate Dynamic Dates",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 15 — Generate Dynamic Dates — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-3d2418a1ed4d"
     },
     {
-      "sectionTitle": "Libraries",
+      "sectionTitle": "Shared sequences and resolved copies",
       "elements": [
         {
-          "type": "concept",
-          "term": "Library",
-          "description": "A folder in the TestCases section containing reusable TestCase sequences. Other TestCases reference Library entries instead of duplicating steps."
+          "type": "note",
+          "text": "TestStepLibraries hold reusable blocks in TestCases. References let consumers share maintained steps. An RTSB and its reference can be renamed; a visible suffix is not proof of the actual link."
         },
         {
-          "type": "warning",
-          "text": "Libraries are stored in the TestCase section — NOT in the Modules section, NOT in Requirements. This is a confirmed exam question: 'In which section are Libraries used? → TestCase.'"
-        },
-        {
-          "type": "concept",
-          "term": "Reusable TestStepBlock (RTSB)",
-          "description": "An individual TestStep sequence stored inside a Library. Can be dragged from the Library into any TestCase."
-        },
-        {
-          "type": "concept",
-          "term": "Reusable TestStepBlock Reference",
-          "description": "When an RTSB is dropped into a TestCase, it appears as a Reference with '_Reference' appended to its name (e.g., 'Precondition_Reference'). It remains linked to the Library — any change in the Library propagates to all TestCases using that reference.",
-          "items": [
-            "Drag RTSB from the Library folder, drop into the TestCase or TestStepFolder.",
-            "The dropped block is named [OriginalName]_Reference.",
-            "All TestCases using the same RTSB are updated simultaneously when the Library block changes.",
-            "Use this when you want a single source of truth (e.g., a shared Login flow)."
-          ]
-        },
-        {
-          "type": "concept",
-          "term": "Resolve the Reference",
-          "description": "Replaces a Library reference inside a TestCase with an inline copy of the Library's steps — making the TestCase self-contained with no external dependencies.",
-          "items": [
-            "Right-click the RTSB Reference → 'Resolve Reference'.",
-            "Icon changes after resolving — the block is no longer linked to the Library.",
-            "After resolving, changes to the Library NO LONGER affect this TestCase.",
-            "Can be undone with Ctrl+Z ONLY before saving. After saving, the resolve is permanent.",
-            "Use when a specific TestCase needs a different version of the standard flow."
-          ]
-        },
-        {
-          "type": "warning",
-          "text": "Library folders are sorted alphabetically automatically. When dragging RTSBs, drag individual folders (containing TestSteps) — not the top-level parent folder."
+          "type": "note",
+          "text": "Resolve Reference produces an editable copy that stops following that block. Independent caution: it does not remove Module references, TCP lookups or other dependencies. No universal save-based Undo deadline is asserted here."
         }
-      ],
-      "bulletPoints": [
-        "Libraries eliminate duplication of common sequences (e.g., login flow) across many TestCases.",
-        "RTSB dropped into a TestCase → named [Name]_Reference, stays linked to Library.",
-        "Resolve the Reference: link → inline copy. Use for TestCase-specific deviations.",
-        "Resolve is reversible with Ctrl+Z until the file is saved — after saving it is permanent."
       ],
       "sectionId": "section-62ef6fd92ee1"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 16 — Create a Library",
+      "sectionTitle": "Course exercise link: Exercise 16 — Create a Library",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 16 — Create a Library — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-dae6f5bfd379"
     },
     {
-      "sectionTitle": "Use the Libraries — Working with RTSB References",
+      "sectionTitle": "Independent reuse exercise",
       "elements": [
         {
-          "type": "list",
-          "title": "Step-by-step: building a TestCase from a Library (Exercise 17 pattern):",
-          "items": [
-            "1. Create a new TestCaseFolder and a new TestCase inside it.",
-            "2. Set the TestCase WorkState to IN_WORK.",
-            "3. Create TestStepFolders inside the TestCase (e.g., 'Process').",
-            "4. Drag the RTSB 'Precondition' from the Library — place ABOVE the Process folder.",
-            "5. Drag the RTSB 'Postcondition' from the Library — place BELOW the Process folder.",
-            "6. Drag remaining RTSBs (Order Product, Start Checkout, Checkout Process, etc.) INTO the Process folder.",
-            "7. Verify the sequence matches the SUT flow.",
-            "8. If a specific block needs customization, right-click it → 'Resolve Reference'."
-          ]
+          "type": "note",
+          "text": "Create a suitable reusable block, add its reference to a disposable case and inspect the setup/action/cleanup ordering. Where different data is needed, inspect business parameters before duplicating a flow. Check how changes affect consumers."
         },
         {
           "type": "note",
-          "text": "After creating the Library (Exercise 16), the TestStepFolders from the original TestCase become Reusable TestStepBlocks. Library folders are auto-sorted alphabetically."
+          "text": "Original Academy Exercises 05–17 and knowledge checks were inaccessible. The examples here are independent documentation-based practice, not verified reproductions. No Tosca execution was performed."
         }
-      ],
-      "bulletPoints": [
-        "Create Library: create a TestStepLibrary in TestCases section, drag existing TestStepFolders into it.",
-        "Use Library: drag RTSBs from Library → they become References in the target TestCase.",
-        "Customise without affecting others: Resolve the Reference on the specific RTSB."
       ],
       "sectionId": "section-a2a093a3f14e"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 17 — Create a TestCase from a Library",
+      "sectionTitle": "Course exercise link: Exercise 17 — Create a TestCase from a Library",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 17 — Create a TestCase from a Library — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases"
+          "text": "Original Academy exercise inaccessible during review. Follow the authorized course to access it; no exercise text, illustration or successful execution is claimed here."
         }
       ],
       "sectionId": "section-52d0a62822d9"
@@ -605,69 +305,54 @@
   ],
   "examPitfalls": [
     {
-      "title": "TCP syntax — exact format required",
-      "trapDescription": "The exam presents multiple syntax variants. Common wrong options: CP[NameOfTheTCP], [CP{NameOfTheTCP}], {TCP[NameOfTheTCP]}.",
-      "bestPractice": "The ONLY correct syntax is {CP[NameOfTheTCP]} — outer curly braces, then CP, then the name in square brackets."
+      "title": "Syntax",
+      "trapDescription": "Putting CP inside brackets.",
+      "bestPractice": "Use {CP[Name]}, with only the name in square brackets."
     },
     {
-      "title": "Libraries belong to TestCase section",
-      "trapDescription": "Distractors place Libraries in the Module section or Requirements section.",
-      "bestPractice": "Libraries are in the TestCase section. 'In which section of Tosca are libraries used? → TestCase.' This is a confirmed exam question."
+      "title": "WorkState",
+      "trapDescription": "Treating completion as enforced approval.",
+      "bestPractice": "Apply a separate review policy."
     },
     {
-      "title": "WorkState COMPLETED ≠ Approved",
-      "trapDescription": "Candidates confuse COMPLETED (set by the tester to signal readiness for review) with Approved (a 4-Eye status set by the reviewer).",
-      "bestPractice": "COMPLETED = tester signals the TestCase is done and ready for review. Approved/Completed (4-Eye) = reviewer has validated it."
+      "title": "Waiting",
+      "trapDescription": "Assuming WaitOn is unbounded.",
+      "bestPractice": "Inspect Synchronization Timeout during WaitOn."
     },
     {
-      "title": "Buffer vs. Verify",
-      "trapDescription": "Questions describe 'reading a value from the SUT'. Candidates choose Verify instead of Buffer.",
-      "bestPractice": "Buffer = READ and STORE. Verify = READ and COMPARE to expected. If the scenario says 'store for later use', the answer is Buffer."
+      "title": "Value types",
+      "trapDescription": "Assuming the historical five types are exhaustive.",
+      "bestPractice": "Current documentation also lists Secret and RawString."
     },
     {
-      "title": "Date expression syntax",
-      "trapDescription": "The exam gives 3-4 date expression variants. The format order matters: {MONTHLAST[][-3y][MMMyyyy]} — NOT {MONTHLAST[][-3y-1d][mmmyyyyy]}.",
-      "bestPractice": "Memorise: {MONTHLAST/MONTHFIRST[start-date][offset][format]}. Format MMMyyyy = 3-letter month abbreviation + 4-digit year."
+      "title": "Date offsets",
+      "trapDescription": "Interpreting w as weeks.",
+      "bestPractice": "It means workdays."
     },
     {
-      "title": "Three TestStep creation methods",
-      "trapDescription": "Questions ask for all valid methods. Candidates forget right-click → 'Search and Add TestStep'.",
-      "bestPractice": "Three methods: (1) Drag-and-drop Module into TestCase. (2) Ctrl+T fuzzy search. (3) Right-click TestCase folder → 'Search and Add TestStep'."
+      "title": "Date questions",
+      "trapDescription": "Dropping the day while testing month-end.",
+      "bestPractice": "Include day information to distinguish dates."
     },
     {
-      "title": "DataType Numeric vs. String for numbers",
-      "trapDescription": "Candidates leave DataType as String when entering prices or quantities. '10' and '10.00' will not match as Strings.",
-      "bestPractice": "Set DataType to Numeric whenever a value is a number that needs comparison. Tosca then treats 10, 10.00, and 10.0 as equal. Check Settings → TBox → Number formats if verification still fails."
+      "title": "Random data",
+      "trapDescription": "Assuming random means unique.",
+      "bestPractice": "Check collision-sensitive requirements independently."
     },
     {
-      "title": "ScratchBook results are temporary",
-      "trapDescription": "Candidates think ScratchBook runs are recorded like ExecutionList runs. They are not.",
-      "bestPractice": "ScratchBook = debug/trial mode only. Results are temporary and overwritten on every new run. For recorded results, use ExecutionLists."
+      "title": "Buffers",
+      "trapDescription": "Assuming they can only be created by runtime steps.",
+      "bestPractice": "Inspect Buffer Viewer and the required data order."
     },
     {
-      "title": "ScratchBook run methods — F6, not F5",
-      "trapDescription": "The exam offers F5 as a distractor. F5 does not run in ScratchBook.",
-      "bestPractice": "F6 = run selected object(s) in ScratchBook. Two valid methods: (1) select + F6, (2) add objects to ScratchBook and run from there."
+      "title": "Resolved references",
+      "trapDescription": "Assuming all dependencies disappear or a universal Undo deadline.",
+      "bestPractice": "Only the resolved block link is removed; inspect remaining dependencies and recovery."
     },
     {
-      "title": "Buffer name must be exact",
-      "trapDescription": "Candidates recall a buffer using a slightly different name. Tosca will not find the stored value.",
-      "bestPractice": "Buffer names are case-sensitive. The name in {B[BufferName]} must match exactly the name given when the Buffer ActionMode was set."
-    },
-    {
-      "title": "RTSB Reference naming (_Reference suffix)",
-      "trapDescription": "Candidates expect the dragged RTSB to keep its original name. It is renamed with '_Reference' appended.",
-      "bestPractice": "When you drag an RTSB from a Library into a TestCase, it appears as [OriginalName]_Reference. It remains linked to the Library until 'Resolve Reference' is applied."
-    },
-    {
-      "title": "Resolve Reference is irreversible after saving",
-      "trapDescription": "Candidates resolve a reference thinking they can undo later. After saving, the unlink is permanent.",
-      "bestPractice": "Resolve Reference can be undone with Ctrl+Z ONLY before saving. Once saved, the TestCase is permanently unlinked from the Library block."
-    },
-    {
-      "title": "'Translate value' fails with 'Buffer not found' — buffers are runtime-only",
-      "trapDescription": "When testing a MATH/Buffer expression like {MATH[{B[SubTotal]}+10.00+{B[Discount]}]} with the right-click 'Translate value' option, Tosca throws 'Translation failed — Buffer X was not found'. Candidates assume the TestCase is broken.",
-      "bestPractice": "Buffers are populated only at RUNTIME, when the Buffer ActionMode step executes. 'Translate value' evaluates at DESIGN time using whatever buffers already exist in the current Tosca session — so a buffer set later in the TestCase is 'not found'. Fix: run the TestCase (or the buffering steps) in the ScratchBook (F6) first to fill the buffers, then translate/run. Also confirm the buffer name matches exactly (case-sensitive) and that the Buffer step runs BEFORE the step that recalls it."
+      "title": "Columns",
+      "trapDescription": "Treating a historical double-click as the general current procedure.",
+      "bestPractice": "Use the documented chooser drag/drop route."
     }
   ],
   "practiceQuiz": [
@@ -675,7 +360,7 @@
       "questionId": "Q1",
       "type": "multi-select",
       "selectCount": 3,
-      "scenario": "A tester wants to add a Module as a TestStep inside a TestCase. Which THREE methods can be used?",
+      "scenario": "Which THREE listed actions can create a Module-based TestStep in an existing TestCase?",
       "options": [
         {
           "id": "A",
@@ -687,7 +372,7 @@
         },
         {
           "id": "C",
-          "text": "Right-click the TestCase folder and select 'Search and Add TestStep'."
+          "text": "Select the TestCase or a folder within it and use Search and Add TestStep."
         },
         {
           "id": "D",
@@ -699,13 +384,21 @@
         "B",
         "C"
       ],
-      "hint": "Three methods are official; one is invented.",
-      "rationale": "The three official methods are: (A) drag-and-drop, (B) Ctrl+T fuzzy search, and (C) right-click → Search and Add TestStep. Double-clicking a Module does not add it to a TestCase. No partial credit."
+      "hint": "Distinguish the tree from the search-result picker.",
+      "rationale": "Drag/drop and either supported Fuzzy Search launch can create the step.",
+      "optionExplanations": {
+        "A": "The model is assigned to the existing case.",
+        "B": "This launches search in a supported context.",
+        "C": "The context command launches the same search.",
+        "D": "A tree double-click is not the search-result insertion action."
+      },
+      "lessonSection": "section-d46a3cb07935",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A tester has finished building a TestCase and wants to signal to the review team that it is ready for inspection. Which WorkState should be set?",
+      "scenario": "The team has finished implementing a TestCase. Which documented WorkState describes completion, without proving review approval?",
       "options": [
         {
           "id": "A",
@@ -727,8 +420,16 @@
       "correctOptions": [
         "D"
       ],
-      "hint": "Done + ready for review = one specific state.",
-      "rationale": "COMPLETED signals that all work on the TestCase is done and it is ready for review. PLANNED = not started; IN_WORK = still in progress; APPROVED is not a TestCase WorkState (it belongs to the 4-Eye Principle, not TestCase states)."
+      "hint": "Completion and approval are separate.",
+      "rationale": "COMPLETED describes completion; review policy is a separate team decision.",
+      "optionExplanations": {
+        "A": "This describes planned work.",
+        "B": "This describes work in progress.",
+        "C": "This is not one of the documented WorkState choices.",
+        "D": "This describes completion, not proof of approval."
+      },
+      "lessonSection": "section-149e751aad6e",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
@@ -755,8 +456,16 @@
       "correctOptions": [
         "C"
       ],
-      "hint": "Outer curly braces + CP in square brackets + name in square brackets.",
-      "rationale": "{CP[BaseURL]} is the correct syntax. Outer curly braces are mandatory. CP goes in square brackets followed by the parameter name in square brackets. TCP is not the correct prefix — CP is."
+      "hint": "Braces surround CP followed by the bracketed name.",
+      "rationale": "Use {CP[BaseURL]}; CP itself is not inside square brackets.",
+      "optionExplanations": {
+        "A": "The outer braces are missing.",
+        "B": "This reverses required delimiters.",
+        "C": "This has the required delimiters and CP prefix.",
+        "D": "TCP is not the expression prefix."
+      },
+      "lessonSection": "section-287cec4aea5a",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
@@ -784,35 +493,51 @@
         "D"
       ],
       "hint": "Read from SUT + store for later = one specific ActionMode.",
-      "rationale": "Buffer reads the current value of a Control from the SUT and stores it in a buffer variable for reuse later in the TestCase. Input writes to the SUT. Verify checks against expected. WaitOn pauses for a condition."
+      "rationale": "Buffer captures the value for later recall; Verify checks an expected result.",
+      "optionExplanations": {
+        "A": "Input changes data rather than captures it.",
+        "B": "Verify compares with an expectation.",
+        "C": "WaitOn waits for a condition.",
+        "D": "Buffer captures the value."
+      },
+      "lessonSection": "section-ee94c4451f3a",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "A TestCase must enter today's date but formatted so it reads the last day of the current month, 3 years ago, in 'MMMyyyy' format (e.g., Jun2022). Which Dynamic Value expression is correct?",
+      "scenario": "Assume today is 15 June 2025 and date parsing accepts dd.MM.yyyy. Which expression gives 30 June 2022 including its day, formatted ddMMMyyyy?",
       "options": [
         {
           "id": "A",
-          "text": "{MONTHLAST[][-3y][MONTHyear]}"
+          "text": "{DATE[15.06.2025][-3y][ddMMMyyyy]}"
         },
         {
           "id": "B",
-          "text": "{MONTHFIRST[][-3y-1d][mmmyyyyy]}"
+          "text": "{MONTHFIRST[15.06.2025][-3y][ddMMMyyyy]}"
         },
         {
           "id": "C",
-          "text": "{MONTHLAST[][-3y][MMMyyyy]}"
+          "text": "{MONTHLAST[15.06.2025][-3y][ddMMMyyyy]}"
         },
         {
           "id": "D",
-          "text": "{DATE[][-3y][MMMyyyy]}"
+          "text": "{MONTHLAST[15.06.2025][+3y][ddMMMyyyy]}"
         }
       ],
       "correctOptions": [
         "C"
       ],
-      "hint": "MONTHLAST for last day; -3y for 3 years ago; MMMyyyy for the format.",
-      "rationale": "{MONTHLAST[][-3y][MMMyyyy]} is correct: MONTHLAST returns the last day of the month, [] uses the current date as start, [-3y] subtracts 3 years, [MMMyyyy] formats as 3-letter month + 4-digit year. This is a confirmed AS1 exam question."
+      "hint": "Include the day so month-start and mid-month cannot look equivalent.",
+      "rationale": "Choose month-end and the negative year offset. Month abbreviations depend on culture.",
+      "optionExplanations": {
+        "A": "This keeps day 15 rather than month-end.",
+        "B": "This selects the first day.",
+        "C": "This selects month-end with the required direction.",
+        "D": "This offsets into the future."
+      },
+      "lessonSection": "section-9d8646a2fe2d",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q6",
@@ -840,7 +565,15 @@
         "D"
       ],
       "hint": "Libraries contain reusable test sequences — not reusable UI models.",
-      "rationale": "Libraries are stored in the TestCase section, not in Modules, ExecutionLists, or Requirements. They contain reusable TestCase sequences (e.g., a login flow) that other TestCases can reference. This is a confirmed AS1 exam question."
+      "rationale": "TestStepLibraries are maintained in TestCases.",
+      "optionExplanations": {
+        "A": "Modules hold technical models.",
+        "B": "Requirements describe coverage needs.",
+        "C": "ExecutionLists organize runs.",
+        "D": "TestCases contains TestStepLibraries."
+      },
+      "lessonSection": "section-62ef6fd92ee1",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q7",
@@ -857,7 +590,7 @@
         },
         {
           "id": "C",
-          "text": "Right-click on the header row and select 'Column Chooser', then double-click to add the desired column."
+          "text": "Open Column Chooser from the details header or View → Add column, then drag the available column onto the header."
         },
         {
           "id": "D",
@@ -868,12 +601,20 @@
         "C"
       ],
       "hint": "Right-click + Column Chooser.",
-      "rationale": "To customize TestCase columns: right-click the header row → 'Column Chooser' → double-click the desired column to add it to the view. This is the standard Tosca Commander column customization workflow."
+      "rationale": "Column availability depends on the selected object; the current general procedure uses drag/drop.",
+      "optionExplanations": {
+        "A": "This is not the documented general procedure.",
+        "B": "Columns can be customized.",
+        "C": "This adds an available column through the chooser.",
+        "D": "Module objects are not column definitions."
+      },
+      "lessonSection": "section-287cec4aea5a",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q8",
       "type": "single-select",
-      "scenario": "A test step needs to pause execution until a loading spinner disappears from the page. Which ActionMode is designed for this purpose?",
+      "scenario": "Which ActionMode waits for a loading control condition, bounded by its configured synchronization timeout?",
       "options": [
         {
           "id": "A",
@@ -896,12 +637,20 @@
         "D"
       ],
       "hint": "It literally means 'wait until the condition is met'.",
-      "rationale": "WaitOn pauses test execution until a Control reaches a specified state or value. It is specifically designed for handling timing and synchronization issues such as waiting for loading indicators to disappear."
+      "rationale": "WaitOn is a condition wait with a configured time bound.",
+      "optionExplanations": {
+        "A": "Capturing data does not express this wait.",
+        "B": "Comparing now is not the condition-wait mode.",
+        "C": "Changing a value is not this wait.",
+        "D": "This waits for the condition within its time bound."
+      },
+      "lessonSection": "section-ee94c4451f3a",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q9",
       "type": "single-select",
-      "scenario": "After importing a Library reference into a TestCase, the tester wants the TestCase to be self-contained with no external dependencies. What action should they perform?",
+      "scenario": "A tester wants an editable copy of one shared block that no longer follows that block, while retaining other necessary test dependencies. What action is appropriate?",
       "options": [
         {
           "id": "A",
@@ -924,13 +673,20 @@
         "A"
       ],
       "hint": "Resolve = replace the link with actual content.",
-      "rationale": "'Resolve the Reference' replaces the Library reference with an inline copy of the Library's TestSteps inside the TestCase, making it completely self-contained with no external Library dependency."
+      "rationale": "Resolve Reference breaks that block link; it does not remove every test dependency.",
+      "optionExplanations": {
+        "A": "This replaces the link with copied steps.",
+        "B": "Export/import is not this block-resolution command.",
+        "C": "Deletion can remove references, not create this copy.",
+        "D": "A supported resolution command exists."
+      },
+      "lessonSection": "section-62ef6fd92ee1",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q-KC1",
       "type": "single-select",
-      "source": "Official Knowledge Check",
-      "scenario": "Once all work on a TestCase is done and ready for review, to which Status should the TestCase WorkState be set?",
+      "scenario": "The team has finished implementing a TestCase. Which documented WorkState describes completion, without proving review approval?",
       "options": [
         {
           "id": "A",
@@ -956,13 +712,21 @@
       "correctOptions": [
         "E"
       ],
-      "hint": "The state that signals the tester is finished and the TestCase awaits review.",
-      "rationale": "COMPLETED is the WorkState that signals the TestCase is finished and ready for a reviewer. 'Ready' and 'Done' are not Tosca WorkState values. IN_WORK = still being built; PLANNED = not started."
+      "hint": "Completion and approval are separate.",
+      "rationale": "COMPLETED describes completion; review policy is a separate team decision.",
+      "optionExplanations": {
+        "A": "Ready is not a documented WorkState.",
+        "B": "Done is not a documented WorkState.",
+        "C": "This describes ongoing work.",
+        "D": "This describes planned work.",
+        "E": "This describes completed implementation."
+      },
+      "lessonSection": "section-149e751aad6e",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q-KC2",
       "type": "single-select",
-      "source": "Official Knowledge Check",
       "scenario": "You can use a TCP to add values for identifiers of various test environments. This statement is…",
       "options": [
         {
@@ -978,13 +742,18 @@
         "B"
       ],
       "hint": "TCPs are designed for exactly this purpose.",
-      "rationale": "True. Test Configuration Parameters (TCPs) are used to centralize environment-specific values such as base URLs, browser settings, and credentials, so they can be changed in one place and apply to all referencing TestSteps."
+      "rationale": "True. Test Configuration Parameters (TCPs) are used to centralize environment-specific values such as base URLs, browser settings, and credentials, so they can be changed in one place and apply to all referencing TestSteps.",
+      "optionExplanations": {
+        "A": "Custom configuration values can describe environments.",
+        "B": "This fits reusable environment configuration."
+      },
+      "lessonSection": "section-287cec4aea5a",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q-KC3",
       "type": "multi-select",
       "selectCount": 2,
-      "source": "Official Knowledge Check",
       "scenario": "What options are available if you want to run a test in the ScratchBook? (2 correct answers)",
       "options": [
         {
@@ -1009,7 +778,15 @@
         "B"
       ],
       "hint": "Two legitimate ways to use ScratchBook — one keyboard shortcut, one drag-based.",
-      "rationale": "Select objects + F6 (A) and add/arrange objects in ScratchBook then run (B) are the two valid methods. Compilation (C) is not a Tosca ScratchBook concept. ScratchBook is fully automated — the tester does NOT fill in data during the run (D is false). No partial credit."
+      "rationale": "Select objects + F6 (A) and add/arrange objects in ScratchBook then run (B) are the two valid methods. Compilation (C) is not a Tosca ScratchBook concept. ScratchBook is fully automated — the tester does NOT fill in data during the run (D is false). No partial credit.",
+      "optionExplanations": {
+        "A": "Selected objects can be trial-run with F6.",
+        "B": "ScratchBook supports arranging a sequence first.",
+        "C": "This is not a required manual compilation workflow.",
+        "D": "Trial execution is not a promise to supply missing steps or data manually."
+      },
+      "lessonSection": "section-a1ed22fc8cc6",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q10",
@@ -1027,7 +804,7 @@
         },
         {
           "id": "C",
-          "text": "Keep all TestSteps generic and unnnamed to maximize reuse."
+          "text": "Keep all TestSteps generic and unnamed to maximize reuse."
         },
         {
           "id": "D",
@@ -1038,13 +815,21 @@
         "A",
         "B"
       ],
-      "hint": "Two are documented best practices; two are anti-patterns.",
-      "rationale": "Rename TestSteps to reflect their action (A) and keep them in chronological order (B) are documented Tosca best practices. Leaving steps unnamed (C) is an anti-pattern. Verification steps come AFTER the corresponding action step (D is incorrect). No partial credit."
+      "hint": "Consider readable intent and causal ordering.",
+      "rationale": "Independent design guidance favors clear names and chronological ordering; verification can also establish preconditions.",
+      "optionExplanations": {
+        "A": "A meaningful name communicates intent.",
+        "B": "A coherent sequence supports the intended flow.",
+        "C": "Generic unnamed steps hide intent.",
+        "D": "A resulting-effect assertion must follow its cause; precondition checks are a different purpose."
+      },
+      "lessonSection": "section-92f805fb47ec",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q11",
       "type": "single-select",
-      "scenario": "A tester enters the value '10.00' to verify a price field, but the test fails even though the SUT displays '10'. What is the most likely cause?",
+      "scenario": "An exact String verification expects '10.00' but reads '10'. Which issue should be investigated first?",
       "options": [
         {
           "id": "A",
@@ -1067,7 +852,15 @@
         "C"
       ],
       "hint": "A DataType controls whether Tosca treats values numerically or as text.",
-      "rationale": "With DataType String, '10' and '10.00' are different character sequences. Setting DataType to Numeric lets Tosca recognize them as equivalent. Check Settings → TBox → Number formats if issues persist after changing DataType."
+      "rationale": "With DataType String, '10' and '10.00' are different character sequences. Setting DataType to Numeric lets Tosca recognize them as equivalent. Check Settings → TBox → Number formats if issues persist after changing DataType.",
+      "optionExplanations": {
+        "A": "Input would not perform the stated exact verification.",
+        "B": "Buffer syntax is not mandatory for a literal expectation.",
+        "C": "These exact strings differ even if numerically equivalent.",
+        "D": "WorkState is not a blanket execution lock."
+      },
+      "lessonSection": "section-98ab0c43c640",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q12",
@@ -1095,12 +888,20 @@
         "B"
       ],
       "hint": "Buffer recall syntax must be wrapped inside MATH.",
-      "rationale": "{MATH[{B[ItemPrice]}*3+5.00]} is correct: the MATH function wraps the expression, and the buffered value is referenced with {B[BufferName]} inside it. 'ItemPrice' alone (A) is not a valid reference. {B[...]} cannot perform arithmetic (C). {CP[...]} is for Test Configuration Parameters, not Buffers (D)."
+      "rationale": "Recall the buffered value inside MATH; CP would reference a different source.",
+      "optionExplanations": {
+        "A": "A bare name does not recall this buffer.",
+        "B": "This recalls the value before arithmetic.",
+        "C": "This requests a buffer name rather than that calculation.",
+        "D": "CP names a configuration parameter, not the stated buffer."
+      },
+      "lessonSection": "section-9d8646a2fe2d",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q13",
       "type": "single-select",
-      "scenario": "A test needs a random 10-character string (letters and numbers) entered as a cardholder name at runtime. Which expression generates this?",
+      "scenario": "Which expression generates a random ten-character alphanumeric value, without guaranteeing uniqueness?",
       "options": [
         {
           "id": "A",
@@ -1123,12 +924,20 @@
         "D"
       ],
       "hint": "Random alphanumeric string = RANDOMTEXT.",
-      "rationale": "{RANDOMTEXT[10]} generates a 10-character random string of letters and numbers. {RND[10]} generates a 10-digit random INTEGER (numbers only). {DATE...} is for date expressions. {B[...]} recalls a stored buffer value — not a random generator."
+      "rationale": "RANDOMTEXT returns letters/numbers; random generation alone does not prove uniqueness.",
+      "optionExplanations": {
+        "A": "This is a random integer.",
+        "B": "This recalls an existing value.",
+        "C": "This formats a date component.",
+        "D": "This produces the requested character class and length."
+      },
+      "lessonSection": "section-9d8646a2fe2d",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q14",
       "type": "single-select",
-      "scenario": "A tester drags the RTSB named 'Login Flow' from a Library into a TestCase. What name will it appear as inside the TestCase?",
+      "scenario": "A TestStep called 'Login Flow' is moved into a TestStepLibrary to create a reusable block. What default extension is documented for the reference replacing the original step?",
       "options": [
         {
           "id": "A",
@@ -1150,8 +959,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "A suffix is automatically added to indicate it is still linked to the Library.",
-      "rationale": "When an RTSB is dragged from a Library into a TestCase, Tosca renames it as [OriginalName]_Reference — in this case 'Login Flow_Reference'. This naming makes it immediately clear that the block is linked to the Library."
+      "hint": "This asks about converting an existing step, not every drag/drop route.",
+      "rationale": "The converted step reference receives _Reference; names remain editable.",
+      "optionExplanations": {
+        "A": "This is the documented default suffix for the conversion.",
+        "B": "No such default prefix is specified for this conversion.",
+        "C": "The replacement reference receives an extension by default.",
+        "D": "No such default prefix is specified for this conversion."
+      },
+      "lessonSection": "section-62ef6fd92ee1",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q15",
@@ -1179,7 +996,15 @@
         "B"
       ],
       "hint": "Resolve = unlink.",
-      "rationale": "'Resolve the Reference' unlinks the block from the Library. Any subsequent Library updates will NOT propagate to the resolved block — it is now an independent inline copy. This is exactly why Resolve is used: to allow TestCase-specific customization without affecting the shared Library."
+      "rationale": "'Resolve the Reference' unlinks the block from the Library. Any subsequent Library updates will NOT propagate to the resolved block — it is now an independent inline copy. This is exactly why Resolve is used: to allow TestCase-specific customization without affecting the shared Library.",
+      "optionExplanations": {
+        "A": "The resolved copy no longer follows this block.",
+        "B": "Its former block link has been removed.",
+        "C": "A later block edit does not inherently invalidate the independent copy.",
+        "D": "Resolution does not create this automatic deletion behavior."
+      },
+      "lessonSection": "section-62ef6fd92ee1",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q16",
@@ -1196,140 +1021,135 @@
         },
         {
           "id": "C",
-          "text": "{MONTH[][+4M][MM]}"
+          "text": "{DATE[][-4M][MM]}"
         },
         {
           "id": "D",
-          "text": "{DATE[][4M][%M]}"
+          "text": "{DATE[][+4y][MM]}"
         }
       ],
       "correctOptions": [
         "A"
       ],
       "hint": "Capital M = Months in the offset. MM in format = 2-digit month.",
-      "rationale": "{DATE[][+4M][MM]} is correct: DATE for a specific date, empty start [] = today, [+4M] = plus 4 months (capital M), [MM] = 2-digit month format. Lowercase m in offset is minutes (B is wrong). MONTH is a date expression output, not a function with offset (C). Option D is missing the + sign and uses %M which is 1-digit format (D is wrong)."
+      "rationale": "Use positive months, not minutes, negative months or years.",
+      "optionExplanations": {
+        "A": "This advances by months and formats the month.",
+        "B": "Lowercase m offsets minutes.",
+        "C": "This moves backwards in months.",
+        "D": "This advances by years, not four months."
+      },
+      "lessonSection": "section-9d8646a2fe2d",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
-      "key": "TestStep creation (3 methods)",
-      "value": "Drag-and-drop | Ctrl+T fuzzy search | Right-click → Search and Add TestStep."
+      "key": "Creation",
+      "value": "Drag Module or use Fuzzy Search in a supported context."
     },
     {
-      "key": "TestCase WorkStates",
-      "value": "PLANNED → IN_WORK → COMPLETED. Set COMPLETED when done + ready for review."
+      "key": "Values",
+      "value": "Multiple values/actions may occur in one Module-based step."
     },
     {
-      "key": "TCP syntax",
-      "value": "{CP[NameOfTheTCP]} — outer curly braces, CP prefix, name in square brackets."
+      "key": "WorkState",
+      "value": "Progress is separate from execution and approval."
     },
     {
-      "key": "ActionMode: Input",
-      "value": "Writes a value TO a Control on the SUT."
+      "key": "TCP",
+      "value": "{CP[Name]}; local overrides affect inherited values."
     },
     {
-      "key": "ActionMode: Verify",
-      "value": "Reads from SUT and compares to expected value — fails if mismatch."
+      "key": "Columns",
+      "value": "Open chooser and drag an available column."
     },
     {
-      "key": "ActionMode: Buffer",
-      "value": "Reads from SUT and STORES the value for later reuse in the same TestCase."
+      "key": "Input",
+      "value": "Changes the control."
     },
     {
-      "key": "ActionMode: WaitOn",
-      "value": "Pauses execution until SUT Control reaches expected state."
+      "key": "Verify",
+      "value": "Checks expected values or properties."
     },
     {
-      "key": "Dynamic date syntax",
-      "value": "{MONTHLAST[][-3y][MMMyyyy]} = last day of month, 3 years ago, MMMyyyy format."
+      "key": "Buffer",
+      "value": "Captures reusable values."
+    },
+    {
+      "key": "WaitOn",
+      "value": "Condition wait bounded by synchronization settings."
     },
     {
       "key": "DataType",
-      "value": "Numeric — for prices/quantities (10 == 10.00). String, Date, Boolean, Password also available."
+      "value": "Choose interpretation deliberately; RawString skips expression parsing."
     },
     {
       "key": "ScratchBook",
-      "value": "Debug/trial run mode. F6 = run selected. Results are temporary — overwritten each run."
+      "value": "Trial runs do not provide retained ExecutionList history."
     },
     {
-      "key": "Buffer recall syntax",
-      "value": "{B[BufferName]} — name must match exactly (case-sensitive) the name given when buffered."
+      "key": "MATH",
+      "value": "Can use stored buffer values in arithmetic."
     },
     {
-      "key": "MATH function syntax",
-      "value": "{MATH[{B[Name]}*quantity+shipping]} — nest Buffer references inside MATH expression."
+      "key": "Random",
+      "value": "Length and character class do not guarantee uniqueness."
     },
     {
-      "key": "Random values",
-      "value": "{RND[n]} = n-digit integer | {RND[min][max]} = integer in range | {RANDOMTEXT[n]} = alphanumeric string."
+      "key": "Date",
+      "value": "w means workdays; M months and m minutes."
     },
     {
-      "key": "Date offset units",
-      "value": "d=days, w=weeks, M=months (capital!), y=years, h=hours, m=minutes. +4M = +4 months."
+      "key": "Format",
+      "value": "Include day when distinguishing month-end; abbreviations are culture-dependent."
     },
     {
-      "key": "RTSB Reference",
-      "value": "Drag RTSB from Library → appears as [Name]_Reference, stays linked. Resolve Reference = unlink + inline."
+      "key": "Reuse",
+      "value": "Share reusable blocks where genuinely needed."
     },
     {
-      "key": "Libraries",
-      "value": "Stored in TestCase section. Create TestStepLibrary, drag TestStepFolders in. Use by dragging RTSBs out."
-    },
-    {
-      "key": "Column Chooser",
-      "value": "Right-click header row → Column Chooser → double-click to add column."
+      "key": "Resolve",
+      "value": "Copies steps and removes that block link, not every dependency."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 11 - Introduction to TestCases",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2716/lesson-video-introduction-to-testcases",
-      "duration": "video"
+      "title": "TestCase structure",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/teststep_from_module.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 12 - Create TestSteps",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2720/lesson-video-create-teststeps",
-      "duration": "video"
+      "title": "Configuration parameters",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/tcp_create_tcp.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 13 - Populate your TestCase",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2724/lesson-video-populate-your-testcase",
-      "duration": "video"
+      "title": "ActionModes and waits",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/action_modes.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 14 - Test Configuration Parameters",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2728/lesson-video-test-configuration-parameters",
-      "duration": "video"
+      "title": "Value types",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/teststepvalue_xteststepvalue.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 15 - ActionModes",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2732/lesson-video-actionmodes",
-      "duration": "video"
+      "title": "Trial runs",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/execution_scratchbook.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 16 - Run a Test",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2736/lesson-video-run-a-test",
-      "duration": "video"
+      "title": "Dynamic dates",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/date_and_time_expressions.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 17 - ActionMode Buffer",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2739/lesson-video-actionmode-buffer",
-      "duration": "video"
-    },
-    {
-      "title": "Lesson 18 - Dynamic Values",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2745/lesson-video-dynamic-values",
-      "duration": "video"
-    },
-    {
-      "title": "Lesson 19 - Libraries",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2986/lesson-video-libraries",
-      "duration": "video"
-    },
-    {
-      "title": "Lesson 20 - Use the Libraries",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/2990/lesson-video-use-the-libraries",
-      "duration": "video"
+      "title": "Shared step libraries",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/teststep_libraries.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }
