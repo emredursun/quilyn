@@ -679,3 +679,20 @@ test('TDS1 maintenance review preserves boundary coverage and removes unsupporte
  assert.match(d.studyGuide[0].elements[0].description,/editing the reference also changes the Class/);assert.match(d.practiceQuiz[1].options[1].text,/Create Element Structure from Clipboard/);assert.match(d.examPitfalls[3].bestPractice,/Retain boundary coverage/);assert.match(d.studyGuide[1].elements[2].text,/does not automatically execute Gherkin/);
  assert.doesNotMatch(JSON.stringify(d),/Tricentis recommends using Classes only|Usually one-time tests|Notepad uses Tab indentation|backbone of every TestSheet/);
 });
+
+test('TDS1 automatic generation review uses documented targets and distinguishes verification from execution',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-tds1/m10_automatic_generation_of_instances.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.equal(d.practiceQuiz[0].options[1].text,'TestSheets, TestCase-Design Classes and Attributes.');assert.match(d.studyGuide[0].elements[1].description,/1000 combinations/);assert.match(d.studyGuide[3].elements[1].description,/Uncombined Instances appear in bold/);assert.equal(d.practiceQuiz[3].options[1].text,'BusinessRelevant = Result.');
+ assert.doesNotMatch(JSON.stringify(d),/requires an empty Instance Folder first|excluded from combinatorics entirely|instantly combines every/);
+});
+
+test('TDS1 capstone review scopes Guest assumptions and equal single-Attribute counts without claiming official scenarios',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-tds1/m11_scenarios.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[i===2?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[1].elements[0].description,/exercise assumptions/);assert.match(d.studyGuide[1].elements[3].description,/100, 95, 90 and 85/);assert.match(d.studyGuide[1].elements[4].description,/All Combinations also produces five/);assert.match(d.practiceQuiz[3].optionExplanations.D,/Position property/);assert.match(d.practiceQuiz[2].options[2].text,/Planned design coverage/);
+ assert.doesNotMatch(JSON.stringify(d),/Tricentis default recommendation|official course closes with three|effectively every order|All Combinations would be unnecessary/);
+ const added=JSON.parse(fs.readFileSync('data/tosca-tds1/m08_integration_of_new_attributes.json'));assert.match(added.studyGuide[1].elements[2].text,/right-click the top-level Instance/);
+});

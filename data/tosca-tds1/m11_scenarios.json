@@ -5,7 +5,7 @@
   "learningObjectives": [
     "Apply the full TDS1 workflow — Requirements, Attributes, Instances, Combinatorics, Classes, and Linking — to a business scenario from scratch.",
     "Decide which combinatorial method fits a given scenario and justify the choice.",
-    "Recognize the review scenarios used in the official course capstone and know what each is testing conceptually."
+    "Apply independent capstone exercises without confusing planned data coverage with executed test evidence."
   ],
   "estTime": "25 min",
   "studyGuide": [
@@ -14,12 +14,12 @@
       "elements": [
         {
           "type": "concept",
-          "term": "Capstone review",
-          "description": "The official course closes with three unguided scenarios where you design a TestSheet from a business description alone, without step-by-step instructions: a discount-calculation feature, a configurable-product feature, and an abstract billing-package feature. Each is meant to force you to apply Lessons 1-10 end to end, without being told which Attribute or method to use. This module walks through one original worked example the same way, then reviews what each official scenario is really testing conceptually."
+          "term": "Independent capstone",
+          "description": "This is an independent Quilyn worked example and set of practice prompts using documented Tosca design concepts. It is not a transcription or certification of the Academy capstone. Define business rules, modeled choices, expected outcomes, coverage method and traceability separately."
         },
         {
           "type": "note",
-          "text": "📄 Scenario 01-03 (Calculate Discount, Product Configuration, Accelerator Package) — Official Tricentis Academy course material, not redistributed here. Access the full business requirements and complete the exercises inside the official course."
+          "text": "The original Academy video and scenario files require access; their titles, contents and expected solutions have not been verified. Use the independent examples below alongside the linked primary documentation."
         }
       ],
       "sectionId": "section-15606c75dc20"
@@ -30,55 +30,55 @@
         {
           "type": "concept",
           "term": "Business context",
-          "description": "A webshop is introducing a Loyalty Tier discount at checkout: Guest checkouts (no loyalty account) get no discount, Bronze members get 5% off the subtotal, Silver members get 10% off, and Gold members get 15% off. An expired loyalty account should be rejected with an error at checkout rather than receiving any discount."
+          "description": "Independent assumptions: a checkout grants Guest 0%, Bronze 5%, Silver 10% and Gold 15% discounts on a subtotal of 100, before tax and shipping. An expired loyalty account is rejected. Assume Guest is the most frequent, least-dependent checkout path and a failure there has the greatest business impact. These are exercise assumptions, not facts about a real webshop."
         },
         {
           "type": "concept",
           "term": "Step 1 — Requirement",
-          "description": "Under Folder 'Webshop' → RequirementSet 'Checkout', create a Requirement 'Apply loyalty discount'. Since pricing-related bugs have high financial impact but this feature isn't used on every order, it's reasonable to weight it with Complex Weighting — a mid Frequency Class and a higher Damage Class."
+          "description": "Create a Requirement for loyalty-discount behavior and assess its risk using project evidence. The exercise does not determine a universal Frequency or Damage class from the feature name. Keep expected amounts and rejection behavior traceable to the specified business rules."
         },
         {
           "type": "concept",
           "term": "Step 2 — Attributes",
-          "description": "Create a TestSheet 'Loyalty Discount at Checkout' with the four core Attributes: Administration (No), Precondition (Yes — e.g. an active customer session), Process (Yes — the Loyalty Tier itself), Verification (Result — the expected discount applied)."
+          "description": "Use an optional layout with Administration (No), Precondition (Yes), Process (Yes) and Verification (Result). Model Loyalty Tier as the only varying business input; keep other inputs fixed for this exercise. Verification holds the expected amounts or rejection outcome."
         },
         {
           "type": "concept",
           "term": "Step 3 — Instances",
-          "description": "Under the Process Attribute's 'Loyalty Tier' Attribute, create Instances: Guest (StraightThrough — the most common, lowest-dependency case), Bronze (Valid), Silver (Valid), Gold (Valid), and Expired Account (Invalid — expected to produce a rejection error, not a discount)."
+          "description": "Create Guest as StraightThrough under the stated frequency, dependency and impact assumptions; Bronze, Silver and Gold as Valid; Expired Account as Invalid. For subtotal 100, verify totals 100, 95, 90 and 85 respectively; for Expired Account verify the specified rejection and absence of a completed discounted order. Invalid data passes a test only when all relevant assertions hold."
         },
         {
           "type": "concept",
           "term": "Step 4 — Combinatorial method",
-          "description": "With one Attribute driving four meaningfully different behaviors, Linear Expansion is the natural fit here: the Guest StraightThrough becomes the baseline TestCase, and each remaining Instance (Bronze, Silver, Gold, Expired Account) becomes its own TestCase differing only in Loyalty Tier — giving 5 TestCases total, each with an isolated, easy-to-debug focus. All Combinations would be unnecessary here since there's only one Attribute actually varying."
+          "description": "With exactly one varying Attribute containing five choices and no constraints, Linear Expansion produces five datasets: one baseline and four alternatives. All Combinations also produces five in this single-Attribute case; it does not create an unnecessary larger suite here. Neither generation operation executes the tests."
         },
         {
           "type": "concept",
           "term": "Step 5 — Reuse and linking",
-          "description": "If 'Loyalty Tier' is likely to be reused in other TestSheets (e.g. a separate Requirement for loyalty point accrual), it's a good candidate to extract into a Class once that second use case appears — not before. Finally, all 5 generated Instances get dragged onto the 'Apply loyalty discount' Requirement, creating TestCase-Substitute links that make this coverage visible on the Requirements dashboard."
+          "description": "A Class is useful if centralized sharing benefits other designs; a mandatory second-use threshold is not established here. Link the five design Instances to the Requirement as substitutes, replace them explicitly after linking physical tests, and inspect execution evidence and recalculated coverage separately."
         }
       ],
       "bulletPoints": [
-        "This example threads all five prior building blocks together: Requirement → Attributes → Instances → Combinatorics → Link to Requirement.",
-        "The combinatorial method wasn't picked arbitrarily — it followed from how many Attributes were actually varying and why."
+        "For this single varying Attribute, both Linear Expansion and All Combinations produce five design rows.",
+        "Verify each expected result explicitly; link and recalculate without equating planned coverage with passed execution."
       ],
       "sectionId": "section-26c1e73759a7"
     },
     {
-      "sectionTitle": "What the official scenarios are really testing",
+      "sectionTitle": "Independent practice prompts",
       "elements": [
         {
           "type": "list",
-          "title": "Conceptual focus of each official Scenario",
+          "title": "Choose and justify the test design",
           "items": [
-            "Scenario 01 (Discount) — one Attribute drives multiple distinct behaviors (discount type and where it applies); good practice for choosing Instances and a Character/Position strategy without over-complicating the structure.",
-            "Scenario 02 (Product Configuration) — several independent Attributes (component choices) that legitimately need combining together; a good test of picking the right combinatorial method for multiple simultaneously-varying Attributes, and of restructuring once any Attribute has more than 6-8 options.",
-            "Scenario 03 (Accelerator Package) — an abstract, unfamiliar domain with several cost/usage rules and no visual application to explore; tests whether you can build a Requirements + TestSheet structure directly from a written business description alone, the way you'd have to on a real, still-being-built feature."
+            "Discount rules: define the distinct outcomes and explicit expected amounts before choosing representative input data.",
+            "Product configuration: identify interacting choices and constraints; choose the method from required coverage rather than declaring a default.",
+            "Written billing specification: identify unclear rules, derive valid and invalid examples, and define observable expected results before automation exists."
           ]
         }
       ],
       "bulletPoints": [
-        "Each scenario stresses a different skill: Instance/Character design, combinatorial method choice, and working from specification text alone."
+        "These are independent exercises, not certified descriptions of the inaccessible official capstone."
       ],
       "sectionId": "section-dc254f1b6a2c"
     }
@@ -87,24 +87,24 @@
     {
       "title": "Defaulting to All Combinations for every scenario",
       "trapDescription": "Reaching for All Combinations whenever a scenario has more than one Attribute, without checking whether that's actually justified.",
-      "bestPractice": "Choose the combinatorial method based on the Requirement's risk, regulatory needs, and how many Attributes are genuinely varying together — Linear Expansion is the Tricentis default recommendation where there's no specific reason to need exhaustive coverage."
+      "bestPractice": "Choose the method from coverage goals, interactions, constraints and risk. No universal Linear Expansion default is established here; with one varying Attribute, All Combinations and Linear Expansion can have the same count."
     },
     {
       "title": "Skipping the Verification Attribute in a capstone TestSheet",
       "trapDescription": "Building Precondition and Process Attributes but leaving Verification empty or undefined.",
-      "bestPractice": "Every TestSheet Instance needs a clearly defined Verification — without it, there's no way to determine whether the TestCase actually passed."
+      "bestPractice": "Define and bind the expected outcomes. A data Character, generated row or Requirement substitute is not itself an assertion or proof that a test passed."
     },
     {
-      "title": "Extracting a Class before there's a second use case",
+      "title": "Using a fixed second-use rule for Classes",
       "trapDescription": "Converting an Attribute structure into a Class the moment it's built, in a capstone scenario where it's only used once so far.",
-      "bestPractice": "Per Lesson 9's guidance, only extract a Class once a structure is reused at least twice — a scenario using an Attribute exactly once doesn't need one yet."
+      "bestPractice": "Choose shared maintenance deliberately and consider bidirectional reference edits. The accessed documentation supports reusable Classes but does not establish a mandatory two-use threshold."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "In the Loyalty Tier worked example, why was 'Guest' chosen as the StraightThrough Instance rather than 'Gold'?",
+      "scenario": "Under the independent example assumptions (Guest is most frequent, least dependent and highest impact if it fails), why is Guest chosen as StraightThrough?",
       "options": [
         {
           "id": "A",
@@ -112,7 +112,7 @@
         },
         {
           "id": "B",
-          "text": "Because Guest is the most frequent, lowest-dependency case — the actual criteria for a StraightThrough."
+          "text": "Its stated frequency, dependency and failure-impact assumptions match the StraightThrough criteria."
         },
         {
           "id": "C",
@@ -127,12 +127,20 @@
         "B"
       ],
       "hint": "Recall the StraightThrough criteria from Lesson 3: high-risk if it fails, easy to implement, fewest dependencies.",
-      "rationale": "StraightThrough should be the highest-risk-if-it-fails, easiest, lowest-dependency case — which for a checkout is the plain Guest path, since it happens on effectively every order, not the least common tier."
+      "rationale": "The choice follows the explicit exercise assumptions and documented StraightThrough characteristics. Guest is not inherently highest-risk or most frequent in every real application, and a zero discount is not the selection criterion.",
+      "lessonSection": "section-26c1e73759a7",
+      "optionExplanations": {
+        "A": "A zero percentage does not define StraightThrough; usage, dependencies and failure impact matter.",
+        "B": "The exercise explicitly supplies the characteristics needed to justify Guest as the baseline.",
+        "C": "Gold can be a valid business choice; that does not determine the baseline.",
+        "D": "The baseline is selected deliberately, not randomly."
+      },
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "In the same worked example, how many TestCases does Linear Expansion produce, given one Attribute (Loyalty Tier) with 1 StraightThrough and 4 other Instances?",
+      "scenario": "With exactly one varying Loyalty Tier Attribute, one StraightThrough and four alternatives, and no constraints, how many design datasets does Linear Expansion produce?",
       "options": [
         {
           "id": "A",
@@ -154,41 +162,57 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Baseline + one TestCase per non-StraightThrough Instance.",
-      "rationale": "Linear Expansion produces the StraightThrough baseline (Guest) plus one TestCase per remaining Instance (Bronze, Silver, Gold, Expired Account) — 1 + 4 = 5 TestCases total."
+      "hint": "Count the baseline plus the four alternatives; these are datasets before template instantiation.",
+      "rationale": "One baseline plus four alternatives gives five datasets. With only this one varying Attribute, All Combinations also has five possibilities; neither count is evidence of executed tests.",
+      "lessonSection": "section-26c1e73759a7",
+      "optionExplanations": {
+        "A": "Four omits the baseline dataset.",
+        "B": "One baseline plus four alternatives equals five datasets.",
+        "C": "There is no second varying Attribute whose choices multiply this set to sixteen.",
+        "D": "One covers only the baseline and omits all four alternate choices."
+      },
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "Which official capstone Scenario most directly tests whether you can build a Requirements and TestSheet structure purely from a written business description, without an existing application to click through?",
+      "scenario": "Five design Instances are linked to a Requirement as substitutes, but no physical tests have run. What does this establish?",
       "options": [
         {
           "id": "A",
-          "text": "Scenario 01 - Calculate Discount"
+          "text": "The feature passed five executed tests."
         },
         {
           "id": "B",
-          "text": "Scenario 02 - Product Configuration"
+          "text": "The substitutes were automatically replaced merely by generating design data."
         },
         {
           "id": "C",
-          "text": "Scenario 03 - Accelerator Package"
+          "text": "Planned design coverage, which still needs physical tests, assertions and execution evidence."
         },
         {
           "id": "D",
-          "text": "None of them involve working from a written description."
+          "text": "The application needs no further validation."
         }
       ],
       "correctOptions": [
         "C"
       ],
-      "hint": "One scenario is explicitly abstract and not part of the DemoWebShop application.",
-      "rationale": "Scenario 03 (Accelerator Package) is an abstract mobile-billing example that isn't part of the DemoWebShop, so it specifically tests building structure from specification text alone, without a UI to explore."
+      "hint": "A planning substitute and an execution result represent different evidence.",
+      "rationale": "Substitutes represent linked design data, not executed or passed tests. Explicitly link physical tests, replace substitutes as appropriate, execute assertions and refresh outdated coverage values.",
+      "lessonSection": "section-26c1e73759a7",
+      "optionExplanations": {
+        "A": "No physical tests have run; planned links cannot establish a pass result.",
+        "B": "Generating design data alone does not replace substitutes with physical test links.",
+        "C": "This correctly limits the evidence to planned scope and identifies the remaining validation steps.",
+        "D": "The design still needs executable assertions and execution evidence."
+      },
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "An 'Expired Account' Instance is included in the Loyalty Tier Attribute and is expected to cause checkout to reject the discount with an error message. What Character should it have?",
+      "scenario": "An expired loyalty account is outside the valid business rules and should be rejected at checkout. Which Character describes this input, distinct from its test execution result?",
       "options": [
         {
           "id": "A",
@@ -211,36 +235,71 @@
         "B"
       ],
       "hint": "Recall the Character definitions from Lesson 3 — which one is used for cases that are expected to produce an error?",
-      "rationale": "A case that is expected to trigger an error/rejection is marked Invalid — the TestCase then passes if that error correctly occurs, per Lesson 3."
+      "rationale": "Invalid describes input expected to trigger an error. The test passes only if the specified rejection and all other relevant assertions are satisfied; the marker does not automatically invert the execution result.",
+      "lessonSection": "section-26c1e73759a7",
+      "optionExplanations": {
+        "A": "Valid denotes an accepted business input; the scenario explicitly requires rejection.",
+        "B": "Invalid describes the out-of-rule input for which rejection must be verified.",
+        "C": "StraightThrough is the frequent valid baseline, not this rejection case.",
+        "D": "Boundary is a Position property, not an alternative Character value."
+      },
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
       "key": "End-to-end flow",
-      "value": "Requirement → Attributes (4 core) → Instances (Character/Position) → Combinatorial method → Link to Requirement."
+      "value": "Requirements → chosen Attribute structure → Instances → coverage method → links → physical tests and execution evidence."
     },
     {
       "key": "Method selection",
       "value": "Base it on how many Attributes truly vary together and the Requirement's risk — not a default habit."
     },
     {
-      "key": "Scenario 01 focus",
-      "value": "Designing Instances/Character for one Attribute driving several distinct behaviors."
+      "key": "Single-Attribute example",
+      "value": "Five choices yield five datasets under both unconstrained Linear Expansion and All Combinations."
     },
     {
-      "key": "Scenario 02 focus",
-      "value": "Combining several independently-varying Attributes; restructuring large option sets."
+      "key": "Expected results",
+      "value": "Verify amounts and rejection explicitly; Invalid Character is not an automatic pass/fail inversion."
     },
     {
-      "key": "Scenario 03 focus",
-      "value": "Building structure directly from a written specification, with no UI to reference."
+      "key": "Independent prompts",
+      "value": "Derive choices and expected results from specifications; original Academy capstone contents are unverified."
     }
   ],
   "topics": [
     {
-      "title": "Scenarios (video)",
-      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
-      "duration": "video"
+      "title": "Primary Tosca documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/testcase_design/instance_combinatorics.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary Tosca documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/testcase_design/attributes.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary Tosca documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/testcase_design/instances.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary Tosca documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/requirements/link_reqs_with_tcd_instances.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary Tosca documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/requirements/requirements.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary Tosca documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/testcase_design/class_references.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }
