@@ -596,3 +596,18 @@ test('BA GenAI review covers missing procedures and scopes response structures a
  assert.match(d.studyGuide[6].elements[1].description,/technical ID/);assert.match(d.studyGuide[7].elements[1].description,/Personas & Channels/);assert.match(d.studyGuide[8].elements[1].description,/part of the Case data/);assert.match(d.practiceQuiz[7].scenario,/configured with the Unstructured response type/);assert.equal(d.practiceQuiz[12].lessonSection,'section-c649697939ef');assert.equal(d.practiceQuiz[15].lessonSection,'section-ba06-sample-data');
  assert.doesNotMatch(JSON.stringify(d),/no Pega login for collaboration|no login needed to collaborate|about twice as fast|within ~90 days|consistent AI-enforced outcomes/);
 });
+
+test('BA modular reuse distinguishes relevant records from library eligibility and consuming applications',()=>{
+ const crypto=require('node:crypto'),file='data/business-architect/m04_modular_architecture_enterprise_reuse.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M04'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,16);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[0,5].includes(i)?['A','B','C']:[10,15].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[5].elements[0].description,/SLA can be relevant without appearing/);assert.match(d.studyGuide[2].bulletPoints[2],/Business applications build on module applications/);assert.match(d.practiceQuiz[9].hint,/insurer/);assert.match(d.practiceQuiz[6].rationale,/creation context/);
+ assert.doesNotMatch(JSON.stringify(d),/most-missed on exams|contains all reusable assets|propagates the fix everywhere|Governed = a Center of Excellence/);
+});
+
+test('TDS1 introduction requires recalculation and avoids guaranteed test completeness',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds1/m00_introduction.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M00'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,3);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.practiceQuiz[2].options[1].text,/recalculate.*restart Tosca/);assert.match(d.studyGuide[0].elements[0].text,/not a transcript/);assert.doesNotMatch(JSON.stringify(d),/only fails for one reason|roll up automatically|10 lessons, using the DemoWebShop/);
+});
