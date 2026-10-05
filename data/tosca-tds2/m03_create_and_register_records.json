@@ -3,9 +3,9 @@
   "moduleTitle": "Lesson 2 - Create and Register records through TDS",
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
   "learningObjectives": [
-    "Use the 'Test Data - Create & provide new record' Standard Module to register new records into a TDS repository.",
+    "Use TestData - Create & provide new item to add test data to a TDS type.",
     "Explain what an Alias name is, when it defaults, and when it must be used.",
-    "View newly created records on the Test Data Management page and explain the auto-lock behavior.",
+    "Distinguish Find reservation from non-locking ReadOnly access.",
     "Generate multiple test records at once using the Repetitions setting on an Execution Entry."
   ],
   "estTime": "20 min",
@@ -16,16 +16,16 @@
         {
           "type": "concept",
           "term": "Where the module lives",
-          "description": "TDS Standard Modules are found under Standard Modules → Test Data Management → Test Data Service. To register a new record, add a TestStep and insert the module 'Test Data - Create & provide new record', which writes new entries into the TDS repository's table-like structure."
+          "description": "Use TestData - Create & provide new item from the Standard subset's Test Data Management → Test Data Service folder to add an item to an existing or new type. Security-enabled installations may restrict access by user group."
         },
         {
           "type": "concept",
           "term": "Using the module",
-          "description": "Expand the module's Data structure Attribute and fill in every required Attribute and value — this is exactly what gets stored under the TDS type you select. The TestStepValue 'Existing or new TDS type*' lets you pick an existing type or create a brand-new one on the fly."
+          "description": "Specify Existing or new TDS type and define the needed attributes under Data structure with ActionMode Input. Supply an alias when later operations need to identify this item."
         }
       ],
       "bulletPoints": [
-        "One Standard Module — 'Create & provide new record' — both creates the record and hands its data back for use later in the same TestCase."
+        "Create adds one item with the configured attributes; reuse its alias in the same TestCase."
       ],
       "sectionId": "section-ea8ab5e4856f"
     },
@@ -35,26 +35,26 @@
         {
           "type": "concept",
           "term": "What it's for",
-          "description": "Alias name is an optional field that labels a specific record within a dataset. If left blank, the TDS type itself is used as the alias — e.g. the TDS type 'CustomerDetails' becomes the record's alias by default."
+          "description": "An alias identifies an item available during the TestCase; it is not a repository column or a search condition. The documented Find workflow uses the type name as the default when its alias is omitted. Use an explicit alias for later update, move or delete operations."
         },
         {
           "type": "concept",
           "term": "When it actually matters",
-          "description": "Alias name exists to distinguish between different roles that share the same TDS type. For example, a customer could be either the sender or the recipient in a bank transaction — two roles with different tasks in the SUT that need to be tested separately. Without a distinct alias, both would be grouped under the same TDS type, and a TestCase could fail by testing a sender's flow when a recipient's data was actually needed."
+          "description": "Independent example: find sender and recipient items using appropriate selection criteria, then assign distinct aliases so subsequent steps address each known item. An alias alone does not choose the correct role or replace those criteria."
         },
         {
           "type": "note",
-          "text": "This course doesn't use Alias names, since the scenario only involves one type of user (the customer)."
+          "text": "Do not infer which aliases an inaccessible Academy exercise used; the example here is independent and uses explicit aliases."
         },
         {
           "type": "concept",
           "term": "Quick self-check",
-          "description": "True or False: (1) If Alias name is left blank, it takes the name of the 'Existing Attribute' — FALSE, it actually takes the name of the TDS type, not any Attribute. (2) Alias name must be used when you have different record types performing different functions in the SUT — TRUE."
+          "description": "Check both selection and identity: Find criteria determine the intended item; its alias addresses the retrieved item in later steps. A default type-name alias is not the name of its first attribute."
         }
       ],
       "bulletPoints": [
         "Blank Alias name → defaults to the TDS type name, not an Attribute name.",
-        "Use Alias name whenever the same TDS type needs to represent more than one distinct role."
+        "Use distinct aliases to address different known items within one TestCase."
       ],
       "sectionId": "section-b137b45c4772"
     },
@@ -64,26 +64,26 @@
         {
           "type": "concept",
           "term": "Finding your data",
-          "description": "On the Test Data Management page, the landing page shows every configured repository as a tile. Opening one reveals a Types column on the left (types created via Standard Modules appear in blue, each with a small green badge showing its record count). Selecting a type displays all of its records, table-like, on the right."
+          "description": "Use Test Data Management to inspect the intended repository, type and item attributes. Its lock controls indicate reservation; a manually locked item is not editable in the Web UI. Interface colors and layout may vary with the installed version."
         },
         {
           "type": "warning",
-          "text": "Once a record is found/retrieved, it is automatically locked — no one else in a distributed team can use it in a TestStep. It only unlocks automatically after the TestCase that retrieved it finishes executing. This is what prevents two testers from colliding on the same record."
+          "text": "Find reserves the retrieved item. Automatic release is documented after execution or a new loop iteration, including failure. ReadOnly does not acquire that lock; explicit release is a separate operation."
         }
       ],
       "sectionId": "section-d0fd37e80118"
     },
     {
-      "sectionTitle": "Worked example: registering a DemoWebShop customer",
+      "sectionTitle": "Independent synthetic customer example",
       "elements": [
         {
           "type": "concept",
           "term": "Inputs and initial state",
-          "description": "First name, last name, and email — already captured as Buffers from the registration TestCase — are fed into 'Create & provide new record' as its inputs. The Status Attribute is set to 'New', which flags freshly registered customers so they can be retrieved later specifically in that state. OrderNumber and OrderStatus are left blank at this point — they get filled in progressively as the customer moves through later steps (purchase, payment, etc)."
+          "description": "Create an item of type CustomerDetails with alias customer. Set a synthetic Email and Status = New using Input. These are example attributes, not a built-in customer schema or a verified Academy registration walkthrough."
         },
         {
           "type": "note",
-          "text": "So far this has run from Scratchbook. In a real project, TestCases like this should run from an Execution List, so results are properly reported and visible to the team."
+          "text": "For repeated execution, link the configured TestCase in an ExecutionList and inspect results for each run. No Tosca execution has been performed as part of this editorial example."
         }
       ],
       "sectionId": "section-840a005a3115"
@@ -94,11 +94,11 @@
         {
           "type": "concept",
           "term": "Repetitions",
-          "description": "To generate several test records in one go, set a Repetitions value on the relevant Execution Entry. From the Ribbon's Context Menu, choose Repetition, enter the desired count in the 'Replace with' field, and select 'Modify All'. A value of 5, for example, produces 5 test records. The same setting can also be changed directly in the Properties pane for that Execution Entry."
+          "description": "Set the ExecutionEntry's Repetitions property to run its TestCase multiple times with the same values. If each successful run creates one item, five successful runs add five items. Repetitions alone does not generate unique data or guarantee successful creation; check each result."
         }
       ],
       "bulletPoints": [
-        "Repetitions on an Execution Entry = the quickest way to bulk-generate records without duplicating TestSteps manually."
+        "ExecutionEntry Repetitions repeats the TestCase; a TestStep folder's Repetition property repeats its contained steps."
       ],
       "sectionId": "section-ab169a24ceb0"
     },
@@ -117,24 +117,24 @@
     {
       "title": "Assuming a blank Alias name inherits an Attribute's name",
       "trapDescription": "Believing an empty Alias name field takes on the name of whichever Attribute is being referenced.",
-      "bestPractice": "A blank Alias name defaults to the TDS type's name — not an Attribute name. This is explicitly false in the course's own recap check."
+      "bestPractice": "In the documented Find workflow, an omitted alias defaults to the type name, not an attribute."
     },
     {
       "title": "Skipping Alias name when one TDS type serves two roles",
       "trapDescription": "Storing both a bank transaction's sender and recipient under the same 'CustomerDetails' type without an Alias to tell them apart.",
-      "bestPractice": "When the same TDS type must represent multiple distinct roles (sender vs recipient), Alias name is required — otherwise a TestCase can retrieve the wrong role's data and fail."
+      "bestPractice": "Select the intended role's item using criteria, then assign a distinct alias; alias naming does not replace selection."
     },
     {
       "title": "Expecting a retrieved record to stay available to other testers",
       "trapDescription": "Assuming a colleague can immediately reuse a record you just retrieved, while your TestCase is still running.",
-      "bestPractice": "A record is automatically locked the moment it's found/retrieved and stays locked until the retrieving TestCase finishes executing — this is intentional, to prevent conflicting use in a distributed team."
+      "bestPractice": "Find reserves an item; ReadOnly does not. Verify the intended ownership and release path for your test."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "A tester leaves the Alias name field blank when creating a new record under the TDS type 'CustomerDetails'. What alias will the record actually get?",
+      "scenario": "A tester leaves Alias name blank in TestData - Find & provide item for type CustomerDetails. What default alias does the documented Find workflow use?",
       "options": [
         {
           "id": "A",
@@ -150,14 +150,17 @@
         },
         {
           "id": "D",
-          "text": "Tosca throws an error and refuses to create the record."
+          "text": "Tosca always rejects a Find with a blank alias."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Recall the True/False check from this lesson.",
-      "rationale": "When Alias name is left blank, it defaults to the TDS type's name — in this case 'CustomerDetails' — not an Attribute name."
+      "hint": "The Find default comes from Existing TDS type.",
+      "rationale": "The documented Find example uses the type name when Alias name is omitted.",
+      "optionExplanations": {"A":"An attribute name is not the documented default resource alias.","B":"The default is Existing TDS type, here CustomerDetails.","C":"Tosca uses the type-name default to address the retrieved item.","D":"The documented Find example deliberately leaves the alias blank."},
+      "lessonSection": "section-b137b45c4772",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
@@ -170,7 +173,7 @@
         },
         {
           "id": "B",
-          "text": "Assign distinct Alias names to the sender and recipient records."
+          "text": "Select each intended item with suitable criteria and assign distinct aliases for later steps."
         },
         {
           "id": "C",
@@ -184,13 +187,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "This is exactly the sender/recipient example used in the lesson.",
-      "rationale": "Alias name exists precisely for this case — distinguishing multiple roles that share one TDS type, so a TestCase reliably retrieves the correct record for its purpose."
+      "hint": "Selection chooses the data; aliases identify known items for subsequent operations.",
+      "rationale": "Distinct aliases let later steps address each selected item without confusing their roles. The aliases do not themselves filter the repository.",
+      "optionExplanations": {"A":"TDS cannot infer these business roles from a shared type name.","B":"Selection criteria identify the right items and distinct aliases address them later.","C":"Separate repositories are unnecessary merely to reference two known items.","D":"A shared type-name default does not give the two roles distinct references."},
+      "lessonSection": "section-b137b45c4772",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "A tester needs to quickly generate 10 test records from the same Execution Entry without duplicating TestSteps. What is the fastest approach?",
+      "scenario": "A TestCase creates one item per successful run. Which setting repeats its ExecutionEntry ten times without copying its TestSteps?",
       "options": [
         {
           "id": "A",
@@ -198,7 +204,7 @@
         },
         {
           "id": "B",
-          "text": "Set the Repetitions value to 10 on that Execution Entry, via the Ribbon's Repetition context menu or the Properties pane."
+          "text": "Set the ExecutionEntry's Repetitions property to 10."
         },
         {
           "id": "C",
@@ -213,13 +219,16 @@
         "B"
       ],
       "hint": "There's a dedicated setting on the Execution Entry for exactly this purpose.",
-      "rationale": "Setting Repetitions to 10 (via the Ribbon's Context Menu → Repetition → 'Replace with' → Modify All, or directly in the Properties pane) generates 10 records without any manual TestStep duplication."
+      "rationale": "ExecutionEntry Repetitions runs its TestCase multiple times. Ten successful runs each creating one item produce ten items; the property does not guarantee success or uniqueness.",
+      "optionExplanations": {"A":"Copying steps changes the TestCase rather than configuring repeated ExecutionEntry runs.","B":"Repetitions is the documented ExecutionEntry property for repeated runs.","C":"An alias is an item reference, not an execution counter.","D":"ExecutionEntry repetitions are supported in the documented execution workflow."},
+      "lessonSection": "section-ab169a24ceb0",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
       "key": "Create module",
-      "value": "TDS Standard Modules → 'Test Data - Create & provide new record'."
+      "value": "TestData - Create & provide new item: type, optional data structure, explicit alias for later operations."
     },
     {
       "key": "Existing or new TDS type*",
@@ -230,16 +239,16 @@
       "value": "Blank → takes the TDS type's name (not an Attribute's)."
     },
     {
-      "key": "Alias name required when",
-      "value": "One TDS type represents multiple distinct roles (e.g. sender vs recipient)."
+      "key": "Alias and selection",
+      "value": "Criteria choose the intended item; its alias addresses it in subsequent TestCase steps."
     },
     {
       "key": "Auto-lock",
-      "value": "A found/retrieved record locks automatically; unlocks once the retrieving TestCase finishes."
+      "value": "Find reserves its retrieved item; release occurs after execution or a new loop iteration, including failure. ReadOnly is non-locking."
     },
     {
       "key": "Bulk generation",
-      "value": "Set Repetitions on the Execution Entry (Ribbon context menu, or Properties pane)."
+      "value": "ExecutionEntry Repetitions repeats runs; verify each creation result and design unique values when needed."
     }
   ],
   "topics": [
@@ -247,6 +256,28 @@
       "title": "Lesson 2 - Create and Register records through TDS (video)",
       "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/578/tricentis-tosca-deep-dive-managing-your-stateful-data-tds2",
       "duration": "video"
+    },
+    {
+      "title": "Create an item (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_create_item.htm"
+    },
+    {
+      "title": "Find an item (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_find_item.htm"
+    },
+    {
+      "title": "Lock an item in Test Data Management (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_gui_lock_item.htm"
+    },
+    {
+      "title": "ExecutionEntry repetitions (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/editing_execution_lists.htm"
+    },
+    {
+      "title": "TestStep folder repetition (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/repetition.htm"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-05",
+  "platformVersion": "Tosca 2026.1 LTS (documentation baseline; Academy video version unverified)"
 }

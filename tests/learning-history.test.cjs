@@ -544,3 +544,10 @@ test('TDS retrieval review uses resource aliases and the TDS expression command'
  assert.equal(d.practiceQuiz[0].options[1].text,'{TDS[customer.Email]}');assert.match(d.practiceQuiz[0].options[3].text,/^\{TD\[/);assert.match(d.practiceQuiz[3].rationale,/alias name.*customer, not the source type/);assert.match(d.studyGuide[4].elements[1].description,/One move targets one known item/);
  assert.doesNotMatch(JSON.stringify(d.studyGuide),/\{TD\[|always works together with a search|200 OK response, confirming/);
 });
+
+test('TDS creation review separates alias identity, item selection and execution repetition',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds2/m03_create_and_register_records.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS2-M03'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,3);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.practiceQuiz[0].scenario,/Find & provide item/);assert.match(d.practiceQuiz[1].options[1].text,/criteria.*distinct aliases/);assert.match(d.practiceQuiz[2].rationale,/does not guarantee success or uniqueness/);assert.match(d.studyGuide[2].elements[1].text,/ReadOnly does not acquire/);assert.doesNotMatch(JSON.stringify(d),/Test Data - Create & provide new record|only unlocks automatically|exactly the sender\/recipient example/);
+});

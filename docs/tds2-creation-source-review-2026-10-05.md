@@ -1,0 +1,11 @@
+# TDS2-M03 create/alias/repetition review — 2026-10-05
+
+Reviewed six complete guide sections, three pitfalls, six recaps and three questions against official Tosca 2026.1 LTS [Create item](https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_create_item.htm), [Find item](https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_find_item.htm), [module attributes](https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/test_data/tds_modules.htm), [Web UI locks](https://docs.tricentis.com/tosca-2026.1/en-us/content/test_data_management/tds_gui_lock_item.htm), [ExecutionEntry repetitions](https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/editing_execution_lists.htm) and [folder repetition](https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/repetition.htm). Full page bodies read.
+
+Updated the create-module name, clarified the distinction between selection criteria and an in-TestCase alias, and scoped the documented omitted-alias default to Find. Replaced claims about unverified course usage and specific UI colors with independent examples and documented behavior. Find locking now includes release on execution completion, failure or a new loop iteration, rather than only a successful finish; non-locking ReadOnly is distinguished. Repeated execution is no longer a guarantee of unique or successfully generated records.
+
+Added 12 specific option explanations; Q1 now asks about Find's documented default, Q2 includes selection criteria as well as distinct aliases, and Q3 tests ExecutionEntry repetition with an explicit successful-create assumption. Preserved Q1–Q3, B/B/B keys and all section IDs. No local diagrams/interactive exercises. Academy video/version/exercises inaccessible and uncertified; no Tosca runtime execution. Documentation baseline stated in user-facing metadata.
+
+Original queue remaining: 626 questions and 133 modules. Physical-device and final all-scope review remain open.
+
+Validation: `npm run manifest:content`, `npm run check` (148/148 passed) and `git diff --check` passed. Initial shell 297.4 KB, within 300 KB. Regression checks stable keys/anchors, reviewed hash, criteria-versus-alias distinction and conditional repetition results. Token 20261005k / quilyn-v126. Local commit only; no push.
