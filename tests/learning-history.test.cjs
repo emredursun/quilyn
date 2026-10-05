@@ -867,3 +867,17 @@ test('AS1 execution guidance separates default references, latest summary and re
  assert.match(d.practiceQuiz[3].options[3].text,/ActualLog is only the latest summary/);
  assert.doesNotMatch(JSON.stringify(d),/all historic results permanently|UNLIMITED reuse|not F6|four-section structure|confirmed.*exam/i);
 });
+
+test('AS1 requirements separates risk class scales from weights and links from completion',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as1/m07_requirements.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['C'],['D'],['A'],['B'],['C'],['D'],['A'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].text,/enter weights manually.*not restricted to 1–10/);
+ assert.match(d.studyGuide[1].elements[1].text,/yields 128/);
+ assert.match(d.studyGuide[2].elements[0].text,/COMPLETED is not required/);
+ assert.match(d.studyGuide[2].elements[2].text,/defaults to Off/);
+ assert.match(d.studyGuide[2].elements[3].text,/Neither means always use the newest run/);
+ assert.match(d.practiceQuiz[5].options[1].text,/ddMMMyyyy/);
+ assert.match(d.practiceQuiz[6].options[2].text,/RequirementSet/);
+ assert.doesNotMatch(JSON.stringify(d),/confirmed AS1 exam|verbatim official|not manually entered|Integer 1–10|CP in square brackets|var\(--pa-ink-[23]\)/i);
+});
