@@ -710,3 +710,15 @@ test('API foundations review scopes launch, HTTP semantics, service generation a
   else{assert.match(d.practiceQuiz[0].scenario,/not a simple message file/);assert.match(d.practiceQuiz[1].scenario,/contract defines POST/);assert.match(d.practiceQuiz[2].rationale,/no HTTP response/);assert.match(d.studyGuide[1].elements[3].rows[3][1],/unexpected server condition/);}
  });
 });
+
+test('API project and result review preserves payload scope, explicit recovery and current multipart workflow',()=>{
+ const crypto=require('node:crypto'),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ ['m03_the_project_section.json','m04_api_scan_results.json'].forEach((name,n)=>{
+  const bytes=fs.readFileSync('data/tosca-api/'+name),d=JSON.parse(bytes),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[[['B','B','B','B'],['B','C','B','A']][n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+  assert.doesNotMatch(JSON.stringify(d),/There is no Undo in the API Scan|closing the whole API Scan window.*also saves|Save as workspace template|new entries appear last|Method tab specifically/);
+  if(!n){assert.match(d.studyGuide[0].elements[2].text,/not a complete message backup/);assert.match(d.quickRecap[2].value,/replaces existing payload/);assert.match(d.practiceQuiz[2].options[1].text,/actual exported test-step order/);assert.match(d.practiceQuiz[3].options[1].text,/context menu/);}
+  else{assert.match(d.studyGuide[0].elements[1].items[1],/Add Files is disabled/);assert.match(d.practiceQuiz[1].options[2].text,/Add Files > Attachment/);assert.match(d.studyGuide[1].elements[0].items[2],/200 alone does not prove persistence/);assert.match(d.practiceQuiz[2].rationale,/every observed value/);}
+ });
+});
