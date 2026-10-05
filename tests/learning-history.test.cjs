@@ -579,3 +579,12 @@ test('TDS introductions scope reuse and require explicit application-state updat
   else{assert.match(d.practiceQuiz[2].scenario,/next TDS Update step/);assert.match(d.studyGuide[1].elements[1].description,/does not automatically synchronize/);assert.match(d.studyGuide[2].elements[1].text,/rather than automatic TDS lifecycle rules/);}
  });
 });
+
+test('BA role review separates import responsibilities from permissions and supports multiple Workspaces',()=>{
+ const crypto=require('node:crypto'),file='data/business-architect/m01_role_of_pega_business_architect.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M01'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,18);
+ const keys=[['A'],['C'],['A','C'],['B'],['D'],['A','B'],['A'],['A'],['A'],['A'],['A'],['A'],['A','B','C'],['A'],['A'],['A','B'],['A'],['A']];
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,keys[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);assert.equal(q.explanationReviewedOn,'2026-10-05');});
+ assert.match(d.studyGuide[6].elements[0].description,/multiple Workspaces/);assert.match(d.studyGuide[6].elements[1].description,/common strategy, not a mandatory/);assert.match(d.practiceQuiz[1].rationale,/not proof of exclusive platform permissions/);assert.match(d.practiceQuiz[4].optionExplanations.D,/does not mean they are absent/);assert.match(d.studyGuide[6].bulletPoints[1],/Infinity Studio/);
+ assert.doesNotMatch(JSON.stringify(d),/One Branch per feature is the standard strategy|not hand-drawn flows|preventing rule conflicts during parallel/);
+});
