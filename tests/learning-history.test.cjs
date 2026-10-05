@@ -746,3 +746,16 @@ test('API TestCase review supports whole-case defaults, preserves clipboard omis
   else{assert.match(d.practiceQuiz[0].options[1].text,/Ctrl\+Shift\+J/);assert.match(d.studyGuide[0].elements[1].text,/Do not create a separate TCP on every TestStepValue/);assert.match(d.studyGuide[0].elements[3].text,/empty ActionMode/);}
  });
 });
+
+test('SOAP review scopes HTTP bindings, authentication, month coverage and predeployment preparation',()=>{
+ const crypto=require('node:crypto'),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ ['m09_soap_vs_rest.json','m10_soap_export_testcase.json','m11_self_created_soap.json'].forEach((name,n)=>{
+  const bytes=fs.readFileSync('data/tosca-api/'+name),d=JSON.parse(bytes),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[[['A','B','A','A'],['A','B','A','A'],['A','A','A']][n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+  assert.doesNotMatch(JSON.stringify(d),/SOAP is a stateless protocol|SOAP = POST-only|SOAP remains extremely widespread|never changes the payload's content/);
+  if(!n){assert.match(d.studyGuide[0].elements[0].text,/GET with SOAP-response/);assert.match(d.practiceQuiz[3].options[0].text,/security contract/);}
+  else if(n===1){assert.match(d.practiceQuiz[1].rationale,/omits the first hour/);assert.match(d.studyGuide[2].elements[1].text,/subsecond events/);assert.match(d.practiceQuiz[0].options[0].text,/Insert/);}
+  else{assert.match(d.practiceQuiz[0].options[0].text,/requires an endpoint/);assert.match(d.studyGuide[1].elements[1].text,/SOAPAction header is universally required/);assert.match(d.studyGuide[1].elements[2].text,/whitespace-sensitive/);}
+ });
+});

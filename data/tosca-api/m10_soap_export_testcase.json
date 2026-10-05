@@ -3,108 +3,75 @@
   "moduleTitle": "Lesson 9 - Export and Create the TestCase",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
   "learningObjectives": [
-    "Export a SOAP scan into Tosca using the same API Test Case flow as REST.",
-    "Distinguish how the Buffer ActionMode behaves differently for Request vs. Response parameters in the API context.",
-    "Build a full SOAP order TestCase using buffered addresses, dynamic month expressions, and Test Configuration Parameters.",
-    "Verify order totals (subtotal, shipping, total) returned by the SOAP service."
+    "Export contract-configured SOAP messages.",
+    "Distinguish consuming a buffer in a request from capturing a response value.",
+    "Build an independent order verification flow.",
+    "Scope dynamic month boundaries and numerical assertions to the contract."
   ],
   "estTime": "40 min",
   "studyGuide": [
     {
-      "sectionTitle": "SOAP Export Is (Almost) Identical to REST",
+      "sectionTitle": "Independent SOAP order scenario",
       "elements": [
         {
-          "type": "text",
-          "text": "Business context for this TestCase: place an order for BlueJeans in the DemoWebShop from start to finish, entirely through the API — get the current user's address, add BlueJeans to the cart, check out using that buffered address for both billing and shipping, then confirm the order appears in this month's order list and verify its pricing."
+          "type": "note",
+          "text": "Assume an authorized disposable sandbox allows reading an address, creating an order and retrieving it by identifier. Configure messages and authentication from that contract, export through API TestCase, inspect references and define expected outcomes. Original DemoWebShop order operations, prices and exercise data were not verified."
         },
         {
           "type": "note",
-          "text": "Because SOAP and REST behave so similarly in the API Scan, exporting a SOAP scan into Tosca — and building value ranges from the technical view — follows exactly the same process already learned for REST. This lesson is as much a recap as it is new material."
+          "text": "Independent guidance: test success and fault behavior; observed server values can identify existing resources but do not alone establish the correct business result. Authentication is contract-specific, not a universal SOAP statelessness rule."
         }
-      ],
-      "bulletPoints": [
-        "Real, server-confirmed values (like an actual saved country) still matter here just as they did for REST — always create value ranges from genuine responses, not invented data.",
-        "As always, remember: since SOAP is stateless, username/password must be sent with every Message that needs authentication."
       ],
       "sectionId": "section-bdf203c232fe"
     },
     {
-      "sectionTitle": "Buffering: Request vs. Response",
+      "sectionTitle": "Request and response buffer defaults",
       "elements": [
         {
-          "type": "concept",
-          "term": "Buffer behaves differently depending on direction",
-          "description": "Selecting a payload line and clicking Buffer creates and buffers a Business Parameter from that element — but what gets stored differs by direction. For a REQUEST parameter, Tosca creates a modifiable EXPRESSION. For a RESPONSE parameter, Tosca records the actual returned VALUE. This is the one meaningful difference between buffering in UI testing and buffering in API testing."
-        },
-        {
           "type": "note",
-          "text": "The Buffer ActionMode, like any other ActionMode, can always be changed afterward if needed."
+          "text": "Add and buffer on a request defaults to Insert with a buffer-reference DefaultValue. The response workflow defaults to Buffer and an element-name DefaultValue. Independent guidance: capture the created identifier before consuming it, and inspect actual Value and ActionMode. Request insertion does not itself capture returned data."
         }
-      ],
-      "bulletPoints": [
-        "Buffered values (from either direction) can be reused later in the TestCase, or resubmitted to double-check the API's consistency."
       ],
       "sectionId": "section-67a331df42fa"
     },
     {
-      "sectionTitle": "Building the Full Order TestCase",
+      "sectionTitle": "Dates and numeric expectations",
       "elements": [
         {
-          "type": "steps",
-          "title": "Shipping Cost TestCase — assembling the pieces",
-          "items": [
-            "Create Test Configuration Parameters for the account credentials (e.g. \"User\" and \"Pass\") and reference them in every TestStepValue that needs authentication.",
-            "Select all TestSteps (not TestStepValues, not the TestCase) and click Auto fill Values > from Default to populate default values in one pass.",
-            "Buffer the address Id from \"01 Get Address Response\", then Insert that buffered Id into both billingAddress and shippingAddress on \"03 Create Order\".",
-            "Buffer the new order's Id from \"03 Create Order Response\" for later use as a Constraint.",
-            "On \"04 Verify Order Placement\", set startDateValue/endDateValue using dynamic MONTHFIRST/MONTHLAST expressions so the date range always covers the current month, whatever day the TestCase runs.",
-            "Constrain \"04 Verify Order Placement Response\" on the buffered OrderId, then Verify the returned OrderSubtotalExclTax, OrderShippingExclTax, and OrderTotal as Numeric values."
-          ]
+          "type": "note",
+          "text": "MONTHFIRST and MONTHLAST compute month boundaries using the current date when the base date is empty. Keep all three bracket parameters: {MONTHFIRST[][][yyyy-MM-dd]} or {MONTHLAST[][][yyyy-MM-dd]}. The expression format is explicit rather than a hardcoded calendar date."
         },
         {
-          "type": "table",
-          "headers": [
-            "Dynamic expression",
-            "Meaning"
-          ],
-          "rows": [
-            [
-              "{MONTHFIRST[][][yyyy-MM-dd]}T01:00:00",
-              "First day of the current month, at 01:00."
-            ],
-            [
-              "{MONTHLAST[][][yyyy-MM-dd]}T23:59:59",
-              "Last day of the current month, at 23:59:59."
-            ]
-          ]
+          "type": "note",
+          "text": "Independent warning: appending T01:00:00 excludes the first hour of the month; a T23:59:59 inclusive end can omit subsecond events. Neither string supplies a timezone. Agree on the service timezone and interval semantics; dynamic dates do not automatically guarantee complete coverage. Prefer an explicit boundary contract, often an exclusive next-month start, where the service supports it."
         },
         {
-          "type": "warning",
-          "text": "Copy dynamic date expressions carefully — accidentally selecting an extra character (or missing one) when copy-pasting {MONTHFIRST[...]}/{MONTHLAST[...]} is a common source of failed TestCases in this exercise."
+          "type": "note",
+          "text": "Numeric DataType interprets numbers rather than exact string notation. Choose it for numeric amount assertions; separately define currency, scale, rounding and acceptable tolerance. Numerical equality alone does not prove tax or shipping rules."
+        },
+        {
+          "type": "note",
+          "text": "Independent flow: configure custom TCP references on supported objects, generate defaults at the needed scope, capture the created identifier, retrieve that resource and verify independently calculated amounts. Inspect list filtering and cleanup if the contract requires a collection lookup."
         }
-      ],
-      "bulletPoints": [
-        "DataType Numeric on the price fields (OrderSubtotalExclTax, OrderShippingExclTax, OrderTotal) avoids false mismatches like '10' vs '10.00' — the same rule learned in AS1.",
-        "Using MONTHFIRST/MONTHLAST instead of a hardcoded date keeps this TestCase working correctly no matter which day of the month it's actually run."
       ],
       "sectionId": "section-65beadde7429"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 09a - Export to Modules and Add Business Parameters",
+      "sectionTitle": "Independent configuration exercise",
       "elements": [
         {
           "type": "note",
-          "text": "📄 API Exercise 09a - Export to Modules and Add Business Parameters — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+          "text": "Prepare messages and map inputs, status/fault assertions and returned identity in a disposable sandbox. Academy Exercise 09a was inaccessible and its solution is not certified."
         }
       ],
       "sectionId": "section-89b0b6d7aa34"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 09b - Complete the TestCase",
+      "sectionTitle": "Independent execution exercise",
       "elements": [
         {
           "type": "note",
-          "text": "📄 API Exercise 09b - Complete the TestCase — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+          "text": "Run only against an available authorized endpoint or a documented simulation. Inspect affected mappings and all business assertions, including boundary cases. Academy Exercise 09b was inaccessible; no Tosca execution was performed."
         }
       ],
       "sectionId": "section-fd2308f32caa"
@@ -112,54 +79,62 @@
   ],
   "examPitfalls": [
     {
-      "title": "Expecting Buffer to behave identically for Request and Response",
-      "trapDescription": "Candidates assume buffering always simply records a static returned value, regardless of direction.",
-      "bestPractice": "Buffering a REQUEST parameter creates a modifiable expression. Buffering a RESPONSE parameter records the actual returned value. This is the one real difference between buffering in UI vs. API testing."
+      "title": "Confusing buffer consumption and capture",
+      "trapDescription": "Assuming request Add and buffer captures a returned value.",
+      "bestPractice": "Request defaults to Insert with a reference; response defaults to Buffer."
     },
     {
-      "title": "Hardcoding today's date instead of using MONTHFIRST/MONTHLAST",
-      "trapDescription": "Candidates type a literal start/end date for the current month, which breaks the TestCase as soon as the month changes.",
-      "bestPractice": "Use {MONTHFIRST[][][format]} and {MONTHLAST[][][format]} so the date range always resolves to the current month at runtime, regardless of which day the TestCase actually executes."
+      "title": "Assuming dynamic dates imply complete coverage",
+      "trapDescription": "Ignoring timezone, the first hour or subsecond end events.",
+      "bestPractice": "Define interval boundaries from the service contract and test edge cases."
     },
     {
-      "title": "Leaving order price fields as String DataType",
-      "trapDescription": "Candidates verify OrderTotal/OrderSubtotalExclTax/OrderShippingExclTax with the default String DataType.",
-      "bestPractice": "Set these price fields to Numeric DataType so values like '14.0000' and '14' are correctly treated as equal during verification."
+      "title": "Equating numeric comparison with business correctness",
+      "trapDescription": "Accepting equal numbers without validating pricing rules.",
+      "bestPractice": "Define expected amounts, currency and rounding independently."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "A tester clicks Buffer on a REQUEST parameter's value in the API Scan payload. What does Tosca create?",
+      "scenario": "What does Add and buffer default to for a request ModuleAttribute?",
       "options": [
         {
           "id": "A",
-          "text": "A modifiable expression, which can be adjusted later if needed."
+          "text": "Insert with a buffer-reference DefaultValue."
         },
         {
           "id": "B",
-          "text": "A static, unchangeable copy of the current value."
+          "text": "An immutable returned response value."
         },
         {
           "id": "C",
-          "text": "Nothing — Buffer only works on Response parameters."
+          "text": "It is unavailable for requests."
         },
         {
           "id": "D",
-          "text": "A new TestCase automatically."
+          "text": "An automatic new TestCase."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "This is different from what happens when you buffer a Response value.",
-      "rationale": "Buffering a Request parameter creates a modifiable expression that can be adjusted if needed — this is the key difference from buffering a Response parameter, which records the actual value returned."
+      "hint": "The request consumes an input reference.",
+      "rationale": "This differs from response capture using Buffer.",
+      "optionExplanations": {
+        "A": "This is the current request default.",
+        "B": "A request is not capturing the returned response here.",
+        "C": "The request workflow is documented.",
+        "D": "Attribute creation does not create a new TestCase."
+      },
+      "lessonSection": "section-67a331df42fa",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "Which dynamic expression correctly sets a TestStepValue to the first day of the current month, formatted yyyy-MM-dd, at 01:00:00?",
+      "scenario": "Which expression renders the first day of the current month as yyyy-MM-dd and appends the literal time 01:00:00?",
       "options": [
         {
           "id": "A",
@@ -181,93 +156,149 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "One function name means \"first\"; the format order matters too.",
-      "rationale": "{MONTHFIRST[][][yyyy-MM-dd]}T01:00:00 returns the first day of the current month formatted yyyy-MM-dd, followed by the fixed time. MONTHLAST would return the last day instead."
+      "hint": "Distinguish first/last and the requested output format.",
+      "rationale": "The expression renders the stated value, but the 01:00 boundary omits the first hour and contains no timezone.",
+      "optionExplanations": {
+        "A": "MONTHLAST computes the last day.",
+        "B": "This matches the stated date format and literal time; interval completeness is separate.",
+        "C": "A shifted current date is not necessarily the month start.",
+        "D": "This uses a different date format."
+      },
+      "lessonSection": "section-65beadde7429",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "Why should OrderSubtotalExclTax, OrderShippingExclTax, and OrderTotal be verified with the Numeric DataType rather than String?",
+      "scenario": "Why choose Numeric for a numerical amount assertion rather than exact string notation?",
       "options": [
         {
           "id": "A",
-          "text": "So values like '14.0000' and '14' are correctly recognized as equal."
+          "text": "Equivalent numerical representations can compare as numbers."
         },
         {
           "id": "B",
-          "text": "Numeric DataType is required for all TestStepValues in API TestCases."
+          "text": "Every API value must be Numeric."
         },
         {
           "id": "C",
-          "text": "String DataType cannot be used with the Verify ActionMode."
+          "text": "String cannot use Verify."
         },
         {
           "id": "D",
-          "text": "It has no practical effect — either DataType behaves identically."
+          "text": "DataType never affects interpretation."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "This is the same String-vs-Numeric issue introduced back in the AS1 course.",
-      "rationale": "Numeric DataType lets Tosca treat equivalent numeric representations (like '14' and '14.0000') as matching, avoiding false verification failures that would occur if they were compared as plain Strings."
+      "hint": "Separate number equality from textual spelling.",
+      "rationale": "Numeric interprets numbers; independently verify currency and rounding policy.",
+      "optionExplanations": {
+        "A": "This addresses numerical interpretation, not every pricing rule.",
+        "B": "Identifiers and text may require other types.",
+        "C": "String verification remains possible.",
+        "D": "DataType changes interpretation."
+      },
+      "lessonSection": "section-65beadde7429",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "Why must the username and password be provided again on every SOAP Message in this order TestCase, even though the user's address was already retrieved earlier?",
+      "scenario": "What determines authentication for each operation in an order flow?",
       "options": [
         {
           "id": "A",
-          "text": "Because SOAP is stateless — the server does not retain data between requests."
+          "text": "The service contract and chosen security mechanism."
         },
         {
           "id": "B",
-          "text": "Because the API Scan requires re-authentication only for POST requests."
+          "text": "API Scan requires authentication only for POST."
         },
         {
           "id": "C",
-          "text": "It isn't necessary — this is only a best practice, not a requirement."
+          "text": "Authentication is always optional."
         },
         {
           "id": "D",
-          "text": "Because REST enforces this rule, not SOAP."
+          "text": "REST rules automatically define SOAP credentials."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "This was established in the previous lesson on SOAP vs. REST.",
-      "rationale": "SOAP is a stateless protocol, so the server doesn't remember prior calls — credentials must be included on every Message in the flow that requires authentication, including Get Address, Add to Cart, Create Order, and Verify Order Placement."
+      "hint": "Do not infer credentials from SOAP alone.",
+      "rationale": "Use the documented security contract for each operation.",
+      "optionExplanations": {
+        "A": "This scopes credentials to the actual service.",
+        "B": "Method alone does not impose this universal rule.",
+        "C": "Some operations require authentication.",
+        "D": "Different service contracts can use different mechanisms."
+      },
+      "lessonSection": "section-bdf203c232fe",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
-      "key": "SOAP export",
-      "value": "Follows the same API Test Case export flow already learned for REST."
+      "key": "Export",
+      "value": "Inspect contract-configured messages and generated references."
     },
     {
-      "key": "Buffer Request vs. Response",
-      "value": "Request buffer → modifiable expression. Response buffer → actual returned value."
+      "key": "Buffers",
+      "value": "Request Insert consumes a reference; response Buffer captures data."
     },
     {
-      "key": "Order TestCase flow",
-      "value": "Get Address (buffer Id) → Add to Cart → Create Order (Insert buffered address, buffer new OrderId) → Verify Order Placement (Constraint on OrderId, Verify totals)."
+      "key": "Order flow",
+      "value": "Capture identity, retrieve resource, assert independent expectations."
     },
     {
-      "key": "Dynamic month range",
-      "value": "{MONTHFIRST[][][yyyy-MM-dd]}T01:00:00 and {MONTHLAST[][][yyyy-MM-dd]}T23:59:59 keep the date range correct regardless of run date."
+      "key": "Month boundaries",
+      "value": "Dynamic date expressions still require timezone and interval decisions."
     },
     {
-      "key": "Price fields",
-      "value": "Verify OrderSubtotalExclTax / OrderShippingExclTax / OrderTotal as Numeric, not String."
+      "key": "Amounts",
+      "value": "Numeric interpretation plus explicit currency/rounding assertions."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 09 - Export and Create the TestCase (video)",
-      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
-      "duration": "video"
+      "title": "Primary documentation",
+      "url": "https://www.w3.org/TR/soap12-part1/",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://www.w3.org/TR/soap12-part2/",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/api/api_create_bp.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/date_and_time_expressions.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/teststepvalue_xteststepvalue.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/api/api_clipboard.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_export.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }

@@ -3,89 +3,61 @@
   "moduleTitle": "Lesson 10 - Self-Created SOAP in the API Scan",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
   "learningObjectives": [
-    "Explain why and when a SOAP message needs to be created by hand instead of scanned.",
-    "Manually build a Request payload, Endpoint, and Headers for an unscanned SOAP operation.",
-    "Use Pretty Print to make a self-created payload human-readable without changing its meaning.",
-    "Export a self-created Message into Tosca the same way as a scanned one."
+    "Prepare messages from a service specification before an implementation is available.",
+    "Distinguish preparation or simulation from testing a real server.",
+    "Configure binding-specific headers, method and envelope.",
+    "Use formatting without mistaking it for validation."
   ],
   "estTime": "35 min",
   "studyGuide": [
     {
-      "sectionTitle": "Why Create a SOAP Message Without Scanning",
+      "sectionTitle": "Preparation before deployment",
       "elements": [
         {
-          "type": "concept",
-          "term": "Shift-left scenario",
-          "description": "Sometimes an API is fully specified — the business knows exactly what it needs to do, how, and for whom — but it isn't hosted anywhere yet. Rather than wait for hosting, the API Scan lets you manually create the message structure from the technical specification alone, so testing can begin immediately (shifting testing further left in the development cycle)."
-        },
-        {
-          "type": "text",
-          "text": "Worked example: create a message that would get the list of all available addresses saved in the DemoWebShop for a given user account — useful if the business were completely rewriting its shopping portal and this data existed but wasn't yet exposed through the website."
+          "type": "note",
+          "text": "Independent shift-left guidance: prepare an operation payload and expected assertions from an agreed specification before implementation. Live behavior cannot be tested without an available endpoint; a simulator only tests its configured model. Record that distinction explicitly."
         }
-      ],
-      "bulletPoints": [
-        "This technique applies to both SOAP and REST — the process doesn't differ between the two, only the payload structure/leverage differs (as covered in Lesson 8)."
       ],
       "sectionId": "section-99806c43a348"
     },
     {
-      "sectionTitle": "Manually Building the Message",
+      "sectionTitle": "Create and inspect a message",
       "elements": [
         {
-          "type": "steps",
-          "title": "Creating a Message from scratch",
-          "items": [
-            "Right-click the destination Folder in the API Scan and choose \"Create Message\".",
-            "Manually type the same payload structure that scanning would normally generate automatically — using the business specification as the source of truth.",
-            "Specify the Endpoint by hand (e.g. the DemoWebShop's base URL) since there is no scan to derive it from.",
-            "Set the correct HTTP Method (POST for SOAP) and any required Headers (Content-Type, SOAPAction)."
-          ]
-        },
-        {
-          "type": "concept",
-          "term": "Pretty Print",
-          "description": "Self-created SOAP payloads may not arrive formatted into separate, readable lines — the content still functions correctly either way, but it's hard for a human to read. Pretty Print reformats the payload into readable, indented lines without changing the message itself in any way."
+          "type": "note",
+          "text": "API Scan supports creating a message in a project folder and editing its payload and endpoint. Set the method, authentication and headers from the actual binding; manual preparation does not prove the service accepts them."
         },
         {
           "type": "note",
-          "text": "Pretty Print is purely cosmetic — it never alters what gets sent, only how it's displayed for editing."
+          "text": "SOAP 1.2 HTTP uses application/soap+xml, with an optional action parameter. Do not assume the SOAP 1.1 SOAPAction header is universally required for SOAP 1.2. Keep the envelope namespace and binding consistent with the contract."
+        },
+        {
+          "type": "note",
+          "text": "Pretty Print formats the visible payload; it is not schema validation, a server request or a repair of business errors. Independent guidance: inspect whitespace-sensitive content and signed XML rather than promise all formatting is semantically harmless."
         }
-      ],
-      "bulletPoints": [
-        "A self-created Message still needs a correctly specified Endpoint, Method, and Headers — the API Scan won't infer these without an actual scan.",
-        "Unformatted (non-pretty) SOAP payloads are still functionally correct; formatting is a readability aid, not a correctness requirement."
       ],
       "sectionId": "section-811478a704a6"
     },
     {
-      "sectionTitle": "Exporting a Self-Created Message",
+      "sectionTitle": "Export and verify readiness",
       "elements": [
         {
           "type": "note",
-          "text": "Exporting a self-created Message to Tosca uses exactly the same API Test Case export button as a scanned URI — the relevant Business Parameters are then created the same way as always."
+          "text": "Use the documented API TestCase export for selected messages, then define attributes and assertions. Generate defaults, inspect references and configure input values. Do not infer that every manually prepared message has the same response artifacts or valid selectors as a live scan."
         },
         {
-          "type": "steps",
-          "title": "Finishing the TestCase",
-          "items": [
-            "Export the self-created Message to Tosca as an API Test Case.",
-            "Select the TestStep and click Auto fill Values in the ribbon to populate default values.",
-            "Replace the relevant value fields with buffered values or Test Configuration Parameters as needed.",
-            "Run the whole TestCase in the Scratchbook."
-          ]
+          "type": "note",
+          "text": "Independent readiness checklist: confirm endpoint access, binding, credentials, payload schema, returned identity and positive/negative assertions. Only execute when an authorized endpoint or documented simulation exists."
         }
-      ],
-      "bulletPoints": [
-        "Once exported, a self-created Message's Module and TestStep behave identically to one that came from an actual scan — there is no lasting difference."
       ],
       "sectionId": "section-dc6ee8489028"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 10 - Self-Created SOAP",
+      "sectionTitle": "Independent exercise",
       "elements": [
         {
           "type": "note",
-          "text": "📄 API Exercise 10 - Self-Created SOAP — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+          "text": "Prepare a disposable SOAP operation from a contract and document which checks are static preparation, simulated execution and actual service execution. Academy video/exercise material was inaccessible."
         }
       ],
       "sectionId": "section-f722444f2294"
@@ -93,134 +65,180 @@
   ],
   "examPitfalls": [
     {
-      "title": "Thinking a self-created message can't be tested until it's hosted",
-      "trapDescription": "Candidates assume testing must wait until the API is actually live and scannable.",
-      "bestPractice": "The whole point of self-creating a SOAP (or REST) message is to start testing before the API is hosted — as soon as it's live, you simply add the real Endpoint/Resource to the already-built TestSteps."
+      "title": "Calling preparation a live test",
+      "trapDescription": "Claiming server verification before a server or simulation exists.",
+      "bestPractice": "Label preparation, simulation and real endpoint execution separately."
     },
     {
-      "title": "Assuming an unformatted SOAP payload is broken",
-      "trapDescription": "Candidates see a self-created SOAP payload as one unbroken line and assume something went wrong.",
-      "bestPractice": "The payload functions identically whether it's on one line or formatted into readable indented lines — Pretty Print only changes the display, not the message's meaning or correctness."
+      "title": "Treating formatting as validation",
+      "trapDescription": "Assuming Pretty Print proves schema or business correctness.",
+      "bestPractice": "Use actual validation and assertions; inspect whitespace-sensitive or signed content."
     },
     {
-      "title": "Forgetting to manually set the Endpoint on a self-created message",
-      "trapDescription": "Candidates build the payload but leave the Endpoint blank, since there was no scan to auto-populate it.",
-      "bestPractice": "A self-created Message has no scan behind it, so the Endpoint (and other technical details a scan would normally supply) must be entered manually before the message can be sent or exported."
+      "title": "Assuming one header pattern for all SOAP",
+      "trapDescription": "Adding SOAPAction without checking the SOAP version and binding.",
+      "bestPractice": "Configure version-specific media type/action and the service security contract."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "In what situation would a tester create a SOAP message manually in the API Scan instead of scanning a URI?",
+      "scenario": "When can preparing a SOAP message manually be useful?",
       "options": [
         {
           "id": "A",
-          "text": "When the API's technical specification is known, but the API isn't hosted anywhere yet."
+          "text": "When a specification exists but implementation is not yet available; live execution still requires an endpoint."
         },
         {
           "id": "B",
-          "text": "Only when the API Scan cannot connect to the internet."
+          "text": "Only when internet access is absent."
         },
         {
           "id": "C",
-          "text": "Manual creation is never a valid alternative to scanning."
+          "text": "Never."
         },
         {
           "id": "D",
-          "text": "Only for REST messages, never for SOAP."
+          "text": "Only for REST."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "This is a classic shift-left scenario — testing starts before hosting exists.",
-      "rationale": "When the API is fully specified but not yet hosted, a message can be manually created from the specification, allowing testing to begin earlier — a shift-left approach. This technique works for both SOAP and REST."
+      "hint": "Distinguish preparation from observed behavior.",
+      "rationale": "Preparation can begin early without falsely claiming live service validation.",
+      "optionExplanations": {
+        "A": "This correctly scopes early preparation.",
+        "B": "Offline status is not the only reason.",
+        "C": "Manual preparation is a valid workflow.",
+        "D": "SOAP can also be prepared from a contract."
+      },
+      "lessonSection": "section-99806c43a348",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "What does the Pretty Print function do to a self-created SOAP payload?",
+      "scenario": "What does Pretty Print establish?",
       "options": [
         {
           "id": "A",
-          "text": "Reformats it into readable, indented lines without changing the message's meaning or function."
+          "text": "Readable formatting of the visible payload, not schema or service correctness."
         },
         {
           "id": "B",
-          "text": "Validates the payload against the live API and fixes any errors."
+          "text": "It validates the live service and fixes errors."
         },
         {
           "id": "C",
-          "text": "Converts the SOAP payload into REST/JSON format."
+          "text": "It converts SOAP to REST."
         },
         {
           "id": "D",
-          "text": "Removes unnecessary elements from the payload automatically."
+          "text": "It automatically removes business fields."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "It's a purely cosmetic, readability-only function.",
-      "rationale": "Pretty Print reformats the payload into separate, readable lines while respecting the exact content — it makes no changes to the message itself, only to how it's displayed."
+      "hint": "Formatting is a presentation function.",
+      "rationale": "Inspect correctness separately, including whitespace-sensitive content.",
+      "optionExplanations": {
+        "A": "This describes formatting without a universal semantic guarantee.",
+        "B": "Pretty Print is not live service validation.",
+        "C": "Formatting does not change architectural style.",
+        "D": "Business-field removal is not its purpose."
+      },
+      "lessonSection": "section-811478a704a6",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "Once a self-created SOAP message is exported to Tosca as an API Test Case, how does it differ from a Module/TestStep created from an actual scan?",
+      "scenario": "After exporting a manually prepared message, what should the tester do?",
       "options": [
         {
           "id": "A",
-          "text": "It behaves identically — there is no lasting difference once exported."
+          "text": "Inspect generated references, configure attributes and assert behavior against an available authorized endpoint or simulation."
         },
         {
           "id": "B",
-          "text": "It cannot use Business Parameters."
+          "text": "Assume attributes cannot be used."
         },
         {
           "id": "C",
-          "text": "It cannot be run in the Scratchbook."
+          "text": "Assume execution can never be performed."
         },
         {
           "id": "D",
-          "text": "It permanently lacks a Response Module."
+          "text": "Assume every message permanently lacks response artifacts."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Think about what actually gets exported — a Message is a Message either way.",
-      "rationale": "Once exported, a self-created Message's Module and TestStep behave exactly like one created from an actual API scan — Business Parameters, ActionModes, and running in the Scratchbook all work identically."
+      "hint": "Inspect what was generated and what can be executed.",
+      "rationale": "Manual creation does not eliminate inspection, mapping or endpoint prerequisites.",
+      "optionExplanations": {
+        "A": "This addresses preparation and execution readiness.",
+        "B": "Exported messages can use Module Attributes.",
+        "C": "Execution is possible with the required environment.",
+        "D": "A universal missing-response rule is unsupported."
+      },
+      "lessonSection": "section-dc6ee8489028",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
-      "key": "Self-created message",
-      "value": "Manually build the payload/Endpoint/Method/Headers when an API is specified but not yet hosted — enables testing before the API goes live."
+      "key": "Preparation",
+      "value": "Specification-based authoring before implementation, not proof of server behavior."
     },
     {
-      "key": "Works for SOAP and REST",
-      "value": "The technique applies to both; only the leverage/format differs, as covered in Lesson 8."
+      "key": "Binding",
+      "value": "Set envelope, method, media type/action and security from the contract."
     },
     {
       "key": "Pretty Print",
-      "value": "Cosmetic reformatting only — never changes the payload's content or behavior."
+      "value": "Formatting, not validation; inspect sensitive XML content."
     },
     {
       "key": "Export",
-      "value": "Same API Test Case export flow as a scanned message; Business Parameters created the same way."
+      "value": "Inspect generated Modules and configure assertions."
     },
     {
-      "key": "Going live later",
-      "value": "Once the real API is hosted, just add the real Endpoint/Resource to the already-built TestSteps."
+      "key": "Execution",
+      "value": "Needs an authorized endpoint or documented simulation."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 10 - Self-Created SOAP in the API Scan (video)",
-      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
-      "duration": "video"
+      "title": "Primary documentation",
+      "url": "https://www.w3.org/TR/soap12-part1/",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://www.w3.org/TR/soap12-part2/",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_home_menu.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_send_messages.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_export.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }

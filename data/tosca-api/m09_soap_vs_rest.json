@@ -3,93 +3,51 @@
   "moduleTitle": "Lesson 8 - The Difference Between SOAP & REST",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
   "learningObjectives": [
-    "State the core protocol and format differences between SOAP and REST.",
-    "Switch the System Under Test from the REST Coffeeshop to the SOAP DemoWebShop.",
-    "Scan the DemoWebShop's SOAP endpoint and rename Operations/Messages for clarity.",
-    "Send SOAP requests with account credentials and interpret the address/country responses."
+    "Distinguish SOAP messaging from REST architectural constraints.",
+    "Scope HTTP method and authentication claims to the applicable binding and contract.",
+    "Inspect a service definition in API Scan.",
+    "Define expected outcomes independently of observed responses."
   ],
   "estTime": "35 min",
   "studyGuide": [
     {
-      "sectionTitle": "SOAP vs. REST, Recap and Reinforcement",
+      "sectionTitle": "SOAP and REST are different kinds of specification",
       "elements": [
         {
-          "type": "table",
-          "headers": [
-            "",
-            "SOAP",
-            "REST"
-          ],
-          "rows": [
-            [
-              "HTTP methods used",
-              "POST only",
-              "All conventional methods (GET, POST, PUT, DELETE...)"
-            ],
-            [
-              "Message formats",
-              "XML only",
-              "XML, JSON, TEXT, and more"
-            ],
-            [
-              "Protocol",
-              "HTTP",
-              "Usually HTTP, though REST can in principle use a different protocol (uncommon)"
-            ],
-            [
-              "Flexibility",
-              "Less flexible",
-              "More flexible, though still less wide-spread than SOAP overall"
-            ]
-          ]
+          "type": "note",
+          "text": "SOAP defines XML-based message construction and processing, with bindings to different underlying protocols. SOAP 1.2 HTTP binding associates POST with request-response and GET with SOAP-response; SOAP is not universally POST-only or HTTP-only."
         },
         {
           "type": "note",
-          "text": "Both SOAP and REST are Web Services implementation methods riding on the same underlying protocol (HTTP) — they differ in how they leverage that protocol and which formats they support, not in the transport layer itself."
+          "text": "REST is an architectural style with constraints including stateless interaction and a uniform interface. JSON alone does not make an API RESTful. Stateless interaction does not mean the server cannot store business resources. Authentication and session behavior must be determined from the service contract, not inferred from the word SOAP."
+        },
+        {
+          "type": "note",
+          "text": "Independent guidance: avoid unsupported popularity rankings or a universal more-flexible/less-flexible verdict. Compare the required interaction, representations, security and tooling for the actual service."
         }
-      ],
-      "bulletPoints": [
-        "SOAP = POST-only, XML-only. REST = any HTTP method, multiple formats.",
-        "REST's flexibility doesn't make it more common than SOAP in the wild — SOAP remains extremely widespread, especially in enterprise systems."
       ],
       "sectionId": "section-2df563e71679"
     },
     {
-      "sectionTitle": "Switching SUT: Scanning the DemoWebShop (SOAP)",
+      "sectionTitle": "Independent service inspection",
       "elements": [
         {
-          "type": "concept",
-          "term": "Why switch SUTs here",
-          "description": "The Coffeeshop used so far is a REST implementation. To explore SOAP, the course switches to the DemoWebShop — the same SUT used in AS1/AS2 — scanning its SOAP endpoint instead of a REST URI."
-        },
-        {
-          "type": "steps",
-          "title": "Scanning the DemoWebShop SOAP endpoint",
-          "items": [
-            "Create a new Component Folder as organizational best practice, then reopen the API Scan.",
-            "Scan the URI: http://demowebshop.tricentis.com/Plugins/Misc.WebServicesCustomer/Remote/NopService.svc",
-            "Rename Operations and Messages for clarity, since the API Scan sorts alphabetically: e.g. \"AddToCart\" → \"02 Add To Cart\", \"CreateOrder\" → \"03 Create Order\", \"GetOrderCollection\" → \"04 Verify Order Placement\".",
-            "Enter DemoWebShop account credentials (username/password) into the relevant request fields, e.g. \"01 Get Address\", and Run to retrieve the account's address.",
-            "Query the available countries via a \"Get Country\" style request to see the full countries list returned in the Response."
-          ]
+          "type": "note",
+          "text": "Use an authorized sandbox and its current service definition. Scan the supplied file or URI, inspect operations, messages, namespaces and expected authentication, then send a permitted request. The historical DemoWebShop endpoint and account flow were not executed or certified here."
         },
         {
           "type": "note",
-          "text": "Renaming Operations and Messages doesn't change their functionality at all — it's purely an organizational best practice, identical in spirit to the numbering convention already used for REST."
+          "text": "Independent guidance: distinguish a local display name from the operation QName, payload and endpoint. A rename is not a substitute for editing the service contract. Inspect technical fields and compare the returned response with explicit expectations; numerical prefixes do not schedule execution."
         }
-      ],
-      "bulletPoints": [
-        "SOAP and REST look and behave very similarly inside the API Scan itself — same Payload/Method/Params tabs, same Send/Run flow.",
-        "Getting the address and country list here sets up the values needed for later SOAP TestCases (billing/shipping address, order creation)."
       ],
       "sectionId": "section-d6209b7f8e1e"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 08 - SOAP Scan",
+      "sectionTitle": "Independent exercise",
       "elements": [
         {
           "type": "note",
-          "text": "📄 API Exercise 08 - SOAP Scan — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+          "text": "Inspect a service definition and identify the message binding, permitted operation and credential mechanism. Prepare positive and negative assertions. Academy video and exercise files were not accessed."
         }
       ],
       "sectionId": "section-a6abb86704a2"
@@ -97,166 +55,215 @@
   ],
   "examPitfalls": [
     {
-      "title": "Thinking REST can only use HTTP",
-      "trapDescription": "Candidates assume REST is strictly bound to HTTP, the same as SOAP.",
-      "bestPractice": "REST can, in principle, use a different transport protocol, though this is uncommon in practice. SOAP, by contrast, is always built on HTTP with POST as its only leverage method."
+      "title": "Treating SOAP as POST-only",
+      "trapDescription": "Applying one familiar binding pattern universally.",
+      "bestPractice": "Inspect the binding; SOAP 1.2 HTTP also defines a GET SOAP-response pattern."
     },
     {
-      "title": "Assuming renaming Operations changes their behavior",
-      "trapDescription": "Candidates worry that renaming a scanned SOAP Operation or Message will break its functionality.",
-      "bestPractice": "Renaming Operations and Messages is purely organizational — it does not affect functionality at all. It exists purely so items sort logically despite the API Scan's alphabetical ordering."
+      "title": "Equating display labels with protocol identity",
+      "trapDescription": "Using renamed labels as proof of the operation QName.",
+      "bestPractice": "Inspect endpoint, binding and payload fields separately."
     },
     {
-      "title": "Forgetting SOAP requires credentials on every request",
-      "trapDescription": "Candidates send a SOAP request to the DemoWebShop without entering account username/password, expecting a valid response anyway.",
-      "bestPractice": "Because SOAP is a stateless protocol, the server does not retain session data — the username/password (or equivalent credentials) must be sent with every single request that needs them."
+      "title": "Inferring authentication from statelessness",
+      "trapDescription": "Assuming SOAP requires username/password on every call.",
+      "bestPractice": "Use the documented service authentication; statelessness does not erase server business data."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "Which message format(s) does SOAP support?",
+      "scenario": "What defines the SOAP message structure?",
       "options": [
         {
           "id": "A",
-          "text": "XML only."
+          "text": "An XML-based envelope and processing model."
         },
         {
           "id": "B",
-          "text": "XML, JSON, and plain text."
+          "text": "Any JSON document is automatically SOAP."
         },
         {
           "id": "C",
-          "text": "JSON only."
+          "text": "Only JSON."
         },
         {
           "id": "D",
-          "text": "Any binary format."
+          "text": "Any arbitrary binary data without a message model."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "This is one of the two defining constraints of SOAP, alongside its HTTP method restriction.",
-      "rationale": "SOAP only supports the XML message format. REST, by contrast, can work with a wider array of formats including XML, JSON, and plain text."
+      "hint": "Distinguish message construction from transport.",
+      "rationale": "SOAP uses an XML-based message model; the selected binding controls its transport.",
+      "optionExplanations": {
+        "A": "This states the message model without falsely restricting all transports.",
+        "B": "JSON alone is not a SOAP envelope.",
+        "C": "SOAP is not a JSON-only protocol.",
+        "D": "SOAP has defined construction and processing rules."
+      },
+      "lessonSection": "section-2df563e71679",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "Which SUT is scanned in this lesson to explore SOAP, and why?",
+      "scenario": "What should a tester use to establish a SOAP service operation and binding?",
       "options": [
         {
           "id": "A",
-          "text": "The Coffeeshop, because it also supports SOAP."
+          "text": "A remembered demo URL without checking it."
         },
         {
           "id": "B",
-          "text": "The DemoWebShop, the same SUT used in AS1/AS2, because it is implemented using SOAP."
+          "text": "The current service definition and authorized sandbox contract."
         },
         {
           "id": "C",
-          "text": "A brand-new banking demo application built for this lesson."
+          "text": "Only a marketing screenshot."
         },
         {
           "id": "D",
-          "text": "No SUT switch is needed — the Coffeeshop supports both implementation methods equally."
+          "text": "Assume every service has the same operations."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "The Coffeeshop used earlier in the course is a REST implementation — a different SUT is needed for SOAP.",
-      "rationale": "The DemoWebShop, the exact same SUT used throughout AS1 and AS2, is implemented using SOAP, so the course switches to it to explore SOAP scanning and automation."
+      "hint": "Use the current contract.",
+      "rationale": "Service-specific operations, bindings and authentication need evidence.",
+      "optionExplanations": {
+        "A": "A historical URL may be stale or unrelated.",
+        "B": "The current contract provides the relevant technical definition.",
+        "C": "A screenshot is not a binding definition.",
+        "D": "Operations are service-specific."
+      },
+      "lessonSection": "section-d6209b7f8e1e",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "What effect does renaming a scanned SOAP Operation (e.g. \"AddToCart\" to \"02 Add To Cart\") have on its underlying functionality?",
+      "scenario": "Which action distinguishes a display label from protocol configuration?",
       "options": [
         {
           "id": "A",
-          "text": "None — renaming is purely organizational and does not affect functionality."
+          "text": "Inspect the operation QName, payload and endpoint separately from its local label."
         },
         {
           "id": "B",
-          "text": "It changes which HTTP Method the Operation uses."
+          "text": "Assume a new label switches the HTTP method."
         },
         {
           "id": "C",
-          "text": "It breaks the link to the underlying endpoint."
+          "text": "Assume renaming always deletes the endpoint."
         },
         {
           "id": "D",
-          "text": "It converts the Operation from SOAP to REST."
+          "text": "Assume a prefix converts SOAP to REST."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "This is the same principle as the numerical-prefix convention used earlier for REST.",
-      "rationale": "Renaming Operations and Messages doesn't affect their functionality at all — it's a best practice purely for organizing and clarifying the alphabetically-sorted list in the API Scan."
+      "hint": "Labels communicate organization.",
+      "rationale": "Protocol settings require technical inspection; a label alone is not their specification.",
+      "optionExplanations": {
+        "A": "This checks the actual technical identity.",
+        "B": "A label is not an HTTP-method selector.",
+        "C": "Endpoint deletion is not implied by a label.",
+        "D": "Naming cannot change architectural style."
+      },
+      "lessonSection": "section-d6209b7f8e1e",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "Why must a username and password be sent with every single SOAP request to the DemoWebShop in this lesson?",
+      "scenario": "What determines whether credentials must be included in a SOAP request?",
       "options": [
         {
           "id": "A",
-          "text": "Because SOAP is a stateless protocol and the server doesn't retain your data between requests."
+          "text": "The service security contract and applicable authentication mechanism."
         },
         {
           "id": "B",
-          "text": "Because REST never requires credentials, unlike SOAP."
+          "text": "REST never uses authentication."
         },
         {
           "id": "C",
-          "text": "Because the DemoWebShop requires a Service Access Key instead of credentials."
+          "text": "Every SOAP service uses the same access key."
         },
         {
           "id": "D",
-          "text": "This is only required for DELETE requests."
+          "text": "Only DELETE operations can require credentials."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Think about what \"stateless\" implies for repeated requests.",
-      "rationale": "SOAP is a stateless protocol — the server doesn't retain data between calls — so every single request that needs authentication must include the username and password again."
+      "hint": "Check service-specific security.",
+      "rationale": "SOAP alone does not mandate repeated username/password credentials or prohibit sessions.",
+      "optionExplanations": {
+        "A": "This scopes authentication correctly.",
+        "B": "REST APIs may require authentication.",
+        "C": "Security mechanisms differ among services.",
+        "D": "Other operations can require authentication."
+      },
+      "lessonSection": "section-2df563e71679",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
       "key": "SOAP",
-      "value": "POST only, XML only, built on HTTP."
+      "value": "XML-based messaging with protocol bindings."
+    },
+    {
+      "key": "SOAP 1.2 HTTP",
+      "value": "Request-response uses POST; SOAP-response uses GET."
     },
     {
       "key": "REST",
-      "value": "All HTTP methods, multiple formats (XML/JSON/text), can (rarely) use a non-HTTP protocol."
+      "value": "Architectural constraints, not a synonym for JSON."
     },
     {
-      "key": "SOAP SUT",
-      "value": "DemoWebShop (demowebshop.tricentis.com) — same SUT as AS1/AS2."
+      "key": "Contract",
+      "value": "Inspect service definition, endpoint and security."
     },
     {
-      "key": "SOAP endpoint scanned",
-      "value": "/Plugins/Misc.WebServicesCustomer/Remote/NopService.svc"
+      "key": "Labels",
+      "value": "Display naming does not specify protocol identity."
     },
     {
-      "key": "Renaming is cosmetic",
-      "value": "Renaming Operations/Messages never changes their functionality — organization only."
-    },
-    {
-      "key": "SOAP is stateless",
-      "value": "Credentials must be sent with every request that needs them; nothing is remembered server-side."
+      "key": "State",
+      "value": "Stateless interactions do not prohibit stored business resources."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 08 - The Difference Between SOAP & REST (video)",
-      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
-      "duration": "video"
+      "title": "Primary documentation",
+      "url": "https://www.w3.org/TR/soap12-part1/",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://www.w3.org/TR/soap12-part2/",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_uri.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }
