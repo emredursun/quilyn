@@ -502,3 +502,11 @@ test('Blueprint review distinguishes branch placement from missing assets and co
  assert.match(sc[1].opts[0],/does not mean.*excluded/);assert.match(sc[1].fbs[0],/placement, not exclusion/);assert.doesNotMatch(JSON.stringify(sc),/\\\\u[0-9a-f]{4}/i);assert.match(d.studyGuide[2].elements[5].description,/without its own new class/);assert.match(d.studyGuide[3].elements[0].description,/add it to a View/);assert.match(d.practiceQuiz[12].options[0].text,/saving.*as a template/);
  assert.doesNotMatch(JSON.stringify(d),/Not generated: Access Roles|Anyone with the URL can collaborate|no special role needed|Access Roles are the ONE asset|no Pega account of any kind|functional application in minutes|Pega is not responsible/);
 });
+
+test('BA Blueprint review retains answers and covers SaaS access and wizard import constraints',()=>{
+ const crypto=require('node:crypto'),file='data/business-architect/m07_accelerating_app_building_blueprint.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M07'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.estTime,'65 min · 4 topics');assert.equal(d.practiceQuiz.length,13);
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,11].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.equal(q.explanationReviewedOn,'2026-10-05');});
+ assert.match(d.studyGuide[2].elements[5].description,/without its own class/);assert.match(d.studyGuide[3].elements[0].description,/Picklist and add it to a View/);assert.match(d.practiceQuiz[11].options[0].text,/saving it as a template/);assert.match(d.practiceQuiz[4].rationale,/does not imply they were not created/);
+ assert.doesNotMatch(JSON.stringify(d),/no Pega instance or login is required to collaborate|functional application in minutes|LSA performs the import|The LSA imports the Blueprint file/);
+});
