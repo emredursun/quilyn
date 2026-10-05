@@ -895,3 +895,21 @@ test('AS1 advanced guidance distinguishes ownership, retry scope, counts and shi
  assert.match(d.practiceQuiz[6].options[1].text,/additional stable properties/);
  assert.doesNotMatch(JSON.stringify(d),/confirmed Knowledge Check|verbatim official|RowCount==RowNum|\$\{Repetition\}|var\(--pa-ink-[23]\)/i);
 });
+
+test('AS1 reference review corrects expression, shortcut and repair advice without inventing guide downloads',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ const bytes=fs.readFileSync('data/tosca-as1/m09_guides_reference.json'),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['C'],['D']][i%4]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[0].text,/w means workdays/);
+ assert.match(d.studyGuide[3].elements[0].text,/RowCount->RowNum/);
+ assert.match(d.studyGuide[4].elements[0].text,/Module references and TCP dependencies remain/);
+ assert.match(d.practiceQuiz[14].options[2].text,/locally editable/);
+ assert.match(d.practiceQuiz[17].options[1].text,/one or several/);
+ assert.match(d.studyGuide[5].elements[0].rows[1][0],/Ctrl\+X/);
+ assert.doesNotMatch(JSON.stringify(d),/runtime-only|NO IF|ONLY before saving|RowCount==RowNum|w=weeks|var\(--pa-ink-[23]\)/i);
+ const b=fs.readFileSync('data/tosca-as1/m10_original_guides.json'),guide=JSON.parse(b);
+ assert.equal(inv.modules.find(m=>m.id===guide.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(b).digest('hex'));
+ assert.doesNotMatch(JSON.stringify(guide.learningObjectives),/open it in the viewer|Download any guide/);
+ assert.match(guide.studyGuide[0].elements[0].text,/have not been inspected/);
+});
