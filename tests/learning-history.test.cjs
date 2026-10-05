@@ -843,3 +843,15 @@ test('AS1 maintenance review keeps ValueRange suggestions separate from enforcem
  assert.doesNotMatch(JSON.stringify(d),/enforced everywhere|flags it as invalid|red cross icon|automatically restricted/i);
  assert.match(d.studyGuide[2].elements.find(e=>e.svg).svg,/same-technology.*Partial merge can retain/);
 });
+
+test('AS1 parameter guidance uses scope rather than job role and preserves override caveats',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as1/m05_advanced_testcase_parameters.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['C'],['D'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].text,/CP is outside square brackets.*overridden/);
+ assert.match(d.studyGuide[2].elements[1].text,/include URL data/);
+ assert.match(d.practiceQuiz[0].options[0].text,/replace literal uses/);
+ assert.match(d.practiceQuiz[5].scenario,/uniqueness check/);
+ assert.doesNotMatch(JSON.stringify(d),/CP in square brackets|exact tip given in Exercise|for non-technical business users managing.*not technical/i);
+ assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.svg).length,2);
+});
