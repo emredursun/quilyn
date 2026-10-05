@@ -11,10 +11,10 @@
 
 
 var PRINCIPLES = [
-  { letter: "I", text: "Manage Intelligence centrally — put all AI, decisioning, and business rules in the application layer, not scattered in channels or data systems" },
+  { letter: "I", text: "Manage Intelligence centrally — manage business decisions and rules centrally to guide outcomes with customer information" },
   { letter: "O", text: "Focus on Outcomes, align your process — use Case Management and Microjourneys to deliver specific customer outcomes" },
   { letter: "U", text: "Connect Up to Channels — presentation and channel interfaces connect up to the central business logic layer" },
-  { letter: "D", text: "Connect Down to data, keep it clean — the data access layer connects downward to systems of record without exposing implementation details" },
+  { letter: "D", text: "Connect Down to data, keep logic nimble — the data access layer connects downward to systems of record without exposing implementation details" },
   { letter: "V", text: "Manage Variations to be scale-ready — handle geographies, business lines, and customer-type variations through the Situational Layer Cake" }
 ];
 
@@ -38,7 +38,10 @@ function renderList() {
     item.dataset.di = displayIdx;
     item.innerHTML = '<span class="drag-handle">' + (checked ? '' : '⠿') + '</span>' +
                      '<span class="num">' + (displayIdx+1) + '.</span>' +
-                     '<span>' + PRINCIPLES[pi].text + '</span>';
+                     '<span>' + PRINCIPLES[pi].text + '</span>' + (checked ? '' : '<button class="btn" aria-label="Move principle ' + (displayIdx+1) + ' up"' + (displayIdx === 0 ? ' disabled' : '') + '>↑ Up</button><button class="btn" aria-label="Move principle ' + (displayIdx+1) + ' down"' + (displayIdx === order.length-1 ? ' disabled' : '') + '>↓ Down</button>');
+    item.querySelectorAll('button').forEach(function(button, bi) {
+      button.addEventListener('click', function() { moveItem(displayIdx, bi === 0 ? -1 : 1); });
+    });
     item.addEventListener('dragstart', onDragStart);
     item.addEventListener('dragover', onDragOver);
     item.addEventListener('drop', onDrop);
@@ -46,12 +49,24 @@ function renderList() {
   });
 }
 
+function moveItem(i, delta) {
+  if (checked) return;
+  var target = i + delta;
+  if (target < 0 || target >= order.length) return;
+  var tmp = order[i]; order[i] = order[target]; order[target] = tmp;
+  renderList();
+  var controls = document.querySelectorAll('.drag-item button');
+  var focus = controls[target*2 + (delta < 0 ? 0 : 1)];
+  if (focus && focus.disabled) focus = controls[target*2 + (delta < 0 ? 1 : 0)];
+  if (focus) focus.focus();
+}
+
 var dragSrc = null;
 function onDragStart(e){ dragSrc = this; }
 function onDragOver(e){ e.preventDefault(); }
 function onDrop(e){
   e.preventDefault();
-  if (!dragSrc || dragSrc === this) return;
+  if (checked || !dragSrc || dragSrc === this) return;
   var a = parseInt(dragSrc.dataset.di), b = parseInt(this.dataset.di);
   var tmp = order[a]; order[a] = order[b]; order[b] = tmp;
   renderList();
@@ -68,7 +83,7 @@ function checkOrder() {
     resultHtml += '<div class="result-row ' + (isCorrect ? 'ok' : 'bad') + '">' +
       '<span class="pos">' + (isCorrect ? '✓' : '✗') + '</span>' +
       '<span><b>You placed:</b> ' + p.text.split(' — ')[0] + ' at position ' + (di+1) +
-      (isCorrect ? '' : ' — should be position ' + (pi+1) + ' (' + PRINCIPLES[di].letter + ')') +
+      (isCorrect ? '' : ' — should be position ' + (pi+1) + ' (' + PRINCIPLES[pi].letter + ')') +
       '</span></div>';
   });
   var pct = Math.round(correct/5*100);
