@@ -734,3 +734,15 @@ test('API export and Module review separates destinations, request buffer defaul
   else{assert.match(d.practiceQuiz[3].options[1].text,/Insert.*buffer reference/);assert.match(d.studyGuide[3].elements[1].text,/automatically applied to corresponding messages/);assert.match(d.practiceQuiz[4].options[1].text,/validate/);assert.match(d.studyGuide[4].elements[0].text,/not proof of server behavior/);}
  });
 });
+
+test('API TestCase review supports whole-case defaults, preserves clipboard omissions and uses current navigation',()=>{
+ const crypto=require('node:crypto'),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ ['m07_api_testcases.json','m08_building_the_testcase.json'].forEach((name,n)=>{
+  const bytes=fs.readFileSync('data/tosca-api/'+name),d=JSON.parse(bytes),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[[['B','B','B','A'],['B','C','B','C','B']][n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+  assert.doesNotMatch(JSON.stringify(d),/verbatim from the course|ValueRange column on the corresponding TestCase|TestCase itself is.*unsupported/);
+  if(!n){assert.match(d.practiceQuiz[1].options[1].text,/whole API TestCase/);assert.match(d.studyGuide[1].elements[1].text,/retain their existing values/);}
+  else{assert.match(d.practiceQuiz[0].options[1].text,/Ctrl\+Shift\+J/);assert.match(d.studyGuide[0].elements[1].text,/Do not create a separate TCP on every TestStepValue/);assert.match(d.studyGuide[0].elements[3].text,/empty ActionMode/);}
+ });
+});

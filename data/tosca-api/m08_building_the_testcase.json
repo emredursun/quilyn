@@ -3,90 +3,55 @@
   "moduleTitle": "Lesson 7 - Building the TestCase",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
   "learningObjectives": [
-    "Add Test Configuration Parameters to API TestStepValues, such as a shared Service Access Key.",
-    "Jump between a TestStep and its underlying Module using CTRL+J or the context menu.",
-    "Use the F9 toggle to hide empty values in long API TestCases.",
-    "Refresh Modules and TestCases directly from the API Scan after the server or API structure changes."
+    "Use custom TCP references in API values.",
+    "Navigate to referenced Modules and add TestSteps using current commands.",
+    "Distinguish hidden empty actions from empty values.",
+    "Update changed Modules and their mappings before targeted verification."
   ],
   "estTime": "35 min",
   "studyGuide": [
     {
-      "sectionTitle": "Building a Complete API TestCase",
+      "sectionTitle": "Build an independently specified API flow",
       "elements": [
         {
-          "type": "text",
-          "text": "Worked example: add a new coffee shop branch, verify it was added, then delete it — the same three-step pattern (Create → Verify → Delete) introduced in the previous lesson, now fully wired up with real values and run end-to-end."
-        },
-        {
-          "type": "warning",
-          "text": "Official Best Practice: when Modules are updated in Tosca Commander, the TestStep will automatically be updated."
-        },
-        {
-          "type": "concept",
-          "term": "Module ↔ TestStep synchronization",
-          "description": "As with UI automation, when a Module is updated in Tosca Commander, its linked TestStep — and by extension the whole TestCase — updates automatically. If you're unsure which Module a TestStep links to, select the TestStep and press Ctrl+J, or right-click it and choose \"Jump to Module\"."
-        },
-        {
-          "type": "concept",
-          "term": "Adding Modules to an API TestCase",
-          "description": "Like in UI TestCases, Modules can be added to an API TestCase either by dragging and dropping them from the Modules section, or with the Ctrl+T shortcut — both methods work identically to how you already add Modules in UI automation."
-        },
-        {
-          "type": "concept",
-          "term": "Test Configuration Parameters (TCP) in API TestCases",
-          "description": "Just like in UI TestCases, add a Test Configuration Parameter — e.g. \"Key\" holding the Service Access Key — to every TestStepValue that needs it. This is far less laborious than updating the same literal value in every TestStep individually if the key ever changes, especially in long TestCases."
+          "type": "note",
+          "text": "Independent example: create a disposable resource, buffer its returned identifier, retrieve that resource and assert expected fields, then delete it where permitted. Do not assume every service uses a list Constraint or the same cleanup semantics. A passing run needs all required assertions, not just successful transport."
         },
         {
           "type": "note",
-          "text": "Buffering the ID from a Create step lets the Constraint ActionMode identify that exact new shop later (to Verify its name/city/country), and the same buffered ID is reused again in the Delete TestStep."
+          "text": "Create a custom TCP on a supported TestCase/folder or other configuration-bearing object, and reference it in values with {CP[Key]}. Child objects inherit the value; lower-level overrides apply. Do not create a separate TCP on every TestStepValue. Use the appropriate supported data type, including Password where suitable, and follow your project credential-handling policy."
+        },
+        {
+          "type": "note",
+          "text": "Use TestStep context menu > Jump to Module or Ctrl+Shift+J to inspect the linked Module. Drag a Module onto a TestCase or use Ctrl+T to launch Search and Add TestStep; choose the intended result."
+        },
+        {
+          "type": "note",
+          "text": "F9 controls show/hide context-sensitive objects, including DoNothing. The View menu hides steps/values with an empty ActionMode; this is not the same as hiding every empty Value, and hiding does not repair missing input."
         }
-      ],
-      "bulletPoints": [
-        "A fully populated API TestCase is just as business-readable as a UI TestCase — an entry-level Automation Specialist with no programming/API knowledge can follow and run it.",
-        "F9 toggles hiding TestStepValues with no value set — invaluable for long, wide API TestCases.",
-        "The Control Flow Diagram gives the same visual TestCase overview you already know from UI automation.",
-        "Run in the Scratchbook, then set WorkState to Completed once the TestCase runs cleanly start-to-finish."
       ],
       "sectionId": "section-b1b628401d8a"
     },
     {
-      "sectionTitle": "Updating Modules and TestCases from the API Scan",
+      "sectionTitle": "Refresh selected Modules and inspect affected mappings",
       "elements": [
         {
-          "type": "steps",
-          "title": "Pushing many server-side changes back into Tosca at once",
-          "items": [
-            "In Tosca Commander, select the Module(s) that need updating — for a Request+Response pair, select both, or select their containing folder.",
-            "On the ribbon, open API Testing > the dropdown below the API Scan button > \"Open Selected Modules\" to reload them inside the API Scan itself.",
-            "Make the necessary changes inside the API Scan.",
-            "Click \"Update\" in the ribbon — the Modules and TestCases back in Tosca Commander are refreshed to match."
-          ]
+          "type": "note",
+          "text": "Open the affected Module through API Testing > API Scan > Open selected Modules, edit the message and click Update. Review each changed request/response Module; do not assume selecting only one refreshes all related artifacts."
         },
         {
-          "type": "warning",
-          "text": "Official Best Practice: when updating Modules, both the Request and the Response need to be selected, in order to update both."
+          "type": "note",
+          "text": "Changed element mappings may require ModuleAttribute Update and Validate. Corresponding message updates do not guarantee every expected value, XPath or business assertion is correct. Inspect affected TestSteps and execute targeted tests."
         }
-      ],
-      "bulletPoints": [
-        "This is the API-Scan-side counterpart to the manual \"Update\" from the Technical View covered in the previous lesson — use whichever is more convenient for the scale of the change."
       ],
       "sectionId": "section-cc96720897dc"
     },
     {
-      "sectionTitle": "Lesson 7 - Official Key Points Recap",
+      "sectionTitle": "Independent completion review",
       "elements": [
         {
-          "type": "list",
-          "title": "Key Points (verbatim from the course's end-of-lesson summary slides):",
-          "items": [
-            "When Modules are updated in Tosca Commander, the TestStep will automatically be updated.",
-            "Like in UI TestCases, Modules can be added by dragging and dropping them or with the Ctrl+T shortcut.",
-            "When updating Modules, both the Request and the Response need to be selected, in order to update both."
-          ]
-        },
-        {
           "type": "note",
-          "text": "These 3 points are the official Lesson 7 recap — treat them as something you must be able to recall word-for-word for the exam."
+          "text": "Check inputs, credential references, returned identity, assertions, mapping validity and cleanup. A WorkState label is workflow metadata rather than proof of exhaustive validation. Original Academy slides and end-to-end exercise execution have not been verified."
         }
       ],
       "sectionId": "section-e18c90c921a1"
@@ -94,59 +59,67 @@
   ],
   "examPitfalls": [
     {
-      "title": "Not knowing how to jump from a TestStep to its Module",
-      "trapDescription": "Candidates manually search through the Modules folder to find which one a given TestStep is linked to.",
-      "bestPractice": "Select the TestStep and press Ctrl+J, or right-click it and choose \"Jump to Module\", to navigate there directly."
+      "title": "Using an outdated navigation shortcut",
+      "trapDescription": "Relying on the former Ctrl+J claim.",
+      "bestPractice": "Use Jump to Module or current Ctrl+Shift+J."
     },
     {
-      "title": "Hardcoding a shared value like the Service Access Key everywhere",
-      "trapDescription": "Candidates type the same Service Access Key literally into every TestStepValue that needs it.",
-      "bestPractice": "Add it once as a Test Configuration Parameter (e.g. \"Key\") and reference it everywhere — updating it in one place if it ever changes, instead of hunting through every TestStep."
+      "title": "Defining configuration on every value",
+      "trapDescription": "Repeating the same custom TCP definition everywhere.",
+      "bestPractice": "Define it on a supported object and reference it via {CP[name]}."
     },
     {
-      "title": "Only selecting one side of a Module pair before updating from the API Scan",
-      "trapDescription": "Candidates select only the Request Module (or only the Response Module) before clicking Update, leaving the other half stale.",
-      "bestPractice": "Select BOTH the Request and Response Modules (or their containing folder) before updating from the API Scan, so both halves refresh together."
+      "title": "Assuming one update repairs all relationships",
+      "trapDescription": "Ignoring changed mappings or a separately changed response.",
+      "bestPractice": "Inspect affected Modules, update mappings and validate."
     },
     {
-      "title": "Thinking API TestCases need a special way to add Modules",
-      "trapDescription": "Candidates assume API TestCases require a different, API-specific method for adding a Module as a TestStep.",
-      "bestPractice": "Official course Best Practice: like in UI TestCases, Modules can be added to an API TestCase by dragging and dropping them, or with the Ctrl+T shortcut — no new mechanism to learn."
+      "title": "Treating Ctrl+T as an immediate insert",
+      "trapDescription": "Assuming the first search result is automatically the right Module.",
+      "bestPractice": "Ctrl+T launches Fuzzy Search; choose the intended result."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "A tester wants to quickly find which Module a specific TestStep in an API TestCase is linked to. What is the fastest way?",
+      "scenario": "Which current command navigates from a TestStep to its referenced Module?",
       "options": [
         {
           "id": "A",
-          "text": "Manually browse the entire Modules folder until the right one is found."
+          "text": "Search every folder manually."
         },
         {
           "id": "B",
-          "text": "Select the TestStep and press Ctrl+J, or right-click it and choose \"Jump to Module\"."
+          "text": "Jump to Module in the context menu, or Ctrl+Shift+J."
         },
         {
           "id": "C",
-          "text": "Delete the TestStep and re-add it from scratch."
+          "text": "Delete the step."
         },
         {
           "id": "D",
-          "text": "This information cannot be determined once imported."
+          "text": "The reference is unavailable."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "There is a direct keyboard shortcut for this, plus a context-menu equivalent.",
-      "rationale": "Ctrl+J (or right-click > \"Jump to Module\") instantly navigates from a selected TestStep to its linked Module — no manual searching required."
+      "hint": "Use the referenced-object command.",
+      "rationale": "Current Commander documentation names this command and shortcut.",
+      "optionExplanations": {
+        "A": "Manual search is unnecessary when a reference exists.",
+        "B": "This follows the referenced Module.",
+        "C": "Deletion is unnecessary for navigation.",
+        "D": "The relationship can be inspected."
+      },
+      "lessonSection": "section-b1b628401d8a",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A long API TestCase has many TestStepValues, most of them empty. What toggle makes the TestCase easier to read by hiding the empty ones?",
+      "scenario": "What shortcut controls contextual show/hide, including DoNothing objects?",
       "options": [
         {
           "id": "A",
@@ -168,129 +141,198 @@
       "correctOptions": [
         "C"
       ],
-      "hint": "This is the same key used in AS1/AS2 for hiding empty TestStepValues.",
-      "rationale": "Toggling F9 hides TestStepValues that have no value set, which is especially useful for long, wide API TestCases with many optional fields."
+      "hint": "DoNothing concerns empty actions, not merely empty values.",
+      "rationale": "F9 is the current show/hide shortcut; inspect context and ActionMode.",
+      "optionExplanations": {
+        "A": "F6 runs tests.",
+        "B": "F2 edits text.",
+        "C": "F9 controls show/hide in context.",
+        "D": "Ctrl+T launches TestStep search."
+      },
+      "lessonSection": "section-b1b628401d8a",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "The underlying API structure has changed in several places at once. What is the correct sequence to refresh the already-imported Modules and TestCases in Tosca?",
+      "scenario": "How do you refresh an existing API Module after its message changes?",
       "options": [
         {
           "id": "A",
-          "text": "Delete the old Modules and manually recreate them from scratch."
+          "text": "Delete all Modules."
         },
         {
           "id": "B",
-          "text": "Select the Modules in Tosca Commander, open them in the API Scan via API Testing > \"Open Selected Modules\", make the changes, then click Update."
+          "text": "Open the selected Module in API Scan, modify the message and click Update; inspect changed attribute mappings too."
         },
         {
           "id": "C",
-          "text": "Simply re-save the Tosca project — changes sync automatically."
+          "text": "Save the workspace and assume every server change is detected."
         },
         {
           "id": "D",
-          "text": "Rename the Modules; Tosca will detect the API changes on its own."
+          "text": "Rename it to rescan automatically."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "This mirrors updating from the Technical View, but starts from inside the API Scan itself.",
-      "rationale": "Select the Modules needing an update, use API Testing > the dropdown below the API Scan button > \"Open Selected Modules\" to load them in the API Scan, make the changes there, then click \"Update\" in the ribbon to refresh Tosca."
+      "hint": "The message and mapping updates have different scopes.",
+      "rationale": "Scan Update refreshes the corresponding Module; changed attributes also need inspection.",
+      "optionExplanations": {
+        "A": "A complete rebuild is not mandatory.",
+        "B": "This follows the update workflow and addresses mapping risk.",
+        "C": "Saving is not automatic server change discovery.",
+        "D": "Renaming does not perform a rescan."
+      },
+      "lessonSection": "section-cc96720897dc",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "When updating both halves of a Message's Modules from the API Scan, what must be selected in Tosca Commander first?",
+      "scenario": "A request Module and a separate response Module both need message changes. What scope should be reviewed?",
       "options": [
         {
           "id": "A",
-          "text": "Only the Response Module — the Request updates automatically."
+          "text": "Only the response."
         },
         {
           "id": "B",
-          "text": "Only the Request Module — the Response updates automatically."
+          "text": "Only the request."
         },
         {
           "id": "C",
-          "text": "Both the Request and Response Modules (or their containing folder)."
+          "text": "Both affected Modules, with their mappings and TestSteps inspected."
         },
         {
           "id": "D",
-          "text": "The entire Component Folder for the whole project."
+          "text": "Every unrelated Module must be deleted."
         }
       ],
       "correctOptions": [
         "C"
       ],
-      "hint": "Request and Response are independent Modules in Tosca — updating one does not touch the other.",
-      "rationale": "Both the Request and Response Modules must be selected (or their containing folder, if both live there) in order to update both sides together from the API Scan."
+      "hint": "Include each changed artifact.",
+      "rationale": "Each affected Module needs review; do not assume one-side updates cover all changes.",
+      "optionExplanations": {
+        "A": "The changed request would be missed.",
+        "B": "The changed response would be missed.",
+        "C": "This includes both changed artifacts and their mappings.",
+        "D": "Unrelated Modules do not require deletion."
+      },
+      "lessonSection": "section-cc96720897dc",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "Which methods can be used to add a Module as a TestStep in an API TestCase?",
+      "scenario": "How can a Module be added as a TestStep?",
       "options": [
         {
           "id": "A",
-          "text": "Only through the API Scan's own export button — Modules cannot be added manually afterward."
+          "text": "Only initial Scan export."
         },
         {
           "id": "B",
-          "text": "Dragging and dropping the Module, or using the Ctrl+T shortcut — the same methods used in UI TestCases."
+          "text": "Drag it onto a TestCase, or use Ctrl+T and choose it in Search and Add TestStep."
         },
         {
           "id": "C",
-          "text": "Only by right-clicking and choosing \"Insert API Module\", a command unique to API TestCases."
+          "text": "Only a special Insert API Module command."
         },
         {
           "id": "D",
-          "text": "API TestCases do not support adding Modules after the initial export."
+          "text": "It cannot be added later."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Nothing new here — it works exactly like UI TestCases.",
-      "rationale": "Official Key Point: like in UI TestCases, Modules can be added by dragging and dropping them, or with the Ctrl+T shortcut. API TestCases don't require a separate, special mechanism."
+      "hint": "Search is a selection workflow.",
+      "rationale": "Both drag-and-drop and Fuzzy Search support creating TestSteps.",
+      "optionExplanations": {
+        "A": "Existing Modules can be reused.",
+        "B": "These are documented creation routes.",
+        "C": "That exclusive command is not the documented requirement.",
+        "D": "Later creation is supported."
+      },
+      "lessonSection": "section-b1b628401d8a",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
-      "key": "Module → TestStep sync",
-      "value": "Updating a Module automatically updates its linked TestStep/TestCase, just like UI automation."
+      "key": "References",
+      "value": "Inspect the linked Module; do not equate refreshed messages with validated assertions."
     },
     {
-      "key": "Jump to Module",
-      "value": "Ctrl+J, or right-click TestStep > Jump to Module."
+      "key": "Jump",
+      "value": "Context menu Jump to Module or Ctrl+Shift+J."
     },
     {
-      "key": "TCP in API TestCases",
-      "value": "Use a Test Configuration Parameter (e.g. Key) instead of hardcoding a shared value everywhere."
+      "key": "TCP",
+      "value": "Define on a supported object and reference {CP[name]}."
     },
     {
-      "key": "F9",
-      "value": "Toggles hiding empty TestStepValues — useful for long API TestCases."
+      "key": "DoNothing",
+      "value": "Empty ActionMode; not synonymous with empty Value."
     },
     {
-      "key": "Updating from API Scan",
-      "value": "Select Module(s) in Tosca → Open Selected Modules → edit in API Scan → click Update."
+      "key": "Scan refresh",
+      "value": "Open selected Module, modify, Update."
     },
     {
-      "key": "Select both sides",
-      "value": "Request AND Response Modules must both be selected to update both together."
+      "key": "Changed mappings",
+      "value": "Update and validate each affected attribute; execute assertions."
     },
     {
-      "key": "Adding Modules",
-      "value": "Drag and drop, or Ctrl+T — the same two methods as UI TestCases."
+      "key": "Add steps",
+      "value": "Drag Module or Ctrl+T, then choose a search result."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 07 - Building the Test Case (video)",
-      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
-      "duration": "video"
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/tcp_create_tcp.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/appendix.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/workspaces_options.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/fuzzy_search.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/user_interface_static_menus.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/api/api_update_modules.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/api/api_update_bp.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/api/api_validate_ma.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }
