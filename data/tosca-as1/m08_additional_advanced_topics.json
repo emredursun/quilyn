@@ -3,402 +3,224 @@
   "moduleTitle": "Section 8 - Additional Advanced Topics",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements",
   "learningObjectives": [
-    "Work in a Multiuser Environment: understand check-out/lock indicators and what you can/cannot do with locked objects.",
-    "Use WHILE, IF, and DO statements (Condition + Loop) to add conditional logic and loops to TestCases.",
-    "Create Recovery Scenarios to handle unexpected failures and CleanUp Scenarios to reset the SUT after a failure.",
-    "Use Dynamic Comparison with XBuffer ({XB}) to verify strings that contain a dynamic part and buffer that part.",
-    "Apply Parent Control, Dynamic ID, and ExplicitName for robust identification of repeating/dynamic elements.",
-    "Use TBox Set Buffer, ResultCount, and RowCount/ColumnCount for advanced buffering and table counting.",
-    "Set Repetition on a TestStepFolder (with ${Repetition} and buffers) to repeat TestSteps a dynamic number of times.",
-    "Use ActionMode Constraint to identify one specific item in a table regardless of its position."
+    "Distinguish checkout ownership from use of an existing Module.",
+    "Use IF branches and bounded WHILE/DO loops.",
+    "Configure recovery and retry scope without duplicating setup.",
+    "Capture dynamic substrings with XBuffer.",
+    "Validate uniqueness for parent-scoped or wildcard identification.",
+    "Distinguish node counts, table cell counts and table dimensions.",
+    "Repeat folder steps while accounting for changing table indexes."
   ],
   "estTime": "3 hr",
   "studyGuide": [
     {
-      "sectionTitle": "Working in a Multiuser Environment",
+      "sectionTitle": "Multi-user editing and use",
       "elements": [
         {
-          "type": "concept",
-          "term": "Multiuser Environment",
-          "description": "Multiple testers work against a shared Tosca repository. To prevent conflicts, objects are checked out/locked while one person edits them. A colored bar next to an object shows its lock status.",
-          "items": [
-            "A red bar next to an object = it is locked/checked out (not editable by you right now).",
-            "You CANNOT make any changes to a locked object.",
-            "If the locked object is a Module, you can STILL add/reference it in your own TestCases — using it does not require editing it.",
-            "A red bar does NOT mean 'no one is working on it' — the opposite: it is locked because someone holds it."
-          ]
+          "type": "note",
+          "text": "Green checkout indicators mean you hold the object; red means another user holds it; white identifies a new object. Inspect checkout details rather than assuming every lock belongs to another person."
         },
         {
           "type": "note",
-          "text": "Key distinction for the exam: locked (red) = cannot EDIT, but a locked Module can still be USED/referenced in TestCases. Locking blocks modification, not consumption."
+          "text": "A Module held by another user cannot be edited by you, but its existing definition can still be referenced by your editable TestCases. Checkout is an editing coordination mechanism, not a guarantee of test readiness or success."
         }
-      ],
-      "bulletPoints": [
-        "Red bar = object locked/checked out → no edits allowed.",
-        "A locked Module can still be dragged into your TestCases (reference/use is allowed).",
-        "Red does NOT mean the object is free — it means it is held by someone."
       ],
       "sectionId": "section-fcbb92387630"
     },
     {
-      "sectionTitle": "Conditional Statements: WHILE, IF, DO",
+      "sectionTitle": "Conditions and bounded loops",
       "elements": [
         {
-          "type": "concept",
-          "term": "Structure: Condition + Loop",
-          "description": "A WHILE/DO statement has two parts you fill in: a Condition and a Loop (Exercise 23).",
-          "items": [
-            "Condition — a Verify-type check that confirms a state (Exists==True, Visible==True, has a value, etc.).",
-            "Loop — the TestSteps Tosca repeats; it keeps running until the Condition is no longer met OR the max repetitions is reached.",
-            "Tip: use the Control Flow Diagram to see a visual representation of the statement."
-          ]
+          "type": "note",
+          "text": "IF evaluates Conditions, then executes THEN when true or optional ELSE when false. It is not a loop. WHILE checks before its Loop and may run zero times; DO runs its Loop before checking and normally runs at least once."
         },
         {
-          "type": "table",
-          "headers": [
-            "Statement",
-            "When block executes",
-            "Min executions",
-            "Use when"
-          ],
-          "rows": [
-            [
-              "WHILE",
-              "While condition is TRUE",
-              "0 (may never run)",
-              "Polling until state changes; condition may already be met"
-            ],
-            [
-              "IF",
-              "If condition is TRUE (once)",
-              "0 (may never run)",
-              "Optional branch — do X only if condition met"
-            ],
-            [
-              "DO",
-              "Always once, then while condition is TRUE",
-              "1 (guaranteed)",
-              "Must execute at least once regardless of condition"
-            ]
-          ]
+          "type": "note",
+          "text": "WHILE and DO have MaximumRepetitions, default 30, to bound iteration. A false condition is control-flow information and does not itself fail the overall test. Bound polling and inspect what happens when the maximum is reached."
         },
         {
-          "type": "analogy",
-          "text": "WHILE = 'Keep stirring until the sauce thickens.' IF = 'If it's raining, take an umbrella; otherwise, wear sunglasses.' DO = 'Taste the sauce at least once, then taste again if it still needs salt.'"
+          "type": "note",
+          "text": "Independent practice: initialize a numeric buffer, evaluate it below a small limit and increment it in the loop. Use TBox Evaluation Tool for buffer conditions. This is not the verified Academy Exercise 23 procedure."
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">WHILE / IF / DO — WHEN EACH BLOCK EXECUTES</text><rect x=\"20\" y=\"28\" width=\"210\" height=\"156\" rx=\"10\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"125\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"14\" font-weight=\"700\">WHILE</text><rect x=\"40\" y=\"62\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.15)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"125\" y=\"78\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\">Repeat while condition TRUE</text><rect x=\"40\" y=\"92\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.15)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"125\" y=\"108\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\">Min executions: 0</text><rect x=\"40\" y=\"122\" width=\"170\" height=\"50\" rx=\"5\" fill=\"rgba(109,139,255,0.05)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"125\" y=\"140\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Use: polling until state</text><text x=\"125\" y=\"153\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">changes; condition may</text><text x=\"125\" y=\"166\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">already be met</text><rect x=\"255\" y=\"28\" width=\"210\" height=\"156\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"14\" font-weight=\"700\">IF</text><rect x=\"275\" y=\"62\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(30,138,91,0.15)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"360\" y=\"78\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"10\">Executes ONCE if condition TRUE</text><rect x=\"275\" y=\"92\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(30,138,91,0.15)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"360\" y=\"108\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"10\">Min executions: 0</text><rect x=\"275\" y=\"122\" width=\"170\" height=\"50\" rx=\"5\" fill=\"rgba(30,138,91,0.05)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"360\" y=\"140\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Use: optional branch</text><text x=\"360\" y=\"153\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Do X only if condition</text><text x=\"360\" y=\"166\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">met (no loop)</text><rect x=\"490\" y=\"28\" width=\"210\" height=\"156\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/><text x=\"595\" y=\"52\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"14\" font-weight=\"700\">DO</text><rect x=\"510\" y=\"62\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(186,117,23,0.15)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"595\" y=\"78\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"10\">Execute once, then while TRUE</text><rect x=\"510\" y=\"92\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(186,117,23,0.15)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"595\" y=\"108\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"10\">Min executions: 1 (guaranteed)</text><rect x=\"510\" y=\"122\" width=\"170\" height=\"50\" rx=\"5\" fill=\"rgba(186,117,23,0.05)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"595\" y=\"140\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">Use: must run at least</text><text x=\"595\" y=\"153\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">once regardless of</text><text x=\"595\" y=\"166\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">initial condition</text></svg>",
-          "caption": "WHILE and IF may execute 0 times if condition is false. DO always executes at least once — key exam distinction."
+          "svg": "<svg viewBox=\"0 0 720 200\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-soft)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">WHILE / IF / DO — WHEN EACH BLOCK EXECUTES</text><rect x=\"20\" y=\"28\" width=\"210\" height=\"156\" rx=\"10\" fill=\"rgba(109,139,255,0.08)\" stroke=\"var(--pa-brand)\" stroke-width=\"2\"/><text x=\"125\" y=\"52\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"14\" font-weight=\"700\">WHILE</text><rect x=\"40\" y=\"62\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.15)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"125\" y=\"78\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\">Repeat while condition TRUE</text><rect x=\"40\" y=\"92\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(109,139,255,0.15)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"125\" y=\"108\" text-anchor=\"middle\" fill=\"var(--pa-brand)\" font-size=\"10\">May execute zero times</text><rect x=\"40\" y=\"122\" width=\"170\" height=\"50\" rx=\"5\" fill=\"rgba(109,139,255,0.05)\" stroke=\"var(--pa-brand)\" stroke-width=\"1\"/><text x=\"125\" y=\"140\" text-anchor=\"middle\" fill=\"var(--pa-ink-soft)\" font-size=\"9\">Use: polling until state</text><text x=\"125\" y=\"153\" text-anchor=\"middle\" fill=\"var(--pa-ink-soft)\" font-size=\"9\">changes; condition may</text><text x=\"125\" y=\"166\" text-anchor=\"middle\" fill=\"var(--pa-ink-soft)\" font-size=\"9\">already be met</text><rect x=\"255\" y=\"28\" width=\"210\" height=\"156\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"360\" y=\"52\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"14\" font-weight=\"700\">IF</text><rect x=\"275\" y=\"62\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(30,138,91,0.15)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"360\" y=\"78\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"10\">Executes ONCE if condition TRUE</text><rect x=\"275\" y=\"92\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(30,138,91,0.15)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"360\" y=\"108\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"10\">Min executions: 0</text><rect x=\"275\" y=\"122\" width=\"170\" height=\"50\" rx=\"5\" fill=\"rgba(30,138,91,0.05)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"360\" y=\"140\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Use: optional branch</text><text x=\"360\" y=\"153\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">Do X only if condition</text><text x=\"360\" y=\"166\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"9\">met (no loop)</text><rect x=\"490\" y=\"28\" width=\"210\" height=\"156\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/><text x=\"595\" y=\"52\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"14\" font-weight=\"700\">DO</text><rect x=\"510\" y=\"62\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(186,117,23,0.15)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"595\" y=\"78\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"10\">Execute once, then while TRUE</text><rect x=\"510\" y=\"92\" width=\"170\" height=\"24\" rx=\"5\" fill=\"rgba(186,117,23,0.15)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"595\" y=\"108\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"10\">Loop before condition; bounded</text><rect x=\"510\" y=\"122\" width=\"170\" height=\"50\" rx=\"5\" fill=\"rgba(186,117,23,0.05)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"595\" y=\"140\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">Use: must run at least</text><text x=\"595\" y=\"153\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">once regardless of</text><text x=\"595\" y=\"166\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"9\">initial condition</text></svg>",
+          "caption": "Independent control-flow comparison: IF branches; WHILE checks before its loop; DO checks after. Loop execution is bounded."
         }
-      ],
-      "bulletPoints": [
-        "WHILE may execute 0 times if condition is false from the start.",
-        "DO guarantees at least 1 execution — use when the block must always run once.",
-        "IF evaluates once and branches — no looping."
       ],
       "sectionId": "section-5b17c7e9a353"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 23 — Create a WHILE Statement",
+      "sectionTitle": "Independent practice and course access",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 23 — Create a WHILE Statement — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements"
+          "text": "Original Academy exercise 23 and its figures were inaccessible. This lesson supplies independent documentation-based guidance; no original exercise or Tosca run was performed."
         }
       ],
       "sectionId": "section-cf7bae6d4980"
     },
     {
-      "sectionTitle": "Recovery and CleanUp Scenarios",
+      "sectionTitle": "Recovery and CleanUp",
       "elements": [
         {
-          "type": "table",
-          "headers": [
-            "Scenario type",
-            "When it fires",
-            "Purpose"
-          ],
-          "rows": [
-            [
-              "Recovery Scenario",
-              "On a common/unexpected error during a TestCase (e.g., stray pop-up)",
-              "Recover the SUT so the TestCase can restart from a clean slate and continue"
-            ],
-            [
-              "CleanUp Scenario",
-              "When a TestCase (and all its Recovery Scenarios) FAILS",
-              "Reset the SUT to a clean state so the NEXT TestCase runs unaffected"
-            ]
-          ]
+          "type": "note",
+          "text": "Create Recovery Scenario Collections on TestCases or TestCase folders. Enable the relevant dialog, verification or exception failure handling through TBox Recovery settings, or override those settings with TCPs. ScratchBook does not support Recovery; exercise it through an ExecutionList."
         },
         {
-          "type": "concept",
-          "term": "Key facts (Exercises 24 & 25)",
-          "description": "Details that show up on the exam:",
-          "items": [
-            "Recovery & CleanUp Scenarios do NOT work in the ScratchBook — only in the TestCase Section / TestCase / TestStep / TestStepValue level, or in a Reusable TestStepBlock.",
-            "Both are always contained within a Recovery Scenario Collection.",
-            "Recovery Scenario has a RetryLevel property (e.g., set to 'TestCase').",
-            "Recovery settings live in Settings >> TBox >> Recovery (On dialog failure / On exception failure / On verification failure → set to 'Recover').",
-            "A CleanUp Scenario can be set at the same levels as Recovery and does NOT require a Recovery Scenario to be present."
-          ]
+          "type": "note",
+          "text": "RetryLevel chooses the failure granularity and the point of resumption: TestStepValue, TestStep or TestCase. It does not describe the object where the collection must be created. Successful Recovery retries from that level; repeating a whole case may duplicate setup or side effects."
         },
         {
-          "type": "warning",
-          "text": "Exam trap: CleanUp does NOT run 'always after every TestCase (pass or fail)'. It fires when the TestCase FAILS (and any Recovery has also failed), to reset the SUT before the next TestCase. Recovery tries to save the CURRENT TestCase; CleanUp prepares a clean slate for the NEXT one."
+          "type": "note",
+          "text": "When Recovery fails, CleanUp attempts to restore the environment for subsequent execution. It is not an always-run teardown for every passing case. Scenarios live in the collection and are tried in order with higher-level fallback."
         },
         {
-          "type": "analogy",
-          "text": "Recovery Scenario = a safety net that tries to catch the current test when it stumbles (e.g., closes a stray pop-up) so it can carry on. CleanUp Scenario = the reset crew that, when the test has truly failed, clears the stage so the next test starts fresh — invaluable for overnight/unattended runs."
+          "type": "note",
+          "text": "NonGUI recovery does not support TestStepValue RetryLevel. Exception Recovery inside conditional statements is unsupported with TestStep/TestStepValue RetryLevel. Review these boundaries before designing retries."
         },
         {
           "type": "diagram",
-          "svg": "<svg viewBox=\"0 0 720 165\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arr7\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-ink-3)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">RECOVERY vs. CLEANUP SCENARIO — TRIGGER CONDITIONS</text><rect x=\"20\" y=\"28\" width=\"320\" height=\"126\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/><text x=\"180\" y=\"52\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"13\" font-weight=\"700\">Recovery Scenario</text><text x=\"180\" y=\"70\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"10\">Trigger: error during the TestCase</text><rect x=\"40\" y=\"78\" width=\"280\" height=\"26\" rx=\"5\" fill=\"rgba(186,117,23,0.10)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"180\" y=\"95\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"10\">Recover THIS TestCase, continue</text><rect x=\"40\" y=\"110\" width=\"280\" height=\"36\" rx=\"5\" fill=\"rgba(186,117,23,0.05)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"180\" y=\"127\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Examples: close unexpected pop-up,</text><text x=\"180\" y=\"140\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">log out, restart from clean slate</text><rect x=\"380\" y=\"28\" width=\"320\" height=\"126\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"540\" y=\"52\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"13\" font-weight=\"700\">CleanUp Scenario</text><text x=\"540\" y=\"70\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"10\">Trigger: TestCase (and Recovery) FAILS</text><rect x=\"400\" y=\"78\" width=\"280\" height=\"26\" rx=\"5\" fill=\"rgba(30,138,91,0.12)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"540\" y=\"95\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"10\">Reset SUT for the NEXT TestCase</text><rect x=\"400\" y=\"110\" width=\"280\" height=\"36\" rx=\"5\" fill=\"rgba(30,138,91,0.05)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"540\" y=\"127\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">Empty cart, log out, close browser →</text><text x=\"540\" y=\"140\" text-anchor=\"middle\" fill=\"var(--pa-ink-2)\" font-size=\"9\">clean slate for unattended runs</text></svg>",
-          "caption": "Recovery tries to save the CURRENT TestCase when an error occurs. CleanUp fires when the TestCase has failed, resetting the SUT for the NEXT TestCase. Neither works in the ScratchBook."
+          "svg": "<svg viewBox=\"0 0 720 165\" xmlns=\"http://www.w3.org/2000/svg\" font-family=\"inherit\"><defs><marker id=\"arr7\" markerWidth=\"8\" markerHeight=\"8\" refX=\"6\" refY=\"3\" orient=\"auto\"><path d=\"M0,0 L0,6 L8,3 z\" fill=\"var(--pa-muted)\"/></marker></defs><text x=\"360\" y=\"16\" text-anchor=\"middle\" fill=\"var(--pa-ink-soft)\" font-size=\"11\" font-weight=\"600\" letter-spacing=\"0.5\">RECOVERY vs. CLEANUP SCENARIO — TRIGGER CONDITIONS</text><rect x=\"20\" y=\"28\" width=\"320\" height=\"126\" rx=\"10\" fill=\"#FAEEDA\" stroke=\"#BA7517\" stroke-width=\"2\"/><text x=\"180\" y=\"52\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"13\" font-weight=\"700\">Recovery Scenario</text><text x=\"180\" y=\"70\" text-anchor=\"middle\" fill=\"#BA7517\" font-size=\"10\">Trigger: configured failure handling</text><rect x=\"40\" y=\"78\" width=\"280\" height=\"26\" rx=\"5\" fill=\"rgba(186,117,23,0.10)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"180\" y=\"95\" text-anchor=\"middle\" fill=\"#5A3200\" font-size=\"10\">Retry from configured RetryLevel</text><rect x=\"40\" y=\"110\" width=\"280\" height=\"36\" rx=\"5\" fill=\"rgba(186,117,23,0.05)\" stroke=\"#BA7517\" stroke-width=\"1\"/><text x=\"180\" y=\"127\" text-anchor=\"middle\" fill=\"var(--pa-ink-soft)\" font-size=\"9\">Examples: close unexpected pop-up,</text><text x=\"180\" y=\"140\" text-anchor=\"middle\" fill=\"var(--pa-ink-soft)\" font-size=\"9\">log out, restart from clean slate</text><rect x=\"380\" y=\"28\" width=\"320\" height=\"126\" rx=\"10\" fill=\"#E1F5E9\" stroke=\"#1E8A5B\" stroke-width=\"2\"/><text x=\"540\" y=\"52\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"13\" font-weight=\"700\">CleanUp Scenario</text><text x=\"540\" y=\"70\" text-anchor=\"middle\" fill=\"#1E8A5B\" font-size=\"10\">Trigger: Recovery unsuccessful</text><rect x=\"400\" y=\"78\" width=\"280\" height=\"26\" rx=\"5\" fill=\"rgba(30,138,91,0.12)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"540\" y=\"95\" text-anchor=\"middle\" fill=\"#0E3D28\" font-size=\"10\">Restore state for subsequent execution</text><rect x=\"400\" y=\"110\" width=\"280\" height=\"36\" rx=\"5\" fill=\"rgba(30,138,91,0.05)\" stroke=\"#1E8A5B\" stroke-width=\"1\"/><text x=\"540\" y=\"127\" text-anchor=\"middle\" fill=\"var(--pa-ink-soft)\" font-size=\"9\">Empty cart, log out, close browser →</text><text x=\"540\" y=\"140\" text-anchor=\"middle\" fill=\"var(--pa-ink-soft)\" font-size=\"9\">clean slate for unattended runs</text></svg>",
+          "caption": "Independent Recovery/CleanUp purpose comparison. Enable the appropriate failure handling and test via an ExecutionList, not ScratchBook."
         }
-      ],
-      "bulletPoints": [
-        "Recovery: fires on an error during the TestCase → recover and continue THIS TestCase.",
-        "CleanUp: fires when the TestCase (and any Recovery) fails → reset SUT for the NEXT TestCase.",
-        "Neither works in the ScratchBook; both live in a Recovery Scenario Collection.",
-        "CleanUp does not require a Recovery Scenario to be present."
       ],
       "sectionId": "section-7f129c3c4dfd"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 24 — Create a Recovery Scenario",
+      "sectionTitle": "Independent practice and course access",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 24 — Create a Recovery Scenario — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements"
+          "text": "Original Academy exercise 24 and its figures were inaccessible. This lesson supplies independent documentation-based guidance; no original exercise or Tosca run was performed."
         }
       ],
       "sectionId": "section-73940ece1ec1"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 25 — Create a CleanUp Scenario",
+      "sectionTitle": "Independent practice and course access",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 25 — Create a CleanUp Scenario — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements"
+          "text": "Original Academy exercise 25 and its figures were inaccessible. This lesson supplies independent documentation-based guidance; no original exercise or Tosca run was performed."
         }
       ],
       "sectionId": "section-d95fe9d40482"
     },
     {
-      "sectionTitle": "Dynamic Comparison (XBuffer), Parent Control & Dynamic ID",
+      "sectionTitle": "Dynamic strings and stable identification",
       "elements": [
         {
-          "type": "concept",
-          "term": "Dynamic Comparison — XBuffer {XB}",
-          "description": "A way to verify a string that contains a DYNAMIC part. {XB} excludes the dynamic portion from the comparison and (optionally) buffers that portion for reuse. Use it for messages with auto-generated numbers, timestamps, etc. that change every run.",
-          "items": [
-            "Syntax: verify 'Order number: {XB[OrderNumber]}' with ActionMode Verify.",
-            "The static text ('Order number: ') is checked; the dynamic part is excluded from the match.",
-            "The excluded/dynamic value is stored in the buffer named inside the brackets (here: OrderNumber).",
-            "You can then reuse {B[OrderNumber]} later for verifications or to steer the app.",
-            "Tip: use the blue downward arrow in the Value cell to insert correct XBuffer syntax; set ActionMode to Verify when recording XBuffers."
-          ]
+          "type": "note",
+          "text": "With Verify, Order number: {XB[OrderNumber]} checks the static text while capturing the variable substring in buffer OrderNumber. Read it later with {B[OrderNumber]}; the bracket content is the buffer name, not a fixed expected order ID."
         },
         {
-          "type": "concept",
-          "term": "Parent Control (Identify by Parent)",
-          "description": "Identifies a UI element relative to its stable parent container. Used when scanning pages with REPEATING elements (e.g., a list of orders) where a child (order number, total, Details button) is not unique on its own but becomes identifiable once its parent DIV is specified.",
-          "items": [
-            "During XScan, select the parent DIV first, then the child controls within it.",
-            "Deselect unstable properties (e.g., InnerText) and use stable ones (e.g., OuterText = 'Order Number:*').",
-            "Wildcards (*) handle the varying part of the text."
-          ]
+          "type": "note",
+          "text": "Start with stable, unique properties. If they cannot distinguish a control, select a stable parent before the child and validate uniqueness within that scope. A parent alone does not distinguish three identical child buttons; an additional stable discriminator or justified index is needed."
         },
         {
-          "type": "concept",
-          "term": "Dynamic ID",
-          "description": "Handles elements whose ID attribute is generated at runtime (e.g., 'btn_7823', 'btn_4910'). Created via XScan using an identification method other than the literal ID — a pattern/partial match or identification by parent."
+          "type": "note",
+          "text": "Changing IDs can use a wildcard for the variable suffix, provided the remaining criteria are unique. Positional indexes can become invalid when the UI changes. ExplicitName permits editing a TestStepValue name; it does not create a stable technical ID in the SUT."
         }
-      ],
-      "bulletPoints": [
-        "Dynamic Comparison = {XB[Buffer]} — verify a partly-dynamic string, exclude + buffer the dynamic part.",
-        "The value inside {XB[...]} is the BUFFER NAME where the dynamic part is stored.",
-        "Parent Control: repeating elements → identify the child via its stable parent DIV.",
-        "Dynamic ID: runtime-generated IDs → pattern/partial match instead of the literal ID."
       ],
       "sectionId": "section-e982b8fb2d5c"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 26 — Execute Dynamic Comparison",
+      "sectionTitle": "Independent practice and course access",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 26 — Execute Dynamic Comparison — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements"
+          "text": "Original Academy exercise 26 and its figures were inaccessible. This lesson supplies independent documentation-based guidance; no original exercise or Tosca run was performed."
         }
       ],
       "sectionId": "section-1ebcba33669d"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 27 — Identify by Parent and Create Dynamic ID Modules",
+      "sectionTitle": "Independent practice and course access",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 27 — Identify by Parent and Create Dynamic ID Modules — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements"
+          "text": "Original Academy exercise 27 and its figures were inaccessible. This lesson supplies independent documentation-based guidance; no original exercise or Tosca run was performed."
         }
       ],
       "sectionId": "section-e73206fe3df4"
     },
     {
-      "sectionTitle": "ExplicitName, TBox Set Buffer, ResultCount & RowCount",
+      "sectionTitle": "Names, buffers and counts",
       "elements": [
         {
-          "type": "concept",
-          "term": "ExplicitName",
-          "description": "A Configuration Parameter (named 'ExplicitName', Value = True) added to a ModuleAttribute. It lets Tosca steer the generated TestStepValues by INDEX and handle dynamic changes — so you can rename a TestStepValue (e.g., to '#1') and steer the repeating/dynamic control by its position.",
-          "items": [
-            "Added in the Module Attribute's Properties tab as Configuration Parameter ExplicitName = True.",
-            "Then in the TestCase you can rename the generated TestStepValue (e.g., 'Order Overview' → '#1').",
-            "Steer by index handles dynamic repeating elements (works together with Parent Control / Dynamic ID)."
-          ]
+          "type": "note",
+          "text": "ExplicitName=True on an XModuleAttribute allows editing its referenced XTestStepValue name; a semicolon-separated value range is another supported form. The meaning of names or # indexes depends on the control type. It is not a universal dynamic-ID repair."
         },
         {
-          "type": "concept",
-          "term": "TBox Set Buffer",
-          "description": "A Standard Module that sets/resets a named buffer's value. Use it to initialize a buffer, store a timestamp, or perform a calculation and store the result. Add the Module as a TestStep, rename the TestStepValue '<Buffername>' to your buffer name, enter the value, ActionMode Input.",
-          "items": [
-            "Example: rename '<Buffername>' to 'NumberOfItems', value 3, ActionMode Input.",
-            "Can hold a MATH result: value {MATH[{B[CartItems]}-1]} to store a calculated number."
-          ]
+          "type": "note",
+          "text": "TBox Set Buffer uses a named ModuleAttribute: Input writes the value, Verify checks an existing value. Dynamic expressions can supply values. It does not read the SUT merely because a buffer was named."
         },
         {
-          "type": "concept",
-          "term": "ResultCount",
-          "description": "Counts the occurrences of a particular value in a table/list, independent of its position. Used in a Verify to assert how many matching items exist. Syntax in the Value cell: ResultCount=={B[NumberOfItems]} with ActionMode Verify.",
-          "items": [
-            "Example: verify a Digital Downloads list has the expected number of items: Item ResultCount=={B[NumberOfItems]} (Verify).",
-            "Can also buffer the count: ResultCount->CartItems with ActionMode Buffer, to reuse the number elsewhere."
-          ]
+          "type": "note",
+          "text": "ResultCount has two contexts. A general control property counts matching current nodes, for example .ResultCount==5 with Verify. Table ResultCount counts constrained cells, excludes configured headers and needs table Select plus cell Constraint; row/column Verify limits scope. Choose the intended context."
         },
         {
-          "type": "concept",
-          "term": "RowCount & ColumnCount",
-          "description": "Functions that count the TOTAL number of rows / columns containing data in a table — INCLUDING the header row/column. Used to steer through a whole table or capture its size.",
-          "items": [
-            "Syntax: in the table's value column, enter RowCount==RowNum (RowNum = buffer name), ActionMode Buffer.",
-            "The result INCLUDES the header — a 4-data-row table buffers RowNum = 5 (4 rows + 1 header).",
-            "ColumnCount works identically for columns.",
-            "Common pattern: buffer RowCount, then subtract the header with {MATH[{B[CartItems]}-1]} to get the real data-row count."
-          ]
-        },
-        {
-          "type": "warning",
-          "text": "RowCount/ColumnCount INCLUDE the header. If you need the number of DATA rows only, subtract 1: {MATH[{B[RowNum]}-1]}. Forgetting the header is a common off-by-one error."
+          "type": "note",
+          "text": "For a table, RowCount and ColumnCount measure table dimensions. Inspect the actual header configuration and returned count before converting it to data-only counts; do not subtract one blindly when the table has no header. Buffer syntax uses a property arrow, for example RowCount->RowNum. Header-relative $ positions differ from absolute # positions."
         }
-      ],
-      "bulletPoints": [
-        "ExplicitName = Configuration Parameter (=True) on a ModuleAttribute → steer/rename TestStepValues by index (#1, #2).",
-        "TBox Set Buffer = Standard Module to set/reset a buffer (value, timestamp, or MATH result).",
-        "ResultCount = count occurrences of a value in a table, position-independent (Verify or Buffer).",
-        "RowCount/ColumnCount = total rows/columns INCLUDING header; subtract 1 for data-only rows."
       ],
       "sectionId": "section-7f276a5c99a8"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 28 — Use ExplicitName",
+      "sectionTitle": "Independent practice and course access",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 28 — Use ExplicitName — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements"
+          "text": "Original Academy exercise 28 and its figures were inaccessible. This lesson supplies independent documentation-based guidance; no original exercise or Tosca run was performed."
         }
       ],
       "sectionId": "section-284dc6b04873"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 29 — Use TBox Set Buffer and ResultCount",
+      "sectionTitle": "Independent practice and course access",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 29 — Use TBox Set Buffer and ResultCount — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements"
+          "text": "Original Academy exercise 29 and its figures were inaccessible. This lesson supplies independent documentation-based guidance; no original exercise or Tosca run was performed."
         }
       ],
       "sectionId": "section-53d6181f64b4"
     },
     {
-      "sectionTitle": "Repetition on Folder Level & ActionMode Constraint",
+      "sectionTitle": "Repetition and constrained table actions",
       "elements": [
         {
-          "type": "concept",
-          "term": "Repetition on Folder Level",
-          "description": "Repeats the TestSteps inside a TestStepFolder a specified number of times, set in the FOLDER's Properties (Attribute 'Repetition'). The count can be static or a buffer (dynamic). This is how you repeat TestSteps in a TestCase — an alternative to a WHILE statement.",
-          "items": [
-            "Set on a TestStepFolder → Properties → Attribute 'Repetition'.",
-            "Value can be a buffer, e.g., {B[ActualCartNumber]}, to repeat a dynamic number of times.",
-            "Inside the loop, use the variable ${Repetition} (e.g., rename a table's <Row> to ${Repetition}) so each iteration acts on the next row.",
-            "Example: empty a shopping cart by repeating the 'remove row' steps once per item — without a WHILE statement."
-          ]
+          "type": "note",
+          "text": "For a known or dynamically evaluated non-negative count, use Repetition on a TestStepFolder, either in the Details column or Properties. It applies to folders inside a TestCase, not manual tests or parallel execution with AOS. {REPETITION} and {REPETITION[FolderName]} are documented expressions for checking repetition."
         },
         {
-          "type": "concept",
-          "term": "ActionMode Constraint",
-          "description": "Limits (constrains) the search within a table/list to identify ONE specific item, regardless of where it sits in the table. You set constraining values on one or more cells; Tosca finds the matching row, then acts on it (e.g., select its Remove checkbox).",
-          "items": [
-            "Set ActionMode Constraint on the cell(s) that uniquely identify the target row.",
-            "Example (Exercise 31): Product(s)='Music 2' (Constraint) + Price='*10.00*' (Constraint) → finds that exact row.",
-            "A combination of constraining cell values narrows down to the single intended item.",
-            "After the row is identified, another cell/action (e.g., Remove checkbox = True, Input) operates on it."
-          ]
+          "type": "note",
+          "text": "When removing rows, positions shift. Repeatedly remove the current first data row after verifying the count/state, or identify each target by a stable business key. Incrementing the row position after deleting earlier rows can skip items."
         },
         {
-          "type": "warning",
-          "text": "Exam trap: ActionMode Constraint is NOT a 'read-only existence check' and NOT for verifying values. It IDENTIFIES one specific item in a list/table of similar items by constraining on cell values. (Confirmed Knowledge Check answer.)"
-        },
-        {
-          "type": "table",
-          "headers": [
-            "ActionMode",
-            "Purpose",
-            "Example"
-          ],
-          "rows": [
-            [
-              "Verify",
-              "Compare a control's value to an expected value",
-              "Sub-Total == 28.00"
-            ],
-            [
-              "Select",
-              "Navigate/pick a table row/column or dropdown without steering",
-              "Select the Products table, a <Row>, a <Cell>"
-            ],
-            [
-              "Constraint",
-              "Identify ONE specific item in a table by constraining cell values",
-              "Product='Music 2' + Price='*10.00*' → that row"
-            ]
-          ]
+          "type": "note",
+          "text": "Constraint restricts the search for the parent row/node using child values. Require unique matching business values or a deliberate index among matches. Then use the correct action on an embedded Remove checkbox/control. Select navigates to nodes, Verify checks values and WaitOn waits within a timeout; they serve different purposes."
         }
-      ],
-      "bulletPoints": [
-        "Repetition: set on a TestStepFolder's Properties (Attribute 'Repetition'); value can be a buffer for a dynamic count.",
-        "Use ${Repetition} inside the loop (e.g., as the row index) so each pass handles the next item.",
-        "ActionMode Constraint: pick out one specific table item by matching cell values, wherever it sits.",
-        "Constraint identifies; it does NOT verify a value or check mere existence."
       ],
       "sectionId": "section-514000727de7"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 30 — Set Repetition on Folder Level",
+      "sectionTitle": "Independent practice and course access",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 30 — Set Repetition on Folder Level — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements"
+          "text": "Original Academy exercise 30 and its figures were inaccessible. This lesson supplies independent documentation-based guidance; no original exercise or Tosca run was performed."
         }
       ],
       "sectionId": "section-1d3a7244608c"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 31 — Use ActionMode Constraint",
+      "sectionTitle": "Independent practice and course access",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS1 Exercise 31 — Use ActionMode Constraint — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements"
+          "text": "Original Academy exercise 31 and its figures were inaccessible. This lesson supplies independent documentation-based guidance; no original exercise or Tosca run was performed."
         }
       ],
       "sectionId": "section-539afb6f4838"
@@ -406,56 +228,56 @@
   ],
   "examPitfalls": [
     {
-      "title": "Recovery vs. CleanUp — both fire on failure, at different points",
-      "trapDescription": "Candidates think CleanUp 'always runs after every TestCase (pass or fail)' like a generic teardown. In Tosca it does not.",
-      "bestPractice": "Recovery fires on an error DURING a TestCase to recover and continue THAT TestCase. CleanUp fires when the TestCase (and any Recovery) has FAILED, to reset the SUT for the NEXT TestCase. Neither runs on a passing test, and neither works in the ScratchBook."
+      "title": "Retry scope",
+      "trapDescription": "Always restarting the complete TestCase.",
+      "bestPractice": "Choose RetryLevel deliberately to avoid duplicate setup/side effects."
     },
     {
-      "title": "DO guarantees at least one execution; WHILE may execute 0 times",
-      "trapDescription": "Questions describe a scenario where code must run 'at least once'. Candidates choose WHILE, which could execute 0 times if the condition is initially false.",
-      "bestPractice": "DO statement = guaranteed minimum one execution. WHILE = may not execute at all if condition is false from the start."
+      "title": "Conditional loops",
+      "trapDescription": "Treating a false loop condition as test failure.",
+      "bestPractice": "Conditions guide branches; loops must be bounded."
     },
     {
-      "title": "Dynamic Comparison = XBuffer {XB}, not comparing two live values",
-      "trapDescription": "Candidates think Dynamic Comparison means comparing two dynamic values. In the AS1 course it specifically means using {XB} to verify a string with a dynamic part.",
-      "bestPractice": "Dynamic Comparison uses {XB[BufferName]} to verify a string while EXCLUDING its dynamic portion and buffering that portion. Example: 'Order number: {XB[OrderNumber]}' (Verify)."
+      "title": "XBuffer purpose",
+      "trapDescription": "Hard-coding a changing ID.",
+      "bestPractice": "Verify static context and capture the variable substring."
     },
     {
-      "title": "{XB[Value]} — the value in brackets is the BUFFER NAME",
-      "trapDescription": "Candidates think the value inside {XB[...]} is the InnerText, the TestStep name, or the value to verify.",
-      "bestPractice": "In {XB[OrderNumber]}, 'OrderNumber' is the name of the BUFFER where the excluded dynamic part is stored. (Confirmed Knowledge Check answer.)"
+      "title": "Buffer name",
+      "trapDescription": "Putting expected data in XB brackets.",
+      "bestPractice": "XB brackets name the captured buffer."
     },
     {
-      "title": "ActionMode Constraint identifies a specific item — it is NOT a read-only check",
-      "trapDescription": "Candidates think Constraint verifies existence/state or a value. Distractors describe it as 'interrupt execution until a property has a value' (that's WaitOn) or 'transfer values to the object' (that's Input).",
-      "bestPractice": "ActionMode Constraint identifies ONE specific item in a list/table of similar items by constraining cell values (e.g., Product='Music 2' + Price='*10.00*'), regardless of position. (Confirmed Knowledge Check answer.)"
+      "title": "Constraint uniqueness",
+      "trapDescription": "Assuming matching values are automatically unique.",
+      "bestPractice": "Inspect uniqueness or use a deliberate matching index."
     },
     {
-      "title": "Repetition is set on a TestStepFolder, not on the TestCase or in Settings",
-      "trapDescription": "Candidates look for repetition in Project>>Settings>>Tbox, in TestCase Properties, or on the ExecutionEntry.",
-      "bestPractice": "To repeat TestSteps, set the 'Repetition' attribute in the PROPERTIES of a TestStepFolder within the TestCase. The value can be a buffer for a dynamic count. (Confirmed Knowledge Check answer.)"
+      "title": "Repeat scope",
+      "trapDescription": "Repeating the full entry instead of its folder steps.",
+      "bestPractice": "Use TestStepFolder Repetition for enclosed steps."
     },
     {
-      "title": "RowCount/ColumnCount include the header row/column",
-      "trapDescription": "Candidates assume RowCount returns only data rows. It counts data rows PLUS the header.",
-      "bestPractice": "RowCount and ColumnCount include the header. A table with 4 data rows returns RowCount = 5. Subtract 1 with {MATH[{B[RowNum]}-1]} for data-only rows."
+      "title": "Header assumptions",
+      "trapDescription": "Subtracting one from every dimension count.",
+      "bestPractice": "Inspect the returned count and actual table header structure."
     },
     {
-      "title": "Multiuser: a red bar blocks EDITING, not USING",
-      "trapDescription": "Candidates think a red (locked) object can't be used at all, or that red means the object is free.",
-      "bestPractice": "A red bar = the object is locked/checked out → you cannot EDIT it. But if it's a Module you can still add/reference it in your TestCases. Red does NOT mean nobody is working on it. (Confirmed Knowledge Check answer.)"
+      "title": "Ownership",
+      "trapDescription": "Treating every checkout as another user lock.",
+      "bestPractice": "Green means you hold it; red means another user."
     },
     {
-      "title": "ExplicitName is a Configuration Parameter (=True), not a Module rename",
-      "trapDescription": "Candidates rename the Module in the Modules section instead of adding the ExplicitName Configuration Parameter.",
-      "bestPractice": "ExplicitName = a Configuration Parameter (Value True) added to a ModuleAttribute. It lets you rename/steer the generated TestStepValues by index (e.g., #1) to handle dynamic elements — it does not rename the Module."
+      "title": "ExplicitName",
+      "trapDescription": "Treating a renamed TestStepValue as a stable SUT ID.",
+      "bestPractice": "Name editing and technical identification are separate."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "A TestCase must submit a form and, if a confirmation dialog appears, click 'OK' to dismiss it. The dialog appears unpredictably. Which control structure handles the conditional dismissal correctly?",
+      "scenario": "A TestCase must dismiss an optional confirmation dialog exactly once if it is present, without looping or treating absence as failure. Which structure fits?",
       "options": [
         {
           "id": "A",
@@ -478,7 +300,16 @@
         "A"
       ],
       "hint": "Conditional action based on presence/absence of an element.",
-      "rationale": "An IF statement evaluates a condition (dialog present?) and executes the OK click only when true. WHILE would loop unnecessarily. DO would click even if no dialog appeared. A Recovery Scenario fires on step failure, not on optional UI elements."
+      "rationale": "IF checks the condition and branches once; the scenario deliberately excludes looping and failure-driven handling.",
+      "source": "Independent documentation-based practice",
+      "optionExplanations": {
+        "A": "IF performs the optional action once under the stated condition.",
+        "B": "Looping is explicitly not requested here.",
+        "C": "It could try the absent dialog before checking.",
+        "D": "The expected optional state need not be turned into an error."
+      },
+      "lessonSection": "section-5b17c7e9a353",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
@@ -506,7 +337,16 @@
         "B"
       ],
       "hint": "Fires after a failure to prepare a clean slate for the NEXT test.",
-      "rationale": "A CleanUp Scenario kicks in when a TestCase and all its Recovery Scenarios have failed. It resets the SUT to a clean state (e.g., empty cart, log out, close browser) so the next TestCase runs unaffected — especially valuable in unattended/overnight runs. It does NOT run after passing tests (D is the common wrong answer). Recovery, by contrast, tries to save the current TestCase."
+      "rationale": "Configured CleanUp attempts to restore the environment when Recovery is unsuccessful. It is not unconditional teardown or a guarantee that the next test passes.",
+      "source": "Independent documentation-based practice",
+      "optionExplanations": {
+        "A": "Recovery has already failed in the scenario.",
+        "B": "Configured CleanUp is the subsequent environment-reset attempt.",
+        "C": "An ordinary trailing loop may never be reached after failure.",
+        "D": "This is not always-run teardown for passing cases."
+      },
+      "lessonSection": "section-7f129c3c4dfd",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
@@ -534,16 +374,25 @@
         "D"
       ],
       "hint": "Static text + a changing part you also want to store = XBuffer.",
-      "rationale": "Dynamic Comparison uses {XB[OrderNumber]} to verify the static portion ('Order number: ') while excluding the dynamic number from the comparison and storing it in the buffer 'OrderNumber' for later reuse. A hard-coded Verify would fail because the number changes every run."
+      "rationale": "Dynamic Comparison uses {XB[OrderNumber]} to verify the static portion ('Order number: ') while excluding the dynamic number from the comparison and storing it in the buffer 'OrderNumber' for later reuse. A hard-coded Verify would fail because the number changes every run.",
+      "source": "Independent documentation-based practice",
+      "optionExplanations": {
+        "A": "A changing ID makes the literal expected string unsuitable.",
+        "B": "Identification does not capture the dynamic substring.",
+        "C": "ResultCount measures matches, not the number of digits.",
+        "D": "Verify checks the static text and XB captures the changing part."
+      },
+      "lessonSection": "section-e982b8fb2d5c",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "A search results page should display exactly 5 product cards after a filtered search. What is the most appropriate way to validate the count?",
+      "scenario": "A generic product-card control definition intentionally matches all filtered product cards. You want to verify that there are exactly five matching nodes, independently of table-cell content. What is appropriate?",
       "options": [
         {
           "id": "A",
-          "text": "Use ResultCount on the product card Control to assert that exactly 5 matches are found."
+          "text": "Verify the general control property .ResultCount==5 on that definition."
         },
         {
           "id": "B",
@@ -562,7 +411,16 @@
         "A"
       ],
       "hint": "Counting matching elements = one specific advanced feature.",
-      "rationale": "ResultCount counts the number of matching elements for a given Module/Control definition on the current page. Asserting a count of 5 is exactly its use case — far more efficient than 5 individual Verify steps."
+      "rationale": "General ResultCount counts matching current nodes. This differs from table ResultCount of constrained cells; existence of the fifth alone does not exclude a sixth.",
+      "source": "Independent documentation-based practice",
+      "optionExplanations": {
+        "A": "Counts matching nodes for the stated generic definition.",
+        "B": "Five separate checks need not exclude additional cards.",
+        "C": "The fifth can exist even when a sixth exists.",
+        "D": "Naming a buffer does not derive the page count."
+      },
+      "lessonSection": "section-7f276a5c99a8",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q5",
@@ -583,19 +441,28 @@
         },
         {
           "id": "D",
-          "text": "Put the remove steps in a TestStepFolder and set its Properties → 'Repetition' attribute to {B[ActualCartNumber]}, using ${Repetition} as the row index inside."
+          "text": "Set Repetition on a TestStepFolder to {B[ActualCartNumber]}; each pass removes the current first data row after verifying its identity/state."
         }
       ],
       "correctOptions": [
         "D"
       ],
       "hint": "Repetition lives in the TestStepFolder's Properties; the count can be a buffer.",
-      "rationale": "Repetition for TestSteps is defined in the PROPERTIES of a TestStepFolder (Attribute 'Repetition'). Using a buffer like {B[ActualCartNumber]} makes it dynamic, and ${Repetition} inside the loop gives the current iteration (used as the row index). It is not set in Settings, TestCase Properties, or the ExecutionEntry."
+      "rationale": "Folder repetition accepts a dynamic expression. Deleting a row shifts later positions, so advancing an index after each deletion can skip items.",
+      "source": "Independent documentation-based practice",
+      "optionExplanations": {
+        "A": "Workspace settings are not this folder repeat count.",
+        "B": "Entry repetitions repeat execution entries, not this inner step group.",
+        "C": "The inner folder property is the appropriate scope.",
+        "D": "Repeats the step group and accounts for row shifts."
+      },
+      "lessonSection": "section-514000727de7",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q6",
       "type": "single-select",
-      "scenario": "A shopping cart table lists many products. You must remove exactly the row where Product = 'Music 2' and Price contains '10.00', wherever that row appears in the table. Which ActionMode identifies that specific row?",
+      "scenario": "A table has exactly one row matching Product='Music 2' and Price='10.00'. Which ActionMode narrows to that row before operating its embedded Remove control?",
       "options": [
         {
           "id": "A",
@@ -618,12 +485,21 @@
         "A"
       ],
       "hint": "Identify one specific item among similar ones, regardless of position.",
-      "rationale": "ActionMode Constraint limits the table search to the row matching the constraining cell values (Product='Music 2' AND Price='*10.00*'), regardless of where it sits. Once identified, another cell/action (Remove = True) operates on that row. Constraint identifies a specific item — it does not verify a value or merely check existence."
+      "rationale": "Constraint narrows the parent-row search using the matching cell values. The scenario guarantees one match; the embedded control needs its own correct input action.",
+      "source": "Independent documentation-based practice",
+      "optionExplanations": {
+        "A": "Constraint narrows the row by the stated unique cell values.",
+        "B": "Picking the first physical row ignores its business identity.",
+        "C": "Comparing values alone does not establish the requested row-search constraint.",
+        "D": "Waiting does not specify the row selector."
+      },
+      "lessonSection": "section-514000727de7",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q7",
       "type": "single-select",
-      "scenario": "An element's ID attribute changes with every page load (e.g., 'btn_7823', 'btn_4910'). The element is always the third button in a container div with a stable ID of 'action-panel'. Which technique best handles this?",
+      "scenario": "Three similar buttons exist under stable parent 'action-panel', and their IDs change. Which approach establishes scoped identification without assuming the parent alone identifies the third button?",
       "options": [
         {
           "id": "A",
@@ -631,7 +507,7 @@
         },
         {
           "id": "B",
-          "text": "Use Parent Control — identify the element relative to its stable parent 'action-panel'."
+          "text": "Select the stable parent, then distinguish the child using additional stable properties or a justified index and validate uniqueness."
         },
         {
           "id": "C",
@@ -646,12 +522,21 @@
         "B"
       ],
       "hint": "The parent is stable; the child is not — use the parent as the reference.",
-      "rationale": "Parent Control identifies a child element by first anchoring to its stable parent ('action-panel'). This is more reliable than wildcards, rescanning before every run, or ExplicitName (which names an already-found element, not a method to find it)."
+      "rationale": "A parent scopes the search but does not alone distinguish similar children. Add a suitable discriminator and validate it against runtime states.",
+      "source": "Independent documentation-based practice",
+      "optionExplanations": {
+        "A": "A broad ID wildcard may still match all three buttons.",
+        "B": "Combines the stable scope with an actual child discriminator.",
+        "C": "A TestStepValue alias does not add a technical SUT identity.",
+        "D": "Repeated rescanning is not a stable identification strategy."
+      },
+      "lessonSection": "section-e982b8fb2d5c",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q8",
       "type": "single-select",
-      "scenario": "A test needs to check a process status field and keep polling until it shows 'COMPLETED'. The polling step may not need to run at all if the status is already 'COMPLETED' when the test starts. Which statement is correct?",
+      "scenario": "You intentionally need a bounded loop with additional polling steps until status becomes COMPLETED. It should skip the loop when the status is already complete. Which control structure fits?",
       "options": [
         {
           "id": "A",
@@ -674,12 +559,21 @@
         "C"
       ],
       "hint": "May not need to run at all = check condition first = WHILE.",
-      "rationale": "WHILE evaluates the condition first and only executes if the condition is true. If the status is already 'COMPLETED' at the start, WHILE executes 0 times — the correct behavior when no polling is needed. DO would always poll at least once even when unnecessary."
+      "rationale": "WHILE checks before entering and may skip its loop. Set a bounded MaximumRepetitions; a simple single-property wait could instead use WaitOn.",
+      "source": "Independent documentation-based practice",
+      "optionExplanations": {
+        "A": "DO starts its loop before evaluating the condition.",
+        "B": "A single branch does not repeatedly perform the requested polling steps.",
+        "C": "Checks the condition before running a bounded loop.",
+        "D": "Recovery handles configured failures, not this expected control flow."
+      },
+      "lessonSection": "section-5b17c7e9a353",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "KC1",
       "type": "single-select",
-      "source": "Official Knowledge Check - Section 08",
+      "source": "Independent documentation-based practice",
       "scenario": "When using the command {XB[Value]}, what is the meaning of the value inside the []?",
       "options": [
         {
@@ -703,12 +597,20 @@
         "D"
       ],
       "hint": "XBuffer stores the excluded dynamic part somewhere.",
-      "rationale": "In {XB[OrderNumber]}, the value inside the brackets is the NAME of the buffer where the excluded dynamic part of the string is stored for later reuse. Verbatim official Knowledge Check question."
+      "rationale": "In {XB[OrderNumber]}, the value inside the brackets is the NAME of the buffer where the excluded dynamic part of the string is stored for later reuse.",
+      "optionExplanations": {
+        "A": "The bracket content names the buffer, not InnerText.",
+        "B": "It does not specify a TestStep name.",
+        "C": "Static expected content belongs outside this dynamic placeholder.",
+        "D": "The name identifies where the captured substring is stored."
+      },
+      "lessonSection": "section-e982b8fb2d5c",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "KC2",
       "type": "single-select",
-      "source": "Official Knowledge Check - Section 08",
+      "source": "Independent documentation-based practice",
       "scenario": "How do you define repetitions for TestSteps in a TestCase?",
       "options": [
         {
@@ -732,14 +634,22 @@
         "A"
       ],
       "hint": "Repetition is a TestStepFolder-level property.",
-      "rationale": "Repetitions for TestSteps are defined in the PROPERTIES of a TestStepFolder within the TestCase (Attribute 'Repetition'). Not in Settings, TestCase Properties, or the ExecutionEntry. Verbatim official Knowledge Check question."
+      "rationale": "Repetitions for TestSteps are defined in the PROPERTIES of a TestStepFolder within the TestCase (Attribute 'Repetition'). Not in Settings, TestCase Properties, or the ExecutionEntry.",
+      "optionExplanations": {
+        "A": "The TestStepFolder controls repetition of its enclosed steps.",
+        "B": "This is not the location of the inner folder count.",
+        "C": "The required scope is the TestStepFolder inside the case.",
+        "D": "This would affect outer execution rather than only enclosed steps."
+      },
+      "lessonSection": "section-514000727de7",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "KC3",
       "type": "multi-select",
       "selectCount": 2,
-      "source": "Official Knowledge Check - Section 08",
-      "scenario": "What does a red button bar next to an object mean while working in Multi-user environments? (2 correct answers)",
+      "source": "Independent documentation-based practice",
+      "scenario": "Another user has checked out an existing Module, indicated by a red block. Which TWO statements describe your normal access while you edit a separate TestCase?",
       "options": [
         {
           "id": "A",
@@ -763,12 +673,20 @@
         "C"
       ],
       "hint": "Locked = can't edit, but a Module can still be used.",
-      "rationale": "A red bar means the object is locked/checked out: you CANNOT make changes to it (C), but if it is a Module you may still add/reference it in your TestCases (B). It can still be run in an ExecutionList (A is false), and red does NOT mean nobody is working on it — it means it is held/locked (D is false). Verbatim official Knowledge Check question. No partial credit."
+      "rationale": "Another user owns the checkout. Its existing Module definition can be used while your changes require editing ownership; checkout color alone says nothing about execution success.",
+      "optionExplanations": {
+        "A": "Checkout color does not alone prohibit execution.",
+        "B": "Existing definitions may still be referenced from your editable case.",
+        "C": "The other owner prevents your editing this checked-out object.",
+        "D": "Red indicates another user owns the checkout."
+      },
+      "lessonSection": "section-fcbb92387630",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "KC4",
       "type": "single-select",
-      "source": "Official Knowledge Check - Section 08",
+      "source": "Independent documentation-based practice",
       "scenario": "What is the difference between a 'WHILE' and a 'DO' statement?",
       "options": [
         {
@@ -792,12 +710,20 @@
         "B"
       ],
       "hint": "One of them guarantees a minimum of one execution.",
-      "rationale": "In a DO statement the loop is executed at least once (the condition is checked AFTER the first execution). A WHILE checks the condition first and may execute 0 times. Verbatim official Knowledge Check question."
+      "rationale": "In a DO statement the loop is executed at least once (the condition is checked AFTER the first execution). A WHILE checks the condition first and may execute 0 times.",
+      "optionExplanations": {
+        "A": "Both WHILE and DO have Loop objects.",
+        "B": "DO enters its loop before checking; WHILE checks first.",
+        "C": "DO also has a Conditions object.",
+        "D": "WHILE is not restricted to Recovery."
+      },
+      "lessonSection": "section-5b17c7e9a353",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "KC5",
       "type": "single-select",
-      "source": "Official Knowledge Check - Section 08",
+      "source": "Independent documentation-based practice",
       "scenario": "What is the best definition of the ActionMode Constraint?",
       "options": [
         {
@@ -821,123 +747,148 @@
         "C"
       ],
       "hint": "Constraint narrows a table search to one specific item.",
-      "rationale": "ActionMode Constraint identifies one specific item in a list/table of similar items by constraining on cell values. Option A describes WaitOn, option B describes Select, and option D describes Input. Verbatim official Knowledge Check question."
+      "rationale": "ActionMode Constraint identifies one specific item in a list/table of similar items by constraining on cell values. Option A describes WaitOn, option B describes Select, and option D describes Input.",
+      "optionExplanations": {
+        "A": "This describes bounded waiting, not identification.",
+        "B": "Selection and list navigation differ from restricting the parent search.",
+        "C": "Constraint narrows a search using child values.",
+        "D": "Transferring input values uses Input."
+      },
+      "lessonSection": "section-514000727de7",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
-      "key": "Multiuser: red bar",
-      "value": "Object locked/checked out → can't EDIT. A locked Module can still be USED in TestCases. Red ≠ free."
+      "key": "Checkout",
+      "value": "Green: yours; red: another user; white: newly created."
     },
     {
-      "key": "WHILE / IF / DO",
-      "value": "WHILE: repeat while true (may run 0×). IF: branch once. DO: run once then check (min 1×). Each has a Condition + Loop."
+      "key": "IF / WHILE / DO",
+      "value": "Branch; condition-first loop; loop-first condition."
     },
     {
-      "key": "Recovery Scenario",
-      "value": "Fires on TestStep FAILURE. Stabilizes SUT. Contained in a Recovery Scenario Collection. Does NOT work in ScratchBook."
+      "key": "Recovery",
+      "value": "Configured failures; RetryLevel controls retry point."
     },
     {
-      "key": "CleanUp Scenario",
-      "value": "Fires when the TestCase (and any Recovery) fails. Resets SUT to a clean state before the next TestCase."
+      "key": "CleanUp",
+      "value": "Environment restoration after Recovery is unsuccessful."
     },
     {
-      "key": "Dynamic Comparison (XBuffer)",
-      "value": "{XB[Buffer]} verifies a string, excludes its dynamic part, and buffers that part. Value in [] = buffer name."
+      "key": "XB",
+      "value": "Capture the variable substring during Verify."
     },
     {
-      "key": "Parent Control",
-      "value": "Identify a child via its stable parent DIV — for pages with repeating elements."
+      "key": "Parent scope",
+      "value": "Still needs a child discriminator and uniqueness check."
     },
     {
       "key": "Dynamic ID",
-      "value": "Runtime-generated IDs → identify via pattern/partial match or by parent."
+      "value": "Stable properties or a unique wildcard combination."
     },
     {
       "key": "ExplicitName",
-      "value": "Configuration Parameter (=True) on a ModuleAttribute → rename/steer TestStepValues by index (#1, #2)."
+      "value": "Allows TestStepValue name editing; not universal identification."
     },
     {
       "key": "TBox Set Buffer",
-      "value": "Standard Module to set/reset a buffer (value, timestamp, or MATH result)."
+      "value": "Input writes; Verify checks the named buffer."
     },
     {
       "key": "ResultCount",
-      "value": "Counts occurrences of a value in a table, position-independent. ResultCount=={B[n]} (Verify) or ->name (Buffer)."
+      "value": "General nodes versus table constrained-cell counting."
     },
     {
-      "key": "RowCount / ColumnCount",
-      "value": "Total rows/columns INCLUDING header. RowCount==RowNum (Buffer). Subtract 1 for data-only rows."
+      "key": "Dimensions",
+      "value": "Inspect headers before converting to data-only counts."
     },
     {
-      "key": "Repetition on Folder Level",
-      "value": "TestStepFolder Properties → 'Repetition' attribute (can be a buffer). Use ${Repetition} as the row index."
+      "key": "Repetition",
+      "value": "Folder count may be dynamic; deleting rows shifts indexes."
     },
     {
-      "key": "ActionMode Constraint",
-      "value": "Identify ONE specific table item by constraining cell values (Product='Music 2' + Price='*10.00*'), any position."
+      "key": "Constraint",
+      "value": "Narrows a parent-node search by child values."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 28 - Working in the Multiuser Environment",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
-      "duration": "video"
+      "title": "Checkout ownership",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/checkin_and_checkout.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 29 - WHILE, IF & DO Statements",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3641/lesson-video-while-if-do-statements",
-      "duration": "video"
+      "title": "Conditions and loops",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/conditional_statements.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 30 - Recovery Scenarios",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3647/lesson-video-recovery-scenarios",
-      "duration": "video"
+      "title": "Recovery overview",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/recovery.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 31 - CleanUp Scenarios",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
-      "duration": "video"
+      "title": "Recovery settings",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/recovery_enable.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 32 - Dynamic Comparison",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
-      "duration": "video"
+      "title": "RetryLevel and runtime",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/recovery_create_scenario.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 33 - Parent Control",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3662/lesson-video-parent-control",
-      "duration": "video"
+      "title": "CleanUp",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/recovery_cleanup.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 34 - Dynamic ID",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
-      "duration": "video"
+      "title": "Text expressions",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/text_expressions.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 35 - ExplicitName",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3668/lesson-video-explicitname",
-      "duration": "video"
+      "title": "ActionModes",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/action_modes.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 36 - TBox Set Buffer",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
-      "duration": "video"
+      "title": "Stable identifiers",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/best_practices/scan_identifiers.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 37 - ResultCount (RowCount & ColumnCount)",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
-      "duration": "video"
+      "title": "ExplicitName",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/xmodules_properties.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 38 - Repetition on Folder Level & ExplicitName on TestStepValue",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1",
-      "duration": "video"
+      "title": "Buffer operations",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/automation_tools/buffer_operations.htm",
+      "duration": "reference"
     },
     {
-      "title": "Lesson 39 - ActionMode Constraint",
-      "url": "https://academy.tricentis.com/learn/courses/567/tricentis-tosca-fundamentals-automating-web-application-testing-as1/lessons/3684/lesson-video-advanced-topics-actionmode-constraint",
-      "duration": "video"
+      "title": "Table steering",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/type_table.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Control property counts",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/control_properties.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Folder repetitions",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/repetition.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "XScan navigation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/xscan_navigate_ui.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }

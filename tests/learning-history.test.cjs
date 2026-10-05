@@ -881,3 +881,17 @@ test('AS1 requirements separates risk class scales from weights and links from c
  assert.match(d.practiceQuiz[6].options[2].text,/RequirementSet/);
  assert.doesNotMatch(JSON.stringify(d),/confirmed AS1 exam|verbatim official|not manually entered|Integer 1–10|CP in square brackets|var\(--pa-ink-[23]\)/i);
 });
+
+test('AS1 advanced guidance distinguishes ownership, retry scope, counts and shifting row indexes',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as1/m08_additional_advanced_topics.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['D'],['A'],['D'],['A'],['B'],['C'],['D'],['A'],['B','C'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].text,/green.*red.*white/i);
+ assert.match(d.studyGuide[3].elements[1].text,/granularity.*not describe the object/);
+ assert.match(d.studyGuide[9].elements[2].text,/General|general/);
+ assert.match(d.studyGuide[9].elements[2].text,/Table ResultCount.*excludes configured headers/);
+ assert.match(d.studyGuide[12].elements[1].text,/skip items/);
+ assert.match(d.practiceQuiz[4].options[3].text,/current first data row/);
+ assert.match(d.practiceQuiz[6].options[1].text,/additional stable properties/);
+ assert.doesNotMatch(JSON.stringify(d),/confirmed Knowledge Check|verbatim official|RowCount==RowNum|\$\{Repetition\}|var\(--pa-ink-[23]\)/i);
+});
