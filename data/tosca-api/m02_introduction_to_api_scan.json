@@ -3,156 +3,158 @@
   "moduleTitle": "Lesson 1 - Introduction to the API Scan",
   "moduleUrl": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
   "learningObjectives": [
-    "Start the API Scan from Tricentis Tosca and know the two ways to open it.",
-    "Scan a REST URI and navigate the resulting Operations and Messages.",
-    "Distinguish the Payload, Request, and Response views for a Message.",
-    "Send a POST request with a Service Access Key and interpret common HTTP status codes."
+    "Launch API Scan through Commander or the documented filesystem entry.",
+    "Scan supported files or URI definitions and distinguish simple messages from generated service operations.",
+    "Configure payload, parameters, headers and authentication and inspect request/response views.",
+    "Apply contract-specific HTTP methods and interpret response status without equating it with all assertions passing."
   ],
   "estTime": "45 min",
   "studyGuide": [
     {
-      "sectionTitle": "Opening the API Scan",
+      "sectionId": "section-e0c3442028ea",
+      "sectionTitle": "Opening and scanning",
       "elements": [
         {
           "type": "concept",
-          "term": "Two ways to open the API Scan",
-          "description": "The API Scan can be started either from the ApiScanStandalone.exe file directly, or from inside Tricentis Tosca via the API Testing tab on the Home ribbon. This course always opens it from inside Tosca, since every exercise exports results into Tosca Commander."
+          "term": "Launch paths",
+          "description": "Select API Testing > API Scan in Commander, or launch ApiScan.exe in %COMMANDER_HOME%. The Modules menu also offers Scan Application > Non UI > API Scan. These are current documented entry points, not an arbitrary executable-distribution guarantee."
         },
         {
           "type": "steps",
-          "title": "Starting a scan from Tosca",
+          "title": "Prepare and scan",
           "items": [
-            "Best practice: create a new Component Folder in Tosca before starting a new API Scan, so the exported results land somewhere organized.",
-            "On the Home ribbon, open the API Testing tab, then click the API Scan button.",
-            "Choose \"Start API Scan\" to scan a new URI or file, or \"Open selected module\" to reopen a previously scanned and saved project.",
-            "Two scan options are available: scan a file (JSON or XML) from a local/shared drive, or scan a URI."
+            "Choose an authorized environment and plan where exported artifacts should be organized. A Component Folder is an organizational choice, not a universal scan prerequisite.",
+            "Use File to scan supported local/shared-drive JSON, RAML, Text, WADL, WSDL, XML or XSD input.",
+            "Use URI to enter a definition address; configure required scan authentication/proxy settings through Advanced.",
+            "Inspect resulting operations or messages. Open and Save commands manage projects; this lesson does not certify automatic last-project reopening."
           ]
-        },
-        {
-          "type": "note",
-          "text": "The first time the API Scan opens there is nothing loaded; every subsequent time it defaults to reopening your last saved project."
         }
-      ],
-      "bulletPoints": [
-        "Create the Component Folder BEFORE starting the scan — that's where the exported Modules/TestCases will land.",
-        "Scan URI vs. Scan file: URI scans a live endpoint; file scans a local JSON/XML document."
-      ],
-      "sectionId": "section-e0c3442028ea"
+      ]
     },
     {
-      "sectionTitle": "Operations, Messages, and the Payload",
+      "sectionId": "section-4a9b334f6dea",
+      "sectionTitle": "Operations, requests and responses",
       "elements": [
         {
           "type": "concept",
-          "term": "Operations and Messages",
-          "description": "Operations contain Messages. A Message's content is only loaded the first time you click its Operation — this avoids the performance cost of generating content for every message up-front on a large, complex API."
+          "term": "Operations and messages",
+          "description": "For scanned service definitions, API Scan initially displays empty operations and generates them when selected. A simple file can be imported directly as a simple message; do not generalize the service-operation behavior to every scanned file."
         },
         {
           "type": "concept",
-          "term": "Payload",
-          "description": "The area where you interact with and check responses. When a Message is first selected, the Payload shows a representation of what can be sent as a Request. Sending that default content usually returns an error — you must fill in appropriate data first. Some Requests (e.g. a GET) can have an empty Payload by design. Unneeded elements can be deleted from the Payload if they aren't relevant to what you're testing."
+          "term": "Configure a message",
+          "description": "Use Method, Endpoint and Resource together with Payload, Params, Auth and Headers. Inspect generated example data against the contract; it is neither guaranteed valid nor guaranteed to return an error. The Home menu Request and Response controls select the corresponding view."
         },
         {
           "type": "steps",
-          "title": "Sending your first REST request (Shops_Post example)",
+          "title": "Independent creation-request example",
           "items": [
-            "Navigate to the \"shops\" folder and the Shops_Post message.",
-            "Enter the previously generated Service Access Key as the \"key\" parameter.",
-            "Fill in the new shop's properties (country, city, name) in the Payload.",
-            "Confirm the Method is set to POST — POST creates a new entry, PUT updates an existing one.",
-            "Send the message and check the Response tab."
+            "Assume the sandbox contract defines POST /shops to create a shop; choose this method because of that contract.",
+            "Set endpoint/resource, valid input and required credentials in the documented location.",
+            "Run the message and inspect status, headers and response body.",
+            "Check expected shop data and any intended persistent effects. Do not equate a success status with all assertions passing."
           ]
         },
         {
           "type": "table",
           "headers": [
-            "Status Code",
+            "Status",
             "Meaning"
           ],
           "rows": [
             [
               "200 OK",
-              "The request succeeded"
+              "The request succeeded; inspect content and business expectations."
             ],
             [
-              "404",
-              "The resource was not found"
+              "201 Created",
+              "The request created one or more resources."
             ],
             [
-              "500",
-              "The server is down or unreachable"
+              "404 Not Found",
+              "No current representation was found, or the server is unwilling to disclose one."
+            ],
+            [
+              "500 Internal Server Error",
+              "An unexpected server condition prevented fulfillment; this is an HTTP response, not evidence that no server was reachable."
             ]
           ]
         }
       ],
       "bulletPoints": [
-        "The Payload's default content is a template, not real data — fill it in before sending to get a meaningful response.",
-        "POST = create a new entry. PUT = update an existing entry. Using the wrong one is a common mistake.",
-        "200 OK confirms success; you can also verify a change directly on the SUT's own page (e.g. the Coffeeshop site)."
-      ],
-      "sectionId": "section-4a9b334f6dea"
+        "POST processing and PUT creation/replacement semantics are distinct; supported operations come from the service contract.",
+        "A network failure without an HTTP response is different from receiving an HTTP error status."
+      ]
     },
     {
-      "sectionTitle": "Hands-On: Exercise 01 - Exploring the REST Protocol",
+      "sectionId": "section-836e5de1c8ad",
+      "sectionTitle": "Independent hands-on workflow",
       "elements": [
         {
           "type": "note",
-          "text": "📄 API Exercise 01 - Exploring the REST Protocol — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases"
+          "text": "Scan an authorized small API definition, generate one service operation, configure valid and invalid requests, and inspect response evidence. The original Academy video and exercise file require access and have not been verified; historical Shops_Post naming and token rules are not certified here."
         }
-      ],
-      "sectionId": "section-836e5de1c8ad"
+      ]
     }
   ],
   "examPitfalls": [
     {
-      "title": "Waiting for every Message to preload",
-      "trapDescription": "Candidates assume all Messages under an Operation are loaded as soon as the API is scanned.",
-      "bestPractice": "A Message's content only loads the first time you click its Operation. This avoids performance issues when scanning larger, more complex APIs — only the empty Operation names load upfront."
+      "title": "Generalizing service-operation generation to every input",
+      "trapDescription": "Assuming every scan lazily generates an Operation when clicked.",
+      "bestPractice": "Service definitions generate initially empty operations on selection; simple files can import directly as messages."
     },
     {
-      "title": "Sending the default Payload as-is",
-      "trapDescription": "Candidates send the Request without editing the Payload and are confused when they get an error back.",
-      "bestPractice": "The default Payload is only a structural template. You must fill in real, valid data before sending — unless the Method is GET, where an empty Payload is often correct by design."
+      "title": "Treating generated data as guaranteed valid or invalid",
+      "trapDescription": "Sending example payloads without checking required fields, credentials and constraints.",
+      "bestPractice": "Inspect the contract and configure meaningful request data. Default content is not guaranteed to succeed or fail; GET content does not have generally defined HTTP semantics."
     },
     {
-      "title": "Confusing POST and PUT",
-      "trapDescription": "Candidates use PUT to create a brand-new entry, or POST to update an existing one.",
-      "bestPractice": "POST creates a new entry (e.g. adding a new shop). PUT updates an existing entry. Choosing the wrong Method causes the request to fail or behave unexpectedly."
+      "title": "Assuming POST always creates and PUT only updates",
+      "trapDescription": "Choosing a method from a simplified CRUD slogan instead of the operation contract.",
+      "bestPractice": "POST requests resource-specific processing; PUT can create or replace a target. Use the method supported by the actual operation."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "In the API Scan's Project Tree, when is a Message's payload content actually generated?",
+      "scenario": "After scanning a service definition (not a simple message file), API Scan shows empty operations. How are the operation details generated?",
       "options": [
         {
           "id": "A",
-          "text": "As soon as the URI is scanned, for every Message at once."
+          "text": "All operations must already be fully generated immediately."
         },
         {
           "id": "B",
-          "text": "Only the first time you click on its Operation."
+          "text": "Select the operation to generate its details."
         },
         {
           "id": "C",
-          "text": "Only after the Message has been exported to Tosca."
+          "text": "Export is always required before viewing any operation."
         },
         {
           "id": "D",
-          "text": "Messages never load content — only Operations do."
+          "text": "Operations can never have message content."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Think about why this matters for a large, complex API.",
-      "rationale": "A Message is only loaded after you click on its Operation for the first time. Loading every message upfront on a large API would be slow and could cause general performance issues."
+      "hint": "The service-scan documentation describes deferred operation generation.",
+      "rationale": "For a scanned service, empty operations initially indicate available functions. Select an operation to generate it; simple-file scans have different behavior.",
+      "optionExplanations": {
+        "A": "The documented service workflow initially creates empty operations.",
+        "B": "Selection generates the operation in this documented service case.",
+        "C": "Export is not a prerequisite for generating operation details in API Scan.",
+        "D": "Generated operations can contain messages."
+      },
+      "lessonSection": "section-4a9b334f6dea",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A tester wants to add a brand-new coffee shop branch to the Coffeeshop service. Which HTTP Method should the Message use?",
+      "scenario": "An independent sandbox contract defines POST /shops as its creation operation. Which method should a new-shop request use?",
       "options": [
         {
           "id": "A",
@@ -174,13 +176,21 @@
       "correctOptions": [
         "C"
       ],
-      "hint": "This method is used to create something new; a different one updates something that already exists.",
-      "rationale": "POST is used to create a new entry, such as adding a new coffee shop branch. PUT is used to update an existing entry — using it here would be incorrect."
+      "hint": "Use the specified contract, not a universal CRUD rule.",
+      "rationale": "The scenario explicitly defines POST for this creation operation. HTTP PUT can also create a target under other contracts; that does not change this endpoint definition.",
+      "optionExplanations": {
+        "A": "GET retrieval does not match the specified creation operation.",
+        "B": "PUT has creation/replacement semantics, but is not the method specified for this operation.",
+        "C": "POST matches the stated sandbox contract.",
+        "D": "DELETE does not match the stated creation operation."
+      },
+      "lessonSection": "section-4a9b334f6dea",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "After sending a Request message in the API Scan, what does a Status Code of 200 mean?",
+      "scenario": "After running a request, what does HTTP 200 OK indicate?",
       "options": [
         {
           "id": "A",
@@ -188,11 +198,11 @@
         },
         {
           "id": "B",
-          "text": "The server is down or unreachable."
+          "text": "No server could be reached."
         },
         {
           "id": "C",
-          "text": "The request succeeded (OK)."
+          "text": "The request succeeded; expected business data still needs verification."
         },
         {
           "id": "D",
@@ -202,97 +212,148 @@
       "correctOptions": [
         "C"
       ],
-      "hint": "This is the most common 'everything worked' status code.",
-      "rationale": "200 OK confirms the request succeeded. 404 means the resource wasn't found, and 500 indicates the server is down or unreachable."
+      "hint": "Interpret the status separately from the test assertion set.",
+      "rationale": "200 indicates request success. Inspect expected response data and effects separately; 500 is a server-error response, whereas an unreachable connection can yield no HTTP response.",
+      "optionExplanations": {
+        "A": "404, rather than 200, concerns a missing or undisclosed representation.",
+        "B": "A received 200 response is not evidence of no reachable server.",
+        "C": "This gives the status meaning without certifying all business assertions.",
+        "D": "200 is a success response, not a pending-processing status."
+      },
+      "lessonSection": "section-4a9b334f6dea",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "Which of the following is best practice before starting a new API Scan from inside Tricentis Tosca?",
+      "scenario": "Which independent preparation helps keep exported API artifacts maintainable?",
       "options": [
         {
           "id": "A",
-          "text": "Create a new Component Folder to organize where the export will land."
+          "text": "Plan their destination and naming before exporting."
         },
         {
           "id": "B",
-          "text": "Delete all existing Component Folders in the project."
+          "text": "Delete every existing folder."
         },
         {
           "id": "C",
-          "text": "Disable the Home ribbon's API Testing tab."
+          "text": "Disable API Scan."
         },
         {
           "id": "D",
-          "text": "Always scan a file instead of a URI."
+          "text": "Always use a local file regardless of the definition location."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "This is about keeping your Tosca project organized before you generate new artifacts.",
-      "rationale": "Best practice is to create a new Component Folder in Tosca before initiating a new API Scan — the scanned API information will be stored there once exported, keeping the session organized."
+      "hint": "Organization is useful but is not a universal mandatory folder prerequisite.",
+      "rationale": "Choose a clear destination and naming strategy. The scan itself supports files and URIs and does not require deleting existing work or a specific Component Folder.",
+      "optionExplanations": {
+        "A": "Planning the destination and names supports maintainability.",
+        "B": "Deleting unrelated work is unnecessary and loses data.",
+        "C": "Disabling the tool does not prepare artifacts for maintenance.",
+        "D": "Choose File or URI according to the actual input, not a blanket rule."
+      },
+      "lessonSection": "section-e0c3442028ea",
+      "explanationReviewedOn": "2026-10-05"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "A learner sends a Shops_Get request expecting to see all coffee shops, but forgot to fill in the \"key\" parameter with their Service Access Key. What is the most likely result?",
+      "scenario": "A sandbox contract requires a credential for a request, but the tester omits it. What should they expect and inspect?",
       "options": [
         {
           "id": "A",
-          "text": "The request succeeds normally, since the key is optional."
+          "text": "Guaranteed success because credentials are always optional."
         },
         {
           "id": "B",
-          "text": "The request fails or returns an error, since the Coffeeshop requires the key to authenticate."
+          "text": "A possible rejection; inspect the actual response and configure the required credential."
         },
         {
           "id": "C",
-          "text": "Tosca automatically fills in the key from the last session."
+          "text": "Guaranteed automatic insertion of last-session credentials."
         },
         {
           "id": "D",
-          "text": "The Method automatically switches from GET to POST."
+          "text": "An automatic method change from GET to POST."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Recall why the Coffeeshop needs a Service Access Key in the first place.",
-      "rationale": "The Coffeeshop requires the Service Access Key as the \"key\" parameter to authenticate every request. Without it (or with an incorrect/expired key), the request will fail or return an error."
+      "hint": "The contract requires authentication; exact error behavior is service-specific.",
+      "rationale": "The request can be rejected. Inspect the response and supply credentials as the contract requires; the exact status/body and any credential reuse must not be assumed.",
+      "optionExplanations": {
+        "A": "The question explicitly specifies a required credential.",
+        "B": "This follows the contract while leaving exact rejection behavior to the actual service.",
+        "C": "The documentation here does not guarantee last-session credential insertion.",
+        "D": "Missing credentials do not define an automatic HTTP method switch."
+      },
+      "lessonSection": "section-4a9b334f6dea",
+      "explanationReviewedOn": "2026-10-05"
     }
   ],
   "quickRecap": [
     {
-      "key": "Two ways to open API Scan",
-      "value": "Standalone .exe, or from Tosca's Home ribbon > API Testing tab (used throughout this course)."
+      "key": "Launch",
+      "value": "Commander API Testing > API Scan or ApiScan.exe in %COMMANDER_HOME%."
     },
     {
-      "key": "Before scanning",
-      "value": "Create a Component Folder in Tosca first, to organize the export destination."
+      "key": "Input",
+      "value": "Scan supported files or URI definitions; configure required access/proxy settings."
     },
     {
-      "key": "Message loading",
-      "value": "A Message's content loads only on first click of its Operation — performance optimization for large APIs."
+      "key": "Operation generation",
+      "value": "A service definition initially has empty operations; select them to generate details. Simple files differ."
     },
     {
-      "key": "Payload default",
-      "value": "Structural template, not real data — must be filled in before sending (except some GETs, which can be empty)."
+      "key": "Message configuration",
+      "value": "Method, endpoint/resource, payload, parameters, headers and authentication are separate controls."
     },
     {
-      "key": "POST vs. PUT",
-      "value": "POST = create new entry. PUT = update existing entry."
+      "key": "HTTP methods",
+      "value": "Follow the contract; POST is resource-specific processing and PUT can create or replace."
     },
     {
-      "key": "Status codes",
-      "value": "200 OK = success. 404 = not found. 500 = server down/unreachable."
+      "key": "Response evidence",
+      "value": "200 success, 201 creation, 404 missing/undisclosed representation, 500 unexpected server condition; assert business results."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 01 - Introduction to the API Scan (video)",
-      "url": "https://academy.tricentis.com/learn/courses/556/tricentis-tosca-deep-dive-automating-api-test-cases",
-      "duration": "video"
+      "title": "Primary documentation or specification",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_launch.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation or specification",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_file.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation or specification",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_uri.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation or specification",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_message_section.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation or specification",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/api_scan_home_menu.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Primary documentation or specification",
+      "url": "https://www.rfc-editor.org/rfc/rfc9110.html",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1; HTTP RFC 9110; SOAP 1.2",
+  "sourceReviewedOn": "2026-10-05"
 }

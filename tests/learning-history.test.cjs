@@ -696,3 +696,17 @@ test('TDS1 capstone review scopes Guest assumptions and equal single-Attribute c
  assert.doesNotMatch(JSON.stringify(d),/Tricentis default recommendation|official course closes with three|effectively every order|All Combinations would be unnecessary/);
  const added=JSON.parse(fs.readFileSync('data/tosca-tds1/m08_integration_of_new_attributes.json'));assert.match(added.studyGuide[1].elements[2].text,/right-click the top-level Instance/);
 });
+
+test('API foundations review scopes launch, HTTP semantics, service generation and test evidence',()=>{
+ const crypto=require('node:crypto'),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ const names=['m00_introduction.json','m01_getting_started.json','m02_introduction_to_api_scan.json'],keys=[['B','A','A','C','C'],['B','C','B','B','B'],['B','C','C','A','B']];
+ names.forEach((name,n)=>{
+  const bytes=fs.readFileSync('data/tosca-api/'+name),d=JSON.parse(bytes),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,5);
+  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[keys[n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+  assert.doesNotMatch(JSON.stringify(d),/ApiScanStandalone\.exe|valid for 24 hours|SOAP uses only POST|500 = server down\/unreachable|16 syllabus sections|two very mundane causes|a physical API/);
+  if(n===0){assert.match(d.practiceQuiz[0].options[1].text,/ApiScan\.exe/);assert.match(d.studyGuide[2].elements[1].description,/does not establish/);assert.match(d.practiceQuiz[3].options[2].text,/explicit assertions/);}
+  else if(n===1){assert.match(d.studyGuide[1].elements[2].text,/SOAP-response pattern to GET/);assert.match(d.practiceQuiz[2].options[1].text,/create or replace/);assert.match(d.studyGuide[3].elements[1].description,/not universal REST requirements/);}
+  else{assert.match(d.practiceQuiz[0].scenario,/not a simple message file/);assert.match(d.practiceQuiz[1].scenario,/contract defines POST/);assert.match(d.practiceQuiz[2].rationale,/no HTTP response/);assert.match(d.studyGuide[1].elements[3].rows[3][1],/unexpected server condition/);}
+ });
+});
