@@ -784,3 +784,17 @@ test('AS1 prerequisites use model-specific licensing and current resources witho
  diagrams.forEach(e=>assert.doesNotMatch(e.svg,/Help → License|1–2 business days|Parallels/));
  assert.doesNotMatch(JSON.stringify(d),/typically valid 30–90|minimum 4 GB|free training licenses are requested|no Certificate is granted/);
 });
+
+test('AS1 workspace review distinguishes local workspaces, admin revocation and independent review policy',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as1/m01_getting_started.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D'],['A'],['B'],['C'],['D'],['A','B','C'],['A'],['B'],['C'],['D']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[1].elements[0].text,/separate workspace per user and machine/);
+ assert.match(d.studyGuide[1].elements[2].text,/revoke checkouts.*rejecting/);
+ assert.match(d.studyGuide[2].elements[0].text,/does not keep the two copies synchronized/);
+ assert.match(d.practiceQuiz[8].scenario,/ordinary Tester B.*without administrative recovery/);
+ assert.match(d.practiceQuiz[9].options[3].text,/local\/repository state/);
+ assert.match(d.studyGuide[3].elements[1].text,/not a universal built-in Tosca enforcement/);
+ assert.doesNotMatch(JSON.stringify(d),/Only a check-in by the holder|force-override are not supported|Contains 9 sections|Save disables undo\/redo|shared Google Doc/);
+ assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.type==='diagram').length,3);
+});
