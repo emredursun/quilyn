@@ -771,3 +771,16 @@ test('XML review separates transport, resource persistence and existing element 
   else{assert.match(d.practiceQuiz[1].scenario,/remains connected/);assert.match(d.studyGuide[0].elements[0].text,/Input can modify existing XML/);assert.match(d.studyGuide[1].elements[1].text,/reload that file/);assert.match(d.studyGuide[1].elements[0].text,/duplicate IDs/);}
  });
 });
+
+test('AS1 prerequisites use model-specific licensing and current resources without promising host support',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as1/m00_prerequisites.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D'],['A'],['B'],['C'],['A','B','C'],['D'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[1].elements[0].text,/8 GB RAM \(16 GB recommended\)/);
+ assert.match(d.practiceQuiz[1].scenario,/online node-locked.*2023.2 or later/);
+ assert.match(d.practiceQuiz[3].options[2].text,/source, availability, validity and connectivity/);
+ assert.match(d.studyGuide[0].elements[0].text,/no named hypervisor.*certified/);
+ const diagrams=d.studyGuide[0].elements.filter(e=>e.type==='diagram');assert.equal(diagrams.length,2);
+ diagrams.forEach(e=>assert.doesNotMatch(e.svg,/Help → License|1–2 business days|Parallels/));
+ assert.doesNotMatch(JSON.stringify(d),/typically valid 30–90|minimum 4 GB|free training licenses are requested|no Certificate is granted/);
+});
