@@ -521,3 +521,11 @@ test('Capturing and presenting data review follows the Fields, Calculated values
  assert.match(d.studyGuide[1].elements[0].description,/App Studio.*read-only/);assert.match(d.studyGuide[1].elements[1].description,/does not establish whether the value is persisted/);assert.match(d.quickRecap[2].value,/App Studio.*read-only/);assert.doesNotMatch(JSON.stringify(d),/Whether users may override a result is a separate View design decision/);
  assert.doesNotMatch(JSON.stringify(d),/Rich Text|Editable by default|Calculated fields are always read-only|Text for everything' is always wrong|List Views are read-only by default|locale-aware/);
 });
+
+test('BA Center-out review keeps stable answer keys and scopes architectural guarantees',()=>{
+ const crypto=require('node:crypto'),file='data/business-architect/m03_pega_center_out_architecture.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M03'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.sourceReviewedOn,'2026-10-05');assert.equal(d.practiceQuiz.length,16);assert.equal(d.studyGuide.length,6);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,i===14?['A','B','C']:[4,7,11].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[14].hint,/Three options/);assert.match(d.practiceQuiz[6].options[0].text,/Case Lifecycles/);assert.match(d.studyGuide[4].elements[1].description,/select and configure/);assert.match(d.studyGuide[5].elements[7].description,/Accessibility Inspector is not supported/);
+ assert.doesNotMatch(JSON.stringify(d),/Four real principles|instantly reaches|logic never has to be rebuilt|neither can break/);
+});
