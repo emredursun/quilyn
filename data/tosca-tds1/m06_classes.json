@@ -6,7 +6,7 @@
     "Explain what a Class is and why it reduces redundancy across TestSheets.",
     "Create a Class using the two primary methods: manual creation and drag-and-drop from an existing Attribute.",
     "Distinguish 'Create Class from Attribute' from 'Create Structure from Attribute'.",
-    "Use Resolve Class Reference and the Relevant column/F11 to manage how a Class behaves inside different TestSheets."
+    "Resolve a reference before local customization and use Relevance to deactivate Attributes."
   ],
   "estTime": "25 min",
   "studyGuide": [
@@ -21,41 +21,39 @@
         {
           "type": "concept",
           "term": "Why it matters",
-          "description": "Reuse saves setup time, and because a Class Reference stays linked to its source Class, updating the Class once propagates that change to every TestSheet referencing it — centralizing maintenance instead of repeating it in every TestSheet."
+          "description": "Class and reference editing are bidirectional: source changes update references, and editing an unresolved reference changes the corresponding Class. Resolve the reference first if you need an independent local variation."
         }
       ],
       "bulletPoints": [
-        "Class = define once. Class Reference = reuse anywhere, unlimited times.",
-        "Update the Class → every Class Reference updates automatically."
+        "Class centralizes reusable Attributes and Instances.",
+        "Shared edits can affect all references; review consumers and their existing combinations."
       ],
       "sectionId": "section-e3634d21b0e3"
     },
     {
-      "sectionTitle": "Four ways to create a Class",
+      "sectionTitle": "Documented Class creation",
       "elements": [
         {
           "type": "list",
           "title": "Creation methods",
           "items": [
-            "Manually — right-click a TestCase Design Folder → 'Create Class', then build Attributes/Instances inside it just like a TestSheet.",
-            "Drag & drop an existing Attribute (or Attribute structure) onto a TestCase Design Folder — Tosca creates a Class and automatically converts the original Attribute into a Class Reference.",
-            "Extract Class — right-click an entire TestSheet and choose 'Extract Class' to convert its whole structure into a Class, with a Class Reference created in its place.",
-            "Drag & drop a Module onto a TestCase Design Folder — the Class takes the Module's name, the Module's Attributes become TestCase Design Attributes, and the Module Attributes' ValueRanges become Instances. This course focuses on methods 1 and 2."
+            "Manual: Create Class in a TestCase-Design folder (Ctrl+N, Ctrl+C); use a unique name and add Attributes/Instances.",
+            "Module: drag selected Module(s) onto the folder; Tosca creates a Class for each with relevant Attributes and Instances.",
+            "Attribute: drag selected Attributes onto the folder; the originals become Class references."
           ]
         },
         {
           "type": "concept",
           "term": "Dragging an Attribute WITHOUT top-level combinations",
-          "description": "If the Attribute structure you drag doesn't already have Instances/combinations at its top level, Tosca asks you to choose: 'Create Class from Attribute' copies the structure AND auto-generates Instance combinations based on the combinations that already existed in the source TestSheet. 'Create Structure from Attribute' copies only the Attribute/Instance structure, with no combinations."
+          "description": "If selected Attributes have no child elements, the documented prompt offers Create Class from Attribute (Class plus Instance collection) or Create Structure from Attribute (Class without an Instance collection). The reference does not describe this as importing all source TestSheet combinations."
         },
         {
           "type": "note",
-          "text": "A Class Reference is visually distinguished by a white arrow overlay on its icon."
+          "text": "Drag a Class onto a TestSheet, another Class or an Attribute to create its reference."
         }
       ],
       "bulletPoints": [
-        "4 creation methods exist; this course covers manual creation and drag-and-drop from an Attribute in depth.",
-        "Dragging an Attribute with existing top-level combinations converts it directly; dragging one without combinations prompts a Create Class vs Create Structure choice."
+        "The accessed page documents manual, Module and Attribute creation; an earlier Extract Class procedure was not verified."
       ],
       "sectionId": "section-6023633bb84c"
     },
@@ -70,17 +68,17 @@
         {
           "type": "concept",
           "term": "Resolve Class Reference",
-          "description": "As with Libraries, if you want to change or remove a Class without affecting the values currently shown in a particular reference, select 'Resolve Class Reference' on that reference first. This breaks the live link, letting that instance of the data be modified or the Class removed independently."
+          "description": "Resolve Class Reference removes the shared reference and returns it to an Attribute. Use this before making an independent local variation. Do not assume resolving one consumer removes other live references or makes deleting the source safe for all of them."
         },
         {
           "type": "concept",
           "term": "Unused Instances vs irrelevant Attributes",
-          "description": "Not every Instance in a Class needs to be used in every TestSheet that references it — Instances not selected in a given Class Reference's combinations are shown bolded in the TestSheet. Separately, whole Attributes inside a Class Reference can be marked irrelevant for a specific TestSheet using the 'Relevant' column (add it via the Column Chooser): unchecking the box for an Attribute grays it out. Press F11 to toggle hiding/revealing these irrelevant Attributes."
+          "description": "Unused combinations and deactivated Attributes are different concerns. Add the Relevance column, select a reference and disable the checkbox for an irrelevant Attribute. It becomes gray; F11 shows or hides deactivated Attributes. Deactivation is more than renaming or deleting a data value."
         }
       ],
       "bulletPoints": [
-        "Resolve Class Reference = detach this specific reference from the live Class link before editing/removing the Class.",
-        "Bolded Instance = unused in this Reference's combinations. Grayed-out Attribute (via Relevant column, F11 to show/hide) = marked not relevant to this TestSheet."
+        "Editing an unresolved reference updates its source Class.",
+        "Relevance is the documented column name; per-reference deactivation and visibility are distinct."
       ],
       "sectionId": "section-1f10f8470da8"
     },
@@ -89,7 +87,7 @@
       "elements": [
         {
           "type": "note",
-          "text": "📄 Exercise 06a-06c (Create and Adapt Class, Use Class and Complete Instances, Complete TestSheet Level Instances) — Official Tricentis Academy course material, not redistributed here. Access it inside the official course."
+          "text": "Independent notes based on public 2026.1 documentation. The authenticated Academy video/exercises were not inspected; no guarantee is made about historical menu labels."
         }
       ],
       "sectionId": "section-9376adb9c39d"
@@ -99,22 +97,22 @@
     {
       "title": "Editing a Class Reference and expecting it to stay independent",
       "trapDescription": "Changing a value inside a Class Reference and assuming other References to the same Class are unaffected.",
-      "bestPractice": "A Class Reference stays live-linked to its Class by default — changes to the Class propagate everywhere it's referenced. To make one reference diverge, use 'Resolve Class Reference' on it first."
+      "bestPractice": "Changes to an unresolved reference also change its source Class. Resolve the consumer before local customization and review other consumers before source deletion."
     },
     {
       "title": "Confusing 'Create Class from Attribute' with 'Create Structure from Attribute'",
       "trapDescription": "Assuming both options behave identically when converting an Attribute without existing combinations.",
-      "bestPractice": "'Create Class from Attribute' also auto-generates Instance combinations from the source TestSheet's existing combinations. 'Create Structure from Attribute' copies only the Attribute/Instance structure, with no combinations created."
+      "bestPractice": "For selected Attributes with no children: Class creates an Instance collection, Structure does not. Do not infer automatic import of all TestSheet combinations."
     },
     {
-      "title": "Forgetting 'Extract Class' as a creation method",
-      "trapDescription": "Only remembering manual creation and drag-and-drop-from-Attribute as ways to make a Class.",
-      "bestPractice": "A whole TestSheet can also be converted directly into a Class via right-click → 'Extract Class', which creates a Class Reference in its place — a third method alongside manual creation and dragging an Attribute."
+      "title": "Assuming historical creation menus are current",
+      "trapDescription": "Treating an unverified Extract Class command as a required current method.",
+      "bestPractice": "Use the documented manual, Module or Attribute workflows; check your installed version for additional commands."
     },
     {
       "title": "Mixing up bolded Instances with grayed-out Attributes",
       "trapDescription": "Treating 'bolded Instance' and 'irrelevant Attribute (grayed out)' as the same signal.",
-      "bestPractice": "Bolded = an unused Instance within this Reference's combinations. Grayed-out = a whole Attribute manually marked irrelevant via the Relevant column, toggled with F11. They're separate mechanisms."
+      "bestPractice": "Use Relevance to deactivate Attributes in a reference, and F11 for visibility. Not using an Instance in a combination is a different operation."
     }
   ],
   "practiceQuiz": [
@@ -144,12 +142,20 @@
         "B"
       ],
       "hint": "This is the core value proposition of using a Class in the first place.",
-      "rationale": "Class References stay live-linked to their Class. Updating the Class (e.g. adding a new Instance) automatically makes that change visible in every Reference to it, without manual work."
+      "rationale": "The documentation says Class changes update its references and reference modifications also change the Class. A new value is available to consumers; availability does not prove every existing combination uses it.",
+      "optionExplanations": {
+        "A": "The source/reference relationship updates shared data automatically.",
+        "B": "Class changes are reflected by references, though existing combinations still need review.",
+        "C": "A normal source edit does not inherently require recreating every reference.",
+        "D": "The documented behavior is not limited to the first reference."
+      },
+      "explanationReviewedOn": "2026-10-05",
+      "lessonSection": "section-e3634d21b0e3"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A tester drags an Attribute with no top-level Instances or combinations onto a TestCase Design Folder and wants Tosca to also generate combinations automatically, based on the source TestSheet's existing combinations. Which option should they choose?",
+      "scenario": "Selected Attributes have no child elements. Which documented choice creates a Class with an Instance collection?",
       "options": [
         {
           "id": "A",
@@ -171,13 +177,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "One option copies structure only; the other also brings combinations along.",
-      "rationale": "'Create Class from Attribute' copies the structure AND auto-generates Instance combinations from what already existed in the source TestSheet. 'Create Structure from Attribute' copies structure only, with no combinations."
+      "hint": "The prompt distinguishes whether an Instance collection is created.",
+      "rationale": "Create Class from Attribute creates a Class and Instance collection; Create Structure from Attribute creates a Class without the collection. This is not a guarantee of imported source TestSheet combinations.",
+      "optionExplanations": {
+        "A": "Structure creates a Class without the Instance collection.",
+        "B": "Class creates the collection for the specified childless-Attribute case.",
+        "C": "This is not the documented choice in that prompt.",
+        "D": "Resolving detaches an existing reference rather than creating a Class collection."
+      },
+      "explanationReviewedOn": "2026-10-05",
+      "lessonSection": "section-6023633bb84c"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "A tester wants to remove a Class entirely, but one particular Class Reference should keep its current values unaffected. What must they do first?",
+      "scenario": "A tester needs one reference to become independently editable while retaining its current structure. What is the documented action?",
       "options": [
         {
           "id": "A",
@@ -199,8 +213,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Same concept as detaching from a Library before removing the shared object.",
-      "rationale": "'Resolve Class Reference' breaks the live link between that specific reference and the Class, letting it keep its current values independently — this should be done before removing or heavily changing the source Class."
+      "hint": "Remove the shared reference before making an independent variation.",
+      "rationale": "Resolve Class Reference replaces the reference with an Attribute for local changes. Other consumers may still reference the original Class; review them before any source deletion.",
+      "optionExplanations": {
+        "A": "Deleting the source is not the documented independent-customization action.",
+        "B": "Resolving replaces the reference with an independently editable Attribute.",
+        "C": "Renaming preserves the shared reference relationship.",
+        "D": "Business relevance does not remove the source/reference link."
+      },
+      "explanationReviewedOn": "2026-10-05",
+      "lessonSection": "section-1f10f8470da8"
     },
     {
       "questionId": "Q4",
@@ -213,7 +235,7 @@
         },
         {
           "id": "B",
-          "text": "Uncheck it in the 'Relevant' column (added via Column Chooser); toggle visibility of irrelevant Attributes with F11."
+          "text": "Disable its Relevance checkbox for that Class reference; use F11 to show or hide deactivated Attributes."
         },
         {
           "id": "C",
@@ -228,7 +250,15 @@
         "B"
       ],
       "hint": "This is a per-Reference visibility setting, not a structural deletion.",
-      "rationale": "Adding the 'Relevant' column via the Column Chooser lets you untick an Attribute to mark it irrelevant for that specific Class Reference (it grays out); F11 toggles whether irrelevant Attributes are hidden or shown."
+      "rationale": "The documented Relevance column controls per-reference Attribute deactivation. Deactivated Attributes are gray; F11 controls their visibility. This does not delete the source Attribute.",
+      "optionExplanations": {
+        "A": "Deletion would change shared structure rather than use per-reference deactivation.",
+        "B": "Relevance and F11 implement the documented deactivation/visibility workflow.",
+        "C": "Invalid labels expected input behavior, not Attribute relevance.",
+        "D": "The documentation explicitly permits deactivation and hiding."
+      },
+      "explanationReviewedOn": "2026-10-05",
+      "lessonSection": "section-1f10f8470da8"
     }
   ],
   "quickRecap": [
@@ -237,31 +267,38 @@
       "value": "Reusable Attribute structure (like a Library) — define once, use via Class Reference anywhere."
     },
     {
-      "key": "4 creation methods",
-      "value": "Manual, drag Attribute onto Folder, Extract Class from a TestSheet, drag a Module onto a Folder."
+      "key": "Creation methods",
+      "value": "Documented manual, Module and Attribute workflows."
     },
     {
       "key": "Create Class vs Create Structure from Attribute",
-      "value": "Class = structure + auto-generated combinations. Structure = structure only, no combinations."
+      "value": "For childless Attributes: Class creates an Instance collection; Structure creates none."
     },
     {
       "key": "Resolve Class Reference",
-      "value": "Detaches one Reference from the live Class link before editing/removing the Class."
+      "value": "Replace the shared reference with an Attribute for local customization; other references remain shared."
     },
     {
-      "key": "Bolded Instance",
-      "value": "An Instance in the Class not used by this Reference's combinations."
+      "key": "Bidirectional editing",
+      "value": "Class updates affect references; unresolved reference edits affect the Class."
     },
     {
-      "key": "Relevant column / F11",
-      "value": "Marks/hides whole Attributes as irrelevant for a specific Class Reference."
+      "key": "Relevance / F11",
+      "value": "Deactivate referenced Attributes with Relevance; F11 controls their visibility."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 06 - Classes (video)",
-      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/577/tricentis-tosca-deep-dive-structuring-your-test-cases-and-test-data-tds1",
-      "duration": "video"
+      "title": "Classes",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/testcase_design/classes.htm",
+      "duration": "reference"
+    },
+    {
+      "title": "Class references",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/testcase_design/class_references.htm",
+      "duration": "reference"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1 documentation",
+  "sourceReviewedOn": "2026-10-05"
 }

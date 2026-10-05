@@ -641,3 +641,17 @@ test('TDS1 combinations review scopes counts and separates arranging, merging an
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[[0,1,4].includes(i)?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
  assert.match(d.practiceQuiz[0].rationale,/64 datasets/);assert.match(d.practiceQuiz[2].scenario,/no additional relation rules/);assert.match(d.studyGuide[3].elements[1].description,/Character and Position/);assert.match(d.quickRecap[6].value,/F12/);assert.doesNotMatch(JSON.stringify(d),/Tricentis-recommended default|industries mandate|StraightThrough → Valid Inner/);
 });
+
+test('TDS1 specification review does not infer mutation scope from filters and checks XL prerequisites',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds1/m05_testcase_specifications.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M05'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[2].elements[2].text,/do not establish.*bulk-fill/);assert.match(d.practiceQuiz[3].options[1].text,/Empty TestStepValues.*uniquely matching/);assert.doesNotMatch(JSON.stringify(d),/corrupting the existing structure|only the matching columns are visible\/editable|never higher/);
+});
+
+test('TDS1 Class review warns about bidirectional edits and uses documented Relevance column',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds1/m06_classes.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M06'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[0].elements[1].description,/editing an unresolved reference changes/);assert.match(d.practiceQuiz[1].scenario,/no child elements/);assert.match(d.practiceQuiz[2].rationale,/Other consumers may still reference/);assert.match(d.practiceQuiz[3].options[1].text,/Relevance checkbox/);assert.doesNotMatch(JSON.stringify(d),/auto-generates Instance combinations|Relevant column\/F11|4 creation methods exist/);
+});
