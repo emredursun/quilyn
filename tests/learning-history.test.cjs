@@ -551,3 +551,19 @@ test('TDS creation review separates alias identity, item selection and execution
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
  assert.match(d.practiceQuiz[0].scenario,/Find & provide item/);assert.match(d.practiceQuiz[1].options[1].text,/criteria.*distinct aliases/);assert.match(d.practiceQuiz[2].rationale,/does not guarantee success or uniqueness/);assert.match(d.studyGuide[2].elements[1].text,/ReadOnly does not acquire/);assert.doesNotMatch(JSON.stringify(d),/Test Data - Create & provide new record|only unlocks automatically|exactly the sender\/recipient example/);
 });
+
+test('TDS repository review uses installed contracts and distinguishes save/export and configuration/data deletion',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds2/m06_managing_tds_via_api.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS2-M06'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.studyGuide.length,7);
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.match(d.studyGuide[2].elements[0].description,/Do not assume a four-field/);assert.match(d.studyGuide[5].elements[0].description,/separate Also delete database option/);assert.match(d.studyGuide[6].elements[0].text,/separate operations/);
+ assert.doesNotMatch(JSON.stringify(d),/required for every one of these calls|re-imported into any Tosca workspace|same repository path in the Endpoint used during creation/);
+});
+
+test('TDS preparation review corrects invalid naming answer and separates type rules and configuration scope',()=>{
+ const crypto=require('node:crypto'),file='data/tosca-tds2/m02_preparing_your_project.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS2-M02'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[i===2?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
+ assert.equal(d.practiceQuiz[2].options[2].text,'CustomerDetails');assert.match(d.practiceQuiz[2].optionExplanations.B,/square brackets are forbidden/);assert.match(d.studyGuide[3].elements[2].description,/override an inherited/);assert.match(d.studyGuide[3].elements[0].description,/Standard.tsu/);
+ assert.doesNotMatch(JSON.stringify(d),/single entry point to every TDS feature|In Memory is the only type that doesn't need|repository\/type name/);
+});
