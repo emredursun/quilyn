@@ -16,16 +16,16 @@
         {
           "type": "concept",
           "term": "The classic mobile toolchain",
-          "description": "Automating a mobile app with raw Appium normally means: installing Appium and its Node.js dependencies, installing Java, wiring up platform-specific drivers (UiAutomator2 for Android, XCUITest for iOS), managing environment variables and PATH entries, and writing test scripts in a supported language. None of that is Tosca-specific — it is the general cost of mobile test automation before you write a single test."
+          "description": "Direct Appium setup can require the server, selected platform drivers and their dependencies. Exact requirements depend on driver, host and version. TMA bundles the supported Appium layer, but device authorization, platform preparation and compatibility checks remain necessary."
         },
         {
           "type": "concept",
           "term": "TMA removes the toolchain, not the underlying engine",
-          "description": "The Tricentis Mobile Agent (TMA) provides simplified setup and configuration of iOS and Android devices. You do not install Appium, Java components, or configure environment variables yourself — TMA bundles and manages that layer. Underneath, Mobile Engine 3.0 still drives sessions the same way Appium-based tools do (UiAutomator2 on Android, XCUITest on iOS); TMA is what hides that machinery behind a device list and a Start/Stop toggle."
+          "description": "TMA simplifies Appium/Java/environment-variable setup for supported devices. Appium drivers and platform tooling still impose compatibility and preparation requirements; use the Agent-certified versions rather than replacing them with arbitrary latest drivers."
         },
         {
           "type": "note",
-          "text": "Knowing that Appium sits underneath is useful for troubleshooting — error messages from a failed session sometimes surface raw Appium/driver text — but day-to-day authoring never requires touching Appium directly."
+          "text": "Session logs and Desired Capabilities may expose Appium details. Normal Tosca authoring uses Modules, but troubleshooting or advanced capabilities can require understanding that underlying layer."
         }
       ],
       "bulletPoints": [
@@ -40,18 +40,18 @@
         {
           "type": "concept",
           "term": "Tricentis Mobile Agent (TMA)",
-          "description": "A standalone application, installed separately from Tosca Commander, that manages device connectivity: it lists connected/available devices, emulators, and simulators, reports their status (Ready, Busy, Offline), starts and stops automation sessions, and exposes a REST API that both the TMA console and Tosca itself talk to."
+          "description": "TMA is a separate installation that manages mobile connectivity and exposes connected device information. Use its Device management view and relevant logs to inspect targets. A displayed device alone is not proof that a session or every subsequent action will succeed."
         },
         {
           "type": "concept",
           "term": "Mobile Engine 3.0",
-          "description": "The Engine inside Tosca that steers mobile applications through a TMA session. Once Modules exist, the TestCase-building workflow is the familiar Tosca one — Modules, TestSteps, TestStepValues, ActionModes — identical in shape to XBrowser or any other Engine. The mobile-specific work lives in the connection and scanning setup, not in how TestCases are structured."
+          "description": "Mobile Engine 3.0 provides the Tosca mobile workflow; mobile web scanning/execution uses Mobile Web Engine 3.0. Modules, TestSteps and ActionModes remain familiar, while app type, capabilities, controls and session preparation affect execution."
         },
         {
           "type": "list",
           "title": "Division of responsibility",
           "items": [
-            "TMA: device discovery, session lifecycle, install/uninstall of apps under test, the REST API Tosca connects through.",
+            "TMA: supported device connectivity and Appium setup; inspect targets and prepare the platform.",
             "Mobile Engine 3.0: control identification during Mobile Scan, and steering (click, swipe, type, verify) during TestCase execution.",
             "Tosca Commander: where Modules and TestCases are authored, exactly as with any other Engine."
           ]
@@ -70,7 +70,7 @@
           "title": "What Mobile Engine 3.0 automates",
           "items": [
             "Android — physical devices (via USB) and emulators created through Android Studio.",
-            "iOS — physical devices and the iOS Simulator, both requiring a Mac running TMA (Xcode dependency).",
+            "iOS — physical devices and simulators, with host/Xcode requirements from the installed Agent version; TMA 2025.4 lists macOS hosts.",
             "Native apps — built specifically for the platform, e.g. a compiled Android/iOS app.",
             "Hybrid apps — a native shell hosting embedded web views, common in cross-platform frameworks.",
             "Mobile web — a website opened in the device's own browser, scanned in its device context."
@@ -78,11 +78,11 @@
         },
         {
           "type": "note",
-          "text": "All three app types (native, hybrid, mobile web) are reached through the same Mobile Scan and the same Mobile Modules — the difference is in what gets captured during scanning, covered in the Mobile Scan lesson."
+          "text": "Native, hybrid and web apps share the mobile workflow, but not every scanning engine, opening Module or supported control. Mobile Web Engine 3.0 handles web content; the native path differs."
         }
       ],
       "bulletPoints": [
-        "Two platforms (Android, iOS) × three app types (native, hybrid, web) — one engine, one scan, one Module workflow."
+        "Android/iOS with version-scoped support; native, hybrid and mobile web with app-specific scanning and steering."
       ],
       "sectionId": "section-cf626a4aeeb3"
     },
@@ -92,7 +92,7 @@
         {
           "type": "concept",
           "term": "Local (TMA)",
-          "description": "TMA runs on the same machine as Tosca Commander, connected to a device via USB or to a simulator/emulator on that same machine. This is the simplest topology and the one most learners start with."
+          "description": "Local (TMA) connects a supported local target to the Tosca/Agent host. Android emulators run with the Agent. Validate host/platform support for the installed version."
         },
         {
           "type": "concept",
@@ -106,7 +106,7 @@
       ],
       "bulletPoints": [
         "Local = TMA and Tosca Commander on the same machine. Remote = TMA on a different machine, reached over the network.",
-        "The choice is a topology/configuration decision — the TestCases themselves do not change."
+        "The authoring model is shared; device/app compatibility, TCPs and capabilities may require changes."
       ],
       "sectionId": "section-e6754477df52"
     }
@@ -120,12 +120,12 @@
     {
       "title": "Treating TMA and Mobile Engine 3.0 as the same thing",
       "trapDescription": "Referring to 'TMA' when describing how a TestCase steers a control, or to 'Mobile Engine' when describing device connectivity.",
-      "bestPractice": "TMA manages devices and sessions; Mobile Engine 3.0 does the scanning and steering inside Tosca. Keep the two separate when troubleshooting — a device-list problem is a TMA problem, a control-identification problem is a Mobile Engine problem."
+      "bestPractice": "Separate connectivity/session setup from scanning/steering while diagnosing. A recognition symptom can also originate in app exposure, context, permissions or the driver; the layer distinction alone does not prove which component is defective."
     },
     {
       "title": "Expecting iOS automation to work the same way on Windows as Android",
       "trapDescription": "Trying to run TMA for iOS directly on a Windows machine.",
-      "bestPractice": "iOS automation depends on Xcode-based tooling (XCUITest), which only exists on macOS. iOS work always needs a Mac somewhere in the topology, whether Tosca Commander itself runs there or connects to it as a Remote (TMA) machine."
+      "bestPractice": "Use the TMA version-specific host matrix. TMA 2025.4 lists iOS hosting as macOS only; a Windows Tosca workstation can use a remote supported Mac Agent."
     }
   ],
   "practiceQuiz": [
@@ -140,7 +140,7 @@
         },
         {
           "id": "B",
-          "text": "Managing device connectivity, session lifecycle, and exposing a REST API — removing the need to manually configure Appium, Java, and environment variables."
+          "text": "Simplifying mobile device connectivity and Appium/Java/environment-variable setup."
         },
         {
           "id": "C",
@@ -155,7 +155,15 @@
         "B"
       ],
       "hint": "TMA is the setup/connectivity layer, not the authoring layer.",
-      "rationale": "TMA provides simplified setup and configuration of iOS and Android devices, manages sessions, and exposes a REST API — so you never manually install Appium, Java components, or configure environment variables. Authoring TestCases happens in Tosca Commander via Mobile Engine 3.0."
+      "rationale": "TMA simplifies supported device connectivity and the bundled Appium setup. Platform/device preparation still applies; authoring is performed in Tosca.",
+      "optionExplanations": {
+        "A": "Modules and TestCases are authored in Tosca; TMA supplies connectivity/setup.",
+        "B": "TMA simplifies the supported mobile connection/toolchain layer; platform preparation remains required.",
+        "C": "The Agent’s primary purpose is connectivity, not embedding all app interfaces in Commander.",
+        "D": "Mobile scanning is still needed to create Modules."
+      },
+      "lessonSection": "section-db35110ddaef",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -185,12 +193,20 @@
         "C"
       ],
       "hint": "Two platforms, three kinds of app — desktop apps belong to a different Engine (WinX/UIA).",
-      "rationale": "Mobile Engine 3.0 covers native, hybrid, and mobile web apps through the same Mobile Scan. Desktop Windows applications are automated through the WinX/UIA Engine, not Mobile Engine 3.0."
+      "rationale": "Mobile Engine 3.0 covers native, hybrid, and mobile web apps through the same Mobile Scan. Desktop Windows applications are automated through the WinX/UIA Engine, not Mobile Engine 3.0.",
+      "optionExplanations": {
+        "A": "Native mobile apps are a documented application category.",
+        "B": "Hybrid apps combine native and web content and use the relevant mobile scanning/steering paths.",
+        "C": "Mobile websites use the device browser and Mobile Web Engine 3.0.",
+        "D": "Desktop-only applications are outside the mobile application categories."
+      },
+      "lessonSection": "section-cf626a4aeeb3",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "Which underlying technology does Mobile Engine 3.0 rely on for iOS device automation?",
+      "scenario": "Which Appium driver is associated with iOS automation and its XCTest/WebDriverAgent tooling?",
       "options": [
         {
           "id": "A",
@@ -213,12 +229,20 @@
         "B"
       ],
       "hint": "It is Xcode-based, which is why iOS automation needs a Mac.",
-      "rationale": "iOS automation runs on XCUITest (Android uses UiAutomator2), both Appium-standard drivers that TMA manages behind the scenes. XCUITest's Xcode dependency is exactly why iOS automation requires a Mac somewhere in the topology."
+      "rationale": "Appium’s XCUITest driver uses WebDriverAgent and Apple’s XCTest tooling. Host/driver/Xcode compatibility is version-dependent; the TMA support matrix determines its supported deployment.",
+      "optionExplanations": {
+        "A": "UiAutomator2 is associated with Android rather than the stated iOS/XCTest tooling.",
+        "B": "XCUITest uses Apple XCTest through WebDriverAgent; consult compatible driver/host versions.",
+        "C": "Selenium WebDriver alone is not the stated iOS platform driver.",
+        "D": "TMA builds on Appium; it does not eliminate that relationship."
+      },
+      "lessonSection": "section-e06052ac5a94",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "A tester says: 'The control isn't being recognised correctly during the Mobile Scan.' Which component is most likely responsible?",
+      "scenario": "A mobile session is confirmed established, but a control is not identified correctly. Which workflow should you investigate next?",
       "options": [
         {
           "id": "A",
@@ -241,7 +265,15 @@
         "B"
       ],
       "hint": "Separate 'can Tosca see the device' problems from 'can Tosca recognise this control' problems.",
-      "rationale": "TMA handles whether a device is discoverable and session-ready. Once a session exists, control identification and steering during scanning and execution are Mobile Engine 3.0's job — that is where a recognition problem belongs."
+      "rationale": "Inspect the Mobile Scan/engine identification path, app exposure, context and underlying driver evidence. The symptom does not prove an engine defect or rule out other configuration issues.",
+      "optionExplanations": {
+        "A": "Established connectivity does not make TMA the sole next identification workflow to inspect.",
+        "B": "Inspect this identification workflow, app context and driver evidence without assuming a proven defect.",
+        "C": "The stated symptom does not establish a licensing failure.",
+        "D": "A carrier is not the identified control-scanning mechanism in the established session."
+      },
+      "lessonSection": "section-db35110ddaef",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
@@ -254,7 +286,7 @@
         },
         {
           "id": "B",
-          "text": "Faster testing without setup hassles for the latest devices"
+          "text": "Simplified supported-device connectivity and bundled Appium toolchain setup."
         },
         {
           "id": "C",
@@ -262,14 +294,22 @@
         },
         {
           "id": "D",
-          "text": "Integration with cloud platforms for device management"
+          "text": "Replacement of every cloud provider’s access and session configuration."
         }
       ],
       "correctOptions": [
         "B"
       ],
       "hint": "Think about what TMA removes from the traditional mobile automation toolchain.",
-      "rationale": "TMA's core benefit is removing manual toolchain setup — Appium, Java components, environment variables, drivers — so testing against current devices can start right away. It doesn't enhance manual testing, and it isn't limited to hybrid apps; cloud device-farm integration exists through specific Modules but isn't TMA's defining benefit."
+      "rationale": "TMA simplifies its supported connectivity/toolchain setup; it does not guarantee immediate support for every latest device or replace all cloud-provider setup.",
+      "optionExplanations": {
+        "A": "This question concerns automation setup, not enhanced manual testing.",
+        "B": "Supported device/toolchain setup is simplified, but preparation and compatibility still apply.",
+        "C": "Native, hybrid and web are supported categories, not hybrid only.",
+        "D": "TMA does not universally replace cloud-provider authentication and configuration."
+      },
+      "lessonSection": "section-e06052ac5a94",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q6",
@@ -278,32 +318,40 @@
       "options": [
         {
           "id": "A",
-          "text": "Enables seamless testing on public and private clouds"
+          "text": "Supports documented cloud connection options with provider-specific configuration."
         },
         {
           "id": "B",
-          "text": "Eliminates configuration challenges for testing across Windows and Mac"
+          "text": "Simplifies supported Agent setup, while platform and device preparation remain required."
         },
         {
           "id": "C",
-          "text": "Depends on technical complexities for using Appium"
+          "text": "Requires every Tosca author to manually install and configure the Appium server before using TMA."
         },
         {
           "id": "D",
-          "text": "Supports compatibility testing for various OS, browsers, and devices"
+          "text": "Supports testing across compatible mobile platforms, browsers and devices."
         }
       ],
       "correctOptions": [
         "C"
       ],
       "hint": "One option directly contradicts what TMA exists to remove.",
-      "rationale": "Tosca Mobile is built specifically so testers do not need to deal with Appium's technical complexity — TMA hides that layer entirely. 'Depends on technical complexities for using Appium' is therefore the false statement; the other three describe genuine capabilities."
+      "rationale": "TMA bundles the supported Appium setup, so manual server setup is not a universal prerequisite. Simplification does not eliminate platform, device or provider configuration.",
+      "optionExplanations": {
+        "A": "Cloud options are documented; they still need provider-specific setup.",
+        "B": "This accurately qualifies setup simplification instead of promising no configuration.",
+        "C": "This false universal prerequisite contradicts TMA’s bundled setup.",
+        "D": "Compatible platform/browser/device testing is documented, without universal support claims."
+      },
+      "lessonSection": "section-e06052ac5a94",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
     {
       "key": "TMA's job",
-      "value": "Device discovery, session lifecycle, REST API — removes manual Appium/Java/environment-variable setup."
+      "value": "Supported connectivity and bundled Appium setup; device preparation and compatible platform versions still matter."
     },
     {
       "key": "Mobile Engine 3.0's job",
@@ -315,7 +363,7 @@
     },
     {
       "key": "Platforms",
-      "value": "Android (device or Android Studio emulator) and iOS (device or Simulator, Mac required)."
+      "value": "Android/iOS targets per the installed Agent matrix; TMA 2025.4 iOS hosts are macOS."
     },
     {
       "key": "App types",
@@ -329,18 +377,25 @@
   "topics": [
     {
       "title": "Mobile Engine 3.0 (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
       "duration": "docs"
     },
     {
       "title": "Get started with mobile test automation (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
       "duration": "docs"
     },
     {
       "title": "Simplify mobile testing with the Tricentis Mobile Agent (Tricentis blog)",
       "url": "https://www.tricentis.com/blog/mobile-agent-tosca",
       "duration": "article"
+    },
+    {
+      "title": "TMA 2025.4 support matrix",
+      "url": "https://docs.tricentis.com/tma-2025.4/content/user_manual/system_requirements.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS / TMA 2025.4; Appium driver requirements",
+  "sourceReviewedOn": "2026-10-06"
 }

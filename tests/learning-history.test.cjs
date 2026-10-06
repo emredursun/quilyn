@@ -1149,3 +1149,12 @@ test('BA life cycle review separates recommendations, parallel work and configur
  assert.equal(d.practiceQuiz[11].lessonSection,d.studyGuide[0].sectionId);
  assert.equal(d.practiceQuiz[12].lessonSection,d.studyGuide[0].sectionId);
 });
+
+test('mobile introduction reviews distinguish Agent support, web engine and unresolved Academy outline',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ ['data/tosca-mobile/m00_introduction.json','data/tosca-mobile/m01_mobile_engine_and_tma.json'].forEach((f,n)=>{const bytes=fs.readFileSync(f),d=JSON.parse(bytes),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));d.practiceQuiz.forEach(q=>{assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ if(!n){assert.equal(r.localContentReview,'partial-source-comparison');assert.equal(d.sourceReviewedOn,undefined);assert.match(d.practiceQuiz[1].scenario,/TMA 2025.4 support matrix/);assert.match(d.practiceQuiz[2].rationale,/do not quantify/);}
+ else{assert.equal(r.localContentReview,'source-compared');assert.match(d.studyGuide[1].elements[1].description,/Mobile Web Engine 3.0/);assert.match(d.practiceQuiz[5].options[2].text,/every Tosca author.*manually install/);assert.deepEqual(d.practiceQuiz[5].correctOptions,['C']);assert.match(d.practiceQuiz[3].rationale,/does not prove an engine defect/);}
+ assert.doesNotMatch(JSON.stringify(d),/large majority|most real-world.*problems hide|Eliminates configuration challenges|Tosca Commander itself runs there/);
+ });
+});
