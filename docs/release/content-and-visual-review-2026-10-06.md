@@ -2,7 +2,7 @@
 
 ## Verified state
 
-The original source-review inventory has 185 modules: 182 source-compared, zero pending, three partial. All 185 recorded content hashes match current files. This describes the independent local technical comparison documented in each inventory entry; it does not certify every original Academy recording, screenshot, challenge or official quiz key.
+The original source-review inventory has 185 modules: 183 source-compared, zero pending, two partial. All 185 recorded content hashes match current files. This describes the independent local technical comparison documented in each inventory entry; it does not certify every original Academy recording, screenshot, challenge or official quiz key.
 
 Across the complete registry, all 1,862 lesson-practice questions have an explanation for each option (1,659 questions belong to the original 185-module inventory). Explanation presence is a coverage measurement, not evidence by itself of editorial correctness. Editorial scope and limitations remain recorded per module. The original queue figures in older dated packet notes are historical snapshots.
 
@@ -39,7 +39,7 @@ Review of the current diff found no remaining blocker for the committed local co
 
 1. AE1-M07: original on-prem custom-control package/installation instructions. Public Cloud guidance cannot verify these.
 2. AE1-M12: original Grand Scenario subset, prescribed sequence and exercise evidence.
-3. TMOB-M00: original Academy outline/prerequisites/recordings.
+3. TMOB-M00: outline, prerequisites, version and rendered summary now compared; complete topic recordings/narration remain uninspected.
 4. Original source media/hidden interactions not inspected, as listed in module-level limitations, including SA-M07 Views checks.
 5. Actual iOS/Android, VoiceOver/TalkBack and installed-product execution. The user confirmed there is no device/service access; the physical-device matrix remains unexecuted.
 
@@ -52,3 +52,13 @@ Direct browser navigation to the original AE1 course redirected to the Tricentis
 Rechecked the Pega Views v6 source in a separate browser tab: both knowledge-check introductions exist but no associated interaction controls or iframe exist in the rendered DOM; warning/error logs were empty. This records the published-page limitation precisely without certifying unavailable content.
 
 SA-M08's remaining two wrong-answer paths, mixed 2/4 final result, immediate score updates and Restart were executed in the browser. All three diagrams were measured at 390 × 844 with 347 px client width / 780 px scroll width / 760 px SVG width. This closes the remaining local scenario-path smoke checks; physical-device/AT validation remains unexecuted.
+
+## Authenticated Academy follow-up
+
+The user signed into Academy. Its original AE1 welcome/description verifies Tosca 16.0 as the course development version and AS1/AS2 plus licensed Tosca access as prerequisites. Lesson 06 objectives explicitly cover custom-control installation, customization examples and important facts. The exercise page lists a 406.01 KB installation PDF and two DLL lesson attachments (`FancyComboBox.dll`, `HtmlTable.dll`). Grand Scenario lists a 445.41 KB exercise PDF and solution video. Neither PDF could be read: the pages display “Downloaded” but the browser download event times out and no accessible downloaded file was produced. Inspection of the browser download page was rejected by the browser URL security policy. Requested the two original PDF files from the user; no credentials or signed resource URLs are stored here. The two AE1 modules remain partial; DLLs were not executed.
+
+TMOB-M00 is now source-compared for its local introduction. Read the authenticated course description and prerequisites, the full SCORM syllabus, Learning Objectives and completely rendered Summary. Course 1311 is 45 minutes, developed with Tosca 2024.2, with five topics: getting started, installation, connection options, scanning options and execution options. Verified software/mobile testing knowledge, AS1, licensed Tosca Mobile access, TMA access and Android Studio setup. Corrected the local introduction to distinguish this syllabus from independent platform/advanced study extensions and newer manual versions. The three quiz keys remain B/B/B with all option explanations reviewed. This does not certify full topic narration, nested recordings or installed-product execution. The reading player used Resume rather than Restart; no assessment was submitted.
+
+Updated source hashes and generated content. Shared token `20261006bq`; service worker `quilyn-v219`. Physical-device/AT validation remains unavailable. Changes are local only.
+
+Follow-up validation: `npm run manifest:content` and `npm run check` passed (**269/269** tests); the new regression protects five original topics, independent extensions, licensing prerequisites, version separation and the recorded content hash. The AE1 theory video exposes an English subtitle track, but neither its download nor seek controls produced usable review material through the browser; its narration remains unverified.
