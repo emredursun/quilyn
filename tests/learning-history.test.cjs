@@ -1349,3 +1349,13 @@ test('Testim customization review bounds waits, scopes search and avoids draft a
  assert.match(d.practiceQuiz[5].scenario,/execution condition.*rather than define test data/);
  assert.doesNotMatch(JSON.stringify(d),/indefinitely, without maintenance|no maintenance required|exactly as long as needed|must never go stale/);
 });
+
+test('Testim advanced editing review separates pre-run precedence, extraction matching and effective shortcut OS',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m04_mastering_advanced_editing_techniques.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[1].description,/Unsync Fields.*configuration OS governs/);
+ assert.match(d.practiceQuiz[1].scenario,/Before execution.*params-file.*no config-file/);
+ assert.match(d.studyGuide[2].elements[0].description,/individual matches remain strings.*arrays/);
+ assert.match(d.studyGuide[3].elements[1].description,/not-visible waiting is web-only/);
+ assert.doesNotMatch(JSON.stringify(d),/Parameters always take precedence|event[s]? at all|Whichever platform.*actually runs/);
+});

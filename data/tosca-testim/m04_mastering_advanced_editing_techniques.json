@@ -15,22 +15,22 @@
         {
           "type": "concept",
           "term": "Add Keyboard Shortcut step",
-          "description": "Sends a specified keyboard shortcut combination (e.g. Ctrl+C) to the AUT during execution — added like other predefined Actions. It's cross-platform by design: a shortcut recorded on Windows (e.g. Ctrl+C) is automatically translated to its Mac equivalent (Cmd+C) at execution time, and vice versa."
+          "description": "Add Keyboard Shortcut sends a supported combination to the AUT. Windows/Mac fields synchronize equivalent shortcuts by default; Unsync Fields permits separate combinations. Inspect the effective test configuration OS rather than assuming the host OS always wins."
         },
         {
           "type": "concept",
           "term": "Setting the shortcut in Properties",
-          "description": "In the step's Properties panel, under the Keyboard Shortcut section, placing the cursor in the Windows field and pressing the keys (all at once) auto-fills the equivalent in the Mac field — or the reverse, starting from the Mac field. Whichever platform the test actually runs on at execution time, Testim uses the corresponding field."
+          "description": "In Properties, press the combination in the applicable Windows or Mac field. The opposite field receives the default translation; use Unsync Fields when the intended combinations differ. A conflicting test-configuration OS governs which command is sent."
         },
         {
           "type": "concept",
           "term": "Unsupported combinations",
-          "description": "Not every possible key combination is supported. If you use a keyboard shortcut Testim doesn't recognize, it presents an 'unsupported keyboard shortcut' error rather than silently ignoring it, defaulting to something else, or blocking the whole test from running."
+          "description": "Unsupported combinations produce an unsupported keyboard shortcut error. Inspect failure handling rather than inferring that the entire test must always stop or always continue."
         }
       ],
       "bulletPoints": [
         "Add Keyboard Shortcut step sends a key combo to the AUT — an Actions-menu predefined step.",
-        "Cross-platform by default: Windows ↔ Mac shortcut translation happens automatically based on the Properties panel fields.",
+        "Default field synchronization translates shortcuts; Unsync Fields and effective OS configuration matter.",
         "An unrecognized combination throws an explicit 'unsupported keyboard shortcut' error."
       ],
       "sectionId": "section-5d7d074d73b1"
@@ -46,12 +46,12 @@
         {
           "type": "concept",
           "term": "Parameter override rules",
-          "description": "When both parameters and test data could supply a value for the same field, parameters take precedence over test data. Within Testim's layered override system specifically, config-file parameters override params-file parameters, and — within the config file — a beforeTest hook's values override a beforeSuite hook's values; params-file parameters, in turn, override the default test data/run data."
+          "description": "Before execution, config-file values override params-file values, which override default test/run data; beforeTest overrides beforeSuite within the config file. During execution, scope and later assignments matter: a more local same-name parameter can shadow a broader one. This is not a universal parameters-always-win rule."
         }
       ],
       "bulletPoints": [
         "Parameters pass custom information into a step/group instead of hardcoding it.",
-        "Precedence: parameters generally override test data — and within parameter sources, config-file > params-file > default test data, with beforeTest overriding beforeSuite inside the config file."
+        "Distinguish pre-run source precedence from runtime scope and later assignments."
       ],
       "sectionId": "section-79a0b7de47ec"
     },
@@ -61,17 +61,17 @@
         {
           "type": "concept",
           "term": "Extract Value step",
-          "description": "The Extract Mode of an Extract Value step determines the value and format of the contents captured into an extract variable — for example, pulling an order number or a generated OTP code off the page and storing it so a later step can use or validate it. Selecting the mode is done directly in the step's own Properties, not through code, and not through a project-level setting."
+          "description": "Extract Value captures selected AUT element text. Extract Mode chooses the whole text or number/date/Regex matches; individual matches remain strings and all-matches modes can return arrays. Selecting a mode does not guarantee a JavaScript number/date type."
         },
         {
           "type": "note",
-          "text": "This is the same pattern used to grab a verification code from an email/SMS inbox: extract only the stable value you actually need (the code, a link, a subject line) rather than trying to assert on the whole message body."
+          "text": "Email/SMS retrieval uses its own supported message workflow. Extract Value is not a universal connector to every source. Keep message/content assertions separate from extracting one useful value."
         }
       ],
       "bulletPoints": [
-        "Extract Value captures a value from the page (or another source) into a variable.",
-        "The data type to extract is set via the step's own Properties (Extract Mode) — not in code, and not in Project Settings.",
-        "Extract only the specific, stable value you need — not the entire surrounding content."
+        "Capture selected element text and choose the required Extract Mode.",
+        "Treat match selection and JavaScript value type separately.",
+        "Use the appropriate source retrieval and outcome assertions."
       ],
       "sectionId": "section-2eaf9bbfa948"
     },
@@ -81,17 +81,17 @@
         {
           "type": "concept",
           "term": "Waiting for an event, not a fixed time",
-          "description": "Testim can wait for a specific event to occur before proceeding to the next step — an element becoming visible, specific text appearing, or a file finishing its download — rather than a plain, guessed time delay. This is the same condition-based-waiting principle covered for basic Wait For steps, applied to a broader set of real application events."
+          "description": "Use the supported wait for readiness such as element visibility, text or a completed download, with a bounded step timeout. Wait for Download uses the documented scripted completion check; adding the step alone does not configure every possible file condition."
         },
         {
           "type": "concept",
           "term": "Wait for element visible / not visible",
-          "description": "Wait for element visible pauses until a target element appears; Wait for element not visible pauses until an element disappears (e.g. a loading spinner clearing). Both are added the same way as other predefined steps: hover the arrow, open Testim's predefined steps, pick the step, then select the target element."
+          "description": "Visible waiting is available for web and mobile; documented not-visible waiting is web-only. Prepare the relevant AUT state before targeting. Visibility is not merely DOM presence, and absence from view does not necessarily mean removal."
         },
         {
           "type": "concept",
           "term": "Changing the element after the fact",
-          "description": "If the wrong element was targeted (or the element changed), the fix is the same as for any other step's target element: open the step's Properties and use Reassign to point it at a different element — not deleting and re-recording the step, and not just adjusting the wait duration (which doesn't fix a wrong target)."
+          "description": "Use Reassign when the required target is different. If the same element still exists with changed identification, consider Improve. Validate the wait condition and timeout; extending time alone does not fix a wrong target."
         }
       ],
       "bulletPoints": [
@@ -106,12 +106,12 @@
     {
       "title": "Assuming an unrecognized keyboard shortcut fails silently or gracefully degrades",
       "trapDescription": "Expecting Testim to ignore an unsupported key combination and continue the test, or to substitute the closest supported shortcut.",
-      "bestPractice": "An unsupported combination produces an explicit 'unsupported keyboard shortcut' error — it doesn't get ignored, silently substituted, or merely block the run without explanation."
+      "bestPractice": "Unsupported combinations report an error; verify supported shortcuts and effective OS configuration. Run-level handling depends on the applicable failure settings."
     },
     {
       "title": "Assuming test data always wins over parameters",
       "trapDescription": "Defining both a parameter and matching test data for the same field and expecting the test data value to be used.",
-      "bestPractice": "Parameters take precedence over test data. Within the parameter sources themselves, config-file values override params-file values, which in turn override the default test data."
+      "bestPractice": "Apply the documented pre-run chain for a matching value: config file > params file > default test/run data. During execution, inspect scope and later assignments instead of assuming all parameters always win."
     },
     {
       "title": "Re-recording a Wait for element visible step just to point it at a different element",
@@ -121,7 +121,7 @@
     {
       "title": "Extracting an entire block of text instead of the specific value needed",
       "trapDescription": "Capturing a whole confirmation message or email body with Extract Value, then trying to parse it in a later step.",
-      "bestPractice": "Configure the Extract Mode to capture only the specific, stable value needed (an order number, an OTP code) so later steps can use it directly without extra parsing."
+      "bestPractice": "Use a suitable extraction match and validate the captured type/value. Retrieval from email/SMS and asserting message correctness are separate tasks."
     }
   ],
   "practiceQuiz": [
@@ -151,40 +151,56 @@
         "A"
       ],
       "hint": "It's an explicit, named error — not a silent fallback.",
-      "rationale": "Unsupported key combinations present the explicit error 'unsupported keyboard shortcut' — Testim doesn't substitute a similar shortcut, silently skip it and continue, or add-but-block-running the step."
+      "rationale": "The shortcut documentation specifies an unsupported keyboard shortcut error. It does not describe automatic nearest-equivalent substitution or silent ignoring; downstream failure behavior depends on configuration.",
+      "optionExplanations": {
+        "A": "The supported-shortcut guide documents this error.",
+        "B": "Unsupported combinations are not automatically replaced by the nearest shortcut.",
+        "C": "This is not the documented error behavior.",
+        "D": "Unsupported input is not documented as silently ignored."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-5d7d074d73b1"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "What happens when both parameters and test data are defined for a test step?",
+      "scenario": "Before execution, default test data and a params-file entry define the same parameter, with no config-file override. Which source wins under the documented rule?",
       "options": [
         {
           "id": "A",
-          "text": "Parameters always take precedence over test data."
+          "text": "The params-file value overrides the default test data value."
         },
         {
           "id": "B",
-          "text": "Test data always overrides parameters."
+          "text": "Default test data overrides the params-file value."
         },
         {
           "id": "C",
-          "text": "Parameters can override test data based on usage."
+          "text": "The value is selected randomly on each run."
         },
         {
           "id": "D",
-          "text": "Both are ignored, and default values are used."
+          "text": "Both values are always discarded."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Think about the override chain: config-file > params-file > default test data.",
-      "rationale": "Parameters take precedence over test data. This holds within Testim's layered override system too: config-file parameters override params-file parameters, which in turn override the default test data/run data."
+      "hint": "Use the documented pre-run source precedence, not a universal runtime claim.",
+      "rationale": "Before execution, params-file values override default test/run data; config-file values would take precedence over the params file. Runtime scope and later assignment rules are distinct.",
+      "optionExplanations": {
+        "A": "The params-file source overrides matching default test data before execution.",
+        "B": "This reverses the documented pre-run rule.",
+        "C": "Precedence is defined rather than random.",
+        "D": "Matching definitions are resolved by precedence, not automatically discarded."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-79a0b7de47ec"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "How can a user select the type of data to be extracted from a web page while using a extract value step?",
+      "scenario": "How do you select which text or matches an Extract Value step captures from an AUT element?",
       "options": [
         {
           "id": "A",
@@ -200,19 +216,27 @@
         },
         {
           "id": "D",
-          "text": "The user can only extract strings using the extract value step."
+          "text": "The step can capture only the entire text and cannot select matches."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "It's a per-step setting, not a project-wide or code-based one.",
-      "rationale": "The data type to extract is controlled by the Extract Mode property, set directly in that step's own Properties — not by writing code, not in Project Settings, and Extract Mode supports more than just plain strings (number, date, regex-matched text)."
+      "hint": "Extract Mode selects matches; this is distinct from the resulting JavaScript type.",
+      "rationale": "Choose Extract Mode in the step’s Properties. Number/date/Regex modes select matches, whose individual values remain strings; all-matches modes support arrays. This setting is not a project-wide datatype switch.",
+      "optionExplanations": {
+        "A": "Extract Mode selects the whole text or required matches.",
+        "B": "Code is not required to choose the step’s built-in extraction mode.",
+        "C": "Extraction mode is configured per step, not globally in the project.",
+        "D": "Number/date/Regex match selection is supported."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-2eaf9bbfa948"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "What should you do if you want to change the element after selecting the \"Wait for element visible\" option in Testim?",
+      "scenario": "A Wait for element visible step must target a different control. How can you change its target without recreating the step?",
       "options": [
         {
           "id": "A",
@@ -235,7 +259,15 @@
         "A"
       ],
       "hint": "It's the same target-element mechanism used everywhere else in Testim.",
-      "rationale": "Retargeting a wait step's element uses the same mechanism as any other step: open Properties and use Reassign. Deleting and re-recording is unnecessary, adjusting the wait duration doesn't change WHICH element is targeted, and there's no separate 'main menu' for this."
+      "rationale": "Open Properties and Reassign the different target. If identification of the same target changed instead, Improve can be relevant; a longer wait does not select a different control.",
+      "optionExplanations": {
+        "A": "Reassign selects the required different target.",
+        "B": "The existing target can be changed without recreating the step.",
+        "C": "Longer timing does not select a different control.",
+        "D": "A different wait type does not by itself assign this required target."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-a874c01afac8"
     },
     {
       "questionId": "Q5",
@@ -263,25 +295,33 @@
         "A"
       ],
       "hint": "Think application-behavior events: visibility, text, and this one.",
-      "rationale": "Testim can wait for events like element visibility, specific text display, or a file finishing its download before proceeding — not mouse movement speed, tab count, or billing details, which aren't waitable application events at all."
+      "rationale": "The documented Wait for Download workflow checks download completion before continuing, with suitable configuration and timeout. Mouse speed, billing and tab count are not the listed built-in completion events; custom logic is a separate mechanism.",
+      "optionExplanations": {
+        "A": "The documented download workflow can wait for file completion.",
+        "B": "Mouse movement speed is not the listed download/visibility/text readiness event.",
+        "C": "Tab count is not one of these built-in readiness events.",
+        "D": "Billing tier is not an application completion event."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-a874c01afac8"
     }
   ],
   "quickRecap": [
     {
       "key": "Keyboard Shortcut step",
-      "value": "Sends a key combo to the AUT; auto-translates Windows ↔ Mac; unsupported combos throw an explicit error."
+      "value": "Windows/Mac shortcut fields synchronize by default; Unsync Fields and configuration OS affect the sent command."
     },
     {
       "key": "Parameters",
-      "value": "Customize a step/group per use; take precedence over test data (config-file > params-file > default test data)."
+      "value": "Pre-run: config file > params file > default data. Runtime scope and later assignments also matter."
     },
     {
       "key": "Extract Value / Extract Mode",
-      "value": "Per-step Properties setting controlling what data type is captured — not code, not Project Settings."
+      "value": "Choose whole text or matches in Properties; individual matches remain strings, all-matches can return arrays."
     },
     {
       "key": "Wait for Events",
-      "value": "Synchronize on element visibility, text display, or file downloads — not a guessed fixed delay."
+      "value": "Wait for supported readiness with a timeout; configure download completion checks explicitly."
     },
     {
       "key": "Retargeting a wait step",
@@ -291,7 +331,7 @@
   "topics": [
     {
       "title": "Keyboard Shortcut Step (Tricentis docs)",
-      "url": "https://help.testim.io/docs/keyboard-shortcut-step",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/keyboard-shortcut-step.htm",
       "duration": "docs"
     },
     {
@@ -308,6 +348,18 @@
       "title": "Wait for (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/advanced-editing/wait-for.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Editing target element properties (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/editing-your-tests/editing-target-element-properties.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Editing a steps properties (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/editing-your-tests/editing-a-steps-properties.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }
