@@ -1158,3 +1158,12 @@ test('mobile introduction reviews distinguish Agent support, web engine and unre
  assert.doesNotMatch(JSON.stringify(d),/large majority|most real-world.*problems hide|Eliminates configuration challenges|Tosca Commander itself runs there/);
  });
 });
+
+test('mobile installation review distinguishes Appium port, REST bindings and readiness evidence',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m02_installing_configuring_tma.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[1].scenario,/default Appium port/);
+ assert.match(d.studyGuide[1].elements[1].description,/--rest-address.*--appium-port.*--grpc-address/);
+ assert.match(d.practiceQuiz[2].rationale,/not proof/);
+ assert.doesNotMatch(JSON.stringify(d),/default REST port is 8585|Only the --rest-address|api\/devices|installer itself is identical|VM installs work unofficially/);
+});
