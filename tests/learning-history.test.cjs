@@ -1379,3 +1379,21 @@ test('Testim management review scopes Auto Improve, status initialization and ch
  assert.match(d.practiceQuiz[3].options[0].text,/Save a changed test/);
  assert.doesNotMatch(JSON.stringify(d),/auto-applied based on having run|whenever changes are made to the test|automatically provision.*already configured/);
 });
+
+test('Testim validation review distinguishes synchronous checks, returned Promises and meaningful signup assertions',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m07_validating_test_steps.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[1].description,/thrown error.*timeout.*Promise/);
+ assert.match(d.studyGuide[1].elements[0].description,/not a universal.*does not create a working email inbox/);
+ assert.match(d.practiceQuiz[1].scenario,/synchronous browser.*no thrown error/);
+ assert.doesNotMatch(JSON.stringify(d),/This is the entire contract|only the final true\/false|pinpoints exactly which step broke/);
+});
+
+test('Testim data review distinguishes spreadsheet headers, embedded snapshots and reusable-file priority',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m08_data_driven_testing_excel.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['B'],['C'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/first row for parameter names.*subsequent data rows/);
+ assert.match(d.studyGuide[0].elements[2].text,/snapshot.*re-upload/);
+ assert.match(d.studyGuide[1].elements[1].description,/JavaScript\/module.exports.*Prioritize test data/);
+ assert.match(d.practiceQuiz[1].scenario,/one header row and five data rows/);
+});

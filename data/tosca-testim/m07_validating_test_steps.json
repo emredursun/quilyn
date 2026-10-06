@@ -36,7 +36,7 @@
         {
           "type": "concept",
           "term": "Data-driven validation in a real flow",
-          "description": "A signup/login flow is a natural example of validating data-driven actions end to end: click Login triggers navigation, a Validate element text step confirms the resulting login text/heading displays correctly, a Generate random value or extraction step supplies a dynamically generated email, and a further validation confirms the password field was set/accepted as expected. Each generated or entered value gets its own validation, rather than only checking the final outcome."
+          "description": "Independent signup example: assert the required heading and resulting registered account using supported text/visibility/custom checks. Add intermediate assertions where they establish meaningful requirements or help diagnosis; asserting every typed value is not a universal Testim requirement. Generating a string does not create a working email inbox or prove a password was accepted."
         },
         {
           "type": "note",
@@ -44,7 +44,7 @@
         }
       ],
       "bulletPoints": [
-        "Data-driven actions (click login, display login text, generate email, set password) each get their own validation step, not just a single end-of-flow check.",
+        "Choose meaningful intermediate and final assertions for the required behavior.",
         "This is where Generate random value/date, Parameters, and Validate element text/visible come together in one flow."
       ],
       "sectionId": "section-dd6790aac0c7"
@@ -55,23 +55,23 @@
         {
           "type": "concept",
           "term": "Custom validations and custom actions",
-          "description": "When a check or action has no equivalent in the predefined steps menu, Testim lets you write your own JavaScript — run either in the browser or outside it, in a Node.js context (a CLI validation/action) — to implement exactly the logic needed."
+          "description": "Browser custom steps can inspect DOM/HTML parameters. Node.js CLI steps are a separate execution path with their own runtime and supported package setup; local execution requires the connected Testim CLI and documented entitlement."
         },
         {
           "type": "concept",
           "term": "Pass/fail contract for custom validations",
-          "description": "A custom validation step is meant to return a boolean: returning true makes the validation succeed, returning false makes it fail. This is the entire contract — whatever logic runs inside, only the final true/false return value determines the step's outcome."
+          "description": "For a synchronous browser custom validation, return an explicit boolean. False or a thrown error can fail the check; timeout and failure handling also matter. Supported asynchronous examples return a Promise that resolves/rejects. The final synchronous true/false value is not the entire contract for every custom or CLI step."
         },
         {
           "type": "concept",
           "term": "Extracting a user-defined value for custom checks",
-          "description": "The Extract Value step captures a value from the app (select the element to extract from; Testim creates the step and assigns that element) into a new parameter. That parameter can then be used inside a validation, a Set Text step, a custom step's code, or anywhere else a value is needed later — including as an input to a custom validation's own logic."
+          "description": "Extract selected AUT text into a variable and reference it in a supported later validation or custom-code scope. Numeric/date matches can remain strings and require deliberate conversion; not every field accepts parameter references."
         }
       ],
       "bulletPoints": [
-        "Custom validations run JavaScript in the browser or in Node.js (CLI) when no built-in step covers the check.",
-        "The contract is simple: return true = pass, return false = fail.",
-        "Extract Value captures a value into a parameter, reusable in later validations, Set Text steps, or custom code."
+        "Browser custom validation and Node.js CLI steps use different runtimes.",
+        "Synchronous boolean checks and asynchronous returned Promises have different completion contracts.",
+        "Reference extracted values only in supported scope/fields."
       ],
       "sectionId": "section-30cc98b12391"
     },
@@ -100,12 +100,12 @@
     {
       "title": "Returning something other than a clean boolean from a custom validation",
       "trapDescription": "Writing a custom validation that returns a truthy/falsy non-boolean value, or forgets to return at all, producing an ambiguous pass/fail result.",
-      "bestPractice": "A custom validation's contract is explicit: return true to pass, return false to fail. Make sure the function actually returns one of these two values."
+      "bestPractice": "Return an explicit boolean for a synchronous browser check. For asynchronous checks, return the supported Promise and validate rejection/timeout behavior; do not let unfinished work escape completion tracking."
     },
     {
       "title": "Only validating the final outcome of a multi-step data-driven flow",
       "trapDescription": "Checking only that a signup completed successfully, without validating the intermediate generated email, the login text, or the password field along the way.",
-      "bestPractice": "Validate each data-driven action individually (login click, resulting text, generated email, password set) so a failure is pinpointed to the specific step that broke, not just 'something in signup failed'."
+      "bestPractice": "Assert meaningful requirements and final outcomes. Intermediate checks can improve evidence, but neither every input check nor one successful visual assertion guarantees full business coverage."
     }
   ],
   "practiceQuiz": [
@@ -135,12 +135,20 @@
         "A"
       ],
       "hint": "Quotes signal a literal string; no quotes signals a reference.",
-      "rationale": "In the Expected value field, a hardcoded value is placed between quotes (e.g. 'red'), while a parameter value is entered by name without quotes — that distinction is how Testim tells a literal apart from a reference."
+      "rationale": "In the Expected value field, a hardcoded value is placed between quotes (e.g. 'red'), while a parameter value is entered by name without quotes — that distinction is how Testim tells a literal apart from a reference.",
+      "optionExplanations": {
+        "A": "The documented expected-value syntax distinguishes quoted literals and parameter references.",
+        "B": "This reverses literal and reference syntax.",
+        "C": "Quoting a parameter name makes it a string, not the reference.",
+        "D": "Parameter references are supported in the expected-value field."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-347ffea18564"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "What must a custom validation step return to make the step pass?",
+      "scenario": "For a completed synchronous browser custom validation with no thrown error, which explicit boolean result indicates success?",
       "options": [
         {
           "id": "A",
@@ -162,8 +170,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "The contract is explicitly a boolean.",
-      "rationale": "Custom validation steps are meant to return a boolean value: true makes the validation succeed, false makes it fail. A string, a number, or relying purely on the absence of a thrown error isn't the documented contract."
+      "hint": "The question is scoped to a synchronous browser boolean check.",
+      "rationale": "True is the documented synchronous success result. False, exceptions and timeouts can indicate failure; asynchronous returned-Promise handling is a separate supported pattern.",
+      "optionExplanations": {
+        "A": "The question asks for an explicit boolean result, not a string.",
+        "B": "True is the documented synchronous boolean success result.",
+        "C": "Use the explicit boolean rather than relying on numeric truthiness.",
+        "D": "A missing return is not the documented boolean success contract."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-30cc98b12391"
     },
     {
       "questionId": "Q3",
@@ -191,7 +207,15 @@
         "B"
       ],
       "hint": "It's the same Extract Value mechanism covered earlier in the path.",
-      "rationale": "The Extract Value step captures a value from the app into a new parameter, which can then be used in a validation (including a custom validation's own code), a Set Text step, or other later steps — not something requiring manual retyping or unsupported."
+      "rationale": "The Extract Value step captures a value from the app into a new parameter, which can then be used in a validation (including a custom validation's own code), a Set Text step, or other later steps — not something requiring manual retyping or unsupported.",
+      "optionExplanations": {
+        "A": "Supported parameter references can be used by later custom checks.",
+        "B": "Extract Value captures selected text into a reusable variable with appropriate scope.",
+        "C": "Manual retyping is not required for parameter reuse.",
+        "D": "Changing the base URL does not capture the required application value."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-30cc98b12391"
     },
     {
       "questionId": "Q4",
@@ -219,12 +243,20 @@
         "B"
       ],
       "hint": "It's a consistent green/red pattern, for both predefined and custom validations.",
-      "rationale": "A passed validation shows a green icon in the step's upper-left corner with a confirming message in Properties; a failed one shows red with a failure message — the same pattern applies whether it's a predefined validation or a custom one."
+      "rationale": "A passed validation shows a green icon in the step's upper-left corner with a confirming message in Properties; a failed one shows red with a failure message — the same pattern applies whether it's a predefined validation or a custom one.",
+      "optionExplanations": {
+        "A": "Executed validation steps have status and result messages.",
+        "B": "The documented result uses the step icon plus Properties messages.",
+        "C": "Passed steps are not removed from the definition.",
+        "D": "Predefined validations also expose results."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-4874a613b843"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "When testing a signup flow with a dynamically generated email and a click-login action, what is the recommended validation approach?",
+      "scenario": "A signup test must establish the heading and registered-account outcome. Which assertion approach covers those requirements without treating every typed value as a universal rule?",
       "options": [
         {
           "id": "A",
@@ -232,7 +264,7 @@
         },
         {
           "id": "B",
-          "text": "Validate each data-driven action individually — the login click's result, the displayed login text, the generated email, and the password set — rather than only the end result."
+          "text": "Assert the required heading and registered-account outcome, adding relevant intermediate checks for requirements and diagnosis."
         },
         {
           "id": "C",
@@ -246,8 +278,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Granular validation pinpoints exactly where a failure occurred.",
-      "rationale": "Validating each data-driven action individually — not just the final outcome — pinpoints exactly which step broke when something fails, rather than leaving 'something in signup failed' as the only signal."
+      "hint": "Validate required behavior rather than every input by default.",
+      "rationale": "Meaningful intermediate and final assertions provide evidence for the stated requirements. Random inputs or a single visual check do not establish all required outcomes; no assertion strategy guarantees exact root-cause localization.",
+      "optionExplanations": {
+        "A": "The required heading check would be omitted.",
+        "B": "These assertions establish the stated heading and account requirements.",
+        "C": "Random inputs do not remove the need for assertions.",
+        "D": "One visual check does not establish all required functional outcomes."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-dd6790aac0c7"
     }
   ],
   "quickRecap": [
@@ -261,11 +301,11 @@
     },
     {
       "key": "Data-driven validation",
-      "value": "Validate each generated/entered value along a flow (login click, text, email, password), not just the end result."
+      "value": "Assert meaningful requirements and final outcomes; intermediate checks are scenario-specific."
     },
     {
       "key": "Custom validation contract",
-      "value": "Return true = pass, return false = fail — runs in-browser or via Node.js (CLI)."
+      "value": "Synchronous browser checks return booleans; supported asynchronous checks return Promises. Exceptions/timeouts also matter."
     },
     {
       "key": "Extract Value",
@@ -291,6 +331,28 @@
       "title": "Extract Value Step (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/advanced-editing/extract-text.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Custom code (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/custom-code.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Add cli validations and actions (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/add-cli-validations-and-actions.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Index (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/parameters/index.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Index (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/index.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }
