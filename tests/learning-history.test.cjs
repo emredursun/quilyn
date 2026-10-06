@@ -1129,3 +1129,12 @@ test('AE1 Vision AI review requires configured recovery and preserves UIDC sizin
  assert.match(d.studyGuide[0].elements[0].text,/blueprint was not accessible/);
  assert.doesNotMatch(JSON.stringify(d),/nothing here will be tested|stable, self-healing Modules for any UI|TBox XEngines|self-healing does not cover/);
 });
+
+test('AE1 capstone review separates verified mechanisms from unverified Academy sequence',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m12_grand_scenario.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(r.localContentReview,'partial-source-comparison');assert.equal(d.sourceReviewedOn,undefined);
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['B'],['B'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[1].description,/resolved reference.*independent copy/);
+ assert.match(d.studyGuide[4].elements[1].description,/not automatic PDF verification.*identifier separately/);
+ assert.match(d.studyGuide[1].elements[2].text,/do not themselves guarantee.*does not undo/);
+ assert.doesNotMatch(JSON.stringify(d),/every TestCase referencing it is fixed at once|TBox lets engines mix freely|differs on every execution/);
+});
