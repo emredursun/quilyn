@@ -1613,3 +1613,9 @@ test('PBA access review separates design personas active access context and comp
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[0].elements[2].description,/multiple groups but one is active.*not identical/);assert.match(d.studyGuide[1].elements[1].description,/ABAC.*CBAC/);assert.match(d.practiceQuiz[8].rationale,/affect other users/);assert.doesNotMatch(JSON.stringify(d),/always applied in this specific sequence/);
 });
+
+test('PBA UI review scopes theme presentation and separates Visible Disabled and Required behavior',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),entry=inv.modules.find(m=>m.id==='BA-M16'),bytes=fs.readFileSync(entry.file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(entry.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===3?['A','B','C']:q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].description,/across an application.*arbitrary per-field/);assert.match(d.studyGuide[2].elements[1].description,/Visible true.*Disabled true.*Required true/);assert.equal(d.practiceQuiz[1].options[2].text,'Insights');assert.match(d.studyGuide[0].bulletPoints[3],/separate portals are not mandatory/);
+});
