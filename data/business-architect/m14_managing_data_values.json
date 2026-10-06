@@ -17,12 +17,12 @@
         {
           "type": "concept",
           "term": "Calculated value field",
-          "description": "A field computed AUTOMATICALLY from an expression or formula referencing other fields. The system owns the value; users cannot edit it directly and it recalculates as input fields change."
+          "description": "A calculated field derives its value from configured inputs using a function, expression or Decision table. Configure dependent inputs correctly; read-only presentation protects the derived value but is not a guarantee that the formula or source data is correct."
         },
         {
           "type": "concept",
           "term": "When the calculation runs",
-          "description": "You configure when a calculated value recalculates — for example each time the underlying data changes — so the result stays current as users edit inputs. Calculated fields are typically presented as read-only because the system maintains them."
+          "description": "The calculation network can update dependent fields when an input changes. Functions support Sum/Average/Maximum/Minimum over numeric relationship items. Expressions support field references; the documented Simple Field Type exceptions are Email, Phone and Picklist."
         },
         {
           "type": "analogy",
@@ -30,7 +30,7 @@
         }
       ],
       "bulletPoints": [
-        "Calculated values reduce manual entry errors and guarantee derived data is consistent.",
+        "Calculated values reduce manual calculation; verify formula, input types, dependencies and rounding.",
         "Define the formula referencing other Case fields; the system recalculates automatically."
       ],
       "sectionId": "section-81c2e5c5fbbe"
@@ -41,7 +41,7 @@
         {
           "type": "concept",
           "term": "Decision Table",
-          "description": "A rule returning a value based on conditions arranged in rows. It evaluates rows TOP TO BOTTOM and returns the first matching row's result, with an 'otherwise' default for non-matching cases."
+          "description": "In the sourced single-result calculation mode, evaluate rows in order and return the first match, or Otherwise. Dev Studio can also enable Evaluate all rows for multiple results; first-match is not every table’s universal contract."
         },
         {
           "type": "concept",
@@ -54,8 +54,9 @@
         }
       ],
       "bulletPoints": [
-        "Decision Tables map condition combinations to return values, evaluated first-match top-to-bottom.",
-        "They keep multi-condition calculations readable and maintainable for business users."
+        "Single-result tables use ordered first-match logic; Evaluate all rows is a distinct mode.",
+        "They keep multi-condition calculations readable and maintainable for business users.",
+        "Custom App Studio Decision tables require Constellation; reusable Dev Studio tables must be marked relevant to appear in App Studio."
       ],
       "sectionId": "section-070a7b71cff7"
     },
@@ -79,7 +80,8 @@
       ],
       "bulletPoints": [
         "Set defaults for fields whose value is usually the same to cut data-entry time.",
-        "Defaults can be a constant or derived; users can override them when the situation differs."
+        "Defaults can be a constant or derived; users can override them when the situation differs.",
+        "Case Settings > Data initialization configures starting values and updates pyDefault; it is not a continuously recalculated formula."
       ],
       "sectionId": "section-1be621577614"
     },
@@ -89,7 +91,7 @@
         {
           "type": "concept",
           "term": "Data Transform",
-          "description": "A rule that manipulates data — it SETS, COPIES, and TRANSFORMS values between pages/fields. Data Transforms ensure values are consistent between Views and between related (parent/child) Cases without manual re-entry."
+          "description": "A Data Transform assigns, copies, converts or calculates values when invoked. Configure the Run Data Transform step or pre/post-processing trigger; a one-time copy does not subscribe to later parent/source changes."
         },
         {
           "type": "concept",
@@ -98,7 +100,7 @@
           "items": [
             "Initialize/seed values on Case creation",
             "Copy data from one Case or page to another (e.g., copy billing address to shipping address)",
-            "Keep parent and child Case data synchronized"
+            "Apply explicit mapping at chosen triggers between related Case contexts; copying alone does not continuously synchronize them."
           ]
         },
         {
@@ -108,7 +110,7 @@
       ],
       "bulletPoints": [
         "Data Transforms manipulate data (set/copy/transform) and promote consistency across Views and related Cases.",
-        "They reduce duplicate entry and keep dependent data in sync."
+        "Changes propagate only when configured processing invokes the transform; use the appropriate reference/synchronization design for ongoing changes."
       ],
       "sectionId": "section-77f03d82713f"
     },
@@ -118,16 +120,16 @@
         {
           "type": "concept",
           "term": "Business logic validation",
-          "description": "Rules that check entered data against business requirements before the Case proceeds — ensuring accuracy and completeness. They block Case advancement until all conditions are satisfied."
+          "description": "Form business validation evaluates configured invalid-value conditions on submission: true raises an error. Stage validation blocks entry into the selected Stage when its invalid condition is true. Neither is a promise of continuous checking at every later use."
         },
         {
           "type": "concept",
           "term": "When validation helps",
-          "description": "Use business-logic validation whenever invalid or inconsistent data could cause downstream errors or rework — it enforces data integrity at the point of entry rather than failing later."
+          "description": "Use controls for format/required-value constraints and business validation for requirements the control cannot express. Define the invalid predicate, give actionable error text and provide a way to correct blocked Stage-entry data."
         },
         {
           "type": "analogy",
-          "text": "Validation is the bouncer at the door: it checks each value against the rules and blocks bad data from entering the Case, preventing problems deeper inside the workflow."
+          "text": "For a required value above 100, configure invalid as value <= 100. A validation error reports what must be corrected; its trigger/context must match the business requirement."
         }
       ],
       "bulletPoints": [
@@ -146,12 +148,12 @@
     {
       "title": "Decision Table evaluation order",
       "trapDescription": "Decision Tables evaluate rows top-to-bottom and return the FIRST matching row's result.",
-      "bestPractice": "Order rows from most specific to most general; the first match wins (with an otherwise/default)."
+      "bestPractice": "In single-result mode order specific rows before general ones; Evaluate all rows is a different mode."
     },
     {
       "title": "Data Transform purpose",
       "trapDescription": "Data Transforms manipulate data (set/copy/transform) and keep values consistent across Views and related Cases — they don't validate or store data.",
-      "bestPractice": "Need to copy/seed/sync data (e.g., billing → shipping, parent → child) → Data Transform."
+      "bestPractice": "Use explicitly invoked transforms for assignments/conversions/copies; do not assume one copy creates ongoing synchronization."
     },
     {
       "title": "Validation improves processing",
@@ -171,7 +173,7 @@
     {
       "title": "Consistency across related Cases",
       "trapDescription": "Keeping parent and child Case values consistent is a Data Transform use case.",
-      "bestPractice": "Sync data between related Cases/Views with a Data Transform rather than manual re-entry."
+      "bestPractice": "Choose explicit copy triggers or references according to snapshot versus ongoing-data needs."
     }
   ],
   "practiceQuiz": [
@@ -200,7 +202,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "A calculated field is automatically computed from a formula over other fields; users cannot edit it directly.",
+      "hint": "Bind Quantity and Price into a calculated expression and verify dependency updates.",
       "rationale": "A calculated value field computes Total from Quantity and Price automatically and updates as inputs change. Free text invites errors; a default is just a starting value; Access Roles are security.",
       "optionExplanations": {
         "A": "A formula derives the total from the changing inputs.",
@@ -208,7 +210,7 @@
         "C": "A one-time default does not track subsequent input changes.",
         "D": "Security permissions do not perform this calculation."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-81c2e5c5fbbe"
     },
     {
@@ -244,7 +246,7 @@
         "C": "An access group controls application permissions rather than shipping price.",
         "D": "A wait pauses execution rather than calculate the cost."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-070a7b71cff7"
     },
     {
@@ -272,7 +274,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Decision Tables stop at the FIRST matching row and return its result — they don't evaluate all rows.",
+      "hint": "The question explicitly excludes Evaluate all rows; use ordered first-match semantics.",
       "rationale": "In this single-result mode, evaluate rows in order and return the first matching result; use the Otherwise result if no row matches. The question is scoped to this mode rather than all possible Decision Table configurations.",
       "optionExplanations": {
         "A": "The single-result table evaluates ordered rows and uses the fallback if needed.",
@@ -280,7 +282,7 @@
         "C": "The stated mode does not average several results.",
         "D": "Evaluation follows rule order rather than random selection."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-070a7b71cff7"
     },
     {
@@ -316,7 +318,7 @@
         "C": "Rejecting other valid countries would change the business requirement.",
         "D": "Deleting the field would lose required information."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-1be621577614"
     },
     {
@@ -352,7 +354,7 @@
         "C": "An SLA controls timing rather than address mapping.",
         "D": "An access role does not perform the data copy."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-77f03d82713f"
     },
     {
@@ -388,7 +390,7 @@
         "C": "A queue allocates work rather than validate a date.",
         "D": "Parallel execution does not enforce field validity."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-976ee77554f4"
     },
     {
@@ -419,14 +421,14 @@
         "B"
       ],
       "hint": "Data Transforms set, copy, and transform field values to manage data consistency across the Case.",
-      "rationale": "Data Transforms set, copy, and transform data and keep Views/related Cases consistent. Authentication and portal assignment are security/UX concerns, not Data Transform functions. No partial credit.",
+      "rationale": "A transform initializes/maps values when invoked. It does not continuously synchronize parent/child data without configured processing; authentication and portal assignment are separate responsibilities.",
       "optionExplanations": {
         "A": "A transform can map values between source and target pages.",
         "B": "It can initialize the field values used by views.",
         "C": "Login verification is an authentication responsibility.",
         "D": "Portal access belongs to user and access-group configuration."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-77f03d82713f"
     },
     {
@@ -454,7 +456,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "The system computes and owns a calculated field's value — it cannot be overridden by user input.",
+      "hint": "Protect the formula-derived output from inconsistent manual input.",
       "rationale": "Calculated fields are system-maintained from a formula, so they are typically read-only to prevent users from overwriting the derived value. The other reasons are inaccurate.",
       "optionExplanations": {
         "A": "Protecting the computed output prevents contradictory manual values.",
@@ -462,7 +464,7 @@
         "C": "The issue is correct ownership of the result rather than display impossibility.",
         "D": "Read-only presentation does not disable validation."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-81c2e5c5fbbe"
     },
     {
@@ -472,7 +474,7 @@
       "options": [
         {
           "id": "A",
-          "text": "They manipulate data (set/copy/transform) to ensure values are consistent between Views and between related Cases"
+          "text": "They assign/copy/convert data when invoked through configured processing"
         },
         {
           "id": "B",
@@ -491,14 +493,14 @@
         "A"
       ],
       "hint": "Data Transforms maintain consistent values across Views and across related Cases in the application.",
-      "rationale": "Data Transforms manipulate field values to keep them consistent across Views and related Cases. They are not security constructs or SLA mechanisms; their sole purpose is data management and synchronization.",
+      "rationale": "Data Transforms manipulate values on invocation. They are not an automatic live synchronization service, authentication authority or SLA policy.",
       "optionExplanations": {
-        "A": "Transforms assign and map values across contexts.",
+        "A": "Configured invocation applies the field assignments/conversions.",
         "B": "Authentication verifies identity rather than transform case data.",
         "C": "Role configuration grants permissions rather than map field values.",
         "D": "Deadline policy belongs to service-level configuration."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-77f03d82713f"
     },
     {
@@ -527,14 +529,14 @@
         "A"
       ],
       "hint": "Validation catches bad or incomplete data at entry time, preventing it from advancing through the Case.",
-      "rationale": "Validation adds the most value when bad data would cause downstream errors/rework; it enforces integrity at entry. It isn't needed when data is always correct and isn't applied post-resolution or to read-only fields.",
+      "rationale": "Validation helps prevent downstream rework when applied at the appropriate form or Stage-entry trigger. It is not automatically reapplied on every later field use and can check generated/read-only data at Stage entry.",
       "optionExplanations": {
         "A": "Early validity checks prevent failures in later work.",
         "B": "Correct data alone does not explain the need for these checks.",
         "C": "Waiting until resolution leaves downstream rework unprevented.",
         "D": "Editable user input often requires validation too."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-976ee77554f4"
     },
     {
@@ -563,14 +565,14 @@
         "A"
       ],
       "hint": "Map each status value to its corresponding discount percentage using a Decision Table row-per-status.",
-      "rationale": "A Decision Table cleanly maps each Order Status value to its corresponding discount and returns the result of the first matching row. The other options do not perform conditional value computation based on multiple status options.",
+      "rationale": "In a single-result calculation, a Decision table maps customer status Gold/Silver/Bronze to the matching discount. This is customer status, not Order Status.",
       "optionExplanations": {
         "A": "The status-to-percentage mapping fits a decision table.",
         "B": "One default cannot express three status-dependent results.",
         "C": "A wait changes timing rather than select the discount.",
         "D": "An access group controls permissions rather than calculate discounts."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-070a7b71cff7"
     },
     {
@@ -606,18 +608,18 @@
         "C": "Initialization is not encryption.",
         "D": "Field defaults do not verify user identity."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-1be621577614"
     }
   ],
   "quickRecap": [
     {
       "key": "Calculated value",
-      "value": "Auto-computed from a formula over other fields; recalculates as inputs change; usually read-only."
+      "value": "Configured functions/expressions/Decision tables derive values; verify dependencies and input correctness."
     },
     {
       "key": "Decision Table",
-      "value": "Returns a value based on condition rows; evaluated top-to-bottom, first match wins (with otherwise/default). Good for tiered calculations."
+      "value": "First match/Otherwise in single-result mode; Evaluate all rows is distinct. Relevant-record configuration enables Dev Studio reuse in App Studio."
     },
     {
       "key": "Default value",
@@ -625,38 +627,45 @@
     },
     {
       "key": "Data Transform",
-      "value": "Manipulates data — set/copy/transform — to keep values consistent across Views and between related (parent/child) Cases."
+      "value": "Invoked set/copy/convert operations; a one-time copy does not maintain live synchronization."
     },
     {
       "key": "Validation",
-      "value": "Business-logic checks at entry that enforce data accuracy/integrity, preventing downstream errors and rework."
+      "value": "Invalid condition true raises an error at form submission or Stage entry; provide a correction route."
     }
   ],
   "topics": [
     {
       "title": "Performing calculated values",
-      "url": "https://academy.pega.com/topic/performing-calculated-values/v2/in/80411/80831",
+      "url": "https://academy.pega.com/topic/performing-calculated-values/v2/in/93701/80831",
       "duration": "20 min"
     },
     {
       "title": "Calculations with Decision tables",
-      "url": "https://academy.pega.com/topic/calculations-decision-tables/v2/in/80411/80831",
+      "url": "https://academy.pega.com/topic/calculations-decision-tables/v2/in/93701/80831",
       "duration": "15 min"
     },
     {
       "title": "Set default property values",
-      "url": "https://academy.pega.com/topic/set-default-property-values/v2/in/80411/80831",
+      "url": "https://academy.pega.com/topic/set-default-property-values/v2/in/93701/80831",
       "duration": "10 min"
     },
     {
       "title": "Manipulate application data",
-      "url": "https://academy.pega.com/topic/manipulate-application-data/v2/in/80831",
+      "url": "https://academy.pega.com/topic/manipulate-application-data/v2/in/93701/80831",
       "duration": "10 min"
     },
     {
       "title": "Validation of data",
-      "url": "https://academy.pega.com/topic/validation-data/v2/in/80831",
+      "url": "https://academy.pega.com/topic/validation-data/v2/in/93701/80831",
       "duration": "10 min"
+    },
+    {
+      "title": "Decision table result modes (supplemental)",
+      "url": "https://academy.pega.com/topic/decision-tables-dev-studio/v3",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Pega Platform '24.2 — module v2, linked bodies checked 2026-10-06"
 }

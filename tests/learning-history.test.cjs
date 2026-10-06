@@ -1601,3 +1601,9 @@ test('PBA Case relationship review requires existing all-child dependencies and 
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.practiceQuiz[2].options[0].text,/all already-created.*without user cancellation/);assert.match(d.practiceQuiz[2].rationale,/Resolved-prefixed.*specific success status/);assert.match(d.studyGuide[0].elements[3].description,/copying does not create ongoing synchronization/);assert.match(d.practiceQuiz[6].hint,/Resolved-Duplicate/);assert.match(d.topics[2].url,/duplicate-search\/v7/);
 });
+
+test('PBA data-value review scopes transform invocation and validation triggers and table result modes',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),entry=inv.modules.find(m=>m.id==='BA-M14'),bytes=fs.readFileSync(entry.file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(entry.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[3].elements[0].description,/when invoked.*one-time copy does not/);assert.match(d.studyGuide[4].elements[0].description,/submission: true raises an error.*Stage/);assert.match(d.studyGuide[1].elements[0].description,/Evaluate all rows/);assert.match(d.practiceQuiz[10].rationale,/customer status, not Order Status/);assert.doesNotMatch(JSON.stringify(d),/guarantee derived data|sole purpose is data management and synchronization/);
+});
