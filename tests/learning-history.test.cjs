@@ -1073,3 +1073,12 @@ test('AE1 Windows review preserves conditional engine guidance and control capab
  assert.match(d.practiceQuiz[2].options[1].text,/evaluate.*references/);
  assert.doesNotMatch(JSON.stringify(d),/does not prescribe one|Not prescribed by Tricentis|Unchanged — same|also reaches desktop elements and the taskbar/);
 });
+
+test('AE1 self healing review separates identification recovery from final assertions and weighted setup',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m06_self_healing.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[2].text,/ARA.*rescan.*Weight -1/);
+ assert.match(d.practiceQuiz[1].scenario,/remaining assertions succeed/);
+ assert.match(d.studyGuide[3].elements[1].description,/Review.*first/);
+ assert.doesNotMatch(JSON.stringify(d),/A successful heal means a normal pass|when self-healing succeeds, the TestCase passes normally/);
+});
