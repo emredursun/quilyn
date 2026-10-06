@@ -17,11 +17,11 @@
         {
           "type": "concept",
           "term": "Where this part picks up",
-          "description": "Everything up to this point runs one TestCase, from one Tosca Commander, against one TMA and one device. The advanced use cases are about what changes when that stops being true: many executions across many agents (Tosca Distributed Execution), or execution owned by a hosted platform instead of a workstation (Tosca Cloud)."
+          "description": "Mobile tests can run in parallel on multiple devices, and can use DEX or CI orchestration. Tosca Cloud artifact upload is a separate integration path; execution still depends on supported agents, connections and target infrastructure. Earlier local examples do not restrict the platform to one TestCase or device."
         }
       ],
       "bulletPoints": [
-        "The advanced use cases are all variations on one theme: execution no longer belongs to a single local machine."
+        "Distinguish test orchestration, mobile target sessions and Cloud artifact copies."
       ],
       "sectionId": "section-501a6fe28126"
     },
@@ -31,26 +31,26 @@
         {
           "type": "concept",
           "term": "TestEvents and ExecutionList configurations",
-          "description": "Distributed Execution does not work by hand-picking which TestCase goes to which machine. Executions are managed through TestEvents together with ExecutionList configurations — the TestEvent defines what should run, and the ExecutionList configuration defines how, while agents pick the work up from there. Assignment is configuration-driven, not manual."
+          "description": "A TestEvent contains ExecutionLists and configurations. The Distribution Server assigns lists to Agents whose configuration matches; users can explicitly configure eligible Agents and lists. In Tosca 2026.1 LTS, DEX is no longer enabled by default and requires activation."
         },
         {
           "type": "list",
           "title": "The moving parts",
           "items": [
-            "TestEvent — the unit that defines an execution to be carried out, the entry point for a distributed run.",
-            "ExecutionList / ExecutionList configuration — what gets executed and under which configuration; agents can be allocated to specific ExecutionLists.",
-            "Agents — the machines that actually execute; per Tricentis docs you can 'Allocate or limit resources to specific Agents and assign each of them to specific ExecutionLists'.",
-            "DEX Monitor — the oversight layer for distributed activity."
+            "TestEvent: groups ExecutionLists and their configurations for a distributed run.",
+            "Configurations: specify which matching Agent pool runs each list. Independent tests can be split with DEX/AOS setup and TCDistribution=True; repetitions are not supported for that split.",
+            "Agents execute the assigned work and need the application/files/connections required by those tests.",
+            "DEX Monitor provides execution status and cancellation controls."
           ]
         },
         {
           "type": "note",
-          "text": "The mental shift is from 'I press Run here' to 'I declare what should run, and the infrastructure resolves who runs it' — the same shift dynamic device allocation makes at the device level."
+          "text": "Agent matching does not replace mobile session configuration. For parallel mobile execution, verify licensing, target isolation and driver port requirements; dynamic target selection is not mandatory."
         }
       ],
       "bulletPoints": [
-        "DEX manages executions via TestEvents + ExecutionList configurations — not by manually assigning TestCases to agents.",
-        "Agents can be scoped to specific ExecutionLists; the DEX Monitor provides oversight."
+        "TestEvents/configurations govern Agent assignment; DEX requires activation in 2026.1 LTS.",
+        "DEX/AOS test splitting and mobile session parallelism have distinct requirements."
       ],
       "sectionId": "section-80eddfd92ef6"
     },
@@ -60,25 +60,25 @@
         {
           "type": "concept",
           "term": "Uploading an ExecutionList",
-          "description": "Tosca Commander can upload TestCases in bulk, and entire ExecutionLists, to Tosca Cloud. An uploaded ExecutionList becomes a Tosca Cloud playlist — playlists are Cloud's own execution unit, managed under Run → Playlists. The ExecutionList is not deleted, not restricted to local machines, and does not block other executions; it is converted into the equivalent Cloud object."
+          "description": "Upload creates a copy in the selected Tosca Cloud workspace, without bidirectional synchronization. A supported uploaded ExecutionList is represented as a playlist, available under Build > Playlists and Run > Playlists. Upload does not certify mobile execution readiness; infrastructure and permissions must still be configured."
         },
         {
           "type": "list",
-          "title": "What playlists unlock",
+          "title": "Playlist configuration and CI",
           "items": [
-            "Execution owned by the Cloud platform rather than a local Commander session.",
-            "Public APIs to run a playlist, poll its progress, and fetch results.",
-            "CI/CD integration — for example running playlists from Jenkins."
+            "Playlists can run on supported personal, team or cloud agents; Cloud orchestration does not imply every test runs on a vendor-hosted machine.",
+            "Configure sequence and Agent characteristics for the required environment.",
+            "The documented Jenkins workflow authenticates, starts a playlist run, polls status and retrieves JUnit results."
           ]
         },
         {
           "type": "note",
-          "text": "Upload mode settings let Tosca upload only objects changed since the previous upload, which matters once uploads are routine rather than one-off migrations."
+          "text": "Only changed selected objects can reduce re-upload work, but uploads overwrite existing Cloud objects and do not synchronize Cloud changes back. Check supported artifacts, excluded resources and version restrictions: TestEvents and configuration objects are excluded even though stored configuration TCP values can be included."
         }
       ],
       "bulletPoints": [
-        "ExecutionList uploaded to Tosca Cloud → becomes a Tosca Cloud playlist (Run → Playlists).",
-        "Playlists are API-addressable, which is what makes CI/CD pipeline integration possible."
+        "An uploaded ExecutionList becomes a separate Cloud playlist copy.",
+        "Validate upload restrictions, Agent characteristics and run readiness."
       ],
       "sectionId": "section-abe38a6c388a"
     },
@@ -88,16 +88,16 @@
         {
           "type": "concept",
           "term": "Distribution raises the stakes on device configuration",
-          "description": "Once executions are distributed or cloud-triggered, nobody is watching a LiveView window when something goes wrong. A TestCase pinned to one static device blocks every other run needing that device, and a TestCase carrying device-specific assumptions fails unpredictably across a pool. Dynamic device allocation and disciplined capability filters stop being conveniences and become prerequisites."
+          "description": "Plan separate usable targets and supported session/port configuration for concurrent runs. Fixed device assignment can be valid when targets are isolated; dynamic selection is an option, not a DEX/Cloud prerequisite. Application state and compatibility still need validation."
         },
         {
           "type": "warning",
-          "text": "Diagnostics get harder in exactly the same proportion: the local console you would have read is gone, so TMA's own logs and the Session ID become the primary way to reconstruct what a distributed run actually did."
+          "text": "Preserve orchestration, Agent, driver and Tosca evidence with timestamps and available session identifiers. A console is not necessarily gone, and one log source or ID is not guaranteed to reconstruct the whole run."
         }
       ],
       "bulletPoints": [
-        "Distributed/cloud execution makes dynamic device allocation and criteria discipline prerequisites, not conveniences.",
-        "With no local console to watch, TMA logs and Session IDs carry the diagnostic load."
+        "Use supported isolated targets, parallel licenses and driver/session configuration.",
+        "Correlate available evidence; dynamic selection and a particular log source are not universal requirements."
       ],
       "sectionId": "section-ce5c68e16f3b"
     }
@@ -106,24 +106,24 @@
     {
       "title": "Thinking DEX means manually assigning TestCases to agents",
       "trapDescription": "Picturing Distributed Execution as a dispatcher where each TestCase is hand-allocated to a specific machine.",
-      "bestPractice": "Executions are managed through TestEvents and ExecutionList configurations. Agents are allocated to ExecutionLists by configuration — the assignment is declared, not performed by hand per TestCase."
+      "bestPractice": "Use TestEvents/configurations to specify eligible Agent pools and ExecutionLists. This is explicit configuration, not a claim that users cannot select specific Agents."
     },
     {
       "title": "Assuming uploading to Tosca Cloud consumes or restricts the ExecutionList",
       "trapDescription": "Expecting an uploaded ExecutionList to be deleted after execution, to stay local-only, or to lock out other executions.",
-      "bestPractice": "The upload converts it into a Tosca Cloud playlist, managed under Run → Playlists and addressable through Cloud's public APIs. Nothing is consumed or disabled."
+      "bestPractice": "Upload creates a separate supported Cloud copy/playlist; changes do not synchronize back and re-upload can overwrite Cloud objects. Configure actual execution infrastructure before running."
     },
     {
       "title": "Carrying single-device habits into distributed execution",
       "trapDescription": "Moving TestCases that assume one pinned device, or that were only ever validated while someone watched LiveView, into a distributed or cloud-triggered setup.",
-      "bestPractice": "Before distributing, remove device-specific assumptions and make the device filter deliberate. Plan to diagnose from TMA logs and Session IDs, since the live console you relied on locally will not be there."
+      "bestPractice": "Validate target isolation, effective configuration, licenses and diagnostics. Fixed targets can be valid; dynamic selection is not mandatory."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "How are test executions managed in Tosca Distributed Execution?",
+      "scenario": "Which objects organize ExecutionLists and matching Agent configuration in a Tosca DEX TestEvent workflow?",
       "options": [
         {
           "id": "A",
@@ -131,7 +131,7 @@
         },
         {
           "id": "B",
-          "text": "By manually assigning test cases to agents"
+          "text": "Only assigning individual TestCases by hand without TestEvents"
         },
         {
           "id": "C",
@@ -145,13 +145,21 @@
       "correctOptions": [
         "D"
       ],
-      "hint": "Distribution is declared through configuration objects — the whole point is that you don't dispatch work by hand.",
-      "rationale": "DEX manages executions through TestEvents together with ExecutionList configurations; agents can then be allocated to specific ExecutionLists. Manual per-TestCase assignment (B) is exactly what the mechanism replaces, direct execution in Commander (C) is the local model DEX moves past, and Tosca Cloud (A) is a separate platform, not how DEX itself manages executions."
+      "hint": "The question asks about the documented TestEvent workflow, not all possible trigger locations.",
+      "rationale": "A TestEvent groups ExecutionLists and configurations; the Distribution Server matches them to Agents. Commander can trigger the TestEvent, but a local direct run alone does not define this orchestration.",
+      "optionExplanations": {
+        "A": "Cloud artifact integration is separate from the named DEX workflow.",
+        "B": "Individual manual assignment alone does not define a TestEvent workflow.",
+        "C": "Commander can trigger DEX, but direct local execution alone does not organize matching Agent configurations.",
+        "D": "TestEvents contain ExecutionLists and configurations used for Agent matching."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-80eddfd92ef6"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "What happens when the execution list is uploaded to Tosca Cloud?",
+      "scenario": "After a successful supported ExecutionList upload to Tosca Cloud, what represents its organized tests in Cloud?",
       "options": [
         {
           "id": "A",
@@ -173,30 +181,38 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Cloud has its own name for an execution unit — the upload translates the Commander object into it.",
-      "rationale": "Playlists are Tosca Cloud's execution unit, managed under Run → Playlists, and an uploaded ExecutionList is converted into one. The other options describe destructive or restrictive behaviour that the upload simply doesn't have — and 'runs only on local machines' inverts the point of moving execution to the Cloud."
+      "hint": "The upload creates a Cloud copy; it does not synchronize both versions.",
+      "rationale": "The uploaded list’s tests are organized into a Cloud playlist. The original is not consumed; Cloud changes do not synchronize back. Running the copy still needs suitable infrastructure and permissions.",
+      "optionExplanations": {
+        "A": "The successful supported upload organizes the copied tests as a Cloud playlist.",
+        "B": "Upload does not consume/delete the original list after execution.",
+        "C": "Uploaded tests can use supported personal/team/cloud agents, not only local machines.",
+        "D": "Creating a playlist does not universally disable other executions."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-abe38a6c388a"
     }
   ],
   "quickRecap": [
     {
       "key": "DEX execution management",
-      "value": "TestEvents + ExecutionList configurations; agents allocated to specific ExecutionLists; DEX Monitor for oversight."
+      "value": "TestEvents contain lists and configurations; the server matches Agent pools. DEX requires activation in 2026.1 LTS."
     },
     {
       "key": "ExecutionList → Tosca Cloud",
-      "value": "Converted into a Tosca Cloud playlist, managed under Run → Playlists."
+      "value": "A supported upload creates a separate Cloud playlist copy, without bidirectional synchronization."
     },
     {
       "key": "Why playlists matter",
-      "value": "API-addressable — run, poll progress, fetch results, integrate with CI/CD (e.g. Jenkins)."
+      "value": "Configure sequence and Agent characteristics; Jenkins can authenticate, trigger, poll and retrieve JUnit results."
     },
     {
       "key": "Mobile consequence",
-      "value": "Distributed execution makes dynamic device allocation and criteria discipline prerequisites, not conveniences."
+      "value": "Parallel targets need isolation, licensing and driver ports. Fixed targets remain valid; dynamic selection is optional."
     },
     {
       "key": "Diagnostics when distributed",
-      "value": "No local console to watch — TMA logs and the Session ID become the primary reconstruction tools."
+      "value": "Preserve orchestration and execution evidence, timestamps and available session IDs; completeness is not guaranteed."
     }
   ],
   "topics": [
@@ -214,6 +230,13 @@
       "title": "Tosca Distributed Execution Configurations (Tricentis docs)",
       "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/distributed_execution/dex_configurations_hub.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Use uploaded tests and playlist copies",
+      "url": "https://docs.tricentis.com/tosca-cloud/en-us/content/references/upload_tests.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Tosca 2026.1 LTS; current driver/Cloud documentation checked 2026-10-06"
 }

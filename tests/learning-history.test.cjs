@@ -1281,3 +1281,32 @@ test('mobile tuning review separates scan reset and preview from execution TCPs 
  assert.match(d.studyGuide[2].elements[0].description,/Child objects inherit.*lower-level/);
  assert.doesNotMatch(JSON.stringify(d),/fail loudly and immediately|A live visual feed|wrong value there does not stop|Removes order-dependent failures|Never several copies/);
 });
+
+test('mobile Module review uses documented scrolling and inspected locator evidence rather than symptom guesses',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m15_module_properties.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[0].options[1].text,/ScrollingBehavior=None.*Module Properties/);
+ assert.match(d.practiceQuiz[1].scenario,/Inspection confirms.*English label/);
+ assert.match(d.studyGuide[2].elements[2].text,/does not support Tosca user simulations/);
+ assert.doesNotMatch(JSON.stringify(d),/guarantees inconsistency|each point directly|normally the clearest|every TestCase inherits it/);
+});
+
+test('advanced capability review separates runtime settings, driver scope, scan entries and execution carry-over',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m16_additional_appium_capabilities.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/Settings APIs.*without changing.*capabilities/);
+ assert.match(d.studyGuide[3].elements[0].description,/entry to the selected group/);
+ assert.match(d.studyGuide[3].elements[1].text,/carry-over.*Name\/Value blank/);
+ assert.match(d.practiceQuiz[1].scenario,/XCUITest iOS/);
+ assert.doesNotMatch(JSON.stringify(d),/No test can report|anything suppressed is also unobserved|right default for most|session at hand|cannot be caught by any test/);
+});
+
+test('mobile orchestration review distinguishes Agent matching, isolated devices and unsynchronized Cloud copies',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m17_advanced_use_cases.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].description,/2026.1 LTS.*no longer enabled by default/);
+ assert.match(d.studyGuide[2].elements[0].description,/copy.*without bidirectional synchronization/);
+ assert.match(d.studyGuide[2].elements[2].text,/overwrite.*TestEvents.*excluded/);
+ assert.match(d.studyGuide[3].elements[0].description,/Fixed device assignment.*not a DEX\/Cloud prerequisite/);
+ assert.doesNotMatch(JSON.stringify(d),/dynamic device allocation.*prerequisites|Nothing is consumed or disabled|console.*is gone|blocks every other run/);
+});

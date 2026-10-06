@@ -3,10 +3,10 @@
   "moduleTitle": "Advanced Use Cases - Module Properties for Realistic Interaction",
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1459/handling-advanced-mobile-automation-use-cases-with-tricentis-tosca-mobile",
   "learningObjectives": [
-    "Define and configure Module properties to enhance mobile automation.",
-    "Explain how Module properties change the way a control is identified and steered.",
-    "Use properties to make automated interaction behave more like real user interaction.",
-    "Recognise which flaky-step problems are solved at Module level rather than in the TestCase."
+    "Distinguish identifying properties from supported steering parameters.",
+    "Validate uniqueness and stability of captured identifiers.",
+    "Use documented native Android scrolling configuration.",
+    "Separate reusable control configuration from scenario synchronization and outcome assertions."
   ],
   "estTime": "25 min",
   "studyGuide": [
@@ -16,16 +16,16 @@
         {
           "type": "concept",
           "term": "Fix it once, not in every TestCase",
-          "description": "A Module describes a control: how to find it and how to interact with it. Every TestCase that steers that control inherits the description. So a property adjusted on the Module applies everywhere the control is used, while the same adjustment made inside a TestCase applies to that TestCase alone. When the same control misbehaves across several TestCases, the Module is the correct place to fix it, and fixing it in each TestCase instead is how a workaround gets copied twenty times."
+          "description": "A reusable Module stores control identification and supported steering configuration. Changes can affect tests that reference it, so validate the affected usages. Not every wait, focus, keyboard or transition behavior is a configurable Module property; some require TCPs, Modules or scenario-specific TestStepValues."
         },
         {
           "type": "note",
-          "text": "A useful test for where a fix belongs: if the answer to 'why is this step configured this way' is a fact about the control, it belongs on the Module. If it is a fact about this particular scenario, it belongs in the TestCase."
+          "text": "Independent maintainability guidance: put a stable reusable control rule in supported shared configuration, and keep scenario-specific actions and assertions explicit. Confirm the actual parameter’s supported level and platform before moving it."
         }
       ],
       "bulletPoints": [
-        "Module properties describe the control and apply everywhere it is used.",
-        "Fact about the control goes on the Module. Fact about the scenario goes in the TestCase."
+        "Shared control configuration can affect multiple usages; validate them.",
+        "Use the parameter’s documented level, not a universal Module-placement rule."
       ],
       "sectionId": "section-d0f80e1f41c0"
     },
@@ -35,26 +35,26 @@
         {
           "type": "concept",
           "term": "Choosing what identifies the control",
-          "description": "A scan captures several properties per control and selects some of them to identify it. That automatic selection is a starting point rather than a verdict. Properties that look stable in one scan can turn out to be dynamic in practice, such as text that is localised, an index that shifts when a list reorders, or a coordinate that moves with screen size. Editing which properties participate in identification is how a Module is made resilient without touching a single TestCase."
+          "description": "XScan identifies controls by properties by default. Make Unique can choose additional properties; you can also choose them manually or use another method. Validate that the selected values uniquely identify the target in expected languages, states and layouts."
         },
         {
           "type": "list",
-          "title": "Signals that identification needs adjusting",
+          "title": "Conditions to investigate",
           "items": [
-            "A step fails only in another language, which points at localised text being used to identify.",
-            "A step fails only when a list has a different number of items, which points at index-based identification.",
-            "A step fails only on a different screen size, which points at coordinates carrying identification weight.",
-            "A step fails only after an unrelated UI change nearby, which points at identification depending on surrounding structure."
+            "A language-specific failure warrants inspecting localized identifiers, layout, application data and target context; it does not prove a text locator is the sole cause.",
+            "A changing list warrants inspecting uniqueness and any index-based assumptions.",
+            "A different screen size warrants inspecting visibility, scrolling, layout and any coordinate assumptions.",
+            "A surrounding UI change warrants inspecting hierarchy and target context along with actual captured properties."
           ]
         },
         {
           "type": "warning",
-          "text": "Each of those failures reproduces reliably under one specific condition and passes everywhere else, which is exactly why they are usually blamed on the environment rather than on identification. The condition under which a step fails is normally the clearest available evidence of which property is doing the identifying."
+          "text": "A reproduction condition is evidence for investigation, not a guaranteed property diagnosis. Compare the current control tree and selected properties with the failing TestStep and logs."
         }
       ],
       "bulletPoints": [
-        "Automatic property selection during a scan is a starting point, not a final answer.",
-        "The condition under which a step fails usually names the unstable property."
+        "Validate actual uniqueness and stability after scanning.",
+        "Reproduction conditions guide investigation without proving one locator cause."
       ],
       "sectionId": "section-ef1299380b4b"
     },
@@ -64,26 +64,26 @@
         {
           "type": "concept",
           "term": "Why realistic matters on mobile",
-          "description": "A framework can often set a value directly on a control, which is fast and reliable and completely unlike what a user does. Mobile UIs frequently attach behaviour to the interaction itself rather than to the resulting value: validation that runs on blur, a picker that only commits on confirm, a list that lazy-loads as it scrolls, an animation that has to finish before the next control accepts input. Automation that sets values directly can bypass all of that, which produces a TestCase that passes while the user-facing flow is broken."
+          "description": "Use the supported interaction path and verify the required business outcome. If a scenario explicitly depends on focus, confirmation or another action, establish that it occurred; a final stored value alone may not demonstrate the required path. This is a local testing principle, not a claim that every native value-setting operation bypasses user behavior."
         },
         {
           "type": "list",
-          "title": "Interaction behaviours worth configuring at Module level",
+          "title": "Documented configuration and explicit actions",
           "items": [
-            "Scrolling a control into view before interacting, rather than assuming it is on screen.",
-            "Tapping to focus before entering text, so focus-dependent behaviour actually fires.",
-            "Respecting keyboard behaviour after text entry, so the keyboard does not cover the next target.",
-            "Allowing animations or transitions to settle before the next interaction is attempted."
+            "For Android native controls, Mobile Engine automatically scrolls to find targets. To disable this, add steering parameter ScrollingBehavior=None in the Module Properties tab.",
+            "The TapByCoordinates=True TCP is a documented {CLICK} fallback; validate the resulting target and action.",
+            "Use supported keyboard Modules/commands for the platform rather than inventing a universal keyboard Module property.",
+            "Use explicit readiness waits and supported actions where the scenario requires them; transitions are not all controlled by one Module setting."
           ]
         },
         {
           "type": "note",
-          "text": "The general point: a test that passes by taking a shortcut the user cannot take has quietly stopped testing the thing you meant to test. Configuring interaction to resemble real use is not only about stability, it is about the result still meaning something."
+          "text": "Native mobile automation does not support Tosca user simulations; the steering guide refers to SendKeys keyboard commands for native interactions. Do not imply that desktop simulation properties automatically apply to native mobile controls."
         }
       ],
       "bulletPoints": [
-        "Mobile behaviour often hangs off the interaction, not off the final value.",
-        "Setting values directly can produce a green TestCase over a broken user flow."
+        "Native Android ScrollingBehavior=None disables automatic scrolling.",
+        "Validate explicit scenario actions and assertions; native user-simulation support differs from desktop."
       ],
       "sectionId": "section-d9dca6f44360"
     }
@@ -92,52 +92,60 @@
     {
       "title": "Working around a control's behaviour in every TestCase",
       "trapDescription": "Adding the same wait, scroll, or extra tap in each TestCase that touches a particular control.",
-      "bestPractice": "If the adjustment is a fact about the control rather than about one scenario, configure it on the Module so every TestCase inherits it. Repeating it per TestCase multiplies the maintenance and guarantees inconsistency."
+      "bestPractice": "Use supported reusable configuration for a shared control behavior, then validate affected usages. Scenario-specific waits may still need explicit TestSteps."
     },
     {
       "title": "Trusting the scan's automatic identification unconditionally",
       "trapDescription": "Assuming the properties chosen during scanning are stable, then treating the resulting condition-specific failures as environment problems.",
-      "bestPractice": "Read the condition under which the step fails. Failing only in another language, only at a different list length, or only on a different screen size each point directly at which property is unstable, and the fix is to change what identifies the control."
+      "bestPractice": "Inspect current control properties, context and logs under the failing condition. A language or layout change alone does not prove one identifier is responsible."
     },
     {
       "title": "Setting values directly instead of interacting realistically",
       "trapDescription": "Writing a value straight into a control and getting a green TestCase, while the real flow depends on focus, confirmation, or scroll-triggered loading.",
-      "bestPractice": "Configure interaction to match how the control is genuinely used when behaviour is attached to the interaction. A TestCase that bypasses that behaviour can pass over a user-facing defect."
+      "bestPractice": "When a scenario explicitly requires interaction events, verify those events and the outcome with supported native actions; do not assume every direct value operation necessarily skips them."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "The same control needs an extra scroll before it can be interacted with, and it is used across eleven TestCases. Where does that adjustment belong?",
+      "scenario": "You need to disable the documented automatic scrolling for an Android native Module. Which configuration is documented?",
       "options": [
         {
           "id": "A",
-          "text": "In each of the eleven TestCases, so the intent stays visible locally."
+          "text": "Add an arbitrary wait to every TestCase."
         },
         {
           "id": "B",
-          "text": "On the Module, since the need to scroll is a fact about the control rather than about one scenario."
+          "text": "Add steering parameter ScrollingBehavior=None in the Module Properties tab."
         },
         {
           "id": "C",
-          "text": "In a TCP at Project level."
+          "text": "Set a custom TCP named DisableAllScrolling and assume the engine recognizes it."
         },
         {
           "id": "D",
-          "text": "It cannot be configured and must be handled with an image-based control."
+          "text": "Image-based identification is mandatory to disable scrolling."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Ask whether the reason is about the control or about the scenario.",
-      "rationale": "The requirement follows the control everywhere it is used, so it belongs on the Module where every TestCase inherits it. Repeating it in eleven TestCases multiplies maintenance and invites inconsistency."
+      "hint": "Use the supported parameter and documented Module configuration.",
+      "rationale": "The native-control steering guide documents ScrollingBehavior=None at Module level to disable Android automatic scrolling. Invented TCP names and image identification do not implement this documented configuration.",
+      "optionExplanations": {
+        "A": "A wait does not configure the documented scrolling switch.",
+        "B": "This is the documented native Android Module steering configuration.",
+        "C": "An invented custom name is not a supported engine switch.",
+        "D": "Disabling scrolling does not require image identification."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-d9dca6f44360"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A step works in English and fails when the same build runs with the app set to German. What does this most directly indicate?",
+      "scenario": "Inspection confirms the control is identified by its English label, but the German build changes that label and the locator no longer matches. Which cause does this evidence establish?",
       "options": [
         {
           "id": "A",
@@ -159,13 +167,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "The one thing that changed between the passing and failing run was the language.",
-      "rationale": "A failure that reproduces only under a language change points at localised text being used for identification. The fix is to change which properties identify the control rather than to treat it as an environment issue."
+      "hint": "The actual identifying property was inspected, not inferred from language alone.",
+      "rationale": "The confirmed English-label locator no longer matches the localized label. Revise and validate identification; generic language-specific failure alone would require further investigation.",
+      "optionExplanations": {
+        "A": "No memory defect is established by the inspected locator mismatch.",
+        "B": "The inspected localized label no longer matches the identifying value.",
+        "C": "The scenario establishes a label mismatch, not a server address defect.",
+        "D": "The scenario establishes a locator cause, not missing reset."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-ef1299380b4b"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "Why can setting a value directly on a mobile control produce a passing TestCase over a broken user flow?",
+      "scenario": "A flow explicitly requires a confirmation action, but a test only checks the resulting stored value and never establishes that confirmation occurred. What coverage gap can remain?",
       "options": [
         {
           "id": "A",
@@ -173,7 +189,7 @@
         },
         {
           "id": "B",
-          "text": "Mobile behaviour is often attached to the interaction itself, such as validation on blur or a picker that commits only on confirm, and setting the value bypasses it."
+          "text": "The stored-value check does not establish that the required confirmation path was exercised."
         },
         {
           "id": "C",
@@ -187,30 +203,38 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Consider what fires on focus, blur, confirm, or scroll that a direct write skips.",
-      "rationale": "When behaviour hangs off the interaction rather than the resulting value, bypassing the interaction skips validation, commit steps, and lazy loading. The TestCase then verifies a path the user cannot take."
+      "hint": "Separate the required interaction path from a final stored value.",
+      "rationale": "A value assertion alone does not establish the required confirmation action. This scenario does not imply all native input operations bypass user behavior.",
+      "optionExplanations": {
+        "A": "The scenario does not establish platform-wide unsupported input.",
+        "B": "A stored value does not prove the required confirmation path occurred.",
+        "C": "No automatic session restart is established.",
+        "D": "No automatic value discard is established."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-d9dca6f44360"
     }
   ],
   "quickRecap": [
     {
       "key": "Scope",
-      "value": "Module properties describe the control and apply to every TestCase that uses it."
+      "value": "Supported reusable Module configuration can affect multiple usages; validate them."
     },
     {
       "key": "Where a fix belongs",
-      "value": "Fact about the control goes on the Module. Fact about the scenario goes in the TestCase."
+      "value": "Use the parameter’s documented level; scenario actions may require explicit TestSteps."
     },
     {
       "key": "Identification",
-      "value": "Scan-selected properties are a starting point. Adjust which properties identify the control when they turn out to be dynamic."
+      "value": "Make Unique and manual property selection help identification; validate stability in intended states."
     },
     {
       "key": "Diagnostic shortcut",
-      "value": "Fails only in another language means localised text. Only at a different list length means index. Only on another screen size means coordinates."
+      "value": "A failure condition guides investigation; inspected locator evidence establishes the cause."
     },
     {
       "key": "Realistic interaction",
-      "value": "Scroll into view, tap to focus, manage the keyboard, let animations settle. Behaviour attached to the interaction is skipped by a direct value write."
+      "value": "Native Android automatic scrolling can be disabled with ScrollingBehavior=None; native user simulations are not supported."
     }
   ],
   "topics": [
@@ -220,9 +244,11 @@
       "duration": "video"
     },
     {
-      "title": "Mobile Engine 3.0 (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
+      "title": "Native mobile steering (Tosca 2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/tbox_mobile_engine_mobile_controls.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Tosca 2026.1 LTS; current driver/Cloud documentation checked 2026-10-06"
 }

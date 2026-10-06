@@ -16,16 +16,16 @@
         {
           "type": "concept",
           "term": "Session-level configuration, not TestCase logic",
-          "description": "Desired Capabilities are passed when the automation session is created, so they configure the session rather than any individual step. Two consequences follow. A capability applies to everything in that session, and changing one means the session has to be recreated. This is why capabilities belong in configuration rather than being toggled mid-flow, and why a Capability Set is a sensible unit to name and reuse."
+          "description": "Appium capabilities are supplied when a session starts and cannot be changed during that session’s lifecycle. Driver-supported Settings APIs can change some runtime behavior without changing the session capabilities; distinguish those mechanisms. Tosca scan capability sets and execution Set/Add Desired Capabilities Modules are separate configuration paths."
         },
         {
           "type": "note",
-          "text": "Tosca exposes these through the Capabilities dialog rather than in code, but they are the standard Appium capabilities underneath, which is why the appium: prefix appears and why Appium's own documentation is the reference when a capability behaves unexpectedly."
+          "text": "Standard W3C capabilities such as platformName and browserName do not need the Appium extension prefix. Appium-specific capabilities use appium: (or supported appium:options grouping). Verify the actual driver/version’s capability support rather than treating all names as universal."
         }
       ],
       "bulletPoints": [
-        "Capabilities configure the session at creation, so they apply to everything in it.",
-        "Changing one requires a new session, which is why they live in configuration."
+        "Session capabilities are immutable; supported runtime Settings are distinct.",
+        "Check standard versus extension names and driver/platform support."
       ],
       "sectionId": "section-8f19c2281292"
     },
@@ -36,21 +36,21 @@
           "type": "list",
           "title": "Four practical groups",
           "items": [
-            "Dialog and permission handling. autoGrantPermissions removes Android runtime permission prompts, autoAcceptAlerts deals with native alerts. These keep the OS from interrupting a run.",
-            "App state between sessions. Capabilities in the reset family decide whether the app starts fresh, keeps its data, or is reinstalled outright. This is the session-level counterpart to the Reset application setting.",
-            "Session lifetime. Timeout-style capabilities govern how long a session tolerates inactivity before it is torn down, which matters when a step legitimately waits a long time.",
-            "Input handling. Keyboard-related capabilities affect how text is entered and whether the on-screen keyboard behaves predictably, which is a recurring source of flaky text-entry steps."
+            "Permissions/alerts: UiAutomator2 autoGrantPermissions has Android target SDK/API requirements and special-permission limitations. XCUITest autoAcceptAlerts is an iOS capability including privacy permission alerts; neither is a universal cross-platform popup switch.",
+            "App state: noReset/fullReset interpretation depends on the driver and application. Validate the supported combination and actual state; do not equate it with the Mobile Scan Reset application checkbox or complete backend cleanup.",
+            "Session lifetime: inspect the documented timeout for the installed driver/server; different timeouts cover different operations.",
+            "Input: XCUITest maxTypingFrequency can tune typing; other keyboard options have platform/simulator scope. Do not assume one input capability fixes every focus or locator error."
           ]
         },
         {
           "type": "concept",
           "term": "Why grouping helps",
-          "description": "Capability lists are long and mostly irrelevant to any given project, so memorising them is wasted effort. Knowing which group a problem falls into is what makes the list navigable: a run interrupted by a popup, a TestCase polluted by leftover state, a session dying during a long wait, and text landing in the wrong place are four different categories, and each has its own small set of candidates."
+          "description": "Grouping helps navigate documentation, but a symptom does not prove one capability is the cause. Inspect the target, focus, application state and driver logs before selecting a supported change."
         }
       ],
       "bulletPoints": [
-        "Four groups: dialogs and permissions, app state, session lifetime, input handling.",
-        "Diagnose which group the symptom belongs to, then look at that group's few candidates."
+        "Scope capabilities to their driver, platform and documented requirements.",
+        "Use grouping as a search aid, not a universal root-cause classifier."
       ],
       "sectionId": "section-8f4c93287644"
     },
@@ -59,21 +59,21 @@
       "elements": [
         {
           "type": "warning",
-          "text": "Every capability that suppresses something also removes it from view. Auto-accepting alerts stabilises a run and simultaneously means the run can no longer report whether an alert appeared, what it said, or whether a new one showed up after a build. Auto-granting permissions has the same shape: the permission flow stops being exercised at all, so a regression in it cannot be caught by any test using that capability."
+          "text": "Automatically accepting alerts or granting permissions can reduce deliberate coverage of their appearance, text and acceptance/denial paths. It does not prove that every alert becomes impossible to observe in logs or other instrumentation, nor guarantee uninterrupted execution."
         },
         {
           "type": "concept",
-          "term": "Suppress broadly, verify deliberately",
-          "description": "The workable position is not to avoid these capabilities, because runs that stall on OS dialogs are worse. It is to accept that suppression is the default for the bulk of the suite while keeping at least one TestCase that deliberately does not suppress, so the dialog behaviour itself stays under test somewhere."
+          "term": "Choose configuration for the test objective",
+          "description": "For a workflow that needs granted permissions, a supported automatic grant may be appropriate. For permission or alert behavior coverage, use controlled initial state and explicitly verify the required dialogs and outcomes. Suppression is not a universal recommended default for the whole suite."
         },
         {
           "type": "note",
-          "text": "This is the same reasoning as the earlier point about realistic interaction. A configuration that makes tests pass more often is only an improvement if the passes still mean what you think they mean."
+          "text": "Treat this as independent coverage guidance. Verify which behavior was exercised, rather than treating a higher pass rate as proof of equivalent coverage."
         }
       ],
       "bulletPoints": [
-        "Suppressed dialogs are also unobserved dialogs. Stability bought with visibility.",
-        "Keep at least one TestCase that does not suppress, so the behaviour stays covered."
+        "Automatic dialog handling can reduce deliberate coverage; observation is not universally impossible.",
+        "Configure controlled dialog tests for the actual required acceptance and denial paths."
       ],
       "sectionId": "section-a90bd4bbe729"
     },
@@ -83,16 +83,16 @@
         {
           "type": "concept",
           "term": "Naming a bundle you will reuse",
-          "description": "A Capability Set groups several capabilities under a name, such as a Close Permissions/Alerts set holding autoGrantPermissions and autoAcceptAlerts, and applies them in one action. A single Add capability entry configures one value for the session at hand. The distinction is reuse: anything the whole suite needs belongs in a named set, while something genuinely specific to one scenario does not."
+          "description": "In the scan Capabilities window, Add capabilities set creates a named group and Add capability adds an entry to the selected group; it is not a separate ungrouped one-session mode. For execution, place Set Desired Capabilities first, with ActionMode Select, before Open Mobile App/OpenUrl; Add Desired Capabilities can extend the pending values before opening."
         },
         {
           "type": "warning",
-          "text": "Watch for one-off capability entries that quietly become load-bearing. A value added to make a single TestCase work, then copied into the next one and the one after, is a Capability Set that never got named. The copies then drift, and the resulting differences are invisible because nothing displays them side by side."
+          "text": "Tosca documents capability carry-over between sequential TestCases: use Set Desired Capabilities first in each TestCase, leaving Name/Value blank when none are needed, to prevent unintended carry-over. Validate execution setup separately from scan configuration."
         }
       ],
       "bulletPoints": [
-        "Named set for anything reused. One-off entry only for genuinely scenario-specific values.",
-        "Copied one-off capabilities are an unnamed set waiting to drift."
+        "Scan sets contain entries; execution uses its documented Set/Add workflow.",
+        "Prevent unintended sequential carry-over with explicit per-TestCase Set Desired Capabilities."
       ],
       "sectionId": "section-df35e4312ab2"
     }
@@ -101,17 +101,17 @@
     {
       "title": "Enabling dialog suppression suite-wide with no exception",
       "trapDescription": "Applying autoGrantPermissions and autoAcceptAlerts everywhere, leaving no TestCase that exercises the permission or alert flow.",
-      "bestPractice": "Suppression is the right default for most of a suite, but keep at least one TestCase without it so a regression in the dialog behaviour is still detectable somewhere."
+      "bestPractice": "Choose dialog handling for the test objective; controlled initial state and explicit assertions are needed for permission/alert coverage. Automatic handling is not a universal default."
     },
     {
       "title": "Toggling capabilities mid-TestCase",
       "trapDescription": "Expecting a capability change to take effect partway through a running session.",
-      "bestPractice": "Capabilities are passed at session creation, so changing one requires a new session. Configure them up front through a Capability Set rather than treating them as runtime switches."
+      "bestPractice": "Session capabilities cannot be changed after creation. Driver-supported runtime Settings are a different mechanism; configure Tosca Set/Add capabilities before the opening step."
     },
     {
-      "title": "Copying one-off capabilities between TestCases",
-      "trapDescription": "Adding the same capability entry by hand to each TestCase that needs it, instead of naming a Capability Set.",
-      "bestPractice": "Anything more than one TestCase needs belongs in a named Capability Set. Hand-copied entries drift apart, and nothing in the UI surfaces the difference."
+      "title": "Assuming scan sets automatically define execution",
+      "trapDescription": "Reusing a scan setup without checking execution capability carry-over.",
+      "bestPractice": "Add capability belongs to the selected scan set. Validate execution Set/Add Desired Capabilities and explicit clearing for sequential tests separately."
     }
   ],
   "practiceQuiz": [
@@ -140,13 +140,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Think about why changing one requires a fresh session.",
-      "rationale": "Capabilities are passed at session creation and configure the whole session, which is why they cannot be toggled mid-flow and why changing one means the session has to be recreated."
+      "hint": "Session capabilities and mutable driver-supported Settings are different mechanisms.",
+      "rationale": "Capabilities configure the new session and are immutable during it. Some drivers expose separate runtime Settings; those do not mutate the session capabilities.",
+      "optionExplanations": {
+        "A": "Capabilities are not automatically renegotiated before every TestStep.",
+        "B": "Capabilities are supplied at session creation.",
+        "C": "They configure more than installation alone.",
+        "D": "They must configure the session before its actions, not only teardown."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-8f19c2281292"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A suite runs with appium:autoAcceptAlerts set to true everywhere. What coverage is silently lost?",
+      "scenario": "An XCUITest iOS suite auto-accepts alerts and has no explicit alert assertions. Which deliberate coverage may be reduced?",
       "options": [
         {
           "id": "A",
@@ -154,7 +162,7 @@
         },
         {
           "id": "B",
-          "text": "No test can report whether an alert appeared, what it said, or whether a new one was introduced."
+          "text": "Verification of alert text and required accept/deny interaction paths."
         },
         {
           "id": "C",
@@ -168,13 +176,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "A suppressed dialog is also an unobserved one.",
-      "rationale": "Auto-accepting alerts removes them as an interruption and as an observation at the same time. If every TestCase suppresses them, a regression in alert behaviour has nowhere left to be caught."
+      "hint": "Automatic acceptance is not equivalent to explicitly testing the dialog behavior.",
+      "rationale": "Automatic acceptance can bypass deliberate text and accept/deny checks. It does not prove alerts cannot be observed through logs or other instrumentation; add objective-specific controlled tests.",
+      "optionExplanations": {
+        "A": "Alert behavior can be relevant to functional coverage.",
+        "B": "Automatic acceptance does not replace explicit text or accept/deny assertions.",
+        "C": "This capability does not itself disable text-entry assertions.",
+        "D": "Automatic alert acceptance does not prohibit application installation."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-a90bd4bbe729"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "Text entry steps behave inconsistently across runs, with characters occasionally landing in the wrong place. Which capability group is the right place to look first?",
+      "scenario": "Logs and inspection confirm an XCUITest typing-speed issue, with the correct target and focus. Which capability category contains maxTypingFrequency for investigation?",
       "options": [
         {
           "id": "A",
@@ -196,30 +212,38 @@
       "correctOptions": [
         "C"
       ],
-      "hint": "Match the symptom to the group that governs it.",
-      "rationale": "Inconsistent text entry falls in the input handling group, where keyboard-related capabilities govern how text is delivered. Grouping capabilities by what they control is what makes a long list navigable."
+      "hint": "The scenario establishes typing behavior after checking the target and focus.",
+      "rationale": "XCUITest documents maxTypingFrequency for typing/clear frequency. Inspect driver/version requirements; a generic text-entry failure alone would not prove a capability cause.",
+      "optionExplanations": {
+        "A": "The established typing-speed issue is not a session-idle timeout diagnosis.",
+        "B": "The scenario does not establish reset-state failure.",
+        "C": "maxTypingFrequency is a documented XCUITest typing capability.",
+        "D": "The scenario does not establish an alert/permission obstruction."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-8f4c93287644"
     }
   ],
   "quickRecap": [
     {
       "key": "When applied",
-      "value": "At session creation. They configure the whole session, so changing one requires a new session."
+      "value": "Capabilities are set at session creation and immutable; supported runtime Settings are distinct."
     },
     {
       "key": "Four groups",
-      "value": "Dialogs and permissions, app state between sessions, session lifetime and timeouts, input and keyboard handling."
+      "value": "Group by behavior while checking driver, platform and version requirements."
     },
     {
       "key": "Suppression cost",
-      "value": "Anything suppressed is also unobserved. Keep at least one TestCase that does not suppress dialogs."
+      "value": "Automatic dialog handling can reduce deliberate coverage; it does not guarantee observation is impossible."
     },
     {
       "key": "Capability Set",
-      "value": "Named, reusable bundle applied in one action. Use it for anything more than one TestCase needs."
+      "value": "Add capability adds an entry to the selected named scan set, not an ungrouped one-off session."
     },
     {
       "key": "Drift warning",
-      "value": "Hand-copied one-off capabilities are an unnamed set, and the copies diverge without anything surfacing the difference."
+      "value": "Use execution Set/Add Desired Capabilities before opening and explicit Set clearing to avoid sequential carry-over."
     }
   ],
   "topics": [
@@ -232,6 +256,13 @@
       "title": "Appium Desired Capabilities (official Appium docs)",
       "url": "https://appium.io/docs/en/latest/guides/caps/",
       "duration": "docs"
+    },
+    {
+      "title": "Tosca scan and execution capability setup (2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_set_appium_capabilities.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Tosca 2026.1 LTS; current driver/Cloud documentation checked 2026-10-06"
 }
