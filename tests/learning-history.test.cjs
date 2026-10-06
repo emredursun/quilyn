@@ -1625,3 +1625,9 @@ test('PBA Insights review scopes sharing and BIX extraction and supplies table-c
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[0].elements[1].description,/does not guarantee identical data/);assert.match(d.studyGuide[2].elements[0].description,/batches, one class.*does not by itself transform\/load/);assert.match(d.studyGuide[1].bulletPoints[2],/Columns.*Measures\/Dimensions.*Simple Value/);assert.match(d.practiceQuiz[5].rationale,/not restricted to App Studio/);
 });
+
+test('PBA deployment review requires configured pipelines and pre-merge checks and retains cloud client responsibilities',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),entry=inv.modules.find(m=>m.id==='BA-M18'),bytes=fs.readFileSync(entry.file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(entry.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[3].description,/Install and integrate.*before publishing/);assert.match(d.studyGuide[2].elements[0].description,/Clients retain.*identity\/access/);assert.match(d.practiceQuiz[11].rationale,/pre-merge testing.*not an instruction to postpone/);assert.match(d.practiceQuiz[7].rationale,/configured authorization\/integration/);
+});
