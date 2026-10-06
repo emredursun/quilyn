@@ -1187,3 +1187,12 @@ test('iOS preparation review scopes host support and keeps pairing, signing and 
  assert.match(d.studyGuide[3].elements[2].text,/\.ipa.*physical.*\.app.*Simulator/);
  assert.doesNotMatch(JSON.stringify(d),/free Apple ID is sufficient|any iOS automation|full stop|only appears after Xcode|simulator\/app's BundleID|Tosca and TMA together/);
 });
+
+test('mobile connection review uses documented dynamic selection without inventing session health guarantees',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m05_connecting_tosca_to_tma.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['B'],['C'],['C'],['A','C','E'],['B'],['A','B','D'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[1].description,/TOSCA_DYNAMIC_DEVICE_SELECTION.*not an arbitrary wildcard/);
+ assert.match(d.practiceQuiz[2].rationale,/do not rule out driver, app, network/);
+ assert.match(d.studyGuide[3].elements[3].items[1],/REST bind port equals the Appium port/);
+ assert.doesNotMatch(JSON.stringify(d),/api\/devices|never even leaves Tosca|Scan tolerates|most connection failures|Every run always|live visual feed/);
+});
