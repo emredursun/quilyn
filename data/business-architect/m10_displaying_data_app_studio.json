@@ -31,7 +31,7 @@
         {
           "type": "concept",
           "term": "Templates",
-          "description": "Handle layout and responsiveness of a View — including breakpoints, white-space management, and wrapping — to ensure out-of-the-box accessibility. Each View type uses a different template; available templates vary by the type and location of the View."
+          "description": "Templates prescribe layout and responsive behavior. Their available options depend on View type/context; prescribed accessibility support still requires validation of the configured application."
         },
         {
           "type": "concept",
@@ -46,7 +46,7 @@
         {
           "type": "concept",
           "term": "Promoted Action",
-          "description": "Gives quick access to a frequently used Action (e.g., Change Stage) as a button on the Case header — a default pattern requiring no button component. Each Case Type supports ONE promoted Action, and it is the first Case-wide Action."
+          "description": "A promoted user Action provides a prominent shortcut without a custom button component. Current optional-action guidance prioritizes the first Stage-wide action other than Edit details, then the first Case-wide action when no Stage-wide action is available; optional Processes cannot be promoted."
         },
         {
           "type": "analogy",
@@ -55,7 +55,7 @@
       ],
       "bulletPoints": [
         "Full Page View and Summary panel are edited in the UX tab; Preview = placeholders, run a Case for live data.",
-        "One promoted Action per Case Type; it is the first Case-wide Action and needs no button component."
+        "Promoted user-action selection depends on Stage/Case-wide precedence, rather than always selecting the first Case-wide action."
       ],
       "sectionId": "section-6e8d96363878"
     },
@@ -70,12 +70,12 @@
         {
           "type": "concept",
           "term": "Prescribed design system",
-          "description": "A systemized collection of design rules, patterns, and UI component standards (Cosmos React) that ensures consistent look, feel, and accessibility across all Pega applications."
+          "description": "Constellation uses a prescribed, configurable set of UI patterns and components for a consistent application experience. This is not a blanket guarantee that every configured View satisfies accessibility needs."
         },
         {
           "type": "concept",
           "term": "The four View types & editability",
-          "description": "Full Page View (read-only), Partial (read-only), List (read-only by default; can enable editing), and Form (editable). View type determines whether users can enter data."
+          "description": "The source taxonomy classifies Full Page and Partial as read-only display, List as read-only by default with supported editing configuration, and Form as supporting editable and read-only content. A read-only framework can still expose configured actions."
         },
         {
           "type": "analogy",
@@ -83,9 +83,9 @@
         }
       ],
       "bulletPoints": [
-        "Pega stores the name and value of each UI element in local storage or an external SOR, making information reusable; settings make data editable or read-only.",
+        "Case/data values can be stored in Pega or an external system of record; this is not a claim that all Case data is stored in browser localStorage.",
         "Data-entry Views are also called forms.",
-        "Out-of-the-box accessibility includes screen-reader support and localization."
+        "The prescribed library supports accessibility and localization; validate the final configured experience."
       ],
       "sectionId": "section-575659515b38"
     },
@@ -122,7 +122,7 @@
           "description": "Two Form types for complex data collection:",
           "items": [
             "MULTI-STEP FORM — one Assignment across MULTIPLE Views (linear; default for Create Stage)",
-            "HIERARCHICAL FORM — a single View with expandable sub-Views (nested structure for complex data)"
+            "HIERARCHICAL FORM — tabs/form groups within one Step-associated View; groups are not independently reusable."
           ]
         }
       ],
@@ -184,13 +184,13 @@
   "examPitfalls": [
     {
       "title": "View editability",
-      "trapDescription": "Full Page View and Partial are ALWAYS read-only; List is read-only by DEFAULT (enable editing); Form is editable.",
+      "trapDescription": "The described taxonomy distinguishes read-only display types from Form and editable List configurations; read-only display does not prohibit every action.",
       "bestPractice": "Memorize: Full Page + Partial = read-only; List = read-only by default; Form = editable. Partial fields are always read-only."
     },
     {
-      "title": "One promoted Action per Case Type",
-      "trapDescription": "Tests whether you think multiple promoted Actions or a button component are needed.",
-      "bestPractice": "Exactly one promoted Action per Case Type; it is the first Case-wide Action; no button component required."
+      "title": "Promoted Action precedence",
+      "trapDescription": "Assuming the first Case-wide action is always selected, even when a Stage-wide action is eligible.",
+      "bestPractice": "Current optional-action guidance prioritizes the first Stage-wide action other than Edit details, with Case-wide fallback. User actions, not optional Processes, are promoted."
     },
     {
       "title": "Full Page View preview shows placeholders",
@@ -262,7 +262,7 @@
         "C": "A multi-step form handles an assignment rather than the complete case framework.",
         "D": "Pulse supports discussion rather than the case's full-page structure."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-6e8d96363878"
     },
     {
@@ -298,50 +298,50 @@
         "C": "Changing studios does not itself create a populated runtime case.",
         "D": "Panel placement does not supply actual data to the authoring preview."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-6e8d96363878"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "A BA wants one-click access to 'Change Stage' from the Case header. What is configured, and what is the limit?",
+      "scenario": "A Case has an eligible Stage-wide user Action and a Case-wide user Action. Under current promoted-action guidance, which has priority?",
       "options": [
         {
           "id": "A",
-          "text": "A promoted Action; one per Case Type; it is the first Case-wide Action and needs no button component"
+          "text": "The first eligible Stage-wide user Action (other than Edit details), with Case-wide fallback"
         },
         {
           "id": "B",
-          "text": "A widget; unlimited per Case Type"
+          "text": "Every optional Process simultaneously"
         },
         {
           "id": "C",
-          "text": "A custom button component; two per Case Type"
+          "text": "The first Case-wide action unconditionally"
         },
         {
           "id": "D",
-          "text": "A Pulse post; one per Stage"
+          "text": "A Pulse post instead of a user Action"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "'Promoted' = one, on the header, no build.",
-      "rationale": "A promoted Action provides header access to a frequent Action; each Case Type supports exactly one, it is the first Case-wide Action, and no button component is required.",
+      "hint": "Stage-wide actions take priority before the Case-wide fallback.",
+      "rationale": "Current optional-action guidance selects the first Stage-wide action other than Edit details; if none is available, it selects the first Case-wide action. Optional Processes cannot be promoted.",
       "optionExplanations": {
-        "A": "Promoting the action exposes the supported header shortcut.",
-        "B": "A generic widget does not set the case-wide action promotion.",
-        "C": "The prescribed shortcut does not require a custom button.",
-        "D": "A discussion post is not an executable case action."
+        "A": "Stage-wide selection precedes the Case-wide fallback.",
+        "B": "Optional Processes cannot be promoted user Actions.",
+        "C": "Case-wide selection is the fallback, not unconditional priority.",
+        "D": "A discussion post is not the promoted executable user Action."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-6e8d96363878"
     },
     {
       "questionId": "Q4",
       "type": "multi-select",
       "selectCount": 2,
-      "scenario": "A BA is reviewing the View types available in App Studio and needs to determine which are inherently read-only. Which TWO View types are ALWAYS read-only?",
+      "scenario": "In the sourced App Studio View taxonomy, which TWO types are classified as read-only display types?",
       "options": [
         {
           "id": "A",
@@ -365,14 +365,14 @@
         "B"
       ],
       "hint": "List is read-only by default (can be enabled); Form is editable.",
-      "rationale": "Full Page View and Partial are always read-only. List is read-only by DEFAULT but editing can be enabled, and Form is editable. No partial credit.",
+      "rationale": "The taxonomy classifies Full Page and Partial as read-only display. Form can mix editable/read-only content; List permits configured editing. Display classification does not exclude configured case actions.",
       "optionExplanations": {
         "A": "The full-page framework displays information in this view taxonomy.",
         "B": "Partial Views display related information without editable fields.",
         "C": "List Views can support editing when it is enabled.",
         "D": "Form Views can collect editable user input."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-575659515b38"
     },
     {
@@ -401,14 +401,14 @@
         "A"
       ],
       "hint": "List Views are read-only by default; to allow data entry you must enable a specific setting.",
-      "rationale": "List Views are read-only by default; to allow create, edit, or delete operations you must explicitly enable editing on the List View configuration. The data source location does not affect whether editing is permitted.",
+      "rationale": "List Views are read-only by default and require editing to be enabled for supported operations. Source capabilities and authorization still matter; UI configuration alone cannot override them.",
       "optionExplanations": {
         "A": "Explicit editing enables the supported list operations.",
         "B": "The view type supports editing rather than prohibit it.",
         "C": "Source location alone does not explain the default editing setting.",
         "D": "A Partial View does not inherently override list editability."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-575659515b38"
     },
     {
@@ -444,7 +444,7 @@
         "C": "Running a case executes the design rather than author its form.",
         "D": "Primary designation selects important fields rather than create the step form."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-575659515b38"
     },
     {
@@ -480,7 +480,7 @@
         "C": "This reverses the containment relationship described here.",
         "D": "Forms can contain multiple fields and views."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f3272ee85d15"
     },
     {
@@ -516,7 +516,7 @@
         "C": "A currency input normally occupies one column.",
         "D": "A single-line phone input does not need the rich editor's width."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f3272ee85d15"
     },
     {
@@ -552,7 +552,7 @@
         "C": "Grouping fields does not automatically create a Partial View.",
         "D": "A group can include fields from different data objects."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f3272ee85d15"
     },
     {
@@ -588,7 +588,7 @@
         "C": "Hierarchical tabs are not separate independently reusable views.",
         "D": "Workflow steps can use these form layouts."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f3272ee85d15"
     },
     {
@@ -624,7 +624,7 @@
         "C": "A Partial View is read-only display rather than this creation process.",
         "D": "A List View displays a sourced collection rather than initial-case capture."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f3272ee85d15"
     },
     {
@@ -660,7 +660,7 @@
         "C": "Editing permission does not create that association.",
         "D": "The restriction is about the form context rather than changing studios."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f3272ee85d15"
     },
     {
@@ -688,7 +688,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Adding a field from a View is possible but creates a non-preferred, View-specific field rather than a reusable one.",
+      "hint": "Adding from a View adds a field to the model; plan the model first for reuse and inheritance.",
       "rationale": "Adding fields from a View is possible, but the best practice is to design the Data Model first in the Data tab with reuse/inheritance in mind.",
       "optionExplanations": {
         "A": "Modeling first encourages reuse of the correct field definitions.",
@@ -696,7 +696,7 @@
         "C": "App Studio also supports field creation.",
         "D": "The View authoring path can add a field."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-ace5706e9aa1"
     },
     {
@@ -732,7 +732,7 @@
         "C": "The designation is reflected in the running App Studio experience.",
         "D": "The feature is not limited to a collection list."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-1955d29046ae"
     },
     {
@@ -768,7 +768,7 @@
         "C": "Record identifiers and status are not the named default pair.",
         "D": "Customer-specific names are not universal Case Type defaults."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-1955d29046ae"
     },
     {
@@ -804,7 +804,7 @@
         "C": "Referenced Primary fields can supplement the default case fields.",
         "D": "Primary designation selects key fields rather than every field automatically."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-1955d29046ae"
     },
     {
@@ -842,7 +842,7 @@
         "C": "Displaying Primary fields is not permanent storage or unconditional editability.",
         "D": "The panel also appears in wider case-page layouts."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-6e8d96363878"
     },
     {
@@ -880,7 +880,7 @@
         "C": "Authoring is not restricted to System Architects in Dev Studio.",
         "D": "Prescribed defaults remain configurable."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-575659515b38"
     },
     {
@@ -916,7 +916,7 @@
         "C": "Bulk collection operations do not model one loan decision.",
         "D": "Hiding the evidence prevents an informed decision."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-575659515b38"
     },
     {
@@ -952,7 +952,7 @@
         "C": "A Partial View displays related information rather than this sourced list.",
         "D": "The full-page framework is not the specific collection view type."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-575659515b38"
     }
   ],
@@ -963,7 +963,7 @@
     },
     {
       "key": "View editability",
-      "value": "Full Page + Partial = read-only. List = read-only by default. Form = editable. Partial fields always read-only."
+      "value": "Sourced taxonomy: Full Page/Partial read-only display; List editing configurable; Form editable/read-only content. Display classification does not remove configured actions."
     },
     {
       "key": "Full Page View",
@@ -975,7 +975,7 @@
     },
     {
       "key": "Promoted Action",
-      "value": "One per Case Type; first Case-wide Action; header button; no component build."
+      "value": "Current guidance: eligible Stage-wide user Action first, then Case-wide fallback; optional Processes are not promoted."
     },
     {
       "key": "Form vs View",
@@ -1001,28 +1001,40 @@
   "topics": [
     {
       "title": "UI configuration in App Studio",
-      "url": "https://academy.pega.com/topic/ui-configuration-app-studio/v4/in/94776",
+      "url": "https://academy.pega.com/topic/ui-configuration-app-studio/v4/in/93701/94776",
       "duration": "20 min"
     },
     {
       "title": "Data capture in Views",
-      "url": "https://academy.pega.com/topic/data-capture-views/v3/in/94776",
+      "url": "https://academy.pega.com/topic/data-capture-views/v3/in/93701/94776",
       "duration": "15 min"
     },
     {
       "title": "Forms in Pega Platform",
-      "url": "https://academy.pega.com/topic/forms-pega-platform/v3/in/94776",
+      "url": "https://academy.pega.com/topic/forms-pega-platform/v3/in/93701/94776",
       "duration": "10 min"
     },
     {
       "title": "Adding data through a UI View",
-      "url": "https://academy.pega.com/topic/adding-data-through-ui-view/v2/in/80626",
+      "url": "https://academy.pega.com/topic/adding-data-through-ui-view/v2/in/93701/94776",
       "duration": "5 min"
     },
     {
       "title": "Designate Primary Fields",
-      "url": "https://academy.pega.com/topic/designate-primary-fields/v2/in/80626",
+      "url": "https://academy.pega.com/topic/designate-primary-fields/v2/in/93701/94776",
       "duration": "5 min"
+    },
+    {
+      "title": "Optional Actions — promoted-action precedence",
+      "url": "https://academy.pega.com/topic/optional-actions/v6",
+      "duration": "docs"
+    },
+    {
+      "title": "UI configuration — summary and promoted action context",
+      "url": "https://academy.pega.com/fr/node/102686/in/102646",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Pega Platform '25 — module v3, topic bodies and supplemental guidance checked 2026-10-06"
 }

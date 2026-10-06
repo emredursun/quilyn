@@ -1577,3 +1577,9 @@ test('PBA data-model review distinguishes reusable definitions from record ident
  assert.match(d.studyGuide[1].elements[0].description,/not itself a database table/);assert.match(d.studyGuide[1].bulletPoints[1],/definition alone does not ensure/);assert.match(d.studyGuide[5].elements[2].description,/not a limit on all custom Data Pages/);assert.match(d.practiceQuiz[15].rationale,/not.*restriction on all custom/);
  assert.ok(d.topics.every(t=>t.url.includes('/93701/94321')));
 });
+
+test('PBA View review scopes read-only display and corrects promoted action precedence and model-field hint',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/business-architect/m10_displaying_data_app_studio.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[3,16,17].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[2].rationale,/Stage-wide.*Case-wide.*Processes cannot/);assert.match(d.studyGuide[1].elements[2].description,/editable and read-only.*configured actions/);assert.match(d.practiceQuiz[4].rationale,/authorization still matter/);assert.doesNotMatch(JSON.stringify(d),/Cosmos React|non-preferred, View-specific field/);
+});
