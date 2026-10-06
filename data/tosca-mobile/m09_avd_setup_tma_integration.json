@@ -12,16 +12,16 @@
   "estTime": "25 min",
   "studyGuide": [
     {
-      "sectionTitle": "Why this course goes deeper on AVD setup",
+      "sectionTitle": "From virtual-device creation to automation validation",
       "elements": [
         {
           "type": "concept",
           "term": "From 'an emulator exists' to 'TMA can drive it'",
-          "description": "The Getting Started course covers creating an AVD as one step among many. This course treats AVD creation and TMA integration as their own dedicated part — because in practice, a surprising share of 'automation isn't working' reports trace back to an AVD that boots and looks fine but was never actually wired up correctly for TMA to use."
+          "description": "A virtual device has separate configuration, boot, discovery and automation checks. Seeing its screen does not prove that the Agent can create a session or launch the test application."
         },
         {
           "type": "note",
-          "text": "Official course description: this interactive course equips you to automate mobile testing using Tricentis Tosca. It starts with setting up an Android Virtual Device (AVD) in Android Studio to establish a solid mobile testing environment, then covers creating and running tests for native, hybrid, and web applications, and troubleshooting common mobile automation issues."
+          "text": "This is an independent local setup guide based on accessible product documentation. The original Academy recording and its exact exercise sequence were not available for comparison."
         }
       ],
       "bulletPoints": [
@@ -36,26 +36,26 @@
           "type": "steps",
           "title": "AVD Manager walkthrough",
           "items": [
-            "Open Android Studio → More Actions (or Tools menu) → Virtual Device Manager.",
+            "Open Android Studio’s Device Manager using the menu available in the installed version.",
             "Click Create Virtual Device, then pick a device definition — a specific phone profile (screen size, density, hardware buttons) such as Pixel 7 or Pixel 8.",
-            "Pick a system image: a specific Android version (API level) and ABI (x86_64 for Intel/AMD hosts, arm64-v8a for Apple Silicon). Download the image if it isn't installed yet.",
-            "Name the AVD something identifiable (avoid the generic default name if managing several AVDs — a clear name matters once DeviceName TCPs start referencing specific device profiles).",
+            "Select a supported API level and compatible system-image architecture, downloading the image if needed.",
+            "Review the AVD configuration and use an identifiable profile name. Keep the profile name distinct from its runtime adb serial.",
             "Finish the wizard, then launch the AVD from the Device Manager and wait for a full boot to the home screen — not just the boot animation completing."
           ]
         },
         {
           "type": "concept",
           "term": "Picking the system image on purpose",
-          "description": "The API level chosen here determines which Android behaviours the AVD exhibits — permission dialog styles, Developer Mode specifics, security defaults. Matching the system image to whatever real-world Android version the app under test actually targets (or needs to be verified against) avoids automating against a device that behaves differently from production."
+          "description": "Choose an image that supports the application’s minimum SDK and required libraries, the intended coverage target and the Agent’s supported OS range. An emulator image is not evidence of identical physical-device behavior."
         },
         {
           "type": "note",
-          "text": "ABI mismatches are a common source of a slow or crashing emulator: an x86_64 image on Apple Silicon (or vice versa) runs, technically, through translation — but noticeably slower, and occasionally with subtle rendering glitches. Match the system image's ABI to the host CPU architecture."
+          "text": "Google documents matching image/host architecture for VM acceleration: x86/x86_64 on x86_64 hosts and arm64-v8a on ARM64 hosts. Do not assume an incompatible image will launch successfully through translation or infer rendering glitches from architecture alone."
         }
       ],
       "bulletPoints": [
         "Device definition = hardware profile. System image = Android version + ABI. Both are deliberate choices, not defaults to click through.",
-        "Match system image ABI to host CPU (arm64-v8a on Apple Silicon, x86_64 on Intel/AMD) for a responsive emulator."
+        "Check supported host/image combinations and VM acceleration rather than promising fallback translation."
       ],
       "sectionId": "section-568ebee4893d"
     },
@@ -66,26 +66,26 @@
           "type": "steps",
           "title": "From booted AVD to TMA-ready device",
           "items": [
-            "With the AVD fully booted, start TMA on the same machine (tray/Start Menu for local use).",
-            "Open the TMA console (http://localhost:8585 by default) and check the Device Management view.",
+            "Run the Android emulator and Agent on the same supported host for the documented TMA setup.",
+            "Open the configured Agent web interface and inspect Device management; do not assume the Appium port is also every REST/UI endpoint.",
             "Confirm the AVD appears in the device list with status Ready — not Offline, not absent entirely.",
-            "Note its identifier: Android emulators are exposed to TMA in the emulator-#### form (e.g. emulator-5554), derived from the emulator's own ADB console port, not a name you choose."
+            "Inspect the runtime adb serial and the target value required by the selected Tosca connection. For adb, emulator-5554 corresponds to console port 5554, while its paired adb port is normally 5555."
           ]
         },
         {
           "type": "warning",
-          "text": "An AVD that's visibly running in the Android Studio emulator window does not guarantee TMA sees it. If it's missing from the TMA console's device list, the emulator process may have started after TMA, or TMA may need a restart to re-scan — check the device list again after both are confirmed running, in that order (AVD first, TMA started or refreshed after)."
+          "text": "If the Agent does not detect the emulator, inspect adb detection, supported versions and Agent logs. A required universal AVD-before-Agent startup order is not established by these guides."
         },
         {
           "type": "concept",
           "term": "Wiring DeviceName to the AVD",
-          "description": "Once the AVD shows Ready with its emulator-#### identifier, that exact string is what goes into the DeviceName TCP for a static, pinned connection to this specific AVD instance. The identifier is tied to the running emulator process — if the AVD is closed and relaunched, it is not guaranteed to receive the same port/identifier."
+          "description": "Tosca’s device table specifies the displayed full emulator name for an Android emulator; other connection cases use reported device IDs. Use the value required by the actual connection and verify it with a minimal test. Do not interchange the AVD profile name and adb serial blindly."
         }
       ],
       "bulletPoints": [
-        "AVD identifier for TMA = emulator-#### (from the AVD's own ADB port), not a name you assign.",
-        "Start order matters when troubleshooting a missing device: confirm the AVD is booted, then confirm TMA sees it — restart/refresh TMA if it doesn't.",
-        "The emulator-#### identifier isn't guaranteed stable across relaunches of the same AVD."
+        "Distinguish AVD profile name, displayed target name and runtime adb serial.",
+        "Verify boot, Agent detection and session/application opening separately.",
+        "Console and adb ports are distinct; re-check the runtime target after relaunch."
       ],
       "sectionId": "section-4743ee12f1fc"
     }
@@ -94,17 +94,17 @@
     {
       "title": "Assuming a booted emulator is automatically TMA-ready",
       "trapDescription": "Seeing the AVD's home screen rendered in Android Studio and moving straight to Tosca without checking the TMA console.",
-      "bestPractice": "Confirm the AVD shows Ready in the TMA Device Management console before touching Tosca — a visually booted emulator and a TMA-visible device are two separate things to verify."
+      "bestPractice": "Check Agent detection and then a minimal session/application launch. A visible or Ready device does not isolate every possible failure."
     },
     {
       "title": "Mismatching system image ABI to host CPU",
       "trapDescription": "Picking an x86_64 system image on an Apple Silicon Mac (or arm64-v8a on an Intel/AMD machine) and blaming Tosca or TMA for a sluggish, unstable emulator.",
-      "bestPractice": "Match the AVD's system image ABI to the host machine's CPU architecture — a mismatched ABI runs through translation, which is slow and occasionally visually glitchy, independent of anything Tosca-related."
+      "bestPractice": "Use the documented compatible host/image architecture for VM acceleration. An architecture mismatch does not prove a particular slow-translation or rendering symptom."
     },
     {
       "title": "Assuming the emulator-#### identifier is permanent",
       "trapDescription": "Hardcoding a DeviceName TCP to emulator-5554 and being surprised when, after relaunching the AVD, TMA reports a different or missing device.",
-      "bestPractice": "Re-check the identifier in the TMA console after relaunching an AVD rather than assuming it's stable — it derives from the emulator's ADB port at that specific launch, not from the AVD's name."
+      "bestPractice": "Inspect the runtime serial and the connection-specific Tosca target value after relaunch. Console and adb ports differ; a profile name is not an adb serial."
     }
   ],
   "practiceQuiz": [
@@ -134,12 +134,20 @@
         "A"
       ],
       "hint": "A visually booted emulator and a TMA-visible device are two separate checks.",
-      "rationale": "A booted AVD does not guarantee TMA sees it. Confirming Ready status in the TMA console isolates whether the problem is the AVD/TMA pairing before looking anywhere else."
+      "rationale": "Checking Agent detection is a useful first investigation among these choices. It does not itself prove session health or isolate all configuration, driver and app failures.",
+      "optionExplanations": {
+        "A": "Agent detection should be verified separately from visual boot.",
+        "B": "The symptom does not establish storage as the first cause.",
+        "C": "Reinstallation is not justified before examining the connection.",
+        "D": "A full host reboot is not yet justified by the evidence."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-4743ee12f1fc"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "What determines an Android emulator's identifier as seen by TMA (e.g. emulator-5554)?",
+      "scenario": "For the adb serial emulator-5554, which port does 5554 identify in the documented console/adb pair?",
       "options": [
         {
           "id": "A",
@@ -147,7 +155,7 @@
         },
         {
           "id": "B",
-          "text": "The emulator's own ADB console port at that launch."
+          "text": "The emulator console port; the paired adb port is normally 5555."
         },
         {
           "id": "C",
@@ -161,58 +169,74 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "It's a port-derived identifier, not something you typed in.",
-      "rationale": "The emulator-#### identifier comes from the running emulator's own ADB console port, not from the AVD's chosen name, API level, or resolution — and it isn't guaranteed to stay the same across relaunches."
+      "hint": "Console and adb use different ports.",
+      "rationale": "The documented default pair uses console 5554 and adb 5555. The runtime serial is not the AVD profile name, API level or screen resolution.",
+      "optionExplanations": {
+        "A": "The profile name is separate from the runtime serial.",
+        "B": "This identifies the console side of the documented port pair.",
+        "C": "API level does not define this runtime port number.",
+        "D": "Resolution does not define this port number."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-4743ee12f1fc"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "On an Apple Silicon Mac, an AVD created with an x86_64 system image runs sluggishly with occasional rendering glitches. What is the most likely cause?",
+      "scenario": "Which image architecture matches an ARM64 host in Google’s documented VM-acceleration requirements?",
       "options": [
         {
           "id": "A",
-          "text": "TMA is running an outdated version."
+          "text": "Any architecture, because translation always works"
         },
         {
           "id": "B",
-          "text": "The system image's ABI doesn't match the host CPU architecture, so it runs through translation."
+          "text": "arm64-v8a, with the other acceleration prerequisites met"
         },
         {
           "id": "C",
-          "text": "The device definition chosen has too high a screen resolution."
+          "text": "The screen-resolution value determines the CPU architecture"
         },
         {
           "id": "D",
-          "text": "Tosca Commander is configured for Remote instead of Local."
+          "text": "Tosca Remote mode changes the host CPU architecture"
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Match the system image's architecture to the host machine's own chip.",
-      "rationale": "x86_64 images run through translation on Apple Silicon (arm64), which is measurably slower and can show rendering glitches — independent of Tosca or TMA. Picking an arm64-v8a image on Apple Silicon avoids this."
+      "hint": "Follow the host/image support table.",
+      "rationale": "The ARM64 row specifies arm64-v8a images. Other host and hypervisor requirements still apply; mismatched images are not guaranteed to run through translation.",
+      "optionExplanations": {
+        "A": "Universal translation support is not documented.",
+        "B": "This matches the ARM64 system-image requirement.",
+        "C": "Screen dimensions do not select the CPU architecture.",
+        "D": "Connection topology does not change CPU architecture."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-568ebee4893d"
     }
   ],
   "quickRecap": [
     {
       "key": "AVD creation",
-      "value": "Android Studio → Virtual Device Manager → device definition + system image (API level + ABI), named deliberately."
+      "value": "Choose a hardware profile and compatible image, then review and launch the AVD."
     },
     {
       "key": "ABI matching",
-      "value": "arm64-v8a on Apple Silicon, x86_64 on Intel/AMD — mismatches run through slow translation."
+      "value": "Use supported host/image combinations and verify VM acceleration prerequisites."
     },
     {
       "key": "TMA integration check",
-      "value": "AVD booted → start/refresh TMA → confirm Ready status in TMA console's device list, in that order."
+      "value": "Verify boot, Agent discovery and minimal session/app opening as separate checks."
     },
     {
       "key": "AVD identifier",
-      "value": "emulator-#### — derived from the ADB console port at launch, not chosen, not guaranteed stable across relaunches."
+      "value": "adb serial emulator-5554 corresponds to console 5554; paired adb is normally 5555."
     },
     {
       "key": "DeviceName wiring",
-      "value": "Use the exact emulator-#### string shown Ready in the TMA console as the static DeviceName value."
+      "value": "Use the connection-specific Tosca target value; profile names and adb serials are distinct."
     }
   ],
   "topics": [
@@ -222,9 +246,11 @@
       "duration": "video"
     },
     {
-      "title": "Get started with mobile test automation (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "title": "AVD setup (Android documentation)",
+      "url": "https://developer.android.com/studio/run/managing-avds",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "TMA 2025.4 / Tosca 2026.1 LTS; Android documentation checked 2026-10-06"
 }

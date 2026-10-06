@@ -1225,3 +1225,21 @@ test('advanced mobile review corrects hardware buttons, virtual biometrics and A
  assert.match(d.practiceQuiz[3].options[1].text,/reservation release.*separately/);
  assert.doesNotMatch(JSON.stringify(d),/api\/devices|almost always|very often|more forgiving|only then network|re-sign with apksigner/);
 });
+
+test('AVD review separates profile names, runtime ports and session-readiness evidence',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m09_avd_setup_tma_integration.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[1].options[1].text,/console port.*adb port.*5555/);
+ assert.match(d.studyGuide[2].elements[2].description,/displayed full emulator name.*Do not interchange/);
+ assert.match(d.studyGuide[1].elements[2].text,/Do not assume.*translation/);
+ assert.doesNotMatch(JSON.stringify(d),/Official course description|surprising share|runs, technically, through translation|isolates whether the problem is|in that order/);
+});
+
+test('mobile app-type review distinguishes opening and engine paths from shared modeling concepts',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m10_testing_native_hybrid_web.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A','B','D'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/websites use OpenUrl.*Buffer stores data.*Verify/);
+ assert.match(d.studyGuide[3].elements[0].description,/Mobile Web Engine 3.0/);
+ assert.match(d.studyGuide[2].elements[2].text,/one-time Verify.*not a substitute for waiting/);
+ assert.doesNotMatch(JSON.stringify(d),/every mobile TestCase starts|Open Mobile App first|most predictable|timing matters more|engine isn't separate|native and web TestCases never/);
+});

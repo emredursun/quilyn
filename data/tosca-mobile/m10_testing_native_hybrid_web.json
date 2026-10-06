@@ -17,17 +17,17 @@
         {
           "type": "concept",
           "term": "What stays the same across all three",
-          "description": "Regardless of app type, every mobile TestCase starts with Open Mobile App, steers scanned Modules with the same TestStepValue/ActionMode mechanics as any other Tosca TestCase, and verifies outcomes with the same Buffer/Verify actions. The Getting Started course covered this shape once (Lesson 7); this part is about applying it three times, deliberately, against each app type's specific quirks."
+          "description": "Native, hybrid and mobile web tests share Tosca’s Module/TestStepValue and supported ActionMode concepts. Opening differs: native/hybrid apps use Open Mobile App after any required capability setup; websites use OpenUrl. Buffer stores data; Verify performs assertions."
         },
         {
           "type": "concept",
           "term": "What actually changes",
-          "description": "Native: control identification relies purely on platform accessibility properties. Hybrid: the TestCase must explicitly manage native/webview context switches mid-flow. Web: steering happens inside the device browser's DOM, closer to an XBrowser TestCase in spirit but running through the Mobile Engine."
+          "description": "Native controls use exposed platform properties. Hybrid flows combine native and web content with the appropriate context. Mobile web scanning/execution defaults to Mobile Web Engine 3.0, with version-specific legacy alternatives; it is not one identical engine path for every app type."
         }
       ],
       "bulletPoints": [
-        "Open Mobile App, ActionModes, Buffer/Verify — identical across native, hybrid, and web.",
-        "Context management (webview switching) and DOM-vs-native identification are what actually differs."
+        "Share modeling concepts while configuring opening, engine and context for each application type.",
+        "Buffering alone is not verification."
       ],
       "sectionId": "section-0016ff03aa39"
     },
@@ -38,19 +38,19 @@
           "type": "steps",
           "title": "End-to-end native flow",
           "items": [
-            "Open Mobile App (first TestStep, app installed or already present).",
+            "Configure required capabilities, then Open Mobile App with the installed-app identifiers or target-compatible installation build.",
             "Steer each screen's scanned controls in sequence — taps, text entry via Send Text Input To Focused Control, list scrolling via Swipe On Screen where no scrollable control was captured directly.",
             "Insert Verify TestSteps at meaningful checkpoints (a confirmation screen appearing, a field showing an expected value) rather than only at the very end.",
-            "Close out with an explicit End Appium Session if the device is shared with other TestCases or teammates."
+            "End the current Appium session when finished and check any provider-specific reservation cleanup separately."
           ]
         },
         {
           "type": "note",
-          "text": "Native is the most predictable of the three to author against, precisely because control identification and steering match what was covered in the Getting Started course's Mobile Scan and TestCase lessons directly — this part is mostly about applying that discipline consistently across a longer, realistic flow rather than a single toy TestStep."
+          "text": "Treat this sequence as independent local authoring guidance. Reliability depends on the application, identifiers, synchronization and assertions rather than an assumed reliability ranking between application types."
         }
       ],
       "bulletPoints": [
-        "Verify at multiple checkpoints along the flow, not only at the end — isolates exactly where a regression breaks the flow."
+        "Use meaningful assertions at checkpoints to narrow the failing operation; this does not guarantee a single root cause."
       ],
       "sectionId": "section-1452d9bfd06d"
     },
@@ -60,20 +60,20 @@
         {
           "type": "concept",
           "term": "Context switches belong in the TestCase, not just the scan",
-          "description": "A hybrid TestCase needs the same native/webview context switching used during scanning to also happen during execution, at the right points in the TestStep sequence — steer the native shell's tab bar, switch to webview context to steer the embedded content, switch back to native context to steer whatever surrounds it next."
+          "description": "Use Get Appium Context and Set Appium Context when the execution flow needs native/web context changes. Confirm the actual current and target contexts rather than assuming each scanned control automatically switches execution context."
         },
         {
           "type": "warning",
-          "text": "A hybrid TestCase authored entirely in whatever context the scan happened to be in when each control was captured will silently fail on controls captured in the 'wrong' context relative to where the TestCase actually needs to be at that point in the flow. Explicit context-switch TestSteps at each transition avoid this."
+          "text": "A context mismatch can prevent correct steering. Inspect the active context and errors before diagnosing the failure; neither a captured context nor an explicit switch guarantees every control operation succeeds."
         },
         {
           "type": "note",
-          "text": "Timing matters more in hybrid than native: the embedded webview can take noticeably longer to finish loading than the native shell around it. A control steered before the webview has finished rendering behaves like a control that doesn't exist yet — build in a wait or a Verify-for-presence step before steering into freshly-loaded webview content."
+          "text": "Synchronize against observable readiness such as an enabled target before interacting with newly loaded content. WaitOn can wait for a property condition; a one-time Verify or buffering operation alone is not a substitute for waiting."
         }
       ],
       "bulletPoints": [
-        "Context switches (native ↔ webview) need to be explicit TestSteps at the right points, not assumed.",
-        "Webview content can load slower than native chrome — verify presence before steering into it."
+        "Confirm and change contexts where the flow requires it.",
+        "Wait for a meaningful readiness condition before interacting."
       ],
       "sectionId": "section-c9b88700926a"
     },
@@ -83,7 +83,7 @@
         {
           "type": "concept",
           "term": "DOM steering through the Mobile Engine",
-          "description": "Once scanned through the device's own browser, a mobile web TestCase steers controls the way a DOM-based Module normally would — but every interaction still runs through the same device session and Mobile Engine plumbing as a native or hybrid TestCase, not a separate execution path."
+          "description": "Use OpenUrl and the relevant Browser TCP for a mobile website. Tosca 2026.1 defaults mobile web scanning/execution to Mobile Web Engine 3.0; native and embedded web content have their respective engine/context behavior."
         },
         {
           "type": "list",
@@ -96,8 +96,8 @@
         }
       ],
       "bulletPoints": [
-        "Mobile web TestCases run through the same Mobile Engine session as native/hybrid — not a separate desktop-style execution path.",
-        "Controls must be captured and steered at actual mobile viewport width — hover-dependent desktop assumptions don't carry over."
+        "Use the documented mobile-web opening and engine path.",
+        "Validate responsive layout and interactions on the actual chosen target."
       ],
       "sectionId": "section-c6e41edfb4cf"
     }
@@ -106,12 +106,12 @@
     {
       "title": "Assuming a hybrid TestCase inherits the right context automatically",
       "trapDescription": "Steering a webview-captured control right after a native-context TestStep without an explicit context switch in between.",
-      "bestPractice": "Insert explicit context-switch TestSteps at every native↔webview transition in the flow — the TestCase's execution context does not follow the control's original capture context automatically."
+      "bestPractice": "Confirm the current Appium context and switch to the required target context when the flow needs it. Inspect errors instead of assuming captured controls automatically select the correct context."
     },
     {
       "title": "Steering into a webview before it's finished loading",
       "trapDescription": "A hybrid TestCase intermittently fails on the first control inside freshly-navigated webview content, while later controls in the same webview work fine.",
-      "bestPractice": "Verify for the target control's presence (or build in an appropriate wait) before steering into webview content that just finished navigating — embedded webviews can lag behind the native shell's own load time."
+      "bestPractice": "Use an appropriate readiness wait such as WaitOn for the required property before interaction; a single Verify is an assertion rather than a universal wait."
     },
     {
       "title": "Treating mobile web like a resized desktop XBrowser TestCase",
@@ -123,11 +123,11 @@
     {
       "questionId": "Q1",
       "type": "multi-select",
-      "scenario": "Which parts of the mobile TestCase workflow stay identical across native, hybrid, and web apps? (three correct answers)",
+      "scenario": "Which three general authoring principles apply across native, hybrid and mobile web tests? (three correct answers)",
       "options": [
         {
           "id": "A",
-          "text": "Open Mobile App as the mandatory first TestStep"
+          "text": "Configure the appropriate opening and connection workflow for the target"
         },
         {
           "id": "B",
@@ -139,7 +139,7 @@
         },
         {
           "id": "D",
-          "text": "Buffer/Verify actions for checking outcomes"
+          "text": "Use supported Verify assertions to check outcomes"
         }
       ],
       "correctOptions": [
@@ -148,12 +148,20 @@
         "D"
       ],
       "hint": "One of the four options is specific to only one of the three app types.",
-      "rationale": "Open Mobile App, TestStepValue/ActionMode mechanics, and Buffer/Verify are identical across all three app types. Native/webview context switching is specific to hybrid apps — native and web TestCases never need it."
+      "rationale": "Each target needs suitable opening/connection setup, Module steering and assertions. Opening steps and engine paths differ; hybrid context changes are not a universal requirement. Buffering alone does not assert an outcome.",
+      "optionExplanations": {
+        "A": "Each target needs appropriate opening/connection setup; the exact steps differ.",
+        "B": "The common Tosca model uses TestStepValues and supported ActionModes.",
+        "C": "Native/web context switching is relevant to mixed-context flows, not all tests.",
+        "D": "Verify assertions check outcomes; Buffer alone stores values."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-0016ff03aa39"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A hybrid TestCase intermittently fails to steer the first control inside a webview right after it navigates, but works fine on subsequent controls in the same webview. What is the most likely cause?",
+      "scenario": "Logs show a hybrid webview target is not yet enabled when the first interaction executes. Which issue should the team address?",
       "options": [
         {
           "id": "A",
@@ -161,7 +169,7 @@
         },
         {
           "id": "B",
-          "text": "The webview hadn't finished loading yet when the TestStep ran — it lags behind the native shell's own load time."
+          "text": "Synchronize with the target’s readiness before interaction."
         },
         {
           "id": "C",
@@ -175,8 +183,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Timing, not identification, is usually the culprit for a flaky first interaction after navigation.",
-      "rationale": "Embedded webviews can take noticeably longer to finish rendering than the native shell around them. Steering into content before it's actually ready behaves like steering a control that doesn't exist yet — a wait or presence-verify before the first interaction avoids this."
+      "hint": "The logs establish a readiness condition, not merely an unexplained intermittent failure.",
+      "rationale": "The observed readiness issue calls for a suitable property wait before interaction. It does not prove all hybrid failures are timing defects or that webviews always load more slowly than native screens.",
+      "optionExplanations": {
+        "A": "The logs establish readiness, not scanning a different application.",
+        "B": "A readiness wait addresses the observed enabled-state issue.",
+        "C": "Hybrid automation is supported.",
+        "D": "Storage is not the readiness cause established by these logs."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-c9b88700926a"
     },
     {
       "questionId": "Q3",
@@ -193,7 +209,7 @@
         },
         {
           "id": "C",
-          "text": "Mobile web TestCases run through a completely separate engine from native/hybrid ones."
+          "text": "Native and mobile web always use identical opening Modules and engine paths"
         },
         {
           "id": "D",
@@ -204,25 +220,33 @@
         "B"
       ],
       "hint": "Think about responsive layout behaviour, not engine architecture.",
-      "rationale": "A responsive site reflows its layout at mobile widths, which can change which controls exist or where they sit. Mobile web TestCases still run through the same Mobile Engine session as native/hybrid — the engine isn't separate, but the layout genuinely is."
+      "rationale": "Responsive layouts can differ in controls and positions. Validate the mobile target; native app opening and mobile website opening/engine paths are not identical.",
+      "optionExplanations": {
+        "A": "XBrowser can capture web controls.",
+        "B": "Responsive layouts can change available controls and positions.",
+        "C": "Opening and engine paths differ by application type.",
+        "D": "Universal desktop speed is not established or relevant."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-c6e41edfb4cf"
     }
   ],
   "quickRecap": [
     {
       "key": "Shared across all three",
-      "value": "Open Mobile App first · TestStepValue/ActionMode steering · Buffer/Verify for outcomes."
+      "value": "Common Module/ActionMode concepts; application opening and engine paths differ."
     },
     {
       "key": "Native-specific",
-      "value": "Predictable identification via platform accessibility properties — apply the discipline consistently across a full flow."
+      "value": "Inspect actual native identifiers and validate synchronization and assertions."
     },
     {
       "key": "Hybrid-specific",
-      "value": "Explicit native↔webview context switches at each transition; webview content can lag behind native shell load time."
+      "value": "Confirm active/target contexts and wait for observable content readiness."
     },
     {
       "key": "Web-specific",
-      "value": "DOM steering through the Mobile Engine — capture at real mobile viewport, touch interaction patterns, not resized desktop assumptions."
+      "value": "Use OpenUrl, the platform Browser TCP and the documented mobile-web engine."
     }
   ],
   "topics": [
@@ -232,9 +256,11 @@
       "duration": "video"
     },
     {
-      "title": "Mobile Engine 3.0 (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
+      "title": "Mobile Engine 3.0 (Tosca 2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Tosca 2026.1 LTS"
 }
