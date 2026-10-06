@@ -1054,3 +1054,13 @@ test('AE1 PDF review distinguishes anchor defaults, relative offsets and explici
  assert.match(d.studyGuide[3].elements[0].description,/does not support OCR/);
  assert.doesNotMatch(JSON.stringify(d),/TBox XEngines|lower it via OCR settings|a shifted layout no longer breaks/);
 });
+
+test('AE1 mail review scopes protocols and cloud prerequisites instead of promising account bypasses',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m04_mail_engine.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.equal(d.practiceQuiz[1].options[1].text,'POP3 or IMAP');
+ assert.match(d.studyGuide[1].elements[1].description,/token-acquisition failure/);
+ assert.match(d.studyGuide[1].elements[2].description,/Client Secret.*Graph/);
+ assert.match(d.studyGuide[2].elements[2].items[1],/does not guarantee availability/);
+ assert.doesNotMatch(JSON.stringify(d),/TBox XEngines|personal mailbox.*avoids this entirely|Authentication Type off 'Direct'|whichever step ran last/);
+});
