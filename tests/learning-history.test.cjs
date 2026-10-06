@@ -973,3 +973,14 @@ test('AS2 recap distinguishes generated negative paths, Character and bounded st
  assert.match(d.practiceQuiz[9].options[0].text,/rescan only when needed/);
  assert.doesNotMatch(JSON.stringify(d),/discount must verify as a negative number|must be typed manually, not drag-and-dropped|usually indicates an unstable module/);
 });
+
+test('AS2 independent capstone qualifies catalogue assumptions and does not invent original guide UI',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ const docs=['m09_grand_scenario.json','m10_original_guides.json'].map(file=>{const bytes=fs.readFileSync('data/tosca-as2/'+file),d=JSON.parse(bytes);assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));return d;});
+ const d=docs[0],ids=new Set(d.studyGuide.map(s=>s.sectionId));d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D'],['B'],['B'],['B'],['D'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[0].scenario,/hypothetical price table/);
+ assert.match(d.practiceQuiz[1].options[1].text,/Verify the expected rejection/);
+ assert.match(d.practiceQuiz[5].options[0].text,/actual Module inventory/);
+ assert.match(docs[1].studyGuide[0].elements[0].text,/no embedded PDF viewer/);
+ assert.doesNotMatch(JSON.stringify(docs[1].learningObjectives),/Click either|Download either/);
+});
