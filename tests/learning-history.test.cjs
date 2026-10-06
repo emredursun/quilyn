@@ -1359,3 +1359,13 @@ test('Testim advanced editing review separates pre-run precedence, extraction ma
  assert.match(d.studyGuide[3].elements[1].description,/not-visible waiting is web-only/);
  assert.doesNotMatch(JSON.stringify(d),/Parameters always take precedence|event[s]? at all|Whichever platform.*actually runs/);
 });
+
+test('Testim execution review distinguishes timeout units, quota scope, graph semantics and secret masking',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m05_optimizing_test_execution.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['A'],['A'],['C'],['A'],['A'],['D']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[1].description,/not automatic encryption.*Static JSON.*JavaScript.*password-type/);
+ assert.match(d.studyGuide[2].elements[0].description,/CLI.*milliseconds.*Scheduler.*seconds.*temporarily/);
+ assert.match(d.studyGuide[3].elements[1].description,/graph plots execution count.*not duration/);
+ assert.match(d.practiceQuiz[7].options[3].text,/locally from the editor/);
+ assert.doesNotMatch(JSON.stringify(d),/next test case.*fails to run|main mechanism for keeping sensitive|runs directly from the editor are.*excluded|every.*nothing remembered/);
+});
