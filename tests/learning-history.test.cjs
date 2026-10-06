@@ -984,3 +984,12 @@ test('AS2 independent capstone qualifies catalogue assumptions and does not inve
  assert.match(docs[1].studyGuide[0].elements[0].text,/no embedded PDF viewer/);
  assert.doesNotMatch(JSON.stringify(docs[1].learningObjectives),/Click either|Download either/);
 });
+
+test('AS2 API review scopes message patterns, TCPs and composed source values',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as2/m08_create_api_testcases.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['D'],['C'],['C'],['A'],['B'],['A'],['A'],['B'],['C'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[1].scenario,/synchronous/);
+ assert.match(d.practiceQuiz[4].options[0].text,/scoped.*inheritance or overrides/);
+ assert.match(d.practiceQuiz[7].options[0].text,/retaining intentional composition/);
+ assert.doesNotMatch(JSON.stringify(d),/every Message.*PAIR|reusable, project-wide|No partial credit|SKU isn't visible on the UI/);
+});
