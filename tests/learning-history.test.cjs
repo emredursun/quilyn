@@ -1583,3 +1583,9 @@ test('PBA View review scopes read-only display and corrects promoted action prec
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[3,16,17].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.practiceQuiz[2].rationale,/Stage-wide.*Case-wide.*Processes cannot/);assert.match(d.studyGuide[1].elements[2].description,/editable and read-only.*configured actions/);assert.match(d.practiceQuiz[4].rationale,/authorization still matter/);assert.doesNotMatch(JSON.stringify(d),/Cosmos React|non-preferred, View-specific field/);
 });
+
+test('PBA assigning work review separates Get Next Work and SLA scopes from guarantees and default reject assumptions',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/business-architect/m11_assigning_completing_work.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.type==='multi-select'?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.equal(d.practiceQuiz[5].options[0].text,'Configured Get Next Work selection');assert.match(d.practiceQuiz[10].rationale,/resolve, continue or change Stage/);assert.match(d.studyGuide[3].elements[2].description,/At 100.*notifications/);assert.match(d.studyGuide[3].bulletPoints[2],/Initial Case urgency.*App Studio/);assert.match(d.learningObjectives[3],/without guaranteeing timely completion/);assert.doesNotMatch(JSON.stringify(d),/always distinct outcomes that lead to different paths/);
+});

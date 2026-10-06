@@ -7,7 +7,7 @@
     "Describe the business value of Pega's workflow automation features associated with routing and approvals.",
     "Explain the importance of work groups in improving process efficiency.",
     "Differentiate between the goal and deadline intervals relative to Service-Level Agreements.",
-    "Explain how Case Urgency functions in guaranteeing timely work completion."
+    "Explain how urgency supports prioritization without guaranteeing timely completion."
   ],
   "estTime": "60 min",
   "studyGuide": [
@@ -17,7 +17,7 @@
         {
           "type": "concept",
           "term": "Assignment routing",
-          "description": "Routing sends each Assignment to the best-available user so work reaches the right person/team at the right time. It orchestrates workflow across functional teams and improves operational efficiency and customer experience."
+          "description": "Routing assigns responsibility to configured users or queues using explicit destinations or conditions. Get Next Work separately selects suitable work using urgency, availability and skills; not every routing setting automatically computes the best available agent."
         },
         {
           "type": "concept",
@@ -31,7 +31,7 @@
         {
           "type": "concept",
           "term": "Routing options",
-          "description": "In App Studio an Assignment Step can route to the current user, a specific named user, or a Work Queue. Routing decisions depend on whether work is personal or shared across a team."
+          "description": "App Studio supports current user, specific user, Work Queue and business-logic routing. Business conditions can choose different user/queue destinations; Get Next Work selection also evaluates urgency, availability and skills."
         },
         {
           "type": "analogy",
@@ -40,7 +40,7 @@
       ],
       "bulletPoints": [
         "Route to a specific user (Worklist) when one person must own the task; route to a Work Queue when any qualified team member can handle it.",
-        "Business-logic routing (e.g., by skill) targets the best-available user."
+        "Distinguish conditional destinations from Get Next Work’s selection of suitable next work."
       ],
       "sectionId": "section-f1042d638849"
     },
@@ -50,7 +50,7 @@
         {
           "type": "concept",
           "term": "Work Group",
-          "description": "A Work Group associates a set of users and Work Queues under a manager, organizing who collaborates on work. Cross-functional Work Groups bring members from different teams together to complete work that spans functions, improving process efficiency."
+          "description": "The sourced Team model describes a primary manager, a shared Work Queue and multiple users, potentially across departments. A user can belong to multiple Work Groups. Authorized managers may transfer work but cannot perform approvals; those outside the group cannot complete its queue tasks."
         },
         {
           "type": "analogy",
@@ -69,7 +69,7 @@
         {
           "type": "concept",
           "term": "Approval Step",
-          "description": "An approval routes a Case to a user to approve or reject; the outcome determines the path (approved continues the primary path; rejected branches to rework or rejection handling). Approvals are a key OOTB workflow-automation feature."
+          "description": "An Approve/Reject Step routes to a configured user, queue or business condition and applies configured outcome behavior. Approval may continue/change Stage; rejection may resolve, continue or change Stage. Default rejection is Resolved-Rejected, not necessarily rework."
         },
         {
           "type": "concept",
@@ -87,7 +87,7 @@
       ],
       "bulletPoints": [
         "Cascading approvals can be driven by a reporting structure or an authority matrix (condition-based levels).",
-        "Approve/reject outcomes route the Case down different paths."
+        "Configure outcome behavior; approve and reject do not necessarily take different paths."
       ],
       "sectionId": "section-ec034db8cefd"
     },
@@ -97,7 +97,7 @@
         {
           "type": "concept",
           "term": "Service-Level Agreement (SLA)",
-          "description": "An SLA defines time targets for completing an Assignment or Case. App Studio exposes a GOAL interval and a DEADLINE interval (Dev Studio adds advanced options). In Dev Studio terms, a goal/deadline IS the Service-Level Agreement rule."
+          "description": "An SLA defines timing, urgency adjustments, notifications and configured escalations for Case/Stage/Process/Step. Goal and Deadline are measured from the start; repeatable Passed Deadline intervals are measured from the Deadline and configured in Dev Studio."
         },
         {
           "type": "concept",
@@ -111,17 +111,17 @@
         {
           "type": "concept",
           "term": "Case Urgency",
-          "description": "A numeric priority value that ensures work is completed on time. Urgency starts at an initial value and increases automatically as the SLA's Goal and Deadline thresholds pass."
+          "description": "Case and Assignment urgency are distinct priorities from 0 to 100. Positive configured increments can raise the relevant urgency at SLA milestones, but do not guarantee completion. At 100 further increments are ignored while configured notifications/escalations still run."
         },
         {
           "type": "analogy",
-          "text": "Goal vs. deadline is a 'please reply by Friday' (goal) versus 'absolutely no later than Monday' (deadline). Urgency is the volume knob — it gets louder at the goal and louder still at the deadline so the task can't be ignored."
+          "text": "Think of urgency as priority rather than automatic completion: attention and escalation still require the configured workflow and available capacity."
         }
       ],
       "bulletPoints": [
-        "Goal = should-finish-by (earlier); Deadline = must-finish-by (later); passing them escalates urgency.",
-        "Higher Urgency = higher priority, so overdue/at-risk work rises to the top of the list.",
-        "Advanced SLA behavior (initial urgency, business-day handling, extra escalations) is configured by SAs in Dev Studio."
+        "Goal is the desired target; Deadline marks lateness. Both are measured from SLA start.",
+        "Urgency affects priority; configured increments stop at 100 without suppressing notifications.",
+        "Initial Case urgency is configurable in App Studio Settings > General; initial Assignment adjustments and Passed Deadline settings use Dev Studio."
       ],
       "sectionId": "section-e22945289109"
     }
@@ -135,12 +135,12 @@
     {
       "title": "Goal vs. Deadline direction",
       "trapDescription": "The classic trap: which is earlier. Goal is the EARLIER target (should); Deadline is the LATER limit (must).",
-      "bestPractice": "Goal interval < Deadline interval; urgency increases at each."
+      "bestPractice": "Goal is the desired target and Deadline marks lateness, both measured from the start. Increments occur only as configured."
     },
     {
       "title": "What Urgency does",
-      "trapDescription": "Urgency is a priority value that rises at goal and deadline — it doesn't move the Case by itself but raises its ranking.",
-      "bestPractice": "Higher urgency → higher position in Worklists, helping ensure on-time completion."
+      "trapDescription": "Configured positive urgency adjustments raise priority but do not automatically complete work.",
+      "bestPractice": "Priority supports timeliness but does not guarantee completion; notifications can still run at urgency 100."
     },
     {
       "title": "Single vs. cascading approval",
@@ -154,13 +154,13 @@
     },
     {
       "title": "Routing destination choice",
-      "trapDescription": "Scenarios test whether to route to a user or a queue, and whether to use business logic (skill-based).",
-      "bestPractice": "Specific owner → user; shared pool → Work Queue; best-available by skill/availability → business-logic routing."
+      "trapDescription": "Confusing conditional destination routing with Get Next Work selection by urgency, availability and skills.",
+      "bestPractice": "Use explicit/conditional destinations for routing and Get Next Work for urgency/skill/availability-based work selection."
     },
     {
       "title": "App Studio vs Dev Studio SLA scope",
       "trapDescription": "App Studio offers goal/deadline; advanced SLA options live in Dev Studio.",
-      "bestPractice": "BA sets goal/deadline in App Studio; SAs configure advanced escalations/business-day handling in Dev Studio (the SLA rule)."
+      "bestPractice": "Goal/Deadline and initial Case urgency are available in App Studio; initial Assignment adjustments and Passed Deadline configuration use Dev Studio."
     }
   ],
   "practiceQuiz": [
@@ -190,14 +190,14 @@
         "A"
       ],
       "hint": "A Work Queue is a shared pool where any qualified team member can pull and complete Assignments.",
-      "rationale": "A Work Queue is the shared queue any qualified team member can work. A Worklist is for a single specific user; the other options are not routing destinations.",
+      "rationale": "A shared queue fits eligible claims-team work. A named Worklist fixes ownership, an access role defines permissions, and the customer is not the required team destination.",
       "optionExplanations": {
         "A": "A shared queue allows eligible teammates to pull the work.",
         "B": "A named Worklist fixes ownership instead of allowing the shared pool.",
         "C": "The work belongs to the claims team rather than the customer.",
         "D": "A role describes permissions rather than hold an assignment."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f1042d638849"
     },
     {
@@ -233,7 +233,7 @@
         "C": "The scenario distinguishes two separate milestones.",
         "D": "A goal is not the mandatory cutoff that the deadline represents."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-e22945289109"
     },
     {
@@ -261,7 +261,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Urgency is a numeric value that increases over time to raise an Assignment's priority in Worklists.",
+      "hint": "Positive configured adjustments raise priority up to the urgency maximum.",
       "rationale": "Positive configured increments increase Assignment Urgency at the milestones, up to the maximum of 100. Assignment-level SLAs adjust Assignment Urgency; Case-level SLAs adjust Case Urgency. These are related but distinct priority values.",
       "optionExplanations": {
         "A": "Configured SLA increments raise the relevant work's priority.",
@@ -269,7 +269,7 @@
         "C": "Customer reassignment is not the meaning of urgency.",
         "D": "Ruleset locking is unrelated to work priority."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-e22945289109"
     },
     {
@@ -305,7 +305,7 @@
         "C": "A queue is a routing destination rather than an approval pattern.",
         "D": "Duplicate detection does not obtain the required approvals."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-ec034db8cefd"
     },
     {
@@ -334,24 +334,24 @@
         "A"
       ],
       "hint": "Routing to a named user places the Assignment directly on that operator's personal Worklist.",
-      "rationale": "Routing to a specific user places the Assignment on that user's personal Worklist. A Work Queue is a shared pool for teams; the other routing options (current user, Work Queue) are the only alternatives — not individual role names.",
+      "rationale": "The named operator’s Worklist fits exclusive ownership. Queue and business-logic routing are also valid alternatives for other requirements; a Stage is not the user destination.",
       "optionExplanations": {
         "A": "A Worklist gives the named operator assignment ownership.",
         "B": "A shared queue would allow eligible teammates to take it.",
         "C": "Organization-wide assignment does not give one operator ownership.",
         "D": "A lifecycle phase is not the operator's assignment destination."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f1042d638849"
     },
     {
       "questionId": "Q6",
       "type": "single-select",
-      "scenario": "An application needs Assignments routed to whichever qualified agent has the right skill and is available. Which routing approach fits?",
+      "scenario": "Which capability selects suitable next work using urgency, user availability and skills?",
       "options": [
         {
           "id": "A",
-          "text": "Route using business logic (e.g., skill/availability) to the best-available user"
+          "text": "Configured Get Next Work selection"
         },
         {
           "id": "B",
@@ -369,15 +369,15 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Skill-based routing assigns work to the best-available operator based on defined skills or attributes.",
-      "rationale": "Business-logic routing selects the best-available user by criteria such as skill and availability. Routing to the current user ignores skill matching; the others aren't valid.",
+      "hint": "Distinguish work selection from a fixed destination or conditional route.",
+      "rationale": "Get Next Work evaluates those factors when selecting the most suitable Assignment. Conditional routing can choose a destination but is not automatically the same algorithm.",
       "optionExplanations": {
-        "A": "Business routing can evaluate the eligibility and availability requirements.",
+        "A": "Get Next Work considers urgency, availability and skills for next-work selection.",
         "B": "The current user may lack the required skill or capacity.",
         "C": "The customer is not the qualified service agent described here.",
         "D": "Disabling routing cannot allocate work to the appropriate agent."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f1042d638849"
     },
     {
@@ -415,7 +415,7 @@
         "C": "Permission roles and work coordination serve different purposes.",
         "D": "A Work Group can coordinate multiple users."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-924b9656c5b7"
     },
     {
@@ -443,15 +443,15 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "The SLA Goal and Deadline thresholds trigger Urgency increases that escalate overdue Assignments.",
-      "rationale": "Urgency rises at the goal (2h) and again at the deadline (8h), pushing the work up the Worklist. The goal being shorter than the deadline is by design.",
+      "hint": "The stated positive increments apply at the goal and deadline, up to the limit.",
+      "rationale": "Configured positive Assignment increments apply at two and eight hours up to the urgency maximum. They support priority, not automatic completion or guaranteed order under all other routing constraints.",
       "optionExplanations": {
         "A": "Positive configured increments apply at the two SLA milestones.",
         "B": "A goal does not automatically resolve the case.",
         "C": "Both milestone settings still apply.",
         "D": "The configured intervals are two and eight hours, not twenty-four."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-e22945289109"
     },
     {
@@ -480,14 +480,14 @@
         "A"
       ],
       "hint": "Basic in App Studio; advanced in Dev Studio.",
-      "rationale": "BAs set the goal/deadline in App Studio; SAs configure advanced SLA behavior (initial urgency, business days, extra escalations) in Dev Studio on the SLA rule.",
+      "rationale": "Goal/Deadline are available in App Studio and Dev Studio. Advanced Passed Deadline settings and initial Assignment adjustments use Dev Studio; initial Case urgency is also configurable in App Studio.",
       "optionExplanations": {
         "A": "Basic milestones are available in App Studio; advanced SLA work uses Dev Studio.",
         "B": "Prediction Studio handles analytical models rather than these timing rules.",
         "C": "Admin Studio monitoring is not the authoring surface for both settings.",
         "D": "The platform provides configurable service-level behavior."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-e22945289109"
     },
     {
@@ -523,17 +523,17 @@
         "C": "An operator represents a user rather than the timing rule.",
         "D": "A Work Group coordinates teams rather than name this policy."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-e22945289109"
     },
     {
       "questionId": "Q11",
       "type": "single-select",
-      "scenario": "A BA has configured an Approve/Reject Step in a loan approval workflow. The approver selects Reject on a submitted application. What typically happens to the Case next?",
+      "scenario": "A BA configures Reject to resolve a loan application. What happens when the approver rejects it?",
       "options": [
         {
           "id": "A",
-          "text": "It branches off the primary path to rework or rejection handling, based on the reject outcome"
+          "text": "The configured rejection handling resolves the Case, with its configured rejection status"
         },
         {
           "id": "B",
@@ -551,15 +551,15 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "An approval step has two distinct outcome paths: approve routes one way, reject routes another.",
-      "rationale": "An approval Step's approve and reject outcomes route the Case down different paths; rejection typically branches to rework or a rejection-handling Stage. Approve and reject are always distinct outcomes that lead to different paths.",
+      "hint": "Follow the configured Reject outcome, not an assumed rework branch.",
+      "rationale": "Reject behavior can resolve, continue or change Stage. This scenario explicitly configures resolution; the documented default status is Resolved-Rejected.",
       "optionExplanations": {
-        "A": "The configured reject outcome determines the exception or rework path.",
+        "A": "The configured Reject outcome controls resolution and status.",
         "B": "Rejection does not inherently delete the submitted case.",
         "C": "Routing to a customer is not a universal rejection behavior.",
         "D": "The outcomes can explicitly follow different paths."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-ec034db8cefd"
     },
     {
@@ -597,7 +597,7 @@
         "C": "Exclusive named ownership instead fits that person's Worklist.",
         "D": "A queue destination does not implement hiding from every team member."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f1042d638849"
     },
     {
@@ -633,7 +633,7 @@
         "C": "These features operate within the lifecycle rather than replace it.",
         "D": "External persistence is an integration concern rather than the main value here."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f1042d638849"
     },
     {
@@ -662,14 +662,14 @@
         "A"
       ],
       "hint": "A single approval involves exactly one approver whose decision (approve/reject) determines the next path.",
-      "rationale": "A single approval has one approver whose approve or reject decision routes the Case to the appropriate next path. Requiring everyone to approve describes a different pattern; single approval is about one decision-maker.",
+      "rationale": "One approver makes the decision and the configured outcome behavior determines what happens next. Distinct approve/reject decisions do not require different paths in every configuration.",
       "optionExplanations": {
         "A": "The configured outcome determines continuation or rework.",
         "B": "A single approval does not require organization-wide signoff.",
         "C": "Approval results can change the workflow path.",
         "D": "The decision is functional rather than decorative."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-ec034db8cefd"
     },
     {
@@ -705,14 +705,14 @@
         "C": "Queues can hold assignments for shared work.",
         "D": "Deletion speed is unrelated to review accountability."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f1042d638849"
     }
   ],
   "quickRecap": [
     {
       "key": "Routing",
-      "value": "Send Assignments to the best-available user. Worklist = specific user; Work Queue = shared team queue; business-logic routing = by skill/availability."
+      "value": "Explicit/conditional user or queue destinations differ from Get Next Work’s urgency/availability/skill selection."
     },
     {
       "key": "Work Groups",
@@ -724,37 +724,44 @@
     },
     {
       "key": "SLA goal vs deadline",
-      "value": "Goal = earlier 'should-by' target; deadline = later 'must-by' limit; goal interval < deadline interval."
+      "value": "Goal desired target and Deadline lateness threshold are measured from SLA start; Passed Deadline repeats from Deadline."
     },
     {
       "key": "Urgency",
-      "value": "Numeric priority that increases at the goal and again at the deadline, raising Worklist ranking to drive on-time completion."
+      "value": "Case/Assignment priorities 0–100; configured increments support timeliness, not guarantee it. Notifications can still run at 100."
     },
     {
       "key": "Studio split",
-      "value": "BA sets goal/deadline in App Studio; SAs configure advanced SLA escalations/business-day handling in Dev Studio."
+      "value": "Initial Case urgency is available in App Studio; initial Assignment and Passed Deadline settings use Dev Studio."
     }
   ],
   "topics": [
     {
       "title": "Assignment routing",
-      "url": "https://academy.pega.com/topic/assignment-routing/v2/in/80411/80671",
+      "url": "https://academy.pega.com/topic/assignment-routing/v2/in/93701/80671",
       "duration": "15 min"
     },
     {
       "title": "Cross-functional Work Groups",
-      "url": "https://academy.pega.com/topic/cross-functional-work-groups/v2/in/80411/80671",
+      "url": "https://academy.pega.com/topic/cross-functional-work-groups/v2/in/93701/80671",
       "duration": "10 min"
     },
     {
       "title": "Approving work",
-      "url": "https://academy.pega.com/topic/approving-work/v2/in/80411/80671",
+      "url": "https://academy.pega.com/topic/approving-work/v2/in/93701/80671",
       "duration": "10 min"
     },
     {
       "title": "Managing work deadlines",
-      "url": "https://academy.pega.com/topic/managing-work-deadlines/v2/in/80411/80671",
+      "url": "https://academy.pega.com/topic/managing-work-deadlines/v2/in/93701/80671",
       "duration": "15 min"
+    },
+    {
+      "title": "Cascading authority-matrix model (supplemental)",
+      "url": "https://academy.pega.com/topic/cascading-approval-authority-matrix-primary-tabs/v1",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Pega Platform '24.2 — module v2, linked bodies checked 2026-10-06"
 }
