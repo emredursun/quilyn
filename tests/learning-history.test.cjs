@@ -993,3 +993,12 @@ test('AS2 API review scopes message patterns, TCPs and composed source values',(
  assert.match(d.practiceQuiz[7].options[0].text,/retaining intentional composition/);
  assert.doesNotMatch(JSON.stringify(d),/every Message.*PAIR|reusable, project-wide|No partial credit|SKU isn't visible on the UI/);
 });
+
+test('PBA rule review avoids architecture-specific UI and first-match resolution guarantees',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/business-architect/m05_creating_a_rule.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.equal(d.practiceQuiz.length,19);d.practiceQuiz.forEach(q=>{assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.equal(q.explanationReviewedOn,'2026-10-06');});
+ assert.match(d.studyGuide[0].elements[2].items[2],/Constellation/);
+ assert.match(d.studyGuide[2].elements[2].description,/other eligibility criteria/);
+ assert.match(d.studyGuide[3].elements[1].description,/identifier, class or Ruleset/);
+ assert.doesNotMatch(d.studyGuide[2].elements[3].text,/first matching Rule/);
+});
