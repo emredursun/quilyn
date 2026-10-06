@@ -15,17 +15,17 @@
         {
           "type": "concept",
           "term": "TestOps Dashboard",
-          "description": "Provides quick-access statistics on tests, remote execution runs, and other project activity — the go-to place to analyze overall project health and quickly identify which tests need attention, without digging through individual runs."
+          "description": "The Dashboard summarizes project activity with plan-dependent panes and selected branch context. It helps prioritize investigation; activity alone does not prove coverage."
         },
         {
           "type": "concept",
           "term": "Duplication Level pane",
-          "description": "Shows the project's auto-grouping duplication score — identifying step sequences that are duplicated across tests but haven't yet been consolidated into shared groups. The lower the score, the healthier the project (same scoring/Green-Yellow-Red concept covered in the Auto Grouping module)."
+          "description": "Duplication Level estimates redundant sequences that may benefit from shared groups. A lower duplication estimate does not certify overall project health."
         },
         {
           "type": "concept",
           "term": "Recent Activity pane",
-          "description": "An activity log of recent events in the project — filterable to 'Assigned to me' to show just your own recent activity — with each entry linking directly to the associated test or object, so you can jump straight to what changed."
+          "description": "Recent Activity links project events. Assigned to me concerns owned tests; the remote pane changes from execution counts to owned-test runs, rather than filtering only actions performed by you."
         },
         {
           "type": "note",
@@ -33,9 +33,9 @@
         }
       ],
       "bulletPoints": [
-        "TestOps Dashboard = quick-access project health overview: tests, remote runs, activity.",
-        "Duplication Level pane: lower score = healthier project (same concept as Auto Grouping's score).",
-        "Recent Activity pane: an event log, filterable to your own activity, linking straight to the affected test."
+        "Interpret metrics within their branch, plan and pane scope.",
+        "Duplication estimates reuse opportunities, not complete quality.",
+        "Ownership filters are distinct from the identity of the event author."
       ],
       "sectionId": "section-d3166f112930"
     },
@@ -45,18 +45,18 @@
         {
           "type": "concept",
           "term": "What Turbo Mode does",
-          "description": "Runs Testim tests up to 30% faster by ignoring step delays and only saving test artifacts (screenshots, logs) for failed runs rather than every run — trading some artifact detail on passing runs for materially faster feedback."
+          "description": "Turbo Mode is a professional-plan feature. It ignores step delays and omits successful-run artifacts to reduce overhead. The vendor reports an average speed improvement, not a promised result for every test; browser crashes can prevent failed-run artifacts too."
         },
         {
           "type": "concept",
           "term": "Enabling Turbo Mode",
-          "description": "Can be turned on two ways: via the CLI with the --turbo-mode flag, or for scheduled runs, by sliding the 'Run in turbo mode' toggle in the Scheduler. Turbo Mode runs execute in extension mode only, on Chrome and Edge Chromium."
+          "description": "Enable --turbo-mode for CLI runs or the Scheduler toggle. Execution is extension-based on Chrome or Edge Chromium; this is not a general mode for every browser or mobile device."
         }
       ],
       "bulletPoints": [
-        "Up to 30% faster: ignores step delays, only saves artifacts for failed runs.",
-        "Two ways to enable: --turbo-mode CLI flag, or the Scheduler's 'Run in turbo mode' toggle.",
-        "Extension-mode only, Chrome/Edge Chromium."
+        "Professional plan; CLI flag or Scheduler toggle.",
+        "Chrome/Edge Chromium extension execution only.",
+        "Successful-run artifact collection is omitted; failed-run data is not guaranteed after crashes."
       ],
       "sectionId": "section-d22ae6ed2921"
     },
@@ -66,18 +66,18 @@
         {
           "type": "concept",
           "term": "Prerequisite: the Testim Chrome Extension",
-          "description": "Capture Video & Bug Scenario is a feature of the Testim Chrome Extension — it must be installed before any video capture is possible. Once installed, you can capture an issue as a Screenshot or as a Video & Bug Scenario directly from the browser."
+          "description": "The Testim browser extension can capture webpage bugs independently of automated tests. Bug reports may include a screenshot, reproduction video, interaction screenshots and generated reproduction text."
         },
         {
           "type": "concept",
           "term": "Publishing the capture",
-          "description": "After capturing, clicking Publish sends the video/screenshot — along with an automatically-generated 'steps to reproduce' description — to a connected bug tracker (Jira, Slack, Trello, GitHub, etc.). Within Testim itself, the captured video is saved to the test results section of the relevant test run, keeping the artifact attached to the context it was captured in."
+          "description": "Connect the relevant bug tracker before submitting a report. The accessible capture page is incomplete and does not establish that every extension video is stored in an associated test-run result: a standalone webpage capture may have no such run."
         }
       ],
       "bulletPoints": [
-        "Prerequisite: Testim Chrome Extension installed.",
-        "Capture as Screenshot or Video & Bug Scenario → Publish → sent to the connected bug tracker, with auto-generated steps to reproduce.",
-        "Saved within Testim under the relevant test run's test results section."
+        "Extension capture and tagging a failed automated run are distinct entry points.",
+        "Tracker connection is required before submission.",
+        "Do not assume every standalone capture has a test-run result."
       ],
       "sectionId": "section-890e5ab3b39b"
     },
@@ -139,7 +139,13 @@
         "A"
       ],
       "hint": "Both the CLI flag and the Scheduler toggle are real, documented ways to enable it.",
-      "rationale": "This is True. Turbo Mode can be enabled via the --turbo-mode CLI flag, or for scheduled runs, by sliding the 'Run in turbo mode' toggle in the Scheduler — both are legitimate ways to turn it on."
+      "rationale": "This is True. Turbo Mode can be enabled via the --turbo-mode CLI flag, or for scheduled runs, by sliding the 'Run in turbo mode' toggle in the Scheduler — both are legitimate ways to turn it on.",
+      "optionExplanations": {
+        "A": "The CLI flag and Scheduler toggle are documented ways to enable eligible Turbo runs.",
+        "B": "Both entry points are supported within the mode’s plan/browser limits."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-d22ae6ed2921"
     },
     {
       "questionId": "Q2",
@@ -167,35 +173,51 @@
         "C"
       ],
       "hint": "The capture functionality lives inside the extension, not the web editor.",
-      "rationale": "Capture Video & Bug Scenario is a feature of the Testim Chrome Extension, so installing that extension is the required first step — not a settings toggle, a validation step, or a bug report template, which are unrelated or downstream concerns."
+      "rationale": "Capture Video & Bug Scenario is a feature of the Testim Chrome Extension, so installing that extension is the required first step — not a settings toggle, a validation step, or a bug report template, which are unrelated or downstream concerns.",
+      "optionExplanations": {
+        "A": "A settings toggle does not install the capture extension.",
+        "B": "A validation is not the capture capability prerequisite.",
+        "C": "Browser-extension capture requires the extension.",
+        "D": "A report template does not install the capture capability."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-890e5ab3b39b"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "When you publish a bug in Testim, where in Testim will the video you capture be saved?",
+      "scenario": "Before submitting an extension-captured webpage bug to a tracker, what is required?",
       "options": [
         {
           "id": "A",
-          "text": "The Testim dashboard"
+          "text": "Create a Dashboard widget"
         },
         {
           "id": "B",
-          "text": "In the test results section of the relevant test run"
+          "text": "Connect Testim to the relevant bug tracker"
         },
         {
           "id": "C",
-          "text": "In the Testim browser extension settings"
+          "text": "Assume every video has an automated run"
         },
         {
           "id": "D",
-          "text": "In the browser console logs"
+          "text": "Store it only in console logs"
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "It stays attached to the context it was captured in.",
-      "rationale": "The captured video is saved within Testim under the test results section of the relevant test run — keeping the artifact tied to the run it documents, rather than sitting in a generic dashboard, extension settings, or console logs."
+      "hint": "Capture and tracker submission are separate steps.",
+      "rationale": "Tracker connection is a documented prerequisite. Standalone extension captures are not necessarily associated with automated test runs.",
+      "optionExplanations": {
+        "A": "A Dashboard widget does not establish a tracker connection.",
+        "B": "Connect the relevant tracker before submitting the report.",
+        "C": "Standalone webpage capture can occur without an automated run.",
+        "D": "Console logs are not the required tracker connection."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-890e5ab3b39b"
     },
     {
       "questionId": "Q4",
@@ -215,7 +237,13 @@
         "B"
       ],
       "hint": "Quarantine tests get a specific flag in the run's result XML.",
-      "rationale": "This is False. Quarantined tests do not run during a normal CI/CD execution — they appear in the suite run with a quarantine indication and are recorded with a 'Skipped' flag in the run XML, unless the --run-quarantined-tests CLI override is used."
+      "rationale": "This is False. Quarantined tests do not run during a normal CI/CD execution — they appear in the suite run with a quarantine indication and are recorded with a 'Skipped' flag in the run XML, unless the --run-quarantined-tests CLI override is used.",
+      "optionExplanations": {
+        "A": "Normal CI skips quarantined tests unless explicitly overridden.",
+        "B": "The default is skipped execution; --run-quarantined-tests deliberately overrides it."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-eec1ce2d29dd"
     }
   ],
   "quickRecap": [
@@ -225,11 +253,11 @@
     },
     {
       "key": "Turbo Mode",
-      "value": "Up to 30% faster; enable via --turbo-mode (CLI) or Scheduler's 'Run in turbo mode' toggle."
+      "value": "Professional-plan CLI/Scheduler mode for Chrome/Edge Chromium extension runs; performance varies and artifacts may be absent."
     },
     {
       "key": "Bug video capture",
-      "value": "Requires the Testim Chrome Extension; saved to the relevant test run's test results section; Publish sends it + auto-generated repro steps to the bug tracker."
+      "value": "Extension captures can report standalone webpage bugs; connect a tracker before submission. No universal run-result storage claim."
     },
     {
       "key": "Quarantine + CI/CD",
@@ -243,13 +271,18 @@
       "duration": "docs"
     },
     {
-      "title": "TestOps Dashboard (Tricentis docs)",
+      "title": "Dashboard (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/testops/insights/dashboard.htm",
       "duration": "docs"
     },
     {
-      "title": "Testim Extension - Capture Video & Bug Scenario (Tricentis docs)",
+      "title": "Testim Extension Capture Video Bug Scenario (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/testim-extension/testim-extension-capture-video-bug-scenario.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Bug Reporting (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/test-management/bug-reporting.htm",
       "duration": "docs"
     },
     {
@@ -257,5 +290,7 @@
       "url": "https://docs.tricentis.com/testim/content/testops/testops-management/test-status.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim documentation checked 2026-10-06"
 }

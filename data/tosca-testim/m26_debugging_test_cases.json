@@ -3,34 +3,33 @@
   "moduleTitle": "Debugging test cases in Tricentis Testim",
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/debugging-test-cases-in-tricentis-testim",
   "learningObjectives": [
-    "Identify Testim's four debugging tools: Debugging Controls, Debugging Helper Panels, JavaScript Code Debugging, and Recording New Steps to Resolve Bugs.",
+    "Use local debugging controls, helper panels, supported browser JavaScript debugging and positioned recording.",
     "Pause, continue, and step through a running test to inspect its behavior.",
     "Distinguish manual breakpoints from virtual breakpoints."
   ],
   "estTime": "5 min",
   "studyGuide": [
     {
-      "sectionTitle": "The four Testim debugging tools, at a glance",
+      "sectionTitle": "Debugging workflows and their boundaries",
       "elements": [
         {
           "type": "list",
           "title": "Testim Debugging Tools",
           "items": [
-            "A. Debugging Controls — Pause/Continue, step-by-step execution, manual and virtual breakpoints. Covered in depth below.",
-            "B. Debugging Helper Panels — supporting panels that surface richer per-step context during a debugging session. Covered below.",
-            "C. JavaScript Code Debugging — the dedicated workflow for stepping through the hand-written or AI-generated code inside custom action/validation/CLI steps. Covered below.",
-            "D. Recording New Steps to Resolve Bugs — inserting missing or corrected steps into an existing test at a specific position, without re-recording the whole test. Covered in depth in its own 'Recording new steps to resolve bugs' module."
+            "Debug controls pause and step through local debug runs; normal local runs ignore breakpoints.",
+            "Helper panels expose logs, breakpoint locations and parameters from executed steps.",
+            "Supported browser JavaScript steps can be inspected through Chrome DevTools; this is not a general Node.js CLI debugger.",
+            "Positioned recording adds steps after establishing the required application state."
           ]
         },
         {
           "type": "note",
-          "text": "These four tools form a natural workflow: use Debugging Controls and Helper Panels to isolate exactly where and why a test broke, drop into JS Code Debugging if the culprit is a custom step's code, then use Recording New Steps to fix the test itself once the root cause is clear."
+          "text": "Use the available evidence to investigate a failure. These tools do not guarantee an exact root cause or turn an application defect into a test defect."
         }
       ],
       "bulletPoints": [
-        "Debugging Controls = pause/step/breakpoints.",
-        "Debugging Helper Panels + JS Code Debugging = deeper per-step and per-code-step inspection.",
-        "Recording New Steps to Resolve Bugs = fixing the test once you know what's wrong (see its own module)."
+        "Local debug mode differs from normal execution.",
+        "Inspect evidence before changing the test."
       ],
       "sectionId": "section-e5cedb6a38ca"
     },
@@ -40,17 +39,17 @@
         {
           "type": "concept",
           "term": "Debug Helper panels",
-          "description": "Supporting panels available during a debugging session that surface additional context around a step — building on Pause/Continue, breakpoints, and step-by-step execution with a richer inspection surface for diagnosing exactly why a step behaved the way it did."
+          "description": "Console Log filters messages and can preserve them between runs; Breakpoint Manager locates/removes breakpoints; Scope shows incoming parameters and test/global exports. Future, unexecuted steps have no runtime values to inspect."
         },
         {
           "type": "concept",
           "term": "JS Code Debugging",
-          "description": "A dedicated debugging workflow for custom JavaScript steps (custom actions, custom validations, CLI actions) — since these steps run hand-written or AI-generated code rather than a predefined action, they need their own debugging path distinct from the generic step-level breakpoint tools covered above."
+          "description": "For supported browser steps, pause before the step in a local debug run, use Step Into, switch to the AUT, open Chrome DevTools and follow the confirmation prompt. Inspect the code, resume its execution and return to the editor. Supported types include custom action/validation/wait, email/network validation and API action/validation; CLI actions are not listed for this browser workflow."
         }
       ],
       "bulletPoints": [
-        "Debug Helper panels add richer step-level inspection during a debugging session.",
-        "JS Code Debugging is the dedicated path for diagnosing custom JavaScript step code specifically — generic breakpoints don't step through that code."
+        "Scope is evidence from executed steps, not values from future steps.",
+        "Chrome DevTools inspects supported code running in the AUT browser, rather than all Node.js CLI code."
       ],
       "sectionId": "section-61a6d807166c"
     },
@@ -60,12 +59,12 @@
         {
           "type": "concept",
           "term": "Pause",
-          "description": "Pauses test execution at any point in the editor — the run stops at the nearest step when clicked — after which Continue resumes execution from that exact location until the test ends."
+          "description": "Pause stops at the nearest step boundary in local debug mode. Continue proceeds from the current location; another breakpoint can pause it again."
         },
         {
           "type": "concept",
           "term": "Step-by-step execution",
-          "description": "To run step-by-step, click the dropdown next to the Play button and select 'Run locally step by step', then use the 'Play Next Step' button to execute one step at a time — letting you inspect state after each individual action rather than watching the whole test run at full speed."
+          "description": "Start a local run with debugging. Pause or insert a breakpoint, then use the available stepping controls. Step Over executes a step/group; Step Into opens a group before its first step; Step Out executes its remaining steps before leaving."
         },
         {
           "type": "concept",
@@ -74,13 +73,13 @@
         },
         {
           "type": "note",
-          "text": "The breakpoint manager panel lists and manages all breakpoints in a test, giving a single place to review where execution will pause before a debugging session starts."
+          "text": "Breakpoint Manager identifies breakpoint locations, supports navigation and removal, and highlights the current pause."
         }
       ],
       "bulletPoints": [
-        "Pause stops at the nearest step; Continue resumes from exactly there.",
-        "Step-by-step run: dropdown next to Play → 'Run locally step by step' → 'Play Next Step'.",
-        "Manual breakpoints = user-set; virtual breakpoints = auto-created by debugging controls (step into/out/over, pause)."
+        "Continue resumes; a later breakpoint can stop the run again.",
+        "Step Over executes the group; Step Into opens it; Step Out executes the remainder.",
+        "Manual breakpoints are user placed; virtual markers arise from debugging controls."
       ],
       "sectionId": "section-6e644809d9b9"
     }
@@ -119,16 +118,24 @@
         "B"
       ],
       "hint": "One is placed by hand, the other appears as a side effect of using debugging tools.",
-      "rationale": "Manual breakpoints are set by the user; virtual breakpoints are created automatically by the system when debugging controls (step into, step out, step over, pause) are used."
+      "rationale": "Manual breakpoints are set by the user; virtual breakpoints are created automatically by the system when debugging controls (step into, step out, step over, pause) are used.",
+      "optionExplanations": {
+        "A": "Manual and virtual markers have different origins.",
+        "B": "Manual markers are user placed; virtual markers are created by debug controls.",
+        "C": "These are local debugging concepts, not a production/local split.",
+        "D": "Virtual markers are not limited to API steps."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-6e644809d9b9"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "How do you run a test one step at a time to inspect it after each action?",
+      "scenario": "Which workflow allows controlled inspection of steps in the current Testim editor?",
       "options": [
         {
           "id": "A",
-          "text": "Click the dropdown next to Play, select 'Run locally step by step', then use 'Play Next Step'."
+          "text": "Run locally with debugging, pause or use a breakpoint, and use stepping controls."
         },
         {
           "id": "B",
@@ -146,8 +153,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "There's a dedicated run mode for this.",
-      "rationale": "To run step-by-step, click the dropdown next to the Play button, select 'Run locally step by step', then click 'Play Next Step' to execute the next step and inspect state in between."
+      "hint": "Use local debug mode.",
+      "rationale": "Local debug mode exposes stepping controls. A normal local run ignores breakpoints; deletion or a zero timeout is not a debugging workflow.",
+      "optionExplanations": {
+        "A": "Local debugging provides controlled stepping.",
+        "B": "Local debug mode supports controlled execution.",
+        "C": "Deleting steps changes coverage rather than providing inspection.",
+        "D": "Zero timeout does not enable debugging."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-6e644809d9b9"
     },
     {
       "questionId": "Q3",
@@ -160,7 +175,7 @@
         },
         {
           "id": "B",
-          "text": "Resumes execution from the exact point it was paused, until the test ends."
+          "text": "Continues from the paused location; another breakpoint can pause the run again."
         },
         {
           "id": "C",
@@ -174,13 +189,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "It picks up exactly where it left off.",
-      "rationale": "Continue resumes test execution from the current (paused) location until the test ends — it doesn't restart from the beginning, skip the rest, or open an unrelated panel."
+      "hint": "Continue resumes rather than restarting.",
+      "rationale": "Continue resumes execution at the current location, subject to later breakpoints; it does not restart or skip all remaining steps.",
+      "optionExplanations": {
+        "A": "Rerun, rather than Continue, restarts the test.",
+        "B": "Continue resumes; later breakpoints may pause again.",
+        "C": "Continue executes remaining work rather than discarding it.",
+        "D": "Continue is an execution control, not a locator-panel command."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-6e644809d9b9"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "A tester has isolated a failure to a custom validation step's JavaScript logic using Pause and step-by-step execution. Which of Testim's four debugging tools is the right next step for inspecting that code specifically?",
+      "scenario": "A failure is isolated to a supported browser custom validation. Which workflow can inspect its JavaScript code?",
       "options": [
         {
           "id": "A",
@@ -202,22 +225,30 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "It's the tool specifically built for stepping through custom-step code.",
-      "rationale": "JavaScript Code Debugging is the dedicated workflow for stepping through the hand-written or AI-generated code inside custom action/validation/CLI steps — the right tool once Debugging Controls has narrowed the failure down to a specific custom step's logic. Recording New Steps is for fixing the test afterward, not diagnosing code."
+      "hint": "The code runs in the AUT browser.",
+      "rationale": "Step Into from a breakpoint before a supported step leads to Chrome DevTools in the AUT. This workflow does not establish support for Node.js CLI steps.",
+      "optionExplanations": {
+        "A": "Step-level controls alone do not expose source-level browser inspection.",
+        "B": "The supported browser JS workflow uses Chrome DevTools in the AUT.",
+        "C": "Recording adds steps rather than diagnosing existing code.",
+        "D": "Result labels annotate runs rather than stepping through code."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-61a6d807166c"
     }
   ],
   "quickRecap": [
     {
       "key": "4 debugging tools",
-      "value": "Debugging Controls, Debugging Helper Panels, JavaScript Code Debugging, Recording New Steps to Resolve Bugs."
+      "value": "Local controls, helper panels, supported browser JS debugging and positioned recording have distinct roles."
     },
     {
       "key": "Pause / Continue",
-      "value": "Pause stops at the nearest step; Continue resumes from exactly there."
+      "value": "Pause stops at a nearby step boundary; Continue resumes until another pause or completion."
     },
     {
       "key": "Step-by-step",
-      "value": "Play dropdown → 'Run locally step by step' → 'Play Next Step'."
+      "value": "Local debug mode exposes Step Over, Step Into and Step Out; normal local runs ignore breakpoints."
     },
     {
       "key": "Manual breakpoints",
@@ -235,9 +266,26 @@
       "duration": "docs"
     },
     {
-      "title": "Stop, Pause & Debug Tests (Tricentis docs)",
+      "title": "Stop Pause Debug Tests (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/results/stop-pause-debug-tests.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Debug Helper Panels (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/debugging-tests/debug-helper-panels.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Js Code Debugging (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/debugging-tests/js-code-debugging.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Recording Additional Steps To Fix Bugs (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/debugging-tests/recording-additional-steps-to-fix-bugs.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim documentation checked 2026-10-06"
 }

@@ -1534,3 +1534,21 @@ test('Testim prerequisite review avoids interpreting previous versions as major 
  assert.match(d.studyGuide[0].elements[2].description,/runtime prerequisites alone do not establish readiness/);
  assert.doesNotMatch(d.practiceQuiz[3].scenario,/prior major versions/);
 });
+
+test('Testim debugging review separates browser code debugging from CLI and scopes executed parameters',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m26_debugging_test_cases.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[1].description,/Chrome DevTools.*CLI actions are not listed/);
+ assert.match(d.studyGuide[1].elements[0].description,/unexecuted steps have no runtime values/);
+ assert.match(d.practiceQuiz[2].options[1].text,/another breakpoint/);
+ assert.doesNotMatch(JSON.stringify(d),/Run locally step by step|Play Next Step|custom action\/validation\/CLI steps/);
+});
+
+test('Testim streamlining review scopes Turbo artifacts and removes unsupported universal capture location',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m27_streamlining_testing_debugging.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['C'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].description,/professional-plan.*not a promised result.*crashes/);
+ assert.match(d.studyGuide[0].elements[2].description,/owned-test runs.*rather than filtering only actions/);
+ assert.match(d.practiceQuiz[2].options[1].text,/Connect Testim/);
+ assert.doesNotMatch(JSON.stringify(d),/video is saved.*test results|up to 30% faster|just your own recent activity/);
+});
