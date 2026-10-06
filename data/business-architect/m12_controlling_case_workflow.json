@@ -24,7 +24,7 @@
         {
           "type": "concept",
           "term": "Process Flow",
-          "description": "The underlying Flow Rule that Pega generates for a Process — the detailed flow diagram (seen in the Dev Studio process modeler) made of shapes and connectors that defines exactly how the Process executes."
+          "description": "The graphical sequence of events, shapes and connectors that models how a Process executes, including alternative paths. You can open it through Configure Process from the Case Lifecycle; it is not accessible only in Dev Studio."
         },
         {
           "type": "analogy",
@@ -32,8 +32,8 @@
         }
       ],
       "bulletPoints": [
-        "App Studio = the visual Process; the Process Flow (Flow Rule) is the generated diagram that implements it.",
-        "Designing a Process in App Studio creates/updates its Flow Rule in the background."
+        "The Lifecycle depicts Steps; the Process Flow depicts their shapes, connectors and alternative paths.",
+        "Configure Process opens the detailed flow from the Lifecycle designer."
       ],
       "sectionId": "section-896aaa9efc9a"
     },
@@ -43,16 +43,16 @@
         {
           "type": "concept",
           "term": "Automation shapes",
-          "description": "Shapes in the Process Flow that execute system actions WITHOUT user interaction — yellow-coded steps such as Send Email, Create PDF, Create Case, Wait, and Change Stage."
+          "description": "System-action shapes can send email, create Cases, wait, change Stage or run a Data Transform. The wider Automation catalog also includes Approval and Questionnaire, which involve users; do not equate every catalog entry with zero human interaction."
         },
         {
           "type": "analogy",
-          "text": "Automation shapes are the robots on the assembly line: they perform set tasks (send, create, wait, change stage) the moment the Case reaches them, with no human touch."
+          "text": "A system action can execute when its configured prerequisites are met. Wait pauses for its configured condition. Create PDF is listed, but the source warns that Constellation needs a workaround rather than out-of-the-box PDF generation."
         }
       ],
       "bulletPoints": [
         "Automation Steps (system) have yellow icons; user Steps (Collect information) have green icons.",
-        "Common automations: send email, create PDF, create child Case, wait, change Stage."
+        "Examples: Send email, Run Data Transform, Create Case, Wait and Change Stage. Constellation PDF generation needs a workaround."
       ],
       "sectionId": "section-fbfab911b6ff"
     },
@@ -97,7 +97,7 @@
           "term": "The three elements of a When Condition",
           "description": "Every When Condition has three parts:",
           "items": [
-            "(1) an INPUT VALUE (a field or another condition)",
+            "(1) an INPUT VALUE, such as a Case field, configuration or another condition",
             "(2) a COMPARATOR (equals, greater than, contains, etc.)",
             "(3) a VALUE to compare against"
           ]
@@ -108,7 +108,7 @@
           "description": "Scope of When Conditions differs by studio:",
           "items": [
             "APP STUDIO — single context within one Case Type",
-            "DEV STUDIO — reusable; available across the entire application Ruleset stack"
+            "DEV STUDIO — named reusable rules can be selected as Existing condition where their class/ruleset context applies"
           ]
         },
         {
@@ -118,7 +118,7 @@
       ],
       "bulletPoints": [
         "When Conditions determine: when a Stage is skipped, when a Process is skipped, and which Steps in a Process execute.",
-        "App Studio custom condition = single context; Dev Studio 'Existing condition' = reusable across contexts/Case Types."
+        "Reusable existing rules still need an applicable class/ruleset context; creation in Dev Studio alone does not make them valid everywhere."
       ],
       "sectionId": "section-40b300ab82b8"
     },
@@ -128,7 +128,7 @@
         {
           "type": "concept",
           "term": "Skip with a When Condition",
-          "description": "A Stage or Process can be configured to skip when a When Condition evaluates to true, or to start only when the condition is true — enabling conditional path control."
+          "description": "Stage Skip stage evaluates whether to bypass an eligible Stage; Create cannot be skipped. A Process starts Always by default, or only when its configured start condition is true. A false Process start condition skips it. Verify condition polarity rather than copying Stage skip logic into Process start logic."
         },
         {
           "type": "analogy",
@@ -136,8 +136,9 @@
         }
       ],
       "bulletPoints": [
-        "Skipping a Stage/Process is driven by a When Condition (skip-when logic).",
-        "Use it to tailor the path to the business context (e.g., skip payment for fully-covered customers)."
+        "Stage skip-when true differs from Process start-when true.",
+        "Create Stage cannot be skipped.",
+        "For covered customers, start Payment only when payment is required."
       ],
       "sectionId": "section-f9d2bfdda85c"
     },
@@ -147,7 +148,7 @@
         {
           "type": "concept",
           "term": "Optional actions",
-          "description": "Actions a user can take OUTSIDE the sequential Step flow, available on demand from the Case actions menu rather than required at a specific point in the process."
+          "description": "User-invoked optional work is outside the mandatory sequence. Use an optional user Action for one action and an optional Process for a series of Steps. Both can be Case-wide or Stage-only, with relevance conditions restricting availability."
         },
         {
           "type": "concept",
@@ -165,7 +166,8 @@
       ],
       "bulletPoints": [
         "Optional actions are user-initiated and not part of the required Step sequence.",
-        "Scope them Case-wide (anytime) or Stage-wide (only in that Stage)."
+        "Scope them Case-wide (anytime) or Stage-wide (only in that Stage).",
+        "Case-wide scope does not bypass configured relevance conditions or user authorization."
       ],
       "sectionId": "section-2bdcac2080d7"
     }
@@ -174,7 +176,7 @@
     {
       "title": "Process vs. Process Flow",
       "trapDescription": "A core differentiation in this module: the Process is the App Studio building block; the Process Flow is the underlying generated Flow Rule diagram.",
-      "bestPractice": "Process = what you design in App Studio; Process Flow (Flow Rule) = the detailed diagram that implements it."
+      "bestPractice": "Lifecycle Process groups Steps; Process Flow models execution with shapes/connectors and is accessible from Configure Process."
     },
     {
       "title": "The three elements of a When Condition",
@@ -198,8 +200,8 @@
     },
     {
       "title": "Automation Steps are system (yellow)",
-      "trapDescription": "Automation shapes run without user action (yellow); Collect information Steps require users (green).",
-      "bestPractice": "Send email / create PDF / create Case / wait / change Stage = Automation shapes."
+      "trapDescription": "System-action shapes differ from the full Automation catalog, which also includes human approval/questionnaire behavior.",
+      "bestPractice": "Use Send email/Create Case/Wait/Change Stage as system examples. Constellation Create PDF requires a workaround."
     },
     {
       "title": "Optional actions: Case-wide vs Stage-wide",
@@ -209,14 +211,14 @@
     {
       "title": "Skipping needs a condition",
       "trapDescription": "Skipping a Stage/Process is condition-driven (When Condition), not arbitrary.",
-      "bestPractice": "Configure skip-when logic with a When Condition tied to the business context."
+      "bestPractice": "Stage skip-when true and Process start-when true have opposite effects. Create Stage cannot be skipped."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "A BA designs a Process in App Studio. What is automatically generated in the background to define exactly how it executes?",
+      "scenario": "Which diagram uses shapes and connectors to model a Process’s detailed execution paths?",
       "options": [
         {
           "id": "A",
@@ -238,15 +240,15 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Designing a Process in App Studio generates the underlying Process Flow diagram (Flow Rule) automatically.",
-      "rationale": "Designing a Process in App Studio generates the underlying Process Flow — the detailed shape-and-connector Flow Rule. The Flow Action defines the user form, the Data Transform handles data copying, and the SLA governs timing.",
+      "hint": "Lifecycle Steps have corresponding flow shapes and connectors.",
+      "rationale": "A Process Flow models the execution sequence and alternative paths. A role defines permissions, a ruleset packages rules and a queue holds shared Assignments.",
       "optionExplanations": {
         "A": "The Flow rule models how the process executes.",
         "B": "A role grants permissions rather than define process execution.",
         "C": "A ruleset revision packages rules rather than model this flow.",
         "D": "A queue holds shared assignments rather than the flow definition."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-896aaa9efc9a"
     },
     {
@@ -285,7 +287,7 @@
         "C": "The comparison target completes the Boolean test.",
         "D": "A version identifier is not a required condition component."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-40b300ab82b8"
     },
     {
@@ -295,7 +297,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Configure the payment Process to be skipped when a When Condition is true"
+          "text": "Start the payment Process only when a condition says payment is required"
         },
         {
           "id": "B",
@@ -313,15 +315,15 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Skipping a Stage or Process based on a condition at run time uses a When Condition on that element.",
-      "rationale": "Skipping a Stage or Process is driven by configuring a When Condition on that Stage or Process to skip when the condition evaluates to true. The other options — SLAs, routing, Data Transforms — do not conditionally bypass a Process.",
+      "hint": "The Process starts when its eligibility condition is true.",
+      "rationale": "A Process start condition must be true to run. Define payment-required so it is false for fully covered customers; Stage skip-when logic has the opposite polarity.",
       "optionExplanations": {
-        "A": "The skip condition controls whether this process is needed.",
+        "A": "A false payment-required start condition skips the Process for covered customers.",
         "B": "Removing resolution would affect the lifecycle rather than payment eligibility.",
         "C": "Queue routing chooses who works rather than whether payment runs.",
         "D": "Urgency changes priority rather than conditional execution."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f9d2bfdda85c"
     },
     {
@@ -350,14 +352,14 @@
         "A"
       ],
       "hint": "Reuse across Case Types points to one approach.",
-      "rationale": "For reuse across contexts/Case Types, SAs create the When Condition in Dev Studio and you select it as an Existing condition. App Studio custom conditions are single-context.",
+      "rationale": "A named reusable When rule can be selected as Existing condition where class/ruleset applicability allows it. Dev Studio creation alone does not grant universal cross-class applicability.",
       "optionExplanations": {
         "A": "A named existing rule enables the planned reuse.",
         "B": "Repeated custom conditions create separate maintenance obligations.",
         "C": "Hard-coded copies undermine the requested shared behavior.",
         "D": "A queue is not a condition-rule repository."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-40b300ab82b8"
     },
     {
@@ -393,7 +395,7 @@
         "C": "A queue allocates work rather than calculate these outcomes.",
         "D": "Sending email is an action rather than the decision structure."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-1cd432d616da"
     },
     {
@@ -404,7 +406,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Send an email / create a PDF"
+          "text": "Send an email / run a Data Transform"
         },
         {
           "id": "B",
@@ -424,20 +426,20 @@
         "B"
       ],
       "hint": "Automation shapes perform system actions — like sending an email or creating a PDF — without any user input.",
-      "rationale": "Automation shapes act without user interaction (send email, create PDF, change Stage, create Case, wait). Typing data and manual approval require users. No partial credit.",
+      "rationale": "These configured system actions and Change Stage do not require the stated manual input. The wider Automation catalog can include human-facing tasks, and Constellation Create PDF needs a workaround.",
       "optionExplanations": {
         "A": "These actions can run without a user's data entry.",
         "B": "A system action can change case progression.",
         "C": "User entry is an assignment rather than system automation.",
         "D": "Manual signoff requires an approver's action."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-fbfab911b6ff"
     },
     {
       "questionId": "Q7",
       "type": "single-select",
-      "scenario": "Customers should be able to cancel their request at ANY point during the Case. How should this be configured?",
+      "scenario": "Customers should be able to request cancellation throughout active Case processing, subject to authorization and configured relevance. Which scope fits?",
       "options": [
         {
           "id": "A",
@@ -459,15 +461,15 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "A Case-wide optional action is available to the user throughout the entire Case, not just in one Stage.",
-      "rationale": "An action available anytime throughout the Case is a Case-wide optional action. A Stage-wide action is limited to one Stage; a required Step or immediate automation wouldn't give on-demand, anytime cancellation.",
+      "hint": "Scope controls where the optional work may be available, not authorization.",
+      "rationale": "Case-wide optional work fits cross-Stage availability; an optional Process fits cancellation involving multiple Steps. Availability remains subject to configured conditions/authorization.",
       "optionExplanations": {
         "A": "Case-wide scope covers the lifecycle as requested.",
         "B": "A creation task cannot remain available at every later point.",
         "C": "First-stage scope is narrower than the request.",
         "D": "Immediate automation would cancel without the user's optional choice."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-2bdcac2080d7"
     },
     {
@@ -503,7 +505,7 @@
         "C": "Users can initiate these actions.",
         "D": "An optional action does not replace lifecycle resolution."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-2bdcac2080d7"
     },
     {
@@ -539,7 +541,7 @@
         "C": "The condition returns a Boolean rather than a numerical score.",
         "D": "A When rule can express the stated test without a Decision Table."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-40b300ab82b8"
     },
     {
@@ -578,7 +580,7 @@
         "C": "It can choose which steps execute.",
         "D": "Database deployment selection is not the workflow behavior asked here."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-40b300ab82b8"
     },
     {
@@ -614,7 +616,7 @@
         "C": "Automation would run rather than remain an optional user choice.",
         "D": "A required creation step is neither optional nor Verification-only."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-2bdcac2080d7"
     },
     {
@@ -650,7 +652,7 @@
         "C": "A case configuration is a documented input category.",
         "D": "An existing When result can participate in the condition."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-40b300ab82b8"
     },
     {
@@ -686,7 +688,7 @@
         "C": "Evaluating conditions often requires case data.",
         "D": "Conditional execution supports rather than disables automation."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-40b300ab82b8"
     },
     {
@@ -722,14 +724,14 @@
         "C": "System creation does not require manual confirmation of every field.",
         "D": "Creation automation is not restricted to the final stage."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-fbfab911b6ff"
     },
     {
       "questionId": "Q17",
       "type": "multi-select",
       "selectCount": 2,
-      "scenario": "Which TWO statements about When Conditions created in App Studio versus Dev Studio are correct?",
+      "scenario": "In the sourced designer, which indicators distinguish system Automation steps from Collect information steps?",
       "options": [
         {
           "id": "A",
@@ -753,14 +755,14 @@
         "B"
       ],
       "hint": "App Studio When Conditions serve a single context; Dev Studio When Conditions are reusable across Rulesets.",
-      "rationale": "App Studio custom conditions are single-context; Dev Studio conditions are reusable across contexts/Case Types and chosen as an Existing condition by name. C and D are false. No partial credit.",
+      "rationale": "The source describes yellow Automation indicators and green Collect information indicators. Approval subprocesses have their own shape; this does not classify every catalog entry or rely on color alone.",
       "optionExplanations": {
         "A": "The custom App Studio condition has the described local context.",
         "B": "A reusable named Dev Studio condition can serve several contexts.",
         "C": "A local custom condition does not automatically become application-wide.",
         "D": "Named existing conditions can be referenced from the configuration."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-40b300ab82b8"
     },
     {
@@ -796,7 +798,7 @@
         "C": "Red identifies resolution stages rather than both action types.",
         "D": "The described indicators communicate action categories."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-fbfab911b6ff"
     },
     {
@@ -832,18 +834,18 @@
         "C": "A stage is not an assignment-holding queue.",
         "D": "Timing changes do not implement stage eligibility."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-f9d2bfdda85c"
     }
   ],
   "quickRecap": [
     {
       "key": "Process vs Process Flow",
-      "value": "Process = App Studio building block; Process Flow = the underlying generated Flow Rule diagram."
+      "value": "Lifecycle Process contains Steps; Process Flow models shapes/connectors and is opened via Configure Process."
     },
     {
       "key": "Automation shapes",
-      "value": "System actions with no user input: send email, create PDF, create Case, wait, change Stage (yellow Steps)."
+      "value": "System examples: Send email, Run Data Transform, Create Case, Wait, Change Stage. Constellation PDF needs a workaround; catalog includes human-facing tasks too."
     },
     {
       "key": "Automating decisions",
@@ -859,43 +861,55 @@
     },
     {
       "key": "Skipping",
-      "value": "Configure skip-when (a When Condition) to bypass a Stage/Process for the business context."
+      "value": "Stage skip-when true; Process start-when true. Create Stage cannot be skipped."
     },
     {
       "key": "Optional actions",
-      "value": "User-initiated, outside the required Step sequence; Case-wide (anytime) or Stage-wide (only in that Stage)."
+      "value": "Optional user Action for one action; optional Process for multiple Steps. Case-wide/Stage-only scope remains subject to configured relevance and authorization."
     }
   ],
   "topics": [
     {
       "title": "Processes and Process Flows",
-      "url": "https://academy.pega.com/topic/processes-and-process-flows/v2/in/80726",
+      "url": "https://academy.pega.com/topic/processes-and-process-flows/v2/in/93701/99096",
       "duration": "15 min"
     },
     {
       "title": "Automation shapes in the Process Flow",
-      "url": "https://academy.pega.com/topic/automation-shapes-process-flow/v3/in/99096",
+      "url": "https://academy.pega.com/topic/automation-shapes-process-flow/v3/in/93701/99096",
       "duration": "10 min"
     },
     {
       "title": "Automating Decisions in the Process Flow",
-      "url": "https://academy.pega.com/topic/automating-decisions-process-flow/v2/in/80726",
+      "url": "https://academy.pega.com/topic/automating-decisions-process-flow/v2/in/93701/99096",
       "duration": "10 min"
     },
     {
       "title": "Conditional execution",
-      "url": "https://academy.pega.com/topic/conditional-execution/v2/in/80726",
+      "url": "https://academy.pega.com/topic/conditional-execution/v2/in/93701/99096",
       "duration": "20 min"
     },
     {
       "title": "Skipping a Stage or Process",
-      "url": "https://academy.pega.com/topic/skipping-stage-or-process/v2/in/80726",
+      "url": "https://academy.pega.com/topic/skipping-stage-or-process/v2/in/93701/99096",
       "duration": "10 min"
     },
     {
       "title": "Optional actions in workflow",
-      "url": "https://academy.pega.com/topic/optional-actions-workflow/v2/in/80726",
+      "url": "https://academy.pega.com/topic/optional-actions-workflow/v2/in/93701/99096",
       "duration": "5 min"
+    },
+    {
+      "title": "Decision table outcome model",
+      "url": "https://academy.pega.com/topic/decision-tables-dev-studio/v3",
+      "duration": "docs"
+    },
+    {
+      "title": "Decision tree outcome model",
+      "url": "https://academy.pega.com/topic/decision-trees/v3/in/52316/53126",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Pega Platform '25 — module v3, linked bodies checked 2026-10-06"
 }
