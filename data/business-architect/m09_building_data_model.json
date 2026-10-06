@@ -54,7 +54,7 @@
         {
           "type": "concept",
           "term": "Data object",
-          "description": "A structure that groups related fields describing a data entity (e.g., a Customer object with First Name, Last Name, Email). The Pega equivalent of a database table or entity."
+          "description": "A reusable definition grouping fields for a business entity, such as Customer. A local table can store its records, but the definition is not itself a database table and may obtain records through an external service."
         },
         {
           "type": "concept",
@@ -77,7 +77,7 @@
       ],
       "bulletPoints": [
         "A data object can be extended by referencing another data object (nesting); any object can be referenced once or many times.",
-        "Across the Case Life Cycle, different Steps can surface different subsets of the same object's fields — guaranteeing it is the same record.",
+        "Different steps can display different fields from the same referenced instance. Reusing the object definition alone does not ensure two references identify the same record.",
         "Source data locally (Pega database) or from an external system of record.",
         "Pega ships pre-configured objects (e.g., Address-Postal, Address-Email) — reuse or extend before building custom.",
         "Data objects are created/managed on the Data Objects and Integrations landing page."
@@ -103,9 +103,10 @@
         }
       ],
       "bulletPoints": [
-        "Basic (value) field types include: Text, Integer, Decimal, Currency, Percentage, Date only, Date & time, Time of day, Boolean (True/False), Email, Phone, URL, Picklist, and Attachment.",
+        "Basic (value) field types include: Text, Integer, Decimal, Currency, Percentage, Date only, Date & time, Time only, Boolean (True/False), Email, Phone, URL, Picklist, and Attachment.",
         "A Picklist enforces a fixed set of options; Boolean captures yes/no; Currency formats monetary values.",
-        "Data-relationship field types (Embedded Data, Data reference, Case reference) connect a field to an entire data object rather than storing a single value."
+        "Data-relationship field types (Embedded Data, Data reference, Case reference) connect a field to an entire data object rather than storing a single value.",
+        "The documented types also include Address, Location, Prediction, User reference and Query. Field-type selection does not replace every business validation rule."
       ],
       "sectionId": "section-b4212896ad9b"
     },
@@ -122,8 +123,8 @@
           "term": "Value change vs. structure change",
           "description": "Two types of data model changes with different implications:",
           "items": [
-            "VALUE change (adding a customer, updating a phone number) — normal business operation; no process change needed",
-            "STRUCTURE change (adding/removing fields) — modifies the data object definition; may require schema updates"
+            "VALUE change, such as updating an existing phone number, is generally routine data maintenance; assess any business-specific effects.",
+            "STRUCTURE change, such as adding a status field, changes the definition and may require process/schema updates; assess the actual impact."
           ]
         },
         {
@@ -138,7 +139,7 @@
       ],
       "bulletPoints": [
         "Local storage: enter records directly via the Records tab → stored in Pega database tables without touching the database directly.",
-        "External storage: each ROW in the external table is one Data Record; at runtime, integration settings and Data Pages fetch the values."
+        "External tables can supply record rows; external services can return records too. Data Pages/integrations retrieve the configured values."
       ],
       "sectionId": "section-52475d24f8e7"
     },
@@ -193,7 +194,7 @@
         {
           "type": "concept",
           "term": "Three default Data Pages per data object",
-          "description": "Every data object includes a single-record read-only Data Page, a list read-only Data Page, and a single read-and-write Data Page (2 read-only + 1 read-write)."
+          "description": "The sourced App Studio data-object model describes three generated defaults: single read-only, list read-only and single read-and-write. This default set is not a limit on all custom Data Pages that an application may define."
         },
         {
           "type": "concept",
@@ -202,13 +203,13 @@
         },
         {
           "type": "analogy",
-          "text": "A Data Page is a barista: you order a 'Customer' and it fetches the beans from whichever supplier (SOR) and hands you a fresh cup (cached page) — you never deal with the supply chain. A Savable Data Page also takes your changes back to the supplier."
+          "text": "A Data Page retrieves and caches the configured records. A save plan can write changes back; the cache is not automatically fresh without an appropriate refresh strategy."
         }
       ],
       "bulletPoints": [
         "Simulated data sources return placeholder data while the real source is still being developed; they still have a source (e.g., the Pega database), just not the production one.",
         "Refresh strategies manage stale data — balancing application performance against data freshness.",
-        "Case Types have only TWO default Data Pages (single read-only + list read-only), used only when one Case Type requests data from another via a Case reference (because Cases auto-save)."
+        "The source describes two generated Case Type reference pages, single and list read-only, for Case reference retrieval. This describes those defaults rather than limiting every use of custom Data Pages."
       ],
       "sectionId": "section-ec78fd28bd8d"
     }
@@ -247,12 +248,12 @@
     {
       "title": "Value change vs. structure change",
       "trapDescription": "Adding/editing record VALUES is routine; adding/removing FIELDS changes the process.",
-      "bestPractice": "Record value change = no process change; field/structure change = process change."
+      "bestPractice": "Value maintenance is generally routine; structural changes require impact assessment and can affect the business process."
     },
     {
       "title": "Default Data Page counts",
       "trapDescription": "Object = three (2 read-only + 1 read-write); Case Type = two (both read-only).",
-      "bestPractice": "Memorize both counts and that Case Type pages are used only for cross-Case-Type requests via Case reference."
+      "bestPractice": "Know the generated default sets and their reference purpose; do not treat their counts as a limit on custom Data Pages."
     },
     {
       "title": "Draft data object has no fields/integration",
@@ -294,7 +295,7 @@
         "C": "The physical view describes implementation and storage details.",
         "D": "The integration map is too technical for this early entity workshop."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-055287b6168d"
     },
     {
@@ -330,7 +331,7 @@
         "C": "Storage and connection design belong to the physical model.",
         "D": "A save plan describes persistence rather than this model translation."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-055287b6168d"
     },
     {
@@ -366,7 +367,7 @@
         "C": "One-to-many would show multiplicity on only one end.",
         "D": "The connector explicitly represents a relationship."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-055287b6168d"
     },
     {
@@ -402,7 +403,7 @@
         "C": "A property is a field rather than a separate data object.",
         "D": "A Data Page retrieves instances rather than name this structural grouping."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-6dd5d40a5cc5"
     },
     {
@@ -438,7 +439,7 @@
         "C": "Creating the placeholder does not itself configure a write-back page.",
         "D": "Draft structure is different from a simulated retrieval source."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-6dd5d40a5cc5"
     },
     {
@@ -467,14 +468,14 @@
         "A"
       ],
       "hint": "Editing an existing record's values is a routine data operation, not a structural process change.",
-      "rationale": "Adding or editing record VALUES is a normal business data operation requiring no process change. Adding a new FIELD, however, changes the data object's structure and constitutes a change to the business process.",
+      "rationale": "Updating values under the existing schema is routine maintenance in this scenario. Adding a field changes structure and may require process changes; assess the actual business effect.",
       "optionExplanations": {
         "A": "New records and changed values are routine data operations.",
         "B": "Adding a field changes structure; editing a value does not.",
         "C": "A new customer record does not require a new case model.",
         "D": "The same business process can operate on updated record values."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-52475d24f8e7"
     },
     {
@@ -510,7 +511,7 @@
         "C": "A case status describes progress rather than record identity.",
         "D": "An identifier is not a data-source configuration."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-52475d24f8e7"
     },
     {
@@ -546,7 +547,7 @@
         "C": "Relationships also connect data objects, not just cases.",
         "D": "Associated objects still define the reusable field structure."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-77a240a9a808"
     },
     {
@@ -582,7 +583,7 @@
         "C": "This is address entry rather than selection of an existing case.",
         "D": "A list permits multiple addresses rather than the required one."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-77a240a9a808"
     },
     {
@@ -618,7 +619,7 @@
         "C": "A list conflicts with exactly one customer per order.",
         "D": "The source is a customer record rather than another case."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-77a240a9a808"
     },
     {
@@ -654,7 +655,7 @@
         "C": "Record identity alone does not select the relationship's data source.",
         "D": "Case saving does not determine whether the source is external."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-77a240a9a808"
     },
     {
@@ -690,13 +691,13 @@
         "C": "A data reference selects data records rather than the specified cases.",
         "D": "A picklist value is not a typed relationship to an existing case."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-77a240a9a808"
     },
     {
       "questionId": "Q13",
       "type": "single-select",
-      "scenario": "How many default Data Pages does each DATA OBJECT have, and of what kinds?",
+      "scenario": "Which three default Data Pages does the sourced App Studio data-object model describe?",
       "options": [
         {
           "id": "A",
@@ -719,14 +720,14 @@
         "A"
       ],
       "hint": "Each data object gets three default Data Pages: two read-only and one read-and-write.",
-      "rationale": "A data object has three default Data Pages: single read-only, list read-only, and single read-and-write (Savable). Case Types have only two default Data Pages, both read-only, because Cases auto-save and don't need a write Data Page.",
+      "rationale": "The described generated defaults are single read-only, list read-only and single read-and-write. They are not a limit on custom pages. The source separately describes two read-only Case Type reference defaults.",
       "optionExplanations": {
-        "A": "The defaults provide one record, a collection, and a write-back path.",
+        "A": "These are the three generated defaults described by the source, not the maximum custom page count.",
         "B": "This omits the default single read-and-write page.",
         "C": "This omits both of the default read-only pages.",
         "D": "The savable single page is already included in the three defaults."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-ec78fd28bd8d"
     },
     {
@@ -762,7 +763,7 @@
         "C": "Simulation supplies temporary values rather than define the whole virtualization layer.",
         "D": "A case reference is one relationship rather than the retrieval abstraction."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-ec78fd28bd8d"
     },
     {
@@ -798,17 +799,17 @@
         "C": "Scattered hard-coded values make later integration replacement harder.",
         "D": "A temporary integration gap does not justify permanently changing the data model."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-ec78fd28bd8d"
     },
     {
       "questionId": "Q16",
       "type": "single-select",
-      "scenario": "Case Types have only two default Data Pages (both read-only). When are they actually used?",
+      "scenario": "Which purpose does the source describe for the two default read-only Case Type reference Data Pages?",
       "options": [
         {
           "id": "A",
-          "text": "Only when one Case Type requests data from another via a Case reference relationship"
+          "text": "Retrieving another Case Type’s information through a Case reference relationship"
         },
         {
           "id": "B",
@@ -826,15 +827,15 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Case Type Data Pages are used only when another Case Type requests data via a Case reference field.",
-      "rationale": "Because Cases auto-save, the two read-only Case Type Data Pages are used specifically when one Case Type requests another's data via a Case reference relationship — not for general data lookup.",
+      "hint": "This concerns the generated reference defaults, not every possible custom Data Page.",
+      "rationale": "The source assigns these read-only defaults to Case reference retrieval. They are not write-back pages or a restriction on all custom data lookup.",
       "optionExplanations": {
-        "A": "The defaults support referencing information from other cases.",
+        "A": "The source describes Case reference retrieval as the purpose of these generated read-only defaults.",
         "B": "Ordinary case persistence does not use these read-only reference pages.",
         "C": "A savable data-object page has a different write-back purpose.",
         "D": "The read-only case pages also support real case references."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-ec78fd28bd8d"
     },
     {
@@ -872,7 +873,7 @@
         "C": "Records are instances; the object's definition is reusable.",
         "D": "A relationship associates objects rather than define the same structure."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-6dd5d40a5cc5"
     },
     {
@@ -910,7 +911,7 @@
         "C": "This replaces the external product source and changes cardinality incorrectly.",
         "D": "Order lines are not selected existing cases and there are several of them."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-77a240a9a808"
     },
     {
@@ -946,7 +947,7 @@
         "C": "Boolean supports only two states rather than three shipping speeds.",
         "D": "An attachment stores a file rather than the shipping choice."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-b4212896ad9b"
     },
     {
@@ -982,7 +983,7 @@
         "C": "This reverses structure and record editing and misuses the integration map.",
         "D": "App Studio supports both operations described here."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-52475d24f8e7"
     }
   ],
@@ -1005,11 +1006,11 @@
     },
     {
       "key": "Data Record",
-      "value": "Fields + values for one instance. Value change = routine; field change = process change. pyGUID = local record ID stored with the Case."
+      "value": "Record = one instance’s values; routine value changes differ from structural impact. Local pyGUID identifies the referenced record."
     },
     {
       "key": "Data Pages",
-      "value": "Bridge that caches data in memory; powers Pega Live Data. Object = 3 (2 read-only + 1 read-write); Case Type = 2 (both read-only)."
+      "value": "Data Pages retrieve/cache. Documented generated defaults: object three; Case Type reference two. Custom pages are not limited to these counts."
     },
     {
       "key": "Savable / Simulated",
@@ -1023,33 +1024,35 @@
   "topics": [
     {
       "title": "Basics of a Data Model",
-      "url": "https://academy.pega.com/topic/basics-data-model/v2/in/80411/80571",
+      "url": "https://academy.pega.com/topic/basics-data-model/v2/in/93701/94321",
       "duration": "20 min"
     },
     {
       "title": "Understanding Data Objects",
-      "url": "https://academy.pega.com/topic/understanding-data-objects/v2/in/80411/80571",
+      "url": "https://academy.pega.com/topic/understanding-data-objects/v2/in/93701/94321",
       "duration": "10 min"
     },
     {
       "title": "Fields and Field Types",
-      "url": "https://academy.pega.com/topic/fields-and-field-types/v2/in/80411/80571",
+      "url": "https://academy.pega.com/topic/fields-and-field-types/v2/in/93701/94321",
       "duration": "15 min"
     },
     {
       "title": "Application Data Records",
-      "url": "https://academy.pega.com/topic/application-data-records/v2/in/80411/80571",
+      "url": "https://academy.pega.com/topic/application-data-records/v2/in/93701/94321",
       "duration": "10 min"
     },
     {
       "title": "Creating data relationships",
-      "url": "https://academy.pega.com/topic/creating-data-relationships/v2/in/80411/80571",
+      "url": "https://academy.pega.com/topic/creating-data-relationships/v2/in/93701/94321",
       "duration": "15 min"
     },
     {
       "title": "Accessing data with Data Pages",
-      "url": "https://academy.pega.com/topic/accessing-data-data-pages/v3/in/94321",
+      "url": "https://academy.pega.com/topic/accessing-data-data-pages/v3/in/93701/94321",
       "duration": "15 min"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Pega Platform '25 — module v3, linked topic bodies checked 2026-10-06"
 }

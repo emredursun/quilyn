@@ -1570,3 +1570,10 @@ for(const [file,keys,verify] of [
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/'+file),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,keys[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});verify(d);
 });
+
+test('PBA data-model review distinguishes reusable definitions from record identity and scopes default pages',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/business-architect/m09_building_data_model.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===16||i===17?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].description,/not itself a database table/);assert.match(d.studyGuide[1].bulletPoints[1],/definition alone does not ensure/);assert.match(d.studyGuide[5].elements[2].description,/not a limit on all custom Data Pages/);assert.match(d.practiceQuiz[15].rationale,/not.*restriction on all custom/);
+ assert.ok(d.topics.every(t=>t.url.includes('/93701/94321')));
+});
