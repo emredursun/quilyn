@@ -15,12 +15,12 @@
         {
           "type": "concept",
           "term": "Hook",
-          "description": "An object that runs an existing Shared Step or Shared Group before/after each step, or before/after an entire test. Once a hook is created, tests run as usual — the hook simply executes automatically as any other step would, at the point it's attached to."
+          "description": "Test Configuration hooks call an existing shared step/group at configured step/test boundaries. Create or edit the configuration and apply it to the relevant tests; creating a configuration alone does not attach it to every test."
         },
         {
           "type": "concept",
           "term": "Before each step / After each step",
-          "description": "A 'before each step' handler runs before every single step in the test; an 'after each step' handler runs after every single step — this is what gives the effect of running something 'between' steps throughout the whole test, not just once at the start or end."
+          "description": "Per-step handlers attach before/after steps. After handlers have Run on choices (Always, Success, Failure), so they are not unconditional in every configuration. Hooks can still run around a step skipped by its own condition; distinguish that condition from the hook’s Run on selection."
         },
         {
           "type": "concept",
@@ -34,9 +34,9 @@
       ],
       "bulletPoints": [
         "Hook = runs a Shared Step/Group before/after a step, or before/after a test.",
-        "'Before/after each step' handlers fire on EVERY step, producing a between-steps effect across the whole test.",
+        "Per-step hooks observe configured boundaries; after hooks obey their Run on choice.",
         "Configuration File run hooks = backend setup/params before/after a single test, or before/after all tests in a run.",
-        "Hooks run automatically once created — no per-test manual wiring needed afterward."
+        "Apply the hook configuration to relevant tests and inspect its results."
       ],
       "sectionId": "section-4d36436ab495"
     },
@@ -47,20 +47,20 @@
           "type": "list",
           "title": "Common scenarios calling for a hook",
           "items": [
-            "Setting up the test — initializing variables used throughout, or preparing the test environment (e.g. a database connection, required directories, starting a server) via a 'before test' hook.",
-            "Repairing/refreshing test data mid-run — a 'before/after each step' hook that resets or corrects a piece of data so subsequent steps aren't left working with stale state.",
-            "Cleaning up after execution — an 'after test' hook that tears down what the 'before test' hook set up, so the environment doesn't leak state into the next run."
+            "Setup: configure applicable before-test logic with supported runtime/access and explicit input state.",
+            "Per-step observation: collect relevant debugging or intermediate-result evidence without silently repairing an application defect.",
+            "Cleanup: configure applicable after-test behavior and verify actual cleanup; hook creation is not a guarantee resources were released."
           ]
         },
         {
           "type": "note",
-          "text": "The common thread: a hook is the right tool whenever the same setup/repair/cleanup logic would otherwise need to be manually copied into the start or end of many tests — exactly the kind of duplication Shared Steps and Hooks exist to eliminate."
+          "text": "Choose the mechanism for its runtime and lifecycle scope. Shared code reduces duplication, but the hook still requires applicable configuration, dependencies and outcome checks."
         }
       ],
       "bulletPoints": [
-        "Setup: before-test hook for variable init / environment prep.",
-        "Repair: before/after-each-step hook to keep data correct as the test progresses.",
-        "Cleanup: after-test hook to tear down what setup created."
+        "Configure setup and inspect effective state.",
+        "Use per-step observation deliberately; avoid masking defects.",
+        "Verify cleanup and applicable after-hook Run on behavior."
       ],
       "sectionId": "section-85c3a6c6d6f4"
     }
@@ -74,7 +74,7 @@
     {
       "title": "Manually copying setup/cleanup logic into every test",
       "trapDescription": "Re-adding the same 'prepare the environment' steps at the start, and the same 'tear it down' steps at the end, of many separate tests.",
-      "bestPractice": "Recognize this as a hook scenario: a before-test hook for setup and an after-test hook for cleanup eliminate the need to duplicate that logic across every test."
+      "bestPractice": "Use applicable shared setup/cleanup logic with the correct hook mechanism and configuration. Validate resources and Run on behavior; hooking does not itself prove successful cleanup."
     }
   ],
   "practiceQuiz": [
@@ -104,7 +104,15 @@
         "B"
       ],
       "hint": "It's specifically about running something before/after — using existing shared steps.",
-      "rationale": "A Hook runs an existing Shared Step or Shared Group before/after each step, or before/after a test — not a validation type, a label/tag, or a browser extension."
+      "rationale": "A Hook runs an existing Shared Step or Shared Group before/after each step, or before/after a test — not a validation type, a label/tag, or a browser extension.",
+      "optionExplanations": {
+        "A": "A hook is a lifecycle mechanism, not only an API response check.",
+        "B": "It invokes shared logic at the configured step/test boundary.",
+        "C": "Failure tags organize results rather than execute shared hook logic.",
+        "D": "Video capture is an extension feature, not a lifecycle hook."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-4d36436ab495"
     },
     {
       "questionId": "Q2",
@@ -132,16 +140,24 @@
         "B"
       ],
       "hint": "Think CLI/run-level setup, not step-level.",
-      "rationale": "Configuration File run hooks operate from the CLI config to set up the application backend and define parameters before/after a single test or before/after all tests in a run — a different granularity than editor-level Hooks attached to a specific step or test."
+      "rationale": "Configuration File run hooks operate from the CLI config to set up the application backend and define parameters before/after a single test or before/after all tests in a run — a different granularity than editor-level Hooks attached to a specific step or test.",
+      "optionExplanations": {
+        "A": "Configuration File hooks and Test Configuration hooks have different mechanisms.",
+        "B": "Config hooks support CLI test/suite setup and parameters.",
+        "C": "The documented config mechanism is not mobile-only.",
+        "D": "Hooks do not remove the need for reusable shared logic."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-4d36436ab495"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "A team keeps manually re-initializing the same set of variables and preparing the same test environment (e.g. a database connection) at the start of dozens of tests. What should they recognize this as?",
+      "scenario": "A team repeats Node.js database-connection setup before each test in a CLI execution. Which reusable lifecycle mechanism fits this setup?",
       "options": [
         {
           "id": "A",
-          "text": "A scenario for a before-test hook, to run that setup logic once per test automatically instead of duplicating it."
+          "text": "A Configuration File beforeTest hook with the required runtime, access and cleanup."
         },
         {
           "id": "B",
@@ -159,13 +175,21 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Variable initialization and environment prep are named use cases for one specific hook type.",
-      "rationale": "A before-test hook is used for exactly this: initializing variables used throughout the test, and preparing the test environment (database connection, directories, starting a server) — eliminating the need to manually duplicate that setup in every test."
+      "hint": "This setup belongs to the stated Node.js CLI execution lifecycle.",
+      "rationale": "Configuration File beforeTest runs reusable setup for each test in the execution. Configure authorized resource access and verify cleanup; creating an editor configuration alone does not install this Node.js setup.",
+      "optionExplanations": {
+        "A": "The config beforeTest lifecycle fits the stated per-test Node.js setup.",
+        "B": "Testim provides configuration-file hooks for this setup.",
+        "C": "Disabling all hooks does not remove repeated setup.",
+        "D": "The entire test need not be rewritten as one custom action."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-85c3a6c6d6f4"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "What is the effect of an 'after each step' hook across a test?",
+      "scenario": "An applied after-each-step hook is configured with Run on Always. Which boundary does it observe, as distinct from afterSuite?",
       "options": [
         {
           "id": "A",
@@ -188,7 +212,15 @@
         "B"
       ],
       "hint": "It's 'each' step, not just the last one.",
-      "rationale": "An 'after each step' handler runs after every single step in the test — not just once at the end — which is what produces the effect of something running 'between' steps throughout the whole run. It isn't failure-conditional, and it's a different mechanism from the Configuration File's afterSuite hook, which operates at the run/suite level."
+      "rationale": "The per-step handler observes each step boundary under the stated Always setting. Success/Failure settings can restrict other configurations; afterSuite operates on the CLI suite lifecycle.",
+      "optionExplanations": {
+        "A": "Once at the suite/test end is different from the stated per-step hook.",
+        "B": "Under Always, the applied handler observes each step boundary.",
+        "C": "Failure-only is a different Run on selection.",
+        "D": "afterSuite operates at the suite lifecycle, not each step."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-4d36436ab495"
     }
   ],
   "quickRecap": [
@@ -198,11 +230,11 @@
     },
     {
       "key": "Before/after each step",
-      "value": "Fires on every step — the 'between steps' effect across the whole test."
+      "value": "Per-step handlers observe configured boundaries; after handlers obey Always/Success/Failure."
     },
     {
       "key": "Recognize the scenario",
-      "value": "Setup (variables/environment) → before-test hook; data repair → before/after-each-step hook; cleanup → after-test hook."
+      "value": "Choose lifecycle/runtime and apply the configuration; inspect setup, observation and cleanup outcomes."
     },
     {
       "key": "Config File run hooks",
@@ -220,5 +252,7 @@
       "url": "https://docs.tricentis.com/testim/content/running-tests/configuration-file-run-hooks/index.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }

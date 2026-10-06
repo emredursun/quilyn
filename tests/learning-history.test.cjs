@@ -1446,3 +1446,12 @@ test('Testim API review preserves parameter support in both types and scopes pre
  assert.match(d.studyGuide[2].elements[1].description,/does not bypass server authorization/);
  assert.doesNotMatch(JSON.stringify(d),/recommended default.*allows passing|parameter passing isn't as directly supported/);
 });
+
+test('Testim hook review applies configuration and Run on choices and separates CLI beforeTest setup',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m15_how_to_use_hooks.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/apply it.*does not attach it to every test/);
+ assert.match(d.studyGuide[0].elements[1].description,/Always, Success, Failure.*skipped/);
+ assert.match(d.practiceQuiz[2].options[0].text,/Configuration File beforeTest/);
+ assert.doesNotMatch(JSON.stringify(d),/no per-test manual wiring|repairs?.*correct.*stale state/);
+});
