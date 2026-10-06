@@ -3,11 +3,11 @@
   "moduleTitle": "Automating Mobile Apps on TMA — Part 4: Troubleshooting with TMA",
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1408/automating-mobile-apps-on-tma-with-tricentis-tosca-mobile",
   "learningObjectives": [
-    "Describe how to troubleshoot mobile automation issues when working with the Tricentis Mobile Agent.",
-    "Apply a systematic, layer-by-layer method to any mobile automation failure.",
-    "Read TMA's own logs to separate device-layer problems from Tosca-side ones.",
-    "Recognise the small set of failure signatures that account for most mobile automation problems.",
-    "Know which diagnostic step to reach for first, given a specific symptom."
+    "Use observed symptoms and logs to investigate mobile automation failures.",
+    "Check device visibility, supported versions and effective connection configuration.",
+    "Compare Agent, driver and Tosca evidence without assuming one source is complete.",
+    "Verify application signing issues instead of applying a universal signature remedy.",
+    "Correlate a session with timestamps and available identifiers."
   ],
   "estTime": "30 min",
   "studyGuide": [
@@ -17,11 +17,11 @@
         {
           "type": "concept",
           "term": "Why this deserves a dedicated part",
-          "description": "Mobile automation setup spans several independent layers — the device/emulator, TMA, the network path between TMA and Tosca, and Tosca's own TCP configuration. A failure at any one layer can produce a symptom that looks like it belongs to a different layer entirely (the recurring theme across this whole course). Troubleshooting effectively means having a fixed order to check those layers in, rather than guessing based on where the error message points."
+          "description": "Device, Agent, network, driver, application and Tosca configuration can all contribute to a failure. This independent local diagnostic guide uses accessible technical documentation; choose checks from observed evidence rather than assuming one universal fastest sequence."
         }
       ],
       "bulletPoints": [
-        "The skill isn't memorizing every error — it's having a reliable order to isolate which layer actually failed."
+        "Capture evidence and change one relevant variable at a time."
       ],
       "sectionId": "section-540a10e18e57"
     },
@@ -30,22 +30,22 @@
       "elements": [
         {
           "type": "steps",
-          "title": "The order that isolates problems fastest",
+          "title": "Evidence to gather",
           "items": [
-            "Device/emulator layer: is the device or AVD actually booted and responsive on its own, independent of TMA or Tosca?",
-            "TMA layer: does the TMA console show the device as Ready? Does GET /api/devices confirm connected:true, busy:false directly from TMA's own REST API?",
-            "Network layer (Remote only): is the TMA host's port reachable from the Tosca machine — firewall rules, and was TMA actually started with --rest-address?",
-            "Tosca configuration layer: do the TCP values (TMAServer with its trailing slash, DeviceName, AppPackage/AppActivity or BundleID) match the documented format exactly?",
-            "Only after all four layers check out, consider something environment-specific or a version mismatch between Tosca and TMA."
+            "Check whether the device/emulator boots and responds. For Android discovery problems, compare adb detection with the Agent device list.",
+            "Record Agent status and available logs. A Ready summary alone does not prove that a session or application will launch.",
+            "For remote connections, verify the actual configured host and ports from the Tosca machine. REST/web bindings and Appium ports are distinct.",
+            "Inspect effective TCPs and capabilities for the actual connection, platform and application; compare scan and execution configuration.",
+            "Check the installed Tosca, Agent, driver and OS support requirements when relevant; version compatibility need not wait until every other check has finished."
           ]
         },
         {
           "type": "note",
-          "text": "This order matters because each layer is cheap to verify in isolation and rules out an entire category of causes at once — checking TCP formatting before confirming the device itself is healthy wastes time second-guessing a config value that was never the problem."
+          "text": "A successful check narrows a hypothesis but does not rule out an entire layer. Prioritize the error and reproduction evidence, then retest the smallest relevant operation."
         }
       ],
       "bulletPoints": [
-        "Device → TMA → network (Remote) → Tosca config → environment/version — check in that order, not reactively based on the error text."
+        "No fixed diagnostic order proves all causes in a layer impossible."
       ],
       "sectionId": "section-340f5d4f4d97"
     },
@@ -55,80 +55,80 @@
         {
           "type": "concept",
           "term": "Why go past the console",
-          "description": "The TMA console's device list gives a status summary; TMA's underlying logs give the actual detail behind a session that failed to start, including the raw driver-level (Appium/UiAutomator2/XCUITest) error that the Tosca-side error message often paraphrases or, as with the trailing-slash case, mischaracterizes entirely."
+          "description": "Agent and driver logs can provide information about failed sessions beyond a status summary. Tosca’s Log Viewer adds execution evidence and supports text/regex search. Logging detail and retained history vary; preserve the relevant run before logs expire."
         },
         {
           "type": "note",
-          "text": "When a Tosca-side error message and a device-console Ready status disagree with each other, the raw TMA log is usually where the real story is — it sits closer to the actual failure than either the summarized console status or Tosca's own error text."
+          "text": "TMA 2026.2 documents Agent Settings → Agent Logs → Download Logs, a cadence up to five days, and selectable iOS, Android and Appium log types. This UI is version-scoped: it is not certified here for TMA 2025.4. Compare evidence from the actual installed version."
         },
         {
           "type": "concept",
-          "term": "Session ID as the log's lookup key",
-          "description": "Each session TMA creates carries a Session ID, and every log line produced by that session is tagged with it. A log file typically holds several runs one after another, so the Session ID is what lets you jump straight to the one execution under investigation instead of reading the whole file — it identifies a session in the log, nothing more; it isn't used to steer controls or edit TestCase data."
+          "term": "Session correlation",
+          "description": "Use a session ID where present together with timestamps, target information and the failing command to correlate a run. Do not assume every log line contains that ID or that a session-creation failure produced an ID. Correlation helps locate evidence; it does not edit controls or TestCase data."
         }
       ],
       "bulletPoints": [
-        "The TMA log carries more detail than either the console's status summary or Tosca's paraphrased error message.",
-        "Session ID = the key for navigating to one specific session inside a log file holding many runs."
+        "Compare Agent/driver logs with Tosca execution evidence.",
+        "Session IDs and timestamps help correlation; missing or partial records need further investigation."
       ],
       "sectionId": "section-bb3ef336d9b1"
     },
     {
-      "sectionTitle": "Recurring failure signatures",
+      "sectionTitle": "Symptom-based investigations",
       "elements": [
         {
           "type": "list",
-          "title": "Patterns worth recognising on sight",
+          "title": "Useful checks, not universal diagnoses",
           "items": [
-            "'Could not create TMA session: Ensure that the requested device is connected' — check the TMAServer trailing slash before touching the device at all.",
-            "Device visible in the OS but absent from the TMA console — a device-layer prerequisite (USB debugging, Developer Mode, phone-data access) rather than a Tosca problem.",
-            "APK install fails with a certificate/signature error — an old v1-only-signed APK meeting a modern Android version's v2+ requirement; re-sign with apksigner.",
-            "Scan connects fine but execution fails on the same connection — the Scan wizard's Add connection dialog tolerates formatting the execution path does not; re-check the TCP value's exact documented format.",
-            "Dynamic allocation intermittently can't find a device under load — a pool-sizing/criteria issue, not a single misconfigured value."
+            "Device missing from Agent: compare adb discovery, device authorization, supported OS and Agent configuration. OS visibility alone does not identify the cause.",
+            "Android recorder issue: the TMA troubleshooting guide includes checks for UiAutomator2 helper apps and their installation. Follow the procedure appropriate to the installed Agent and device.",
+            "APK signature error: use apksigner verify and inspect the actual certificate/platform error; obtain a compatible build from the application owner rather than blindly re-signing.",
+            "Scan succeeds but execution fails: compare effective connection settings, capabilities, target, application state and logs. Success in one operation does not prove execution configuration matches.",
+            "Dynamic-selection timeout: inspect actual compatible device availability alongside configuration and driver errors; do not assume every timeout is a capacity failure."
           ]
         }
       ],
       "bulletPoints": [
-        "A handful of failure signatures account for most real-world mobile automation problems — recognising them on sight beats re-deriving the diagnosis from scratch each time."
+        "An error message suggests checks but does not certify a single root cause."
       ],
       "sectionId": "section-8623ca1a9cee"
     },
     {
-      "sectionTitle": "Where this course leads next",
+      "sectionTitle": "Continue with related local material",
       "elements": [
         {
           "type": "note",
-          "text": "This part closes the 'Automating mobile apps on TMA' course. The Tricentis Academy learning path continues with 'Handling advanced mobile automation use cases with Tricentis Tosca Mobile' — the natural follow-up once AVD setup, native/hybrid/web TestCase authoring, dynamic device allocation, and troubleshooting are all comfortable."
+          "text": "The local advanced-use-case modules can extend this practice after connection and basic execution are understood. The original Academy course ordering and recording were unavailable for comparison; this recommendation is independent local guidance."
         }
       ],
       "bulletPoints": [
-        "Next course in the path: Handling advanced mobile automation use cases with Tricentis Tosca Mobile."
+        "Use related local modules after validating the basic workflow."
       ],
       "sectionId": "section-856aaf707e76"
     }
   ],
   "examPitfalls": [
     {
-      "title": "Diagnosing from the error message's literal wording",
-      "trapDescription": "Reading 'ensure the requested device is connected' and spending the first round of troubleshooting on the device itself.",
-      "bestPractice": "Recognise this specific message as a known signature of a TMAServer formatting issue (usually the trailing slash) before investigating the device — the wording is misleading by design of the underlying URL construction, not a hint about where to look."
+      "title": "Assigning a root cause from generic error wording",
+      "trapDescription": "Treating a connection message as proof of one URL or device defect.",
+      "bestPractice": "Compare effective configuration with device and session evidence before changing settings."
     },
     {
-      "title": "Skipping straight to Tosca's TCPs before confirming the device/TMA layers",
-      "trapDescription": "Editing TCP values as a first response to any connection failure, without first confirming the device is Ready in the TMA console.",
-      "bestPractice": "Work the layers in order — device, then TMA, then network (Remote), then Tosca config. Each layer ruled out first narrows the search before touching configuration."
+      "title": "Treating a successful check as complete fault isolation",
+      "trapDescription": "Assuming device visibility or a Ready summary rules out all device, driver and application issues.",
+      "bestPractice": "Test session creation and application launch separately and inspect supported versions when relevant."
     },
     {
-      "title": "Relying only on the TMA console's status, never the underlying logs",
-      "trapDescription": "Seeing 'Ready' in the console and concluding the device layer can't be the cause of a subsequent failure.",
-      "bestPractice": "The console shows a status summary; the underlying TMA log shows the actual session-level detail. When console status and Tosca's error disagree, the log is the tie-breaker."
+      "title": "Assuming logs are complete",
+      "trapDescription": "Treating one log source as a guaranteed tie-breaker containing every driver detail.",
+      "bestPractice": "Correlate available Agent, driver and Tosca records with timestamps and identifiers; acknowledge missing evidence."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "Following a layer-by-layer troubleshooting method for a mobile connection failure, what should be checked first?",
+      "scenario": "The emulator screen is unresponsive and its boot has not been confirmed. Which check directly investigates this observed symptom before attempting a Tosca session?",
       "options": [
         {
           "id": "A",
@@ -150,8 +150,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Start at the layer closest to the physical hardware.",
-      "rationale": "The method works outward from the device layer: device/emulator health first, then TMA, then network (for Remote setups), then Tosca's own configuration, and version mismatches last — each step rules out a whole category before moving to the next."
+      "hint": "The scenario establishes an unverified, unresponsive emulator.",
+      "rationale": "Confirm boot and responsiveness for the stated symptom. This is not a universal rule that configuration or version checks must always happen last.",
+      "optionExplanations": {
+        "A": "TCP review can be useful, but it does not directly confirm the observed emulator boot problem.",
+        "B": "Boot and responsiveness directly investigate this stated symptom.",
+        "C": "Remote firewall review does not directly confirm local emulator responsiveness.",
+        "D": "Compatibility matters, but reading version numbers does not confirm the observed boot state."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-340f5d4f4d97"
     },
     {
       "questionId": "Q2",
@@ -179,40 +187,56 @@
         "A"
       ],
       "hint": "The console gives a summary; something more detailed sits underneath it.",
-      "rationale": "When the console's status and Tosca's error disagree, the underlying TMA log carries the actual session-level detail that resolves the disagreement — it sits closer to the real failure than either the summarized console status or Tosca's paraphrased error."
+      "rationale": "Agent/driver logs are a useful next evidence source alongside Tosca execution logs. They may be incomplete and do not automatically resolve every disagreement; destructive changes are not justified by a Ready summary.",
+      "optionExplanations": {
+        "A": "Logs can provide further evidence, without guaranteeing a complete diagnosis.",
+        "B": "Reinstallation is not justified by this evidence.",
+        "C": "Replacement is not justified by this evidence.",
+        "D": "Disabling the entire firewall is not an evidence-based remedy."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-bb3ef336d9b1"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "Which of the following is a known, recognisable failure signature rather than something requiring fresh investigation each time?",
+      "scenario": "Mobile Scan succeeds, but execution fails. Which response uses evidence without inventing a universal cause?",
       "options": [
         {
           "id": "A",
-          "text": "A TestCase that passes on the first run and fails identically on every subsequent run for an unrelated reason each time."
+          "text": "Always recreate every emulator."
         },
         {
           "id": "B",
-          "text": "'Could not create TMA session: Ensure that the requested device is connected' appearing after a Mobile Scan connected successfully."
+          "text": "Compare effective scan/execution configuration, target state and relevant logs."
         },
         {
           "id": "C",
-          "text": "A TestCase that has never been run before failing on its very first execution."
+          "text": "Always remove the firewall entirely."
         },
         {
           "id": "D",
-          "text": "A brand new AVD that has never been configured in any TCP failing to appear in Tosca."
+          "text": "Assume a trailing slash proves the sole cause of every such failure."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "One of these has a name and a known root cause across this whole course; the others are too generic to be a 'signature.'",
-      "rationale": "That specific error text following a successful scan is the recognisable signature of a TMAServer trailing-slash formatting problem — worth recognising on sight rather than re-diagnosing from first principles every time it appears."
+      "hint": "A successful scan proves that operation succeeded, not that every execution parameter matches.",
+      "rationale": "Compare effective setup and actual failure evidence. A scan/execution difference does not establish a universal URL parser defect, firewall failure or corrupt emulator.",
+      "optionExplanations": {
+        "A": "Successful scanning does not prove every emulator must be recreated.",
+        "B": "Compare actual configurations and failure evidence before choosing a remedy.",
+        "C": "The evidence does not justify removing the firewall.",
+        "D": "This symptom does not establish one universal URL cause."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-8623ca1a9cee"
     },
     {
       "questionId": "Q4",
       "type": "multi-select",
-      "scenario": "What are the advantages of effective troubleshooting in mobile test automation? (three correct answers)",
+      "scenario": "Which are potential benefits of evidence-based troubleshooting? (three correct answers)",
       "options": [
         {
           "id": "A",
@@ -220,7 +244,7 @@
         },
         {
           "id": "B",
-          "text": "Enhance user experience"
+          "text": "Help uncover real application defects that affect user experience"
         },
         {
           "id": "C",
@@ -240,8 +264,17 @@
         "B",
         "D"
       ],
-      "hint": "Two of these overclaim or invert what troubleshooting is for — one adds manual work, the other promises something no practice can promise.",
-      "rationale": "Systematic troubleshooting means a failure is diagnosed once and its signature recognised thereafter, so TestCases need less rework (reduced maintenance), device/execution time isn't burned re-running blind (minimized wasted resources), and real app defects surface instead of being written off as flakiness (better user experience). C inverts the point — good troubleshooting reduces the manual fallback, it doesn't increase it. E is an overclaim: troubleshooting shortens the path from failure to cause, it never eliminates failures."
+      "hint": "Benefits are possible improvements, not universal guarantees about manual work or failure counts.",
+      "rationale": "Evidence-based diagnosis can reduce avoidable rework and wasted reruns and help surface real application defects. It neither requires increased manual testing in every case nor guarantees zero failures.",
+      "optionExplanations": {
+        "A": "Accurate diagnosis can reduce avoidable test rework.",
+        "B": "Identifying actual app defects can support improvements to user experience.",
+        "C": "Troubleshooting does not inherently require increased manual testing in every case.",
+        "D": "Avoiding blind reruns can reduce wasted execution effort.",
+        "E": "No troubleshooting method guarantees zero failures."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-540a10e18e57"
     },
     {
       "questionId": "Q5",
@@ -262,36 +295,44 @@
         },
         {
           "id": "D",
-          "text": "To navigate directly to a specific session in the log"
+          "text": "Correlate available log records with a specific session"
         }
       ],
       "correctOptions": [
         "D"
       ],
-      "hint": "It's a lookup key for the log, not something you edit or steer with.",
-      "rationale": "Every TMA/Appium session gets its own Session ID, and every log line belonging to that session is tagged with it. In a log file holding several runs back to back, searching that ID is what isolates the one execution you care about — the other options describe editing controls or TestCase data, which the Session ID has nothing to do with."
+      "hint": "An identifier helps correlation when available.",
+      "rationale": "Use an available session ID with timestamps and target information to correlate records. Not every line is guaranteed to carry the ID, and a failed session creation may not produce one.",
+      "optionExplanations": {
+        "A": "A session identifier does not modify resource IDs.",
+        "B": "A session identifier is not a control locator.",
+        "C": "It does not update TestCase attributes.",
+        "D": "Use available session identifiers and timestamps to correlate records."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-bb3ef336d9b1"
     }
   ],
   "quickRecap": [
     {
       "key": "Layer order",
-      "value": "Device/emulator → TMA (console + /api/devices) → network (Remote) → Tosca TCP config → environment/version — in that order."
+      "value": "Prioritize checks using observed symptoms, configuration and supported versions."
     },
     {
       "key": "Why order matters",
-      "value": "Each layer is cheap to verify and rules out a whole category of causes before moving to the next."
+      "value": "A successful check narrows hypotheses but does not rule out every cause in a layer."
     },
     {
       "key": "TMA logs vs console",
-      "value": "Console = status summary. Logs = actual session-level detail — the tie-breaker when console and Tosca's error disagree."
+      "value": "Combine Agent/driver logs with Tosca evidence; completeness is not guaranteed."
     },
     {
       "key": "Known failure signatures",
-      "value": "Trailing-slash error text · device invisible to TMA despite OS visibility · v1-signature APK rejection · scan-ok/execute-fail · dynamic-allocation pool contention."
+      "value": "Compare device discovery, helper installation, actual signing errors and effective execution configuration."
     },
     {
       "key": "Session ID",
-      "value": "Tags every log line of one session — use it to navigate directly to that session in a log containing multiple runs."
+      "value": "Use an available session ID with timestamps; not every line or failed creation has an ID."
     }
   ],
   "topics": [
@@ -301,9 +342,16 @@
       "duration": "video"
     },
     {
-      "title": "Get started with mobile test automation (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "title": "TMA 2025.4 troubleshooting",
+      "url": "https://docs.tricentis.com/tma-2025.4/content/user_manual/troubleshoot.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "TMA 2026.2 log download (version-scoped)",
+      "url": "https://docs.tricentis.com/tma-2026.2/content/user_manual/download_logs.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS / TMA 2025.4 troubleshooting; TMA 2026.2 log-download UI",
+  "sourceReviewedOn": "2026-10-06"
 }

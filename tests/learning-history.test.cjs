@@ -1243,3 +1243,23 @@ test('mobile app-type review distinguishes opening and engine paths from shared 
  assert.match(d.studyGuide[2].elements[2].text,/one-time Verify.*not a substitute for waiting/);
  assert.doesNotMatch(JSON.stringify(d),/every mobile TestCase starts|Open Mobile App first|most predictable|timing matters more|engine isn't separate|native and web TestCases never/);
 });
+
+test('dynamic selection review separates documented literal from invented scheduler and filter guarantees',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m11_dynamic_device_allocation.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['A'],['A','B','D'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[0].options[1].text,/Appium dynamic selection/);
+ assert.match(d.studyGuide[1].elements[0].description,/not arbitrary wildcard syntax/);
+ assert.match(d.studyGuide[1].elements[1].items[1],/do not invent a minimum-version comparison/);
+ assert.match(d.practiceQuiz[2].scenario,/only one compatible device/);
+ assert.doesNotMatch(JSON.stringify(d),/TMA evaluates the pool|hands out whichever Ready|failure modes specific to dynamic|literal wildcard|keeps the whole pool usable/);
+});
+
+test('mobile troubleshooting review requires evidence and scopes logging instead of universal root causes',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m12_troubleshooting_tma.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['A'],['B'],['A','B','D'],['D']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[1].text,/2026.2.*not certified here for TMA 2025.4/);
+ assert.match(d.studyGuide[3].elements[0].items[2],/apksigner verify.*application owner/);
+ assert.match(d.practiceQuiz[4].rationale,/Not every line.*failed session creation/);
+ assert.match(d.practiceQuiz[0].scenario,/unresponsive.*boot has not been confirmed/);
+ assert.doesNotMatch(JSON.stringify(d),/api\/devices|every log line.*tagged|most real-world|trailing-slash formatting problem|misleading by design|re-sign with apksigner|version mismatches last/);
+});
