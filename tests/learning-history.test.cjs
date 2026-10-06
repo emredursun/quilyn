@@ -1496,3 +1496,18 @@ test('Testim CI review requires actual runner setup and distinguishes listed gui
  assert.match(d.studyGuide[1].elements[0].description,/starting command.*JUnit report path/);
  assert.match(d.practiceQuiz[2].rationale,/not proof.*prohibited/);
 });
+
+test('Testim repository integration review preserves Master-base and pull-request merge restrictions',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m21_azure_devops_github_actions.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[1].description,/always base on Testim Master.*pull-request actions/);
+ assert.match(d.studyGuide[1].elements[0].description,/obsolete Node 10.x/);
+});
+
+test('Testim TMS review distinguishes credentials mappings remote reporting and quota',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m22_enhancing_test_workflows_integrations.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['D'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[0].description,/TTM API key.*Xray.*Jira\/Xray/);
+ assert.match(d.studyGuide[2].elements[1].description,/multiple TTM.*skips.*disconnecting removes mappings/);
+ assert.match(d.studyGuide[2].elements[3].text,/separate from subscription quota.*local CLI\/library/);
+});
