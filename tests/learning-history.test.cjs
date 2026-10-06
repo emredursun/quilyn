@@ -1631,3 +1631,9 @@ test('PBA deployment review requires configured pipelines and pre-merge checks a
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[0].elements[3].description,/Install and integrate.*before publishing/);assert.match(d.studyGuide[2].elements[0].description,/Clients retain.*identity\/access/);assert.match(d.practiceQuiz[11].rationale,/pre-merge testing.*not an instruction to postpone/);assert.match(d.practiceQuiz[7].rationale,/configured authorization\/integration/);
 });
+
+test('PBA Scrum tools review scopes studio integration and distinguishes readiness from Done and Sprint selection',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),entry=inv.modules.find(m=>m.id==='BA-M19'),bytes=fs.readFileSync(entry.file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(entry.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].description,/App Studio and Dev Studio/);assert.match(d.studyGuide[1].elements[2].description,/requires configured integration/);assert.match(d.studyGuide[0].elements[0].description,/not made private by an @mention/);assert.match(d.studyGuide[2].elements[1].description,/locally agreed.*not a mandatory universal/);assert.match(d.practiceQuiz[5].rationale,/Done does not universally require production/);assert.match(d.practiceQuiz[12].rationale,/Sprint Goal, capacity and dependencies/);
+});
