@@ -1511,3 +1511,18 @@ test('Testim TMS review distinguishes credentials mappings remote reporting and 
  assert.match(d.studyGuide[2].elements[1].description,/multiple TTM.*skips.*disconnecting removes mappings/);
  assert.match(d.studyGuide[2].elements[3].text,/separate from subscription quota.*local CLI\/library/);
 });
+
+test('Testim positioned recording review avoids guaranteed diagnosis and verifies revised assertions',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m23_recording_new_steps_resolve_bugs.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].description,/do not guarantee.*application or environment/);
+ assert.match(d.studyGuide[0].elements[3].description,/assertions.*save and replay/);
+});
+
+test('Testim Dashboard review distinguishes Flaky classification and pane units from lifecycle and coverage',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m24_advanced_reporting_insights.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].items[1],/retry-derived.*not a fifth manually assigned/);
+ assert.match(d.studyGuide[1].elements[1].text,/switches from executions to owned-test runs.*time\/filter selection does not change/);
+ assert.match(d.studyGuide[0].elements[1].description,/lower activity does not by itself establish shrinking test coverage/);
+});

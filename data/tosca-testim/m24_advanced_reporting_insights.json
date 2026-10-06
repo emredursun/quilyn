@@ -14,12 +14,12 @@
         {
           "type": "concept",
           "term": "TestOps Dashboard",
-          "description": "Part of the broader Insights area, giving a higher-level view than the Reports tab alone — pulling together quality and activity signals so a team lead or consultant can answer 'how healthy is this project right now' without digging through individual test runs."
+          "description": "Insights provides branch-scoped Dashboard and Reports views with available plan features. Use their statistics to investigate test quality/activity; they do not alone certify overall application health or requirement coverage."
         },
         {
           "type": "concept",
           "term": "Metrics that matter beyond pass/fail",
-          "description": "Interpreting pass rates, failure types, average durations, and team activity together — not in isolation — is what surfaces genuine trends and problem areas. A single metric (say, pass rate) read alone can mask a real issue that only shows up when cross-referenced with, say, a spike in average duration or a specific failure type."
+          "description": "Compare metrics under the same relevant selection and time scope. Correlated pass-rate, duration or activity changes can guide investigation but do not prove the cause; lower activity does not by itself establish shrinking test coverage."
         }
       ],
       "bulletPoints": [
@@ -36,21 +36,21 @@
           "title": "TestOps Dashboard panes",
           "items": [
             "Remote Execution Runs — passed/failed remote runs (suite/plan/scheduled/labeled), filterable to Last 24 Hours / 3 Days / 7 Days, with failure reasons and frequency.",
-            "Test Overview — distributes all project tests across 5 statuses: Active, Quarantine, Evaluating, Draft, Flaky.",
-            "Duplication Level — the auto-grouping duplication score (lower = healthier).",
+            "Test Overview displays Active, Quarantine, Evaluating, Draft and Flaky categories. Flaky is retry-derived classification, not a fifth manually assigned lifecycle choice.",
+            "Duplication Level is a weekly grouping estimate; a lower score does not certify runtime correctness.",
             "Recent Activity — an activity log with links straight to the affected test/object.",
             "Pull Requests — Pending / Requested Changes / Approved counts; only shown when the MASTER branch is selected."
           ]
         },
         {
           "type": "note",
-          "text": "The 'Assigned to me' toggle filters every pane down to the current user's own activity/tests — EXCEPT Duplication Level, which stays project-wide regardless of the toggle."
+          "text": "Assigned to me leaves Duplication Level project-wide, while the remote pane switches from executions to owned-test runs. The remote pane time/filter selection does not change Test Overview or Duplication Level; do not compare these panes as though they share one denominator."
         }
       ],
       "bulletPoints": [
-        "Test Overview's 5 statuses: Active, Quarantine, Evaluating, Draft, Flaky.",
+        "Overview categories include retry-derived Flaky alongside the four lifecycle choices.",
         "Pull Requests pane only appears when the master branch is selected.",
-        "'Assigned to me' filters everything except Duplication Level."
+        "Assigned to me changes ownership scope and the remote pane’s unit, while Duplication stays project-wide."
       ],
       "sectionId": "section-b30d8edddd51"
     }
@@ -59,7 +59,7 @@
     {
       "title": "Judging project health from pass rate alone",
       "trapDescription": "Concluding a project is healthy purely because the pass rate looks fine, without checking duration trends or team activity.",
-      "bestPractice": "Interpret pass rate, failure types, average durations, and team activity together — a stable pass rate can still hide a creeping duration regression or shrinking test coverage from reduced team activity."
+      "bestPractice": "Compare relevant metrics and effective scope before investigating causes. A stable pass rate does not certify coverage, but reduced activity alone does not prove coverage declined either."
     }
   ],
   "practiceQuiz": [
@@ -89,7 +89,15 @@
         "A"
       ],
       "hint": "It's about project health over time, not one run's outcome.",
-      "rationale": "The TestOps Dashboard gives a higher-level, project-wide view of quality and activity trends, letting you assess overall project health rather than reading one test run's isolated result."
+      "rationale": "The TestOps Dashboard gives a higher-level, project-wide view of quality and activity trends, letting you assess overall project health rather than reading one test run's isolated result.",
+      "optionExplanations": {
+        "A": "The Dashboard provides broader branch-scoped statistics and activity evidence.",
+        "B": "Editing test steps is not its aggregate-view role.",
+        "C": "A dashboard does not replace the execution runner.",
+        "D": "Its aggregate scope differs from one run."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-77a97ccab16c"
     },
     {
       "questionId": "Q2",
@@ -117,12 +125,20 @@
         "B"
       ],
       "hint": "Think about a stable pass rate hiding a duration regression.",
-      "rationale": "A stable pass rate can hide a creeping issue — like rising average durations or shrinking team activity/coverage — that only becomes visible when the metrics are read together instead of one at a time."
+      "rationale": "A single statistic can omit relevant changes. Compare scopes and investigate evidence; correlation or activity decline does not prove the underlying cause or missing coverage.",
+      "optionExplanations": {
+        "A": "The view is not restricted to one isolated metric.",
+        "B": "Comparing appropriately scoped metrics can expose relevant changes for investigation.",
+        "C": "These metrics measure different things.",
+        "D": "One metric does not establish the full coverage/quality picture."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-77a97ccab16c"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "In the TestOps Dashboard's Test Overview pane, which five status categories does it distribute tests across?",
+      "scenario": "Which five display categories are documented in the Test Overview pane, without implying five manually assigned lifecycle choices?",
       "options": [
         {
           "id": "A",
@@ -144,8 +160,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "These are the same test-status concepts covered in the Test Library module, minus one addition.",
-      "rationale": "Test Overview distributes all project tests across five statuses: Active (ready/stable), Quarantine (unstable), Evaluating (stability uncertain), Draft (in-progress), and Flaky (intermittently failing)."
+      "hint": "Flaky is a retry-derived classification alongside the lifecycle choices.",
+      "rationale": "The Dashboard lists Active, Quarantine, Evaluating, Draft and Flaky. The separate lifecycle-status feature has four choices; Flaky is associated with passing after retries.",
+      "optionExplanations": {
+        "A": "These are the listed display categories, not five manual lifecycle choices.",
+        "B": "These are not the cited Overview categories.",
+        "C": "These do not match the documented category list.",
+        "D": "Colors are not the category names."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-b30d8edddd51"
     },
     {
       "questionId": "Q4",
@@ -173,7 +197,15 @@
         "B"
       ],
       "hint": "It's tied to one specific branch.",
-      "rationale": "The Pull Requests pane, showing Pending / Requested Changes / Approved counts, only appears on the dashboard when the master branch is the one selected."
+      "rationale": "The Pull Requests pane, showing Pending / Requested Changes / Approved counts, only appears on the dashboard when the master branch is the one selected.",
+      "optionExplanations": {
+        "A": "The pane is restricted to master in the documentation.",
+        "B": "Master selection is the documented branch condition.",
+        "C": "It is not documented as free-plan-only.",
+        "D": "Its availability is not tied to an active CLI run."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-b30d8edddd51"
     },
     {
       "questionId": "Q5",
@@ -201,7 +233,15 @@
         "B"
       ],
       "hint": "One pane deliberately stays project-wide no matter what.",
-      "rationale": "'Assigned to me' filters all the dashboard's panes down to the current user's own activity — except Duplication Level, which always reflects the whole project regardless of the toggle."
+      "rationale": "Ownership scoping affects applicable panes, while Duplication remains project-wide. The remote pane also switches from executions to owned-test runs; its time filters do not redefine every pane.",
+      "optionExplanations": {
+        "A": "Filtering does not delete other users’ data.",
+        "B": "Applicable ownership scope changes while Duplication remains project-wide.",
+        "C": "Duplication specifically remains unaffected.",
+        "D": "The toggle adjusts existing panes rather than launching an unrelated dashboard."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-b30d8edddd51"
     }
   ],
   "quickRecap": [
@@ -214,8 +254,8 @@
       "value": "Pass rate + failure types + durations + team activity — not any one metric alone."
     },
     {
-      "key": "Test Overview statuses",
-      "value": "Active, Quarantine, Evaluating, Draft, Flaky."
+      "key": "Test Overview categories",
+      "value": "Four lifecycle choices plus retry-derived Flaky classification."
     },
     {
       "key": "Pull Requests pane",
@@ -223,7 +263,7 @@
     },
     {
       "key": "'Assigned to me'",
-      "value": "Filters everything except Duplication Level."
+      "value": "Ownership scope changes; remote executions become owned-test runs, and Duplication stays project-wide."
     }
   ],
   "topics": [
@@ -236,6 +276,23 @@
       "title": "Insights (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/testops/insights/index.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Test status (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/testops/testops-management/test-status.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Flaky tests (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/testops/testops-management/flaky-tests.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Auto grouping2 (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/auto-grouping2.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }
