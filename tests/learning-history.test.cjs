@@ -1023,3 +1023,15 @@ test('PSA data model review distinguishes defaults, edit modes, simulation and s
  assert.match(d.practiceQuiz[13].scenario,/simulated/);
  assert.doesNotMatch(JSON.stringify(d),/one for the Operator context|requires Dev Studio|A 'data class' is not a Pega term|not a\."|there is\."|--pa-ink-2|--pa-ink-3/);
 });
+
+test('AE1 introduction and framework review correct positional table syntax and qualify course access',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ const docs=['m00_introduction.json','m01_tbox_engines_frameworks.json'].map(file=>{const bytes=fs.readFileSync('data/tosca-ae1/'+file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));d.practiceQuiz.forEach(q=>{assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});return d;});
+ assert.deepEqual(docs[0].practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['B']]);
+ assert.deepEqual(docs[1].practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['C'],['A'],['B'],['B'],['B'],['A']]);
+ assert.match(docs[1].studyGuide[4].elements[0].description,/relative to the configured header/);
+ assert.match(docs[1].practiceQuiz[4].options[1].text,/unique Order ID/);
+ assert.match(docs[1].practiceQuiz[7].options[0].text,/NONE on the report definition/);
+ assert.doesNotMatch(JSON.stringify(docs),/\$ = by a cell|\$ notation instead targets the row|only the visuals shift|Final Exam draws no questions/);
+ assert.match(docs[0].studyGuide[0].elements[2].text,/unavailable during review/);
+});

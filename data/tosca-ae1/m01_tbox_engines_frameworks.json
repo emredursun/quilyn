@@ -18,7 +18,7 @@
         {
           "type": "concept",
           "term": "The problem a framework solves",
-          "description": "Every technology exposes its controls differently: a browser has a DOM, a Windows application has native window handles, an Excel workbook has cells and ranges, a mail server speaks a protocol. Without a framework, automating each would mean a different tool, a different scripting model, and a different skill set per technology — and no way to build one TestCase that crosses them."
+          "description": "Each technology exposes different interfaces. A shared framework supplies common automation building blocks while engines implement technology-specific operations."
         },
         {
           "type": "concept",
@@ -52,8 +52,8 @@
             "Excel UI Engine 3.0 — the Microsoft Excel user interface: application window, dialogs, and loaded worksheets.",
             "PDF Engine — PDF documents, including comparison reporting between files.",
             "UIA Engine 3.0 — Windows controls via the Microsoft UI Automation framework.",
-            "Win32 Engine — Windows desktop applications steered through server processes.",
-            "Mobile Engine 3.0 — native Android apps and mobile web applications.",
+            "WinX Engine 3.0 — Windows UI API applications; distinguish it from legacy Win32 steering.",
+            "Mobile engines — inspect version-specific native and mobile web support and prerequisites.",
             "API Engine 3.0 — web services and API endpoints (the API Testing course's territory).",
             "Plus technology-specific engines outside AE1's scope: SAP, Java, Salesforce."
           ]
@@ -99,17 +99,17 @@
         {
           "type": "concept",
           "term": "How the Engine gets chosen",
-          "description": "You do not pick an Engine manually per TestStep. The Engine is determined by the Module: when you scan an application, Tosca creates Modules bound to the appropriate Engine for that technology, and every TestStep created from that Module is steered by it. This is why the same TestCase can mix a web TestStep and an Excel TestStep without any special handling — each TestStep inherits its Engine from its Module."
+          "description": "A Module carries engine/interface information used by its TestSteps. Scanned and Standard Modules can represent different technologies; inspect the actual Module configuration."
         },
         {
           "type": "concept",
           "term": "Why the workflow never changes",
-          "description": "Because the Engine is hidden behind the Module, the mechanics you learned in AS1/AS2 carry over unchanged: drag a Module onto a TestCase to create a TestStep, fill in TestStepValues, set ActionMode to Input, Verify, Buffer or Select, and run. Learning a new Engine in AE1 is therefore mostly about learning what that technology exposes — which properties exist on an Excel cell, what an Anchor means in a PDF — not about learning a new way to build tests."
+          "description": "Modules, TestSteps and TestStepValues remain familiar building blocks. Available ActionModes depend on InterfaceType and control support; they are not universally identical for every engine."
         }
       ],
       "bulletPoints": [
         "Module → Engine → technology. You choose the Module; the Engine follows automatically.",
-        "ActionModes (Input / Verify / Buffer / Select) behave the same across every Engine."
+        "Check supported ActionModes for the Module interface and control."
       ],
       "sectionId": "section-3a0f4f31cb92"
     },
@@ -118,8 +118,8 @@
       "elements": [
         {
           "type": "concept",
-          "term": "Two ways to reach one row: $ (by value) vs # (by index)",
-          "description": "A scanned table gives you a row-level TestStepValue that can be pointed at a specific row two different ways. The # notation targets a row by its ordinal position — the 3rd row, the 12th row — regardless of what data it holds. The $ notation instead targets the row whose cell matches a value you supply, so the TestStep finds 'the row where Order ID = 4021' rather than 'row number 7'. Index-based steering breaks the moment a row is inserted, deleted, or re-sorted; value-based steering survives it, which is why $ is generally the more resilient choice for tables whose row order can change between runs."
+          "term": "Header-relative positions, absolute positions and value constraints",
+          "description": "In table addressing, $ identifies positions relative to the configured header, while # identifies absolute positions. Both numeric forms are positional. To find a row by business values, configure cell constraints and resolve any multiple matches before acting on another cell."
         },
         {
           "type": "concept",
@@ -129,7 +129,7 @@
         {
           "type": "concept",
           "term": "Constraint ActionMode",
-          "description": "Used to narrow a table TestStep down to one specific row before acting on a different cell in that same row — for example, constrain to the row where the Product column reads 'Laptop', then verify or buffer the Price cell in that row. Constraint is what makes $-style value matching usable across multi-column tables: you locate the row by one column's value and then operate on another."
+          "description": "Constraint restricts the search using one or more cell values. Ensure that the resulting row is unique before verifying or buffering another cell; a constraint is not a guarantee of uniqueness."
         },
         {
           "type": "note",
@@ -137,14 +137,13 @@
         },
         {
           "type": "note",
-          "text": "📄 This technique comes from an official Tricentis hands-on guide; the material itself is not redistributed here — the mechanism is described above so it can be recognised and applied."
+          "text": "Independent guidance compared with the public table documentation; the original hands-on guide was not accessed."
         }
       ],
       "bulletPoints": [
-        "# = row by position. $ = row by a cell's value. Prefer $ when row order can change between runs.",
-        "HeaderRow lets later steps address a column by its header text instead of a raw index.",
-        "Constraint locks a TestStep onto one row (found via $) so a different cell in that row can then be read or verified.",
-        "Table values also accept REGEX, for matching a pattern instead of a fixed literal."
+        "$ positions are header-relative; # positions are absolute.",
+        "Use business-value constraints when row order can change.",
+        "HeaderRow defines which row supplies headers; inspect uniqueness before acting."
       ],
       "sectionId": "section-7b082db8f7d7"
     },
@@ -159,32 +158,22 @@
         {
           "type": "concept",
           "term": "Interactive mode: jumptonode and task",
-          "description": "You start by copying an object's NodePath from its Properties pane in Tosca Commander (Workspace closed before touching TC Shell). From a command prompt in the Tosca Commander install directory, TCShell.exe -workspace \"<path to .tws>\" -login \"<user>\" <password> opens the Workspace; jumptonode \"<NodePath>\" then moves the shell's focus to that TestStepValue or ExecutionList; and task lists every action available at that point — for a TestStepValue that includes Modify Value, for an ExecutionList it includes Run — selected by number or by name."
+          "description": "Open TC Shell with the workspace path and authentication appropriate to its repository type. Parameters are case-sensitive. JumpToNode uses an object NodePath; task lists operations available for the current object. Inspect the applicable start/command documentation rather than assuming every repository uses -login."
         },
         {
           "type": "concept",
           "term": "Script mode: .tcs and .bat",
-          "description": "The same jumptonode / task commands, written into a plain-text .tcs script file instead of typed live, let TC Shell replay a whole sequence — update a TestStepValue, then jump to an ExecutionList and run it — with zero interaction. A short .bat file wrapping TCShell.exe -workspace <path> -login <user> <password> <path to the .tcs file> then turns that sequence into something a build server can double-click or call from a pipeline step."
+          "description": "Pass a plain-text .tcs command file to start script mode. Supply task inputs in that file; TC Shell processes commands, closes the workspace and exits. A wrapper is optional, not an intrinsic requirement of script mode."
         },
         {
           "type": "concept",
-          "term": "Tosca REST API: downloading an execution report",
-          "description": "Separately from TC Shell, a Tosca Server installation exposes a REST API that can, among other things, print an ExecutionList's report to a file without anyone opening Tosca Commander at all. It requires the Tricentis.Tosca.RestApiService Windows service to be running (disabled by default) and the service's config file to point WorkspaceBasePath at the folder holding the Workspaces it should serve. On the ExecutionEntries object being printed, the PrintOutputFormat property has to be set to ASKUSER first — otherwise the report endpoint has nothing to act on."
-        },
-        {
-          "type": "note",
-          "text": "The report endpoint follows the shape http(s)://<server>:<port>/rest/ToscaCommander/<workspacename>/object/<id>/task/PrintReport?reportName=<name>&outputFilepath=<target path>, where <id> is the ExecutionList's UniqueId copied from its Properties pane. It is called with Basic Authentication (a Tosca username/password) and a plain GET; a 200 OK response means the file was written to the target path."
-        },
-        {
-          "type": "note",
-          "text": "📄 Both techniques come from official Tricentis hands-on guides; the material itself is not redistributed here — the mechanisms are described above so they can be recognised and applied."
+          "term": "Printing reports through TC Shell",
+          "description": "The public 2026.1 reporting workflow requires a report definition with designer configuration and PrintOutputFormat set to NONE. Navigate to the data object, run its Print Report task, and supply the output location/name/type. This does not verify an older REST guide or guarantee a file solely from HTTP status."
         }
       ],
       "bulletPoints": [
-        "TC Shell = Tosca Commander from the command line. Interactive mode for one-off changes; script mode (.tcs + a wrapping .bat) for unattended runs.",
-        "Always close Tosca Commander before using TC Shell against the same Workspace.",
-        "jumptonode \"<NodePath>\" moves the shell's focus; task lists what can be done there (Modify Value, Run, …).",
-        "The REST API report endpoint needs Tricentis.Tosca.RestApiService running, WorkspaceBasePath configured, and the ExecutionEntries object's PrintOutputFormat set to ASKUSER before it will produce a file."
+        "TC Shell provides interactive and script modes.",
+        "Inspect the current reporting workflow and verify the resulting file; do not infer success solely from a response code."
       ],
       "sectionId": "section-1a3d005d9c11"
     }
@@ -193,7 +182,7 @@
     {
       "title": "Thinking each Engine needs its own way of building TestCases",
       "trapDescription": "Assuming that automating Excel or PDF requires a different TestCase structure or scripting approach than web automation.",
-      "bestPractice": "The whole purpose of TBox is one common interface. Modules, TestSteps, TestStepValues, and ActionModes work identically across engines — only what the technology exposes differs."
+      "bestPractice": "Use the common object model, but inspect the engine/interface-specific operations."
     },
     {
       "title": "Believing TBox or Engines 3.0 are separate add-ons",
@@ -213,22 +202,22 @@
     {
       "title": "Steering a table row by # when the row order can change",
       "trapDescription": "Hardcoding row #7 to always mean a specific order, then having the TestCase silently check the wrong row after the data set changes.",
-      "bestPractice": "Prefer $ (steer by a cell's value) over # (steer by position) whenever rows can be inserted, removed, or re-sorted between runs. Use Constraint to lock onto the row found by value before touching a different cell in it."
+      "bestPractice": "Both $ numeric and # numeric addressing are positional. Use cell constraints with a unique business value when order varies."
     },
     {
-      "title": "Running TC Shell against a Workspace that is still open in Tosca Commander",
-      "trapDescription": "Starting TCShell.exe -workspace ... while the same project is open in the Tosca Commander GUI, and getting inconsistent or failing results.",
-      "bestPractice": "Close Tosca Commander before pointing TC Shell at the same Workspace — the two are not meant to hold it open simultaneously."
+      "title": "Confusing interactive and script modes",
+      "trapDescription": "Starting TC Shell without a script and expecting unattended command replay.",
+      "bestPractice": "Pass the script path for script mode; without a script it starts interactively."
     },
     {
-      "title": "Calling the REST API PrintReport endpoint without setting PrintOutputFormat",
-      "trapDescription": "Sending a well-formed GET to the /task/PrintReport endpoint and getting no usable file back.",
-      "bestPractice": "The ExecutionEntries object being printed needs its PrintOutputFormat property set to ASKUSER first, from Tosca Commander, before the report endpoint has anything to generate."
+      "title": "Mixing reporting workflows",
+      "trapDescription": "An older REST example does not establish current TC Shell configuration.",
+      "bestPractice": "The reviewed 2026.1 TC Shell workflow uses NONE on the report definition; validate the produced file."
     },
     {
-      "title": "Expecting the Tosca REST API to work from a bare Tosca Commander install",
-      "trapDescription": "Trying to call the /rest/ToscaCommander/... endpoint on a machine that only has Tosca Commander installed.",
-      "bestPractice": "The REST API is served by a separate Tosca Server installation, with the Tricentis.Tosca.RestApiService started (it is disabled by default) and WorkspaceBasePath configured to point at the Workspaces folder."
+      "title": "Assuming an API endpoint is verified",
+      "trapDescription": "Server reporting setup and authentication vary by version.",
+      "bestPractice": "Consult the applicable REST API manual before using an endpoint. The original hands-on REST guide was not obtained."
     }
   ],
   "practiceQuiz": [
@@ -258,7 +247,15 @@
         "B"
       ],
       "hint": "Think about what makes automating Excel feel the same as automating a web page.",
-      "rationale": "TBox is the shared .NET foundation for all Engines 3.0, covering GUI and non-GUI tests alike. It absorbs the differences between technologies so the TestCase-building workflow stays constant, and it ships as part of the standard Tosca installation."
+      "rationale": "TBox is the shared .NET foundation for all Engines 3.0, covering GUI and non-GUI tests alike. It absorbs the differences between technologies so the TestCase-building workflow stays constant, and it ships as part of the standard Tosca installation.",
+      "optionExplanations": {
+        "A": "TBox is the shared automation foundation, not a performance product.",
+        "B": "It supplies a common framework for GUI and non-GUI Engines 3.0.",
+        "C": "The framework is not a mandatory test scripting language.",
+        "D": "Its scope includes non-web technologies."
+      },
+      "lessonSection": "section-3f0703ebeee5",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -286,7 +283,15 @@
         "B"
       ],
       "hint": "The binding happens one level above the TestStep.",
-      "rationale": "Modules are bound to an Engine when the application is scanned, and every TestStep created from a Module is steered by that Module's Engine. This is exactly what lets one TestCase mix technologies with no special handling."
+      "rationale": "Modules are bound to an Engine when the application is scanned, and every TestStep created from a Module is steered by that Module's Engine. This is exactly what lets one TestCase mix technologies with no special handling.",
+      "optionExplanations": {
+        "A": "The Module carries interface/engine information.",
+        "B": "The TestStep uses its referenced Module configuration.",
+        "C": "Engine selection is not trial-and-error execution of every engine.",
+        "D": "One TestCase can contain Modules for multiple technologies."
+      },
+      "lessonSection": "section-3a0f4f31cb92",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
@@ -314,7 +319,15 @@
         "C"
       ],
       "hint": "Which one has no screen or visible control to locate?",
-      "rationale": "The XML Engine 3.0 works directly against data with no visual component, making it a non-GUI engine. XBrowser, Excel UI, and Mobile all steer visible controls on a screen."
+      "rationale": "The XML Engine 3.0 works directly against data with no visual component, making it a non-GUI engine. XBrowser, Excel UI, and Mobile all steer visible controls on a screen.",
+      "optionExplanations": {
+        "A": "XBrowser operates browser UI.",
+        "B": "Excel UI operates visible application controls.",
+        "C": "XML processing works directly with structured data.",
+        "D": "The described Mobile steering targets visible application controls."
+      },
+      "lessonSection": "section-8b6cb5843323",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
@@ -342,7 +355,15 @@
         "A"
       ],
       "hint": "It is the object that represents a piece of the application under test.",
-      "rationale": "Engines 3.0 use XModules to steer test objects. An XModule carries the identification information the Engine needs, can be structured hierarchically, and is reusable across TestCases."
+      "rationale": "Engines 3.0 use XModules to steer test objects. An XModule carries the identification information the Engine needs, can be structured hierarchically, and is reusable across TestCases.",
+      "optionExplanations": {
+        "A": "XModules represent the objects used by Engines 3.0.",
+        "B": "ExecutionLists organize runs rather than object identification.",
+        "C": "Requirements express coverage goals.",
+        "D": "TestSheets model test data rather than steering objects."
+      },
+      "lessonSection": "section-3a0f4f31cb92",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
@@ -355,7 +376,7 @@
         },
         {
           "id": "B",
-          "text": "$ — reference the row by the value in a cell, such as the Order ID column."
+          "text": "Constrain the row using its unique Order ID value before reading the target cell"
         },
         {
           "id": "C",
@@ -369,8 +390,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "One notation is resilient to row order changing; the other is not.",
-      "rationale": "$ finds a row by matching a cell's value, so it keeps working when rows are inserted, removed, or re-sorted. # finds a row by fixed position, which breaks the moment the order changes. HeaderRow addresses columns by name, not rows."
+      "hint": "Business-value matching differs from either kind of numeric position.",
+      "rationale": "Both $ numeric and # numeric forms identify positions. A unique Order ID constraint finds the intended record despite reordering. HeaderRow establishes headers, not the required business row.",
+      "optionExplanations": {
+        "A": "A fixed absolute index follows position, not Order ID.",
+        "B": "A unique business-value constraint survives reordered rows.",
+        "C": "HeaderRow establishes header addressing, not record identity.",
+        "D": "Reordered tables can be searched by business values."
+      },
+      "lessonSection": "section-7b082db8f7d7",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q6",
@@ -398,63 +427,87 @@
         "B"
       ],
       "hint": "One column locates the row; a different column is then read.",
-      "rationale": "Constraint narrows a table TestStep to the one row matching a given value, so a different cell in that same row — like Price — can then be verified or buffered. This is what makes $-style value matching practical across multi-column tables."
+      "rationale": "Constraint narrows the row search by Product. Ensure the match is unique, then verify Price. An index is positional and rescanning each value does not model this reusable search.",
+      "optionExplanations": {
+        "A": "A pattern alone does not define the required row/cell relationship.",
+        "B": "Constraint narrows the row before accessing Price.",
+        "C": "A numeric index does not identify the Laptop business value.",
+        "D": "A reusable table Module can search different values."
+      },
+      "lessonSection": "section-7b082db8f7d7",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q7",
       "type": "single-select",
-      "scenario": "Before using TC Shell against a Workspace, what must be true?",
+      "scenario": "How does TC Shell enter script mode instead of interactive mode?",
       "options": [
         {
           "id": "A",
-          "text": "Tosca Commander must have that same Workspace open."
+          "text": "Keep the Commander UI open to select script mode"
         },
         {
           "id": "B",
-          "text": "Tosca Commander must be closed."
+          "text": "Pass the command script file in the start parameters"
         },
         {
           "id": "C",
-          "text": "The Workspace must be read-only."
+          "text": "Make every workspace read-only"
         },
         {
           "id": "D",
-          "text": "A REST API service must be running."
+          "text": "Start a REST API service"
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "TC Shell and the Commander GUI are not meant to hold the same Workspace open together.",
-      "rationale": "Tosca Commander should be closed before driving the same Workspace through TC Shell. The REST API is a separate mechanism, served by Tosca Server, unrelated to TC Shell."
+      "hint": "The start command needs the script resource.",
+      "rationale": "Pass the script file as a start parameter. With no script, TC Shell starts interactively. A REST service, read-only workspace or Commander UI is not the mode selector.",
+      "optionExplanations": {
+        "A": "The UI is not the TC Shell mode selector.",
+        "B": "Supplying the script path starts command replay in script mode.",
+        "C": "Read-only access does not select script mode.",
+        "D": "REST is separate from the TC Shell mode selection."
+      },
+      "lessonSection": "section-1a3d005d9c11",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q8",
       "type": "single-select",
-      "scenario": "A GET request to the Tosca REST API's PrintReport endpoint returns 200 OK, but no report file is produced. What was most likely missed?",
+      "scenario": "For the documented Tosca 2026.1 TC Shell reporting workflow, what output-format setting is required before printing?",
       "options": [
         {
           "id": "A",
-          "text": "The ExecutionEntries object's PrintOutputFormat property was never set to ASKUSER."
+          "text": "Set PrintOutputFormat to NONE on the report definition"
         },
         {
           "id": "B",
-          "text": "The request used Basic Authentication instead of no authentication."
+          "text": "Disable all authentication"
         },
         {
           "id": "C",
-          "text": "TC Shell was not running at the same time."
+          "text": "Start a REST API service; no report definition is needed"
         },
         {
           "id": "D",
-          "text": "The report was requested in interactive mode instead of script mode."
+          "text": "Always set ASKUSER on ExecutionEntries regardless of workflow"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "One property on the object being printed has to be set from Tosca Commander first.",
-      "rationale": "The PrintReport endpoint needs the target ExecutionEntries object's PrintOutputFormat set to ASKUSER before it has anything to generate. Basic Authentication is actually required, not to be avoided; TC Shell and interactive/script mode are unrelated to the REST API."
+      "hint": "Read the current TC Shell reporting prerequisites, not an older REST walkthrough.",
+      "rationale": "Set PrintOutputFormat to NONE on the report definition for this TC Shell workflow. Authentication choices and API service state are not the requested reporting prerequisite.",
+      "optionExplanations": {
+        "A": "NONE is the documented report-definition setting for this workflow.",
+        "B": "Removing authentication is not a reporting configuration.",
+        "C": "A REST service does not replace the TC Shell report definition.",
+        "D": "The older ASKUSER claim is not the reviewed TC Shell prerequisite."
+      },
+      "lessonSection": "section-1a3d005d9c11",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
@@ -484,15 +537,15 @@
     },
     {
       "key": "Table row referencing",
-      "value": "# = by index (fragile to reordering). $ = by a cell's value (resilient). Constraint locks onto the row found by value; HeaderRow names columns by their header text; values also accept REGEX."
+      "value": "Numeric $ addressing is header-relative; # is absolute. Use unique cell constraints to find business records; HeaderRow defines headers."
     },
     {
       "key": "TC Shell",
-      "value": "Command-line control of Tosca Commander. Interactive mode = typed commands (jumptonode, task). Script mode = a .tcs file run via a .bat, for unattended execution. Close Tosca Commander first."
+      "value": "Interactive mode prompts for commands; script mode processes a supplied .tcs file. Start parameters and authentication depend on repository type."
     },
     {
-      "key": "Tosca REST API reporting",
-      "value": "Served by Tosca Server (Tricentis.Tosca.RestApiService + WorkspaceBasePath). Set PrintOutputFormat to ASKUSER on the ExecutionEntries object, then GET .../task/PrintReport?reportName=...&outputFilepath=... with Basic Auth."
+      "key": "TC Shell reporting",
+      "value": "For the reviewed 2026.1 workflow: configured report definition, PrintOutputFormat NONE, Print Report task, and explicit output location/name/type. Inspect the file."
     }
   ],
   "topics": [
@@ -501,5 +554,7 @@
       "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
       "duration": "video"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS public documentation; original AE1 course unverified",
+  "sourceReviewedOn": "2026-10-06"
 }
