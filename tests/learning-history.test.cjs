@@ -1607,3 +1607,9 @@ test('PBA data-value review scopes transform invocation and validation triggers 
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[3].elements[0].description,/when invoked.*one-time copy does not/);assert.match(d.studyGuide[4].elements[0].description,/submission: true raises an error.*Stage/);assert.match(d.studyGuide[1].elements[0].description,/Evaluate all rows/);assert.match(d.practiceQuiz[10].rationale,/customer status, not Order Status/);assert.doesNotMatch(JSON.stringify(d),/guarantee derived data|sole purpose is data management and synchronization/);
 });
+
+test('PBA access review separates design personas active access context and complementary authorization',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),entry=inv.modules.find(m=>m.id==='BA-M15'),bytes=fs.readFileSync(entry.file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(entry.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[2].description,/multiple groups but one is active.*not identical/);assert.match(d.studyGuide[1].elements[1].description,/ABAC.*CBAC/);assert.match(d.practiceQuiz[8].rationale,/affect other users/);assert.doesNotMatch(JSON.stringify(d),/always applied in this specific sequence/);
+});

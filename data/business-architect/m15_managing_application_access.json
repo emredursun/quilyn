@@ -25,12 +25,12 @@
         {
           "type": "concept",
           "term": "Operator record (Operator ID)",
-          "description": "Each user has an Operator ID record that stores their profile and credentials and links them to an Access Group. The Operator record is how an individual user is represented in Pega."
+          "description": "An Operator ID identifies an individual with profile, skills, substitutions and access context. Authentication may use external SSO/token services; an operator profile is not a reason to share accounts or assume plaintext passwords are stored there."
         },
         {
           "type": "concept",
           "term": "Access Group",
-          "description": "Associates an operator with an APPLICATION, a set of ACCESS ROLES, the available PORTALS, and available work pools. The Access Group determines which application, portal, and roles a user receives. A Persona corresponds to an Access Group."
+          "description": "An Access Group supplies application/ruleset, portal, work-pool and Access Role context. An operator can have multiple groups but one is active at a time. Creating a Persona generates a corresponding group; the user-needs Persona and technical permissions group are not identical."
         },
         {
           "type": "concept",
@@ -44,7 +44,7 @@
       ],
       "bulletPoints": [
         "Relationship chain: Persona ↔ Access Group → Access Roles; the Operator record references the Access Group.",
-        "Personas determine which work assignments and functionality users can access (work access).",
+        "Personas describe user needs; technical access configuration enforces permissions. Work Groups coordinate assignment distribution rather than replace Access Groups.",
         "One Persona/Access Group can serve many users with the same needs."
       ],
       "sectionId": "section-bcceb3629c42"
@@ -55,21 +55,26 @@
         {
           "type": "concept",
           "term": "Authentication",
-          "description": "Verifies WHO the user is — confirming identity at login (e.g., username/password, SSO, multi-factor). Authentication answers 'Are you really you?' and happens FIRST."
+          "description": "Authentication verifies an identity using the configured credentials or SSO/token/MFA service. In the signed-in flow described here, identity verification precedes authorization of protected operations."
         },
         {
           "type": "concept",
           "term": "Authorization",
-          "description": "Determines WHAT an authenticated user is allowed to access and do — enforced through Access Roles/Access Groups (RBAC). Authorization answers 'What are you allowed to do?' and happens AFTER authentication."
+          "description": "Authorization determines permitted runtime data/actions and design-time rule/tool access. Roles/groups support RBAC; Pega also describes complementary ABAC object/user attribute checks and CBAC personal-data request handling."
         },
         {
           "type": "analogy",
           "text": "Authentication is showing your passport at the airport (proving who you are); authorization is your boarding pass deciding which gate/seat you may enter (what you're allowed to do). You authenticate first, then you're authorized."
+        },
+        {
+          "type": "concept",
+          "term": "Complementary access controls",
+          "description": "RBAC organizes role permissions. ABAC considers user and object attributes. CBAC concerns personal-data access/change/removal requests. Selecting a Persona or routing work does not replace these configured controls."
         }
       ],
       "bulletPoints": [
         "Authentication = identity verification (login); Authorization = permissions (what you can access).",
-        "Authentication comes first; authorization then governs access via roles.",
+        "Successful login does not grant every operation; evaluate applicable authorization when protected work is requested.",
         "Together they implement the organization's operational and security policies."
       ],
       "sectionId": "section-414063fe732f"
@@ -99,12 +104,12 @@
     {
       "title": "Persona maps to an Access Group",
       "trapDescription": "A Persona corresponds to an Access Group (with its roles), which is how role-based access is realized.",
-      "bestPractice": "Design Personas, then implement them via Access Groups and Access Roles."
+      "bestPractice": "Creating a Persona generates an Access Group, but the design persona and technical access context are not identical."
     },
     {
       "title": "Work access comes from the Persona/roles",
       "trapDescription": "Which work and functionality a user can access is governed by their Persona/Access Group/roles, not arbitrary settings.",
-      "bestPractice": "To change what work a user can do, adjust their Persona/Access Group and Access Roles."
+      "bestPractice": "Identify needs with Personas, then configure and verify applicable access controls; Work Group membership/routing is not permission enforcement."
     }
   ],
   "practiceQuiz": [
@@ -141,7 +146,7 @@
         "C": "Shared credentials would erase individual operator identity.",
         "D": "Customers are not the staff access category."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-bcceb3629c42"
     },
     {
@@ -151,7 +156,7 @@
       "options": [
         {
           "id": "A",
-          "text": "An individual user's profile/credentials, linked to an Access Group"
+          "text": "An individual user’s profile and access context, linked to Access Group configuration"
         },
         {
           "id": "B",
@@ -170,14 +175,14 @@
         "A"
       ],
       "hint": "An Operator record represents one individual user and links them to their Access Group for permissions.",
-      "rationale": "The Operator record represents an individual user — storing their profile and credentials — and links to an Access Group that provides the application, portals, and Access Roles. An Access Role only defines permissions, not the full operator profile.",
+      "rationale": "The operator identifies an individual and links to access context; SSO or other configured services may authenticate the user. Do not equate an operator profile with plaintext credential storage.",
       "optionExplanations": {
         "A": "The operator identifies one user and their access context.",
         "B": "A user category describes a Persona.",
         "C": "A role alone does not provide the operator profile.",
         "D": "A landing page displays content, not user identity."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-bcceb3629c42"
     },
     {
@@ -213,7 +218,7 @@
         "C": "Data mapping does not grant application access.",
         "D": "A queue holds team assignments, not access privileges."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-bcceb3629c42"
     },
     {
@@ -249,7 +254,7 @@
         "C": "An operator identifies the individual receiving access.",
         "D": "A Persona describes shared user needs."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-bcceb3629c42"
     },
     {
@@ -285,7 +290,7 @@
         "C": "Field mapping does not verify identity.",
         "D": "A decision table is not a login mechanism."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-414063fe732f"
     },
     {
@@ -321,13 +326,13 @@
         "C": "Calculating a value does not grant permissions.",
         "D": "A deadline does not authorize case actions."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-414063fe732f"
     },
     {
       "questionId": "Q7",
       "type": "single-select",
-      "scenario": "A BA is explaining the Pega security model to a new team member who is unclear about what happens first when a user logs in. Which sequence is correct for application security?",
+      "scenario": "For the signed-in protected application flow described here, which security sequence is appropriate?",
       "options": [
         {
           "id": "A",
@@ -350,14 +355,14 @@
         "A"
       ],
       "hint": "The correct sequence is: first authenticate (verify identity), then authorize (grant access by role).",
-      "rationale": "Authentication verifies identity first; then authorization grants access based on roles. The other sequences or claims reverse this order or conflate the two distinct security layers, which are always applied in this specific sequence.",
+      "rationale": "Verify the signed-in identity before authorizing protected work. Successful authentication does not eliminate later permission checks; this is not a claim that all security policies consist of only two one-time operations.",
       "optionExplanations": {
         "A": "Verify identity before evaluating application permissions.",
         "B": "This reverses the login security sequence.",
         "C": "Unresolved cases still need access controls.",
         "D": "A Persona does not authenticate its users."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-414063fe732f"
     },
     {
@@ -395,7 +400,7 @@
         "C": "Roles grant permissions rather than checking login credentials.",
         "D": "A Persona is a user category."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-bcceb3629c42"
     },
     {
@@ -405,7 +410,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Adjust the manager Persona's Access Group/Access Roles to grant the permission"
+          "text": "Review and adjust the authorized access-role/group configuration, checking the impact on other users"
         },
         {
           "id": "B",
@@ -424,14 +429,14 @@
         "A"
       ],
       "hint": "Permissions are defined in Access Roles and bundled in the Access Group tied to the user's Persona.",
-      "rationale": "Permissions are governed by Access Roles within the Access Group that is linked to the operator's Persona. Authentication confirms identity, default values pre-fill fields, and Wait Steps pause workflow — none of these grant access permissions.",
+      "rationale": "Review the relevant authorization policy with the IT/security owner. Changing a shared role/group can affect other users; login provider changes and workflow waits do not grant the required permission.",
       "optionExplanations": {
-        "A": "Approval access belongs in the permission configuration.",
+        "A": "Use the permission configuration and assess shared-role impact rather than grant broad access blindly.",
         "B": "Changing login identity checks does not grant approval rights.",
         "C": "Pre-filled values do not authorize the manager.",
         "D": "Waiting changes workflow timing, not permissions."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-bcceb3629c42"
     },
     {
@@ -460,14 +465,14 @@
         "A"
       ],
       "hint": "Security policy enforcement uses RBAC (Personas, Access Groups, Access Roles) plus authentication and authorization.",
-      "rationale": "Operational and security policies are enforced through role-based access control — Personas, Access Groups, and Access Roles — combined with authentication and authorization layers. SLAs, routing, and Data Transforms serve process-management purposes.",
+      "rationale": "Identity and applicable authorization controls enforce access requirements. RBAC is one model; ABAC and CBAC complement it. UI visibility, calculations or workflow sequencing do not replace enforcement.",
       "optionExplanations": {
         "A": "Identity and access controls enforce the security requirements.",
         "B": "Calculations cannot replace identity and permission checks.",
         "C": "Workflow sequencing does not establish authorized access.",
         "D": "Discussion and alerts do not enforce access policies."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-414063fe732f"
     },
     {
@@ -503,7 +508,7 @@
         "C": "One undifferentiated permission set misses the differing needs.",
         "D": "Successful login alone does not distinguish permissions."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-bcceb3629c42"
     }
   ],
@@ -514,11 +519,11 @@
     },
     {
       "key": "Operator record",
-      "value": "An individual user's profile/credentials; references an Access Group."
+      "value": "Individual profile/access context; configured authentication may use external services."
     },
     {
       "key": "Access Group",
-      "value": "Ties an operator to an application, portals, work pools, and Access Roles. A Persona corresponds to an Access Group."
+      "value": "Application/portal/work-pool/roles; operator can have multiple groups with one active. Persona and group are distinct."
     },
     {
       "key": "Access Role",
@@ -530,7 +535,7 @@
     },
     {
       "key": "Authorization",
-      "value": "Determines WHAT you can access/do (via roles); happens after authentication."
+      "value": "Protect runtime/design operations with applicable RBAC/ABAC/CBAC controls; successful login is not blanket access."
     }
   ],
   "topics": [
@@ -544,5 +549,7 @@
       "url": "https://academy.pega.com/topic/authentication-and-authorization/v2/in/93701/80881",
       "duration": "10 min"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Pega Platform '24.2 — source also applies to '25/'26; bodies checked 2026-10-06"
 }
