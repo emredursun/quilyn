@@ -1,0 +1,9 @@
+# Testim loops and messages review — 2026-10-06
+
+TESTIM-M09: compared all three sections, two objectives, three pitfalls, seven recaps and six questions. Added 24 option explanations. Applied the documented 99-iteration maximum to every loop type, scoped TESTIM_ITERATOR to loops and distinguished visibility from DOM presence. Per-item loops do not guarantee coverage of every paged/virtualized row in an arbitrarily large table; inspect matched items and iteration results. Default no-repeat does not override execution gates or failure handling.
+
+TESTIM-M10: compared and revised all three sections, three objectives, three pitfalls, five recaps and five questions. Added twenty option explanations. Replaced the unsupported narrative that managed email is the only SMS-reading mechanism: the official direct SMS example uses a CLI action with Twilio and filtered-message export. Codeless Validate email supplies its own text/link export parameters; generic DOM Extract Value does not read an arbitrary inbox. Managed-address provider restrictions do not ban all external integrations. A temporary inbox does not create a fresh phone or backend account, and extracting a code does not establish all delivery/content requirements.
+
+An explicitly configured SMS-to-email forwarding scenario is retained only as independent environment-specific guidance; it is not certified as the original Academy workflow or equivalent to phone delivery. Exact primary URLs, reviewed hashes and scope are in the inventory. Original Academy recordings/exercises/figures and live Testim/SMS/email execution remain unavailable; no physical-device/AT certification is claimed.
+
+Validation: two semantic regressions added; generated content refreshed. Full `npm run check` passed: 233/233 tests. Local commit only; no push.

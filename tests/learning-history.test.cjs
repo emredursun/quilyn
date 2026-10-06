@@ -1397,3 +1397,21 @@ test('Testim data review distinguishes spreadsheet headers, embedded snapshots a
  assert.match(d.studyGuide[1].elements[1].description,/JavaScript\/module.exports.*Prioritize test data/);
  assert.match(d.practiceQuiz[1].scenario,/one header row and five data rows/);
 });
+
+test('Testim loop review applies the common iteration limit and scopes actual matched-item coverage',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m09_loops_multiple_validations.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['B'],['B'],['C'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/99 iterations for any loop type/);
+ assert.match(d.studyGuide[1].elements[0].description,/paging\/virtualization.*does not guarantee every record/);
+ assert.match(d.studyGuide[1].elements[1].description,/not a general test-wide parameter/);
+ assert.doesNotMatch(JSON.stringify(d),/regardless of how many rows exist/);
+});
+
+test('Testim message review separates direct SMS retrieval, managed email exports and phone state',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m10_extracting_sms_email_service.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['A'],['B'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[1].description,/CLI action with Twilio.*returned Promise/);
+ assert.match(d.studyGuide[0].elements[1].description,/emailExtractedText.*emailExtractedLinks.*not required/);
+ assert.match(d.studyGuide[2].elements[1].description,/does not create a fresh phone number/);
+ assert.doesNotMatch(JSON.stringify(d),/not that Testim has a dedicated SMS|no separate SMS API needed|Extract Value then pulls|brand-new contact point on every run/);
+});
