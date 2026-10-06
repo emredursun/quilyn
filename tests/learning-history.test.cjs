@@ -1481,3 +1481,18 @@ test('Testim cross-browser review corrects grid selection flag and separates mat
  assert.match(d.studyGuide[0].elements[1].description,/single grid test.*not evidence of physical-device/);
  assert.doesNotMatch(JSON.stringify(d),/--test-config.*sets which grid|--test-config is used to add\/update the grid/);
 });
+
+test('Testim export review separates execution run and metadata rows and scopes coverage claims',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m19_exporting_test_lists_results.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/Counted Runs.*test metadata.*200/);
+ assert.match(d.studyGuide[0].elements[1].description,/selected run, not proof of complete/);
+});
+
+test('Testim CI review requires actual runner setup and distinguishes listed guides from provisioning',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m20_integrating_ci_tools.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['A'],['D'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/supported Node.js.*Shell capability alone does not guarantee/);
+ assert.match(d.studyGuide[1].elements[0].description,/starting command.*JUnit report path/);
+ assert.match(d.practiceQuiz[2].rationale,/not proof.*prohibited/);
+});
