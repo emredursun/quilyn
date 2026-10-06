@@ -1327,3 +1327,14 @@ test('Testim fundamentals review distinguishes editor grid playback, local Chrom
  assert.match(d.studyGuide[2].elements[1].description,/existence and visibility.*web-only.*not necessarily removal from the DOM/);
  assert.doesNotMatch(JSON.stringify(d),/other browsers need the CLI\/Scheduler|only proves.*crash|Visible checks presence; Text checks presence/);
 });
+
+test('Testim editing review corrects unsupported course keys and preserves clone and extraction limits',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m02_how_to_edit_tests.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.deepEqual(d.practiceQuiz[1].correctOptions,['B']);assert.deepEqual(d.practiceQuiz[11].correctOptions,['A']);
+ d.practiceQuiz.forEach(q=>{assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[4].description,/All matches modes return arrays/);
+ assert.match(d.studyGuide[2].elements[11].description,/nested shared steps.*remain shared/);
+ assert.match(d.studyGuide[2].elements[7].description,/does not continuously monitor/);
+ assert.match(d.studyGuide[2].elements[5].description,/dollar signs and underscores.*differently/);
+ assert.doesNotMatch(JSON.stringify(d),/verified:.*incorrect|For the exam, pick C|counterintuitive; memorize|course-key quirk/);
+});

@@ -16,7 +16,7 @@
         {
           "type": "concept",
           "term": "Target element",
-          "description": "The target element is the element that was selected in the AUT (Application Under Test) browser as the main element for a step. It is shown as a thumbnail image in the step's Properties panel, and it is fully editable after the step has been recorded."
+          "description": "A step’s target is the selected AUT element, represented by a thumbnail in Properties. Open Show Properties to edit supported settings; available fields depend on the step type."
         },
         {
           "type": "concept",
@@ -40,22 +40,22 @@
         {
           "type": "concept",
           "term": "Highlight",
-          "description": "Opens the AUT browser with the target element momentarily highlighted in pink. It changes nothing — it exists purely so you can visually confirm, during editing, that the correct element is targeted for a step."
+          "description": "Highlight temporarily emphasizes the selected target in the AUT for inspection; it does not replace locators or highlight every element matching a class."
         },
         {
           "type": "concept",
           "term": "Reassign",
-          "description": "Replaces the target element with a completely different element from the AUT: the system removes and overrides all existing locators for that step. Use it when the original element no longer exists at all — for example, a blue 'Login' button was removed and replaced by an entirely different control."
+          "description": "Reassign chooses a different target and replaces its locators. Use it when the intended target has genuinely changed."
         },
         {
           "type": "concept",
           "term": "Improve",
-          "description": "Used when the SAME target element still exists but the DOM around it changed. Testim compares the existing locators to newly collected ones and updates (merges into) them rather than overriding them — examining which selectors changed, which stayed the same, and which disappeared. Example: the 'Login' button is still the same button, but its text changed from 'login' to 'LOG-IN' and its color changed. Improve — not Reassign — is the correct choice here, because it is the same element, not a different one."
+          "description": "Improve updates identification for the existing target after a DOM change, comparing captured and current attributes. Reach the relevant AUT state and verify the resulting target."
         },
         {
           "type": "concept",
           "term": "View locators",
-          "description": "Opens the Locators panel, showing exactly how Testim's Smart Locators identify the target element and its parent elements. Testim's algorithm inspects potentially hundreds of attributes on an element, assigns each a weight, and uses the highest-weighted ones to find the element on future runs — so if some attributes change, the Smart Locator can still find the element using the others."
+          "description": "View locators displays weighted target and parent attributes. Resilience is not guaranteed; manual locator edits disable future Auto Improve for those locators, and the documentation recommends consulting support."
         },
         {
           "type": "list",
@@ -90,32 +90,32 @@
         {
           "type": "concept",
           "term": "Add Prefix / Add Suffix / String type / Length",
-          "description": "Properties of a Generate random value step. Add Prefix/Suffix attach a fixed string to every generated value (e.g. prefix 'User' → User47, User65, User32). String type controls whether the generated value uses letters only, numbers only, or both. Length sets how long the generated value is."
+          "description": "Generate random value sets character type and random length. Optional prefixes and suffixes can contain quoted strings or existing variables/expressions; they are not restricted to fixed strings."
         },
         {
           "type": "concept",
           "term": "Date format / Time difference / Use UTC",
-          "description": "Properties of a Generate date step. The default date format is 'YYYY-MM-DD', but it can be changed to any JS date format. Time difference offsets the generated date/time before or after the current browser time (or UTC). Use UTC switches the reference time zone from the browser's local time to UTC."
+          "description": "Generate date uses configurable format tokens (default YYYY-MM-DD), a signed time offset and browser time or UTC. Check the required input format; do not confuse format tokens with an arbitrary JavaScript Date object."
         },
         {
           "type": "concept",
           "term": "Extract Mode",
-          "description": "On an Add extract value step, Extract Mode controls what data type is pulled from the matched text — by default the entire string, but it can be narrowed to a number, a date, or a regular-expression match for just part of the text. Even when extracting a Number/Date/Regular-Exp, the resulting extracted value is still stored as a string."
+          "description": "Extract Mode selects the whole text or number/date/Regex matches. Individual extracted matches remain strings; All matches modes return arrays. Convert deliberately before numeric calculations."
         },
         {
           "type": "concept",
           "term": "Variable name and Variable scope",
-          "description": "Add extract value step, Get cookie, Generate random value, and Generate date steps all store their result in a variable — Variable name sets what that variable is called (subject to JavaScript naming rules: no spaces or special characters). Variable scope controls where it can be referenced: Local (within the same group, or the same test if declared at test level), Test (the default — across steps and groups in the same test), or Suite (across tests in the same test suite)."
+          "description": "Choose a valid JavaScript identifier; dollar signs and underscores are allowed. Generated values default to Test scope; Local limits scope and Suite shares it across suite tests. Consult the individual step’s documentation: the Extract Value page describes Local availability differently from the general Properties table."
         },
         {
           "type": "concept",
           "term": "Native events (Click step)",
-          "description": "A Click step can be configured, at the project level, to fire as a Native event (the browser's real, built-in click-handling pipeline — what happens on an actual mouse click or tap) or a Non-Native event (a synthetic/programmatic click dispatched via JavaScript, simulating the interaction). If a Click step reports as passed but the click visibly didn't do anything in the AUT, toggling the Native events checkbox is a standard troubleshooting step."
+          "description": "Click can use native browser events or synthetic events. The Native events setting is a possible troubleshooting change, not proof that event type caused every click-without-effect failure; inspect target, readiness and outcome."
         },
         {
           "type": "concept",
           "term": "Pre-step delay (ms)",
-          "description": "Available on Validate element not visible and Wait for element not visible. By default there's no delay, but you can set one (in milliseconds) to first wait before checking that an element is absent — useful when you want to make sure an element doesn't suddenly appear a moment later, not just that it's absent right now."
+          "description": "Pre-step delay postpones the not-visible check. It does not continuously monitor absence or prove the element cannot appear after the check."
         },
         {
           "type": "concept",
@@ -125,7 +125,7 @@
         {
           "type": "concept",
           "term": "+PARAMS",
-          "description": "Available on custom/API/network steps (Add custom action, Add API action, Add custom validation, Validate API, Add network validation, Add custom wait for). Clicking the + next to PARAMS lets you define HTML and JS parameters for the step, so it can be reused to test different scenarios without hardcoding the values in advance."
+          "description": "Supported custom, API and network steps expose PARAMS for HTML and JavaScript inputs. Parameters let callers supply different data to the same logic."
         },
         {
           "type": "concept",
@@ -135,16 +135,16 @@
         {
           "type": "concept",
           "term": "Replace with a clone / See old revisions",
-          "description": "Replace with a clone detaches a step from a Shared Step so an edit affects only this one test, instead of every test using that shared step. See old revisions opens the list of automatically-saved prior versions of the test (change message, user, date) whenever a change is saved — including changes to a shared step — letting you inspect or revert to an earlier revision."
+          "description": "Replace with a clone creates a separately editable copy of a shared step/group. Cloning a group does not automatically detach nested shared steps: they remain shared. Saved changes create revisions; reverting shared content can affect other instances."
         }
       ],
       "bulletPoints": [
         "Expected value accepts literal text, Parameters, Regex, or JS expressions — not just a plain string.",
         "Checkbox/radio validations only work on native input elements, not custom non-input implementations.",
-        "Variable scope: Local (group/test) < Test (default, whole test) < Suite (across tests in a suite).",
-        "Native events toggle explains 'the click step passed but nothing happened' failures.",
+        "Variable scope depends on the step; avoid assuming every Local description is identical.",
+        "Native events is a possible click troubleshooting setting, not a guaranteed diagnosis.",
         "Auto complete suggests matching Shared Groups while recording — pick one instead of re-recording it.",
-        "Replace with a clone edits just one test's copy; a normal edit to a shared step changes every test using it."
+        "Cloning isolates the selected shared item; nested shared steps remain shared."
       ],
       "sectionId": "section-607569d67ac4"
     },
@@ -159,7 +159,7 @@
         {
           "type": "concept",
           "term": "Shared Steps / Shared Group",
-          "description": "Selecting the Shared Group checkbox on a group makes it callable from other tests in the project — not just copy-pasted, but referenced, so a single edit to the shared group propagates to every test that uses it. This is the core mechanism for reusable, maintainable test authoring (e.g. a login sequence built once and reused everywhere)."
+          "description": "Shared groups enable cross-test reuse within a project. Edits to shared definitions affect their references; review affected tests and distinguish instance-specific properties from shared ones."
         },
         {
           "type": "note",
@@ -178,7 +178,7 @@
       ],
       "bulletPoints": [
         "Group steps with the folder icon; nest groups inside groups when useful.",
-        "Check 'Shared Group' to make a group callable from other tests — edit once, every caller updates.",
+        "Mark a group Shared Group for project-wide reuse; review affected references after edits.",
         "Parameters on a shared group let each calling test supply its own values without duplicating steps.",
         "Shared Steps Library filters by Groups / Actions / Validations / Wait for; its 'Used by' column counts referencing tests and links to them.",
         "Labels organize the Test Library by tag, not location — a test can carry several at once."
@@ -205,7 +205,7 @@
     {
       "title": "Editing a shared step and assuming it only affects the current test",
       "trapDescription": "Changing a Shared Step's properties directly, not realizing every test that references that shared step just changed too.",
-      "bestPractice": "If the change should apply everywhere, editing the shared step directly is correct. If it should apply to only this one test, use Replace with a clone first to detach a private copy before editing."
+      "bestPractice": "Clone the item for a private change, then inspect nested shared steps before editing them; cloning a group leaves nested shared steps shared."
     },
     {
       "title": "Trying to validate a custom (non-native) checkbox widget",
@@ -215,12 +215,12 @@
     {
       "title": "Assuming a property edit waits for the header-bar Save button",
       "trapDescription": "Answering 'True' to 'changes made to a property are applied only after the save button is clicked on the header bar'.",
-      "bestPractice": "Per the course, property changes are applied immediately. The header-bar Save persists the test as a whole, but it isn't what makes a property change take effect."
+      "bestPractice": "The Properties documentation says edits apply to the open test immediately. Save before closing the editor to preserve the edited test."
     },
     {
-      "title": "Answering Highlight and group-reuse questions from the docs instead of the course key",
-      "trapDescription": "Picking the docs-accurate answer for two Knowledge Check questions whose verified course key differs.",
-      "bestPractice": "Verified against the course: 'What is the functionality of the Highlight option?' expects 'highlights all elements that match a certain criterion' (C), and 'how can you reuse a group within the same test and also apply it to other tests?' expects 'by duplicating the steps' (B)."
+      "title": "Memorizing an unsupported answer-key exception",
+      "trapDescription": "Teaching behavior that contradicts primary product documentation as an exam rule.",
+      "bestPractice": "This independent quiz follows documented product behavior: Highlight inspects the selected target; shared groups enable reuse. Original Academy answer-key claims were not independently verifiable."
     },
     {
       "title": "Re-recording a login (or other) sequence that Auto complete already offered",
@@ -255,7 +255,15 @@
         "C"
       ],
       "hint": "It's the thing selected in the AUT browser as the main element for a step.",
-      "rationale": "The target element is the element selected in the AUT browser as the main element for a step — the UI component the step interacts with. It has nothing to do with environment config, user profiles, or being a script itself."
+      "rationale": "The target element is the element selected in the AUT browser as the main element for a step — the UI component the step interacts with. It has nothing to do with environment config, user profiles, or being a script itself.",
+      "optionExplanations": {
+        "A": "A target is not environment configuration.",
+        "B": "A target is not a user profile.",
+        "C": "The target is the AUT control selected for the step.",
+        "D": "The selected UI element is not a test script."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-17490e3ff7d3"
     },
     {
       "questionId": "Q2",
@@ -268,7 +276,7 @@
         },
         {
           "id": "B",
-          "text": "It visually highlights the selected element on the web page during the test run to confirm that the correct element is being targeted for interaction."
+          "text": "It temporarily highlights the selected target in the AUT browser while inspecting a step."
         },
         {
           "id": "C",
@@ -280,10 +288,18 @@
         }
       ],
       "correctOptions": [
-        "C"
+        "B"
       ],
-      "hint": "Go with the course's answer key here, not the product docs wording.",
-      "rationale": "Per the course's answer key (verified: B is marked incorrect), the expected answer is C. Note that Testim's documentation describes Highlight as opening the AUT browser with the single target element momentarily highlighted in pink, which is closer to B's wording. For the exam, pick C."
+      "hint": "Inspect the selected target; this action does not change its locators.",
+      "rationale": "Highlight visually identifies the selected target in the AUT. It is not a class-based search, test-script error scan or run comparison.",
+      "optionExplanations": {
+        "A": "Highlight does not analyze an entire script for errors.",
+        "B": "It highlights the selected target for visual inspection.",
+        "C": "It does not highlight every class/tag match.",
+        "D": "It is not a comparison between runs."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-aee14255fdd5"
     },
     {
       "questionId": "Q3",
@@ -311,7 +327,15 @@
         "B"
       ],
       "hint": "The original element is gone entirely — you need to point the step at a genuinely different element.",
-      "rationale": "Reassign replaces the target element with a different element from the AUT, removing and overriding all existing locators. It's the right choice when the original element no longer exists, as opposed to Improve, which is for the same element that has merely changed."
+      "rationale": "Reassign replaces the target element with a different element from the AUT, removing and overriding all existing locators. It's the right choice when the original element no longer exists, as opposed to Improve, which is for the same element that has merely changed.",
+      "optionExplanations": {
+        "A": "Highlight inspects but does not replace the target.",
+        "B": "Reassign selects the replacement target and overrides its locators.",
+        "C": "Improve updates the existing target, which has been removed here.",
+        "D": "Locator inspection alone does not select the replacement control."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-aee14255fdd5"
     },
     {
       "questionId": "Q4",
@@ -339,7 +363,15 @@
         "B"
       ],
       "hint": "Reassign overrides; Improve merges.",
-      "rationale": "Improve compares the existing locators to the newly collected ones and updates (merges) them instead of overriding them — exactly suited to a same element, changed DOM scenario. Reassign would needlessly discard the step's existing locator history."
+      "rationale": "Improve compares the existing locators to the newly collected ones and updates (merges) them instead of overriding them — exactly suited to a same element, changed DOM scenario. Reassign would needlessly discard the step's existing locator history.",
+      "optionExplanations": {
+        "A": "A changed appearance alone does not require a different target.",
+        "B": "Improve updates the existing target’s identification.",
+        "C": "Highlight does not repair locators.",
+        "D": "Opening the locator view is not itself a locator update."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-aee14255fdd5"
     },
     {
       "questionId": "Q5",
@@ -367,7 +399,15 @@
         "B"
       ],
       "hint": "It's a checkbox setting on the group itself, not a naming convention.",
-      "rationale": "Selecting the Shared Group checkbox is what makes a group available to be called from other tests in the project. A naming convention has no functional effect, and groups are not shared by default."
+      "rationale": "Selecting the Shared Group checkbox is what makes a group available to be called from other tests in the project. A naming convention has no functional effect, and groups are not shared by default.",
+      "optionExplanations": {
+        "A": "A naming convention does not mark a group shared.",
+        "B": "The Shared Group setting enables cross-test reuse.",
+        "C": "CSV export/import does not create the shared definition.",
+        "D": "Groups are not all shared by default."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-55ac8a720e8a"
     },
     {
       "questionId": "Q6",
@@ -395,7 +435,15 @@
         "B"
       ],
       "hint": "It's about how the element is found, not who else uses it or what happened in the past.",
-      "rationale": "View locators opens the Locators panel, showing how Testim's Smart Locators identify the target element and its parent elements — the attributes Testim's algorithm weighted highest during analysis. It's not a run history, a cross-project usage list, or raw page source."
+      "rationale": "View locators opens the Locators panel, showing how Testim's Smart Locators identify the target element and its parent elements — the attributes Testim's algorithm weighted highest during analysis. It's not a run history, a cross-project usage list, or raw page source.",
+      "optionExplanations": {
+        "A": "The panel shows locators rather than run videos.",
+        "B": "It shows weighted target and parent identification attributes.",
+        "C": "Usage counts belong to shared-library management.",
+        "D": "Locator inspection is not the full page source."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-aee14255fdd5"
     },
     {
       "questionId": "Q7",
@@ -415,7 +463,13 @@
         "B"
       ],
       "hint": "Property edits take effect right away.",
-      "rationale": "False. Per the course, changes made to a property are applied immediately, without needing to click the Save button on the header bar. Saving the test is a separate step that persists the test as a whole."
+      "rationale": "Property edits apply to the open test immediately; the documented workflow still requires Save before closing the editor to preserve changes.",
+      "optionExplanations": {
+        "A": "Edits apply before saving; saving still preserves the test.",
+        "B": "The documented Properties workflow applies edits immediately."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-17490e3ff7d3"
     },
     {
       "questionId": "Q8",
@@ -443,7 +497,15 @@
         "A"
       ],
       "hint": "This is the same icon used to open the panel that shows the target element thumbnail.",
-      "rationale": "Clicking the Show Properties icon on a step opens its Properties panel, where every editable property — target element, expected value, variable name/scope, and the rest — is changed directly. Copying, recreating, or reverting to an old revision are unrelated to routine property editing."
+      "rationale": "Clicking the Show Properties icon on a step opens its Properties panel, where every editable property — target element, expected value, variable name/scope, and the rest — is changed directly. Copying, recreating, or reverting to an old revision are unrelated to routine property editing.",
+      "optionExplanations": {
+        "A": "Show Properties opens the editable settings panel.",
+        "B": "A copy is not required for ordinary property editing.",
+        "C": "Recreating the step is not required to edit supported settings.",
+        "D": "A revision restore is different from editing current properties."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-17490e3ff7d3"
     },
     {
       "questionId": "Q9",
@@ -456,7 +518,7 @@
         },
         {
           "id": "B",
-          "text": "It is available for use in any other test case in the suite."
+          "text": "It is available for reuse by other tests in the same project."
         },
         {
           "id": "C",
@@ -471,7 +533,15 @@
         "B"
       ],
       "hint": "It's about cross-test reuse, not export, storage location, or versioning.",
-      "rationale": "Selecting the Shared Group checkbox makes the group available to be called from other tests in the project — not an export mechanism, a local-only storage choice, or a versioning feature."
+      "rationale": "Selecting the Shared Group checkbox makes the group available to be called from other tests in the project — not an export mechanism, a local-only storage choice, or a versioning feature.",
+      "optionExplanations": {
+        "A": "Sharing is not automatic external export.",
+        "B": "Other tests in the project can reference the shared group.",
+        "C": "Sharing does not mean local-only storage.",
+        "D": "Sharing is distinct from test revision history."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-55ac8a720e8a"
     },
     {
       "questionId": "Q10",
@@ -499,7 +569,15 @@
         "C"
       ],
       "hint": "It's about supplying different data to the same steps, not runtime step changes or speed.",
-      "rationale": "Parameters on a group let it be reused with different values supplied by each calling test, rather than duplicating the underlying steps — it doesn't alter step logic at runtime, speed up execution, or generate reports."
+      "rationale": "Parameters on a group let it be reused with different values supplied by each calling test, rather than duplicating the underlying steps — it doesn't alter step logic at runtime, speed up execution, or generate reports.",
+      "optionExplanations": {
+        "A": "Parameters supply data; they do not automatically change the step sequence.",
+        "B": "Parameterization does not guarantee faster execution.",
+        "C": "Each caller can supply different values to the same group logic.",
+        "D": "Parameters do not automatically generate reports."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-55ac8a720e8a"
     },
     {
       "questionId": "Q11",
@@ -527,7 +605,15 @@
         "B"
       ],
       "hint": "Shared steps pay off when the same sequence recurs across tests, like login/logout.",
-      "rationale": "Shared steps are most valuable exactly when the same action sequence — like logging in or out — needs to be applied across multiple test cases, so a future change is made once instead of in every test."
+      "rationale": "Shared steps are most valuable exactly when the same action sequence — like logging in or out — needs to be applied across multiple test cases, so a future change is made once instead of in every test.",
+      "optionExplanations": {
+        "A": "A one-off action gains less from cross-test reuse.",
+        "B": "Recurring sequences benefit from one shared definition.",
+        "C": "Running once does not by itself justify sharing.",
+        "D": "Unique independent sequences are not this reuse case."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-55ac8a720e8a"
     },
     {
       "questionId": "Q12",
@@ -552,10 +638,18 @@
         }
       ],
       "correctOptions": [
-        "B"
+        "A"
       ],
-      "hint": "The course's answer key here is counterintuitive; memorize it.",
-      "rationale": "Per the course's answer key (verified: A is marked incorrect), the expected answer is B. This contradicts the reuse model taught elsewhere in the course, where a shared group is the recommended way to reuse steps across tests. Treat it as a course-key quirk to memorize for the exam."
+      "hint": "Reuse a shared definition instead of maintaining duplicated steps.",
+      "rationale": "A group can be reused in its test; marking it shared enables reuse in other project tests. Independent copies do not provide a single shared definition for maintenance.",
+      "optionExplanations": {
+        "A": "A shared group enables project reuse without independently duplicating its definition.",
+        "B": "Copies can replay the same actions but lack a single shared definition.",
+        "C": "Re-recording creates independent copies rather than shared reuse.",
+        "D": "A test-only group does not provide cross-test reuse."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-55ac8a720e8a"
     },
     {
       "questionId": "Q13",
@@ -583,7 +677,15 @@
         "A"
       ],
       "hint": "It works during recording, matching against your existing Shared Groups.",
-      "rationale": "While recording, Testim watches for a match against your existing Shared Groups and suggests them as next steps via an 'Auto record your steps' pop-up — it isn't a code-enhancement tool, a revision-recovery mechanism, or an uninterruptible-test guarantee."
+      "rationale": "While recording, Testim watches for a match against your existing Shared Groups and suggests them as next steps via an 'Auto record your steps' pop-up — it isn't a code-enhancement tool, a revision-recovery mechanism, or an uninterruptible-test guarantee.",
+      "optionExplanations": {
+        "A": "It suggests existing shared groups during recording.",
+        "B": "This feature is not code-editor completion.",
+        "C": "It does not revert test revisions.",
+        "D": "Suggestions do not guarantee uninterrupted execution."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-607569d67ac4"
     },
     {
       "questionId": "Q14",
@@ -600,18 +702,26 @@
         },
         {
           "id": "C",
-          "text": "Specialized Steps can not be added using Auto Complete feature."
+          "text": "Auto Complete requires typing the entire group as a code script."
         },
         {
           "id": "D",
-          "text": "Auto Complete requires a minimum of 10 tests to be recorded by Testim before it can offer suggestions."
+          "text": "Auto Complete compares revisions instead of suggesting existing shared groups."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "The other three all describe a limitation Auto Complete doesn't actually have.",
-      "rationale": "Auto Complete identifies matching, reusable Shared Groups and suggests them while recording future tests. If the matched group has parameters, you're prompted to name and set them — they ARE editable, not locked — and there's no 10-test minimum or restriction against specialized steps."
+      "hint": "The feature suggests existing shared groups during recording.",
+      "rationale": "Auto Complete suggests matching shared groups during recording. Group parameters can be supplied before playback; the feature is documented for professional-plan projects.",
+      "optionExplanations": {
+        "A": "Matching shared groups can be offered during recording.",
+        "B": "The documented flow accepts parameter values before playback.",
+        "C": "A script is not required to accept a recorded-group suggestion.",
+        "D": "Revision comparison is not the described suggestion workflow."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-607569d67ac4"
     },
     {
       "questionId": "Q15",
@@ -639,7 +749,15 @@
         "A"
       ],
       "hint": "It's the four kinds of reusable step the library organizes.",
-      "rationale": "The Shared Steps Library supports filtering by step category: Groups, Actions, Validations, and Wait for — not by project/user metadata or test/folder names."
+      "rationale": "The documented category filters are Groups, Actions, Validations and Wait for. Name searching is separate from these category filters.",
+      "optionExplanations": {
+        "A": "These are the documented category filters.",
+        "B": "Test case is not a listed shared-step category.",
+        "C": "Project and users are not these category filters.",
+        "D": "Folder searching is separate from step-category filtering."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-55ac8a720e8a"
     },
     {
       "questionId": "Q16",
@@ -667,7 +785,15 @@
         "B"
       ],
       "hint": "It's a usage count, clickable to see which tests reference it.",
-      "rationale": "The 'Used by' column displays the number of tests using the shared step, and clicking it navigates to the Test Library filtered to those specific tests. Modification date, validation type, and folder are each covered by the library's other columns (Date Modified, Kind, Name), not this one."
+      "rationale": "The 'Used by' column displays the number of tests using the shared step, and clicking it navigates to the Test Library filtered to those specific tests. Modification date, validation type, and folder are each covered by the library's other columns (Date Modified, Kind, Name), not this one.",
+      "optionExplanations": {
+        "A": "Modification date is a separate column.",
+        "B": "Used by counts the tests referencing the shared item.",
+        "C": "Kind identifies the item/step type.",
+        "D": "Folder location is not the usage count."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-55ac8a720e8a"
     }
   ],
   "quickRecap": [
@@ -697,7 +823,7 @@
     },
     {
       "key": "Variable scope",
-      "value": "Local (group/test) < Test (default) < Suite — how far a captured variable can be referenced."
+      "value": "Choose Local/Test/Suite as documented for the step; check the Extract Value Local-scope discrepancy."
     },
     {
       "key": "Native events",
@@ -709,7 +835,7 @@
     },
     {
       "key": "Replace with a clone",
-      "value": "Detaches a shared step so an edit affects only this one test, not every caller."
+      "value": "Clone the selected shared item for separate editing; nested shared steps can remain shared."
     },
     {
       "key": "Property edits",
@@ -717,13 +843,13 @@
     },
     {
       "key": "Shared Steps",
-      "value": "Group steps, check 'Shared Group' → callable from other tests; one edit updates every caller."
+      "value": "Shared groups and supported shared steps enable reuse within a project; review affected references."
     }
   ],
   "topics": [
     {
       "title": "Editing Target Element Properties (Tricentis docs)",
-      "url": "https://help.testim.io/docs/editing-target-element-properties",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/editing-your-tests/editing-target-element-properties.htm",
       "duration": "docs"
     },
     {
@@ -735,6 +861,78 @@
       "title": "Steps (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/editing-tests/steps.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Editing a steps properties (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/editing-your-tests/editing-a-steps-properties.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Index (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/groups/index.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Auto complete (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/groups/auto-complete.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Index (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/test-management/shared-steps-library/index.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Labels (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/test-management/labels.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Revisions (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/test-management/revisions.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Generating a random value (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/generating-a-random-value.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Generating a date (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/generating-a-date.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Extract text (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/extract-text.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Checkbox and radio button validation (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/checkbox-and-radio-button-validation.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Parameters for groups (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/parameters/parameters-for-groups.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Validate element text (primary documentation)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/validate-element-text.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Variables (primary documentation)",
+      "url": "https://developer.mozilla.org/en-US/docs/Learn_web_development/Core/Scripting/Variables",
+      "duration": "docs"
+    },
+    {
+      "title": "JavaScript identifier rules (MDN)",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Grammar_and_types",
+      "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Testim web documentation checked 2026-10-06",
+  "sourceReviewedOn": "2026-10-06"
 }
