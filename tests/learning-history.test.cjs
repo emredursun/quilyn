@@ -1619,3 +1619,9 @@ test('PBA UI review scopes theme presentation and separates Visible Disabled and
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===3?['A','B','C']:q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[1].elements[0].description,/across an application.*arbitrary per-field/);assert.match(d.studyGuide[2].elements[1].description,/Visible true.*Disabled true.*Required true/);assert.equal(d.practiceQuiz[1].options[2].text,'Insights');assert.match(d.studyGuide[0].bulletPoints[3],/separate portals are not mandatory/);
 });
+
+test('PBA Insights review scopes sharing and BIX extraction and supplies table-chart configuration concepts',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),entry=inv.modules.find(m=>m.id==='BA-M17'),bytes=fs.readFileSync(entry.file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(entry.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[1].description,/does not guarantee identical data/);assert.match(d.studyGuide[2].elements[0].description,/batches, one class.*does not by itself transform\/load/);assert.match(d.studyGuide[1].bulletPoints[2],/Columns.*Measures\/Dimensions.*Simple Value/);assert.match(d.practiceQuiz[5].rationale,/not restricted to App Studio/);
+});
