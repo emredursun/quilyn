@@ -62,7 +62,7 @@
         {
           "type": "concept",
           "term": "Process",
-          "description": "A series of Tasks/Steps within a Stage. Each Stage can contain one or more Processes; a Case can only move to the next Process after completing the Steps in the current one (e.g., Place Order, Process Order, Ship Items)."
+          "description": "A Process groups related Steps within a Stage. Processes normally run sequentially; independently started/completed Processes can instead run in parallel. Completion and transition behavior follows the configured Case Life Cycle."
         },
         {
           "type": "concept",
@@ -91,7 +91,7 @@
         {
           "type": "concept",
           "term": "Create Process",
-          "description": "The default Process in the Create Stage. Non-Channel-specific Create Processes can only include Collect information Steps; Channel-specific ones may include Collect information and Automation Steps."
+          "description": "The default Process in the Create Stage can be modified. Non-Channel-specific Create Processes only include Collect information Steps. Channel-specific Processes can start conditionally for the configured Channel; validate supported Steps for that configuration."
         },
         {
           "type": "concept",
@@ -178,12 +178,12 @@
         {
           "type": "concept",
           "term": "User guidance",
-          "description": "Instructions and help that keep users oriented while completing work — Step/Stage instructions, optional actions, and contextual guidance — so users know what to do at each Assignment to drive the Case to resolution."
+          "description": "Assignment instructions explain what users must accomplish and which information to enter. Meaningful Case Status values communicate progress; they can update on Stage or Step entry, with a resolution status after the final Stage’s Processes complete."
         },
         {
           "type": "concept",
           "term": "Communicating with stakeholders",
-          "description": "Pega keeps Case participants informed throughout the Life Cycle using features such as Pulse (post/view/reply to messages in Case context) and automated notifications (e.g., email) tied to Case events and status."
+          "description": "Pulse supports discussion in Case context. Automated communication must be configured: identify recipients, message content and timing. A Send email Step sends at that point in the flow; Case-level Worklist notifications inform the assigned user when the routed Assignment is entered."
         },
         {
           "type": "concept",
@@ -192,7 +192,7 @@
         },
         {
           "type": "analogy",
-          "text": "Status + notifications are the flight tracker for a Case: participants always see the current 'gate' (status) and get alerts (notifications) when something changes."
+          "text": "Status provides a business progress indicator; notifications are configured for relevant events and recipients. Not every participant automatically receives every change, and a status value does not by itself send a message."
         }
       ],
       "bulletPoints": [
@@ -205,7 +205,7 @@
   "examPitfalls": [
     {
       "title": "Stage / Process / Step hierarchy",
-      "trapDescription": "These three building blocks are tested constantly. Stage = phase; Process = group of Steps; Step = single user or automated action.",
+      "trapDescription": "Do not confuse phase, grouped work and individual action: Stage, Process and Step have different roles.",
       "bestPractice": "Remember the nesting: a Stage contains Processes; a Process contains Steps."
     },
     {
@@ -240,7 +240,7 @@
     },
     {
       "title": "Naming conventions",
-      "trapDescription": "Case Type = outcome-focused name; Stage = noun/noun phrase/gerund (≤2 words); Process and Step = verb + noun.",
+      "trapDescription": "Recommended naming: Case Type conveys outcome; Stage uses a meaningful noun/noun phrase/gerund, preferably two words or fewer; Process and Step use verb + noun. This is guidance rather than a platform-enforced word limit.",
       "bestPractice": "Stage 'Processing'; Process 'Process order'; Step 'Check inventory'. Avoid vague names like 'Financial operations'."
     },
     {
@@ -283,7 +283,7 @@
         "C": "Steps are individual actions within a process.",
         "D": "Personas describe participants rather than work phases."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-74742efcf18c"
     },
     {
@@ -319,7 +319,7 @@
         "C": "These terms distinguish the model from its runtime instance.",
         "D": "A Case Type covers the transaction rather than one action."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-316d538e9022"
     },
     {
@@ -358,7 +358,7 @@
         "C": "Data and interfaces describe needed information and access.",
         "D": "Rule packaging is not one of the three business-design pillars."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-316d538e9022"
     },
     {
@@ -394,7 +394,7 @@
         "C": "Creation cannot be freely removed or reordered in this model.",
         "D": "The Create Stage does not offer the normal transition configuration."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-4833de8425ae"
     },
     {
@@ -423,14 +423,14 @@
         "A"
       ],
       "hint": "Non-Channel-specific Create Processes are restricted to one specific Step type for initial data entry.",
-      "rationale": "Create Processes that are not Channel-specific can only include Collect information Steps, which are designed for entering initial Case data. Automation Steps must be deferred until after the Case is created.",
+      "rationale": "Non-Channel-specific Create Processes are restricted to Collect information Steps in this source model. Do not extend that restriction into an assertion that every Channel-specific configuration has identical behavior.",
       "optionExplanations": {
         "A": "This restricted Create Process supports initial user data entry.",
         "B": "Automation is not the allowed type for this non-channel-specific process.",
         "C": "This ignores the stated Create Process restriction.",
         "D": "Change Stage automation is outside the permitted initial-capture steps."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-4833de8425ae"
     },
     {
@@ -459,14 +459,14 @@
         "A"
       ],
       "hint": "Alternate Stages sit off the primary path to handle exceptions, deviations, or negative resolutions.",
-      "rationale": "Alternate Stages handle deviations from the primary path — such as exception handling or negative resolutions like rejection — and allow the Case to re-enter the primary path once the exception is resolved.",
+      "rationale": "An Alternate Stage handles this exception and can return the Case to the primary path when configured to do so. Other Alternate Stages may resolve a Case negatively rather than return it.",
       "optionExplanations": {
-        "A": "An exception path belongs in an Alternate Stage.",
+        "A": "This configured exception-and-return path uses an Alternate Stage; returning is not mandatory for every Alternate Stage.",
         "B": "Initial creation does not handle the later rejection path.",
         "C": "A Primary Stage represents the expected processing path.",
         "D": "Parallel execution concerns independent work rather than the rejection detour."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-4833de8425ae"
     },
     {
@@ -502,7 +502,7 @@
         "C": "A clear resolution path is recommended for every Case Type.",
         "D": "Resolution describes the end rather than the creation step."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-4833de8425ae"
     },
     {
@@ -540,7 +540,7 @@
         "C": "This swaps the collection indicator with automation.",
         "D": "An automation does not itself require user entry."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-4833de8425ae"
     },
     {
@@ -576,7 +576,7 @@
         "C": "Alternate Stages model exceptions rather than independent work in one phase.",
         "D": "Collection steps are actions rather than these two independent processes."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-4833de8425ae"
     },
     {
@@ -612,7 +612,7 @@
         "C": "Persona Step is not the transition action described here.",
         "D": "The case is already past initial creation in this scenario."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-c49b726295d8"
     },
     {
@@ -648,7 +648,7 @@
         "C": "Create Stage transitions cannot be configured this way.",
         "D": "Automation changes who performs the action rather than allow navigation back."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-c49b726295d8"
     },
     {
@@ -684,8 +684,8 @@
         "C": "The phrase is broad and does not specify this task.",
         "D": "Processing names a phase rather than the particular action."
       },
-      "explanationReviewedOn": "2026-10-02",
-      "lessonSection": "section-74742efcf18c"
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-316d538e9022"
     },
     {
       "questionId": "Q13",
@@ -713,15 +713,15 @@
         "A"
       ],
       "hint": "Try it in 'This Case is in ___.'",
-      "rationale": "Stages use a noun, noun phrase, or gerund of up to two words — for example, 'Processing' or 'Delivery.' Verb + noun is the convention for Processes and Steps; outcome statements are used to name Case Types, not Stages.",
+      "rationale": "The recommended Stage name uses a meaningful noun, noun phrase or gerund, preferably no more than two words. The wording is a naming recommendation, not a hard platform limit. Verb + noun naming describes Processes and Steps.",
       "optionExplanations": {
         "A": "A concise phase name fits the stage's contextual role.",
         "B": "Verb-plus-noun naming describes the task or process action.",
         "C": "This longer phrase names a case outcome rather than a concise phase.",
         "D": "A number does not communicate the stage's business purpose."
       },
-      "explanationReviewedOn": "2026-10-02",
-      "lessonSection": "section-74742efcf18c"
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-316d538e9022"
     },
     {
       "questionId": "Q14",
@@ -756,7 +756,7 @@
         "C": "Process does not communicate the business outcome.",
         "D": "Submit form describes a task rather than the overall case purpose."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-316d538e9022"
     },
     {
@@ -792,7 +792,7 @@
         "C": "A ruleset revision is a packaging concept rather than customer value.",
         "D": "A system of record supplies information rather than define this work outcome."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-316d538e9022"
     },
     {
@@ -828,7 +828,7 @@
         "C": "A Resolution Stage is a phase rather than the entry task.",
         "D": "A Channel describes the interaction medium rather than the action."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-74742efcf18c"
     },
     {
@@ -866,7 +866,7 @@
         "C": "Typing into a form requires a user assignment.",
         "D": "Persona-channel design is not one of these runtime automation actions."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-4833de8425ae"
     },
     {
@@ -895,14 +895,14 @@
         "A"
       ],
       "hint": "Who participates + how they reach the Case.",
-      "rationale": "Personas (the people and roles involved) and Channels (how they interact with the Case) form the second pillar of an application in App Studio. Case Types and Strategies are the first pillar; Data and Interfaces are the third.",
+      "rationale": "Personas represent user groups and roles; Channels describe how those users access the application. Together they form one of the three pillars; ordinal numbering is not what determines their purpose.",
       "optionExplanations": {
         "A": "This pillar describes who participates and how.",
         "B": "This pillar addresses information and integration rather than participants.",
         "C": "This pillar addresses work and outcomes rather than interaction media.",
         "D": "Ruleset management is not one of the three pillars."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-d34363f54e07"
     },
     {
@@ -931,14 +931,14 @@
         "A"
       ],
       "hint": "Pulse supports in-context conversation between team members and automated Case event notifications.",
-      "rationale": "Pulse enables in-context collaboration through posts, comments, and replies, and automated notifications keep all participants informed of Case events and status changes. It is not a routing or data mechanism.",
+      "rationale": "Pulse supports Case-context collaboration. Email Steps and Case-level Notifications communicate with configured recipients at configured times; not every status change automatically notifies every participant.",
       "optionExplanations": {
-        "A": "Case-context discussion and notifications support ongoing collaboration.",
+        "A": "Pulse supports discussion; configured email/notification mechanisms inform selected recipients at appropriate events.",
         "B": "Manual calls are not the only communication mechanism.",
         "C": "A nightly document does not provide interactive in-context discussion.",
         "D": "Ruleset locking controls edits rather than notify participants."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-9be5b8217efa"
     },
     {
@@ -974,7 +974,7 @@
         "C": "App Studio is used to express and refine this design.",
         "D": "The workflow still needs data to achieve its outcome."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-9be5b8217efa"
     }
   ],
@@ -997,7 +997,7 @@
     },
     {
       "key": "Stage types",
-      "value": "Create (green, first, fixed, assigns Case ID), Primary (expected outcome / primary path), Alternate (deviations/exceptions, optional), Resolution (red, end; at least one required)."
+      "value": "Create (green, first/fixed); Primary (expected path); Alternate (exception/negative resolution); Resolution (red, finishes lifecycle; at least one recommended)."
     },
     {
       "key": "Icons & parallel",
@@ -1009,11 +1009,11 @@
     },
     {
       "key": "Naming",
-      "value": "Case Type = outcome (Loan Application Review); Stage = noun/gerund ≤2 words (Processing); Process/Step = verb+noun (Process order, Check inventory)."
+      "value": "Outcome-focused Case Type; meaningful noun/gerund Stage, preferably ≤2 words; verb+noun Process/Step. Naming guidance, not validation limits."
     },
     {
       "key": "Communication",
-      "value": "Pulse for in-context collaboration; automated notifications + Case status keep participants informed."
+      "value": "Pulse supports discussion; meaningful status and configured notifications inform relevant recipients at chosen events."
     }
   ],
   "topics": [
@@ -1029,12 +1029,12 @@
     },
     {
       "title": "Users, Personas, and Channels",
-      "url": "https://academy.pega.com/topic/users-personas-and-channels/v2/in/80516",
+      "url": "https://academy.pega.com/topic/users-personas-and-channels/v2/in/93701/80516",
       "duration": "15 min"
     },
     {
       "title": "User guidance",
-      "url": "https://academy.pega.com/topic/user-guidance/v2/in/80516",
+      "url": "https://academy.pega.com/topic/user-guidance/v2/in/93701/80516",
       "duration": "10 min"
     },
     {
@@ -1044,8 +1044,10 @@
     },
     {
       "title": "Benefits of Case Management with Pega",
-      "url": "https://academy.pega.com/topic/benefits-case-management-pega/v2/in/80516",
+      "url": "https://academy.pega.com/topic/benefits-case-management-pega/v2/in/93701/80516",
       "duration": "5 min"
     }
-  ]
+  ],
+  "platformVersion": "Pega Platform '24.2; Academy BA Case Life Cycle module v2",
+  "sourceReviewedOn": "2026-10-06"
 }

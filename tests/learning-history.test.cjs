@@ -1138,3 +1138,14 @@ test('AE1 capstone review separates verified mechanisms from unverified Academy 
  assert.match(d.studyGuide[1].elements[2].text,/do not themselves guarantee.*does not undo/);
  assert.doesNotMatch(JSON.stringify(d),/every TestCase referencing it is fixed at once|TBox lets engines mix freely|differs on every execution/);
 });
+
+test('BA life cycle review separates recommendations, parallel work and configured notifications',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/business-architect/m08_case_life_cycle_design.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[1].description,/normally run sequentially.*instead run in parallel/);
+ assert.match(d.practiceQuiz[12].rationale,/not a hard platform limit/);
+ assert.match(d.practiceQuiz[18].rationale,/not every status change automatically/);
+ assert.match(d.practiceQuiz[5].rationale,/may resolve a Case negatively/);
+ assert.equal(d.practiceQuiz[11].lessonSection,d.studyGuide[0].sectionId);
+ assert.equal(d.practiceQuiz[12].lessonSection,d.studyGuide[0].sectionId);
+});
