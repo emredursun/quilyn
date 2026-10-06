@@ -913,3 +913,17 @@ test('AS1 reference review corrects expression, shortcut and repair advice witho
  assert.doesNotMatch(JSON.stringify(guide.learningObjectives),/open it in the viewer|Download any guide/);
  assert.match(guide.studyGuide[0].elements[0].text,/have not been inspected/);
 });
+
+test('AS2 foundations separate official policy, instance Character and negative-test status',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ const files=['data/tosca-as2/m00_introduction.json','data/tosca-as2/m01_testsheet_creation.json'];
+ const docs=files.map((file,n)=>{const bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,(n?[['A'],['B'],['D'],['C'],['A'],['B'],['D'],['B']]:[['D'],['C'],['D'],['C'],['D']])[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});return d;});
+ assert.match(docs[0].studyGuide[1].elements[0].text,/read-only.*restarting/);
+ assert.match(docs[0].practiceQuiz[2].options[3].text,/current official course account/);
+ assert.doesNotMatch(JSON.stringify(docs[0].quickRecap),/60%|2-week|Badge \+ points/);
+ assert.match(docs[1].studyGuide[2].elements[0].description,/neither that name nor the leftmost/);
+ assert.match(docs[1].practiceQuiz[2].scenario,/every other assertion succeeds/);
+ assert.match(docs[1].studyGuide[0].elements[0].text,/hypothetical specification/);
+ assert.doesNotMatch(JSON.stringify(docs[1]),/var\(--pa-ink-[23]\)|shown in the official Exercise/);
+ ['data/tosca-as1/m03_testcases.json','data/tosca-as1/m04_advanced_module_actions.json'].forEach(file=>assert.doesNotMatch(fs.readFileSync(file,'utf8'),/var\(--pa-ink-[23]\)/));
+});
