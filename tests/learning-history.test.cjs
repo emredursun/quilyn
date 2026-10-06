@@ -1035,3 +1035,12 @@ test('AE1 introduction and framework review correct positional table syntax and 
  assert.doesNotMatch(JSON.stringify(docs),/\$ = by a cell|\$ notation instead targets the row|only the visuals shift|Final Exam draws no questions/);
  assert.match(docs[0].studyGuide[0].elements[2].text,/unavailable during review/);
 });
+
+test('AE1 Excel review separates manipulation, file comparison defaults and save operations',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m02_excel_engine.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['C'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[3].elements[0].description,/off by default/);
+ assert.match(d.practiceQuiz[0].rationale,/File Compare is a separate path/);
+ assert.match(d.studyGuide[1].elements[1].description,/only applies with Save Path/);
+ assert.doesNotMatch(JSON.stringify(d),/23 sub-lessons|TBox XEngines|every other Excel Module depends on it/);
+});
