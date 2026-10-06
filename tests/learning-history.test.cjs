@@ -1430,3 +1430,19 @@ test('Testim assistant review includes explicit draft insertion, acknowledgement
  assert.match(d.studyGuide[0].elements[1].description,/acknowledge.*Help.*Paste code at cursor/);
  assert.match(d.examPitfalls[0].bestPractice,/suggestions, not proof of correctness/);
 });
+
+test('Testim auto-grouping review scopes weekly estimates, branch output and parameter naming',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m13_auto_group_test_steps.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['C'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/weekly offline.*not native mobile/);
+ assert.match(d.studyGuide[1].elements[0].items[4],/non-master branch.*parameters still require names/);
+});
+
+test('Testim API review preserves parameter support in both types and scopes preview and CORS behavior',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m14_performing_api_testing.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['A'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[2].text,/Both API step types support parameters/);
+ assert.match(d.studyGuide[1].elements[2].description,/Send preview does not execute assertions.*dynamic values become empty/);
+ assert.match(d.studyGuide[2].elements[1].description,/does not bypass server authorization/);
+ assert.doesNotMatch(JSON.stringify(d),/recommended default.*allows passing|parameter passing isn't as directly supported/);
+});

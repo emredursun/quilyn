@@ -14,7 +14,7 @@
         {
           "type": "concept",
           "term": "The duplication score",
-          "description": "Testim measures how much duplicate step content exists across a project as a numerical score from 0 to 100, following the DRY (Don't Repeat Yourself) principle — the more identical step sequences appear across multiple tests, the higher the score."
+          "description": "The duplication score is a 0–100 estimate of ungrouped repeated sequences on master, refreshed by weekly offline processing rather than every edit. Auto grouping is documented for professional-plan web/mobile-web projects, not native mobile projects."
         },
         {
           "type": "list",
@@ -43,18 +43,18 @@
             "Examine details — click a suggestion to see which tests contain the duplicate steps, and open individual tests to verify the sequence in context.",
             "Filter/sort — narrow suggestions by test owner, name, suite, or group; sort by duplication impact or step count.",
             "Edit if needed — customize the group's composition by adding/removing individual steps (a group needs a minimum of 3 steps).",
-            "Create the shared group — select the affected tests, name the group, choose a new or existing branch, and confirm; parameters are generated automatically as needed."
+            "Create the shared group for selected usages in a new branch or eligible current non-master branch. Generated parameters still require names; review the changes before merging."
           ]
         },
         {
           "type": "note",
-          "text": "Auto Grouping is the discovery and consolidation workflow; the resulting Shared Group then works the same way as any other shared group covered earlier — one edit propagates to every calling test."
+          "text": "Suggestions require review in their test contexts. A lower duplication score does not prove equivalent coverage or runtime correctness; validate affected tests after grouping."
         }
       ],
       "bulletPoints": [
         "The Auto Grouping pane surfaces candidate duplicate sequences with impact metrics, filterable/sortable.",
         "A candidate group needs a minimum of 3 steps.",
-        "Creating the group picks affected tests + a name + a branch; parameters are auto-generated as needed."
+        "Choose affected usages, name and eligible branch; supply names for generated parameters and review before merging."
       ],
       "sectionId": "section-9fc4502de4c3"
     }
@@ -63,7 +63,7 @@
     {
       "title": "Manually hunting for duplicate step sequences",
       "trapDescription": "Trying to spot repeated sequences across dozens of tests by eye, which doesn't scale as a project grows.",
-      "bestPractice": "Use Auto grouping to identify duplicate step sequences across the project automatically, rather than relying on manual inspection."
+      "bestPractice": "Use suggestions to find eligible repeated sequences, then inspect them in context and validate the refactor. Weekly estimates do not reflect every recent edit."
     },
     {
       "title": "Ignoring a Red duplication score",
@@ -80,7 +80,7 @@
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "What does Testim's duplication score measure, and what is its range?",
+      "scenario": "What does the documented 0–100 project duplication score estimate?",
       "options": [
         {
           "id": "A",
@@ -88,7 +88,7 @@
         },
         {
           "id": "B",
-          "text": "How much duplicate step content exists across the project, on a 0–100 scale."
+          "text": "Ungrouped duplicate step sequences on master, using a weekly refreshed estimate."
         },
         {
           "id": "C",
@@ -103,7 +103,15 @@
         "B"
       ],
       "hint": "It's specifically about repeated step content, following DRY.",
-      "rationale": "The duplication score is a 0–100 measure of how much duplicate step content exists across a project, following the DRY principle — not a test count, a pass rate, or a count of existing shared groups."
+      "rationale": "The score estimates ungrouped repetition on master using weekly processing; it is not a live test count, pass rate or correctness measure.",
+      "optionExplanations": {
+        "A": "The score measures repeated sequences, not total test count.",
+        "B": "It is the documented weekly duplication estimate on master.",
+        "C": "Pass rate is a different measure.",
+        "D": "Existing shared-group count is not the duplication score."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-f79049c28145"
     },
     {
       "questionId": "Q2",
@@ -131,7 +139,15 @@
         "C"
       ],
       "hint": "Red is the most severe of the three categories.",
-      "rationale": "Red indicates a project contains a lot of duplication, and applying Auto Grouping is highly recommended — it's not a blocking error, and it's more severe than the Yellow (moderate, recommended) or Green (good, minimal) categories."
+      "rationale": "Red indicates a project contains a lot of duplication, and applying Auto Grouping is highly recommended — it's not a blocking error, and it's more severe than the Yellow (moderate, recommended) or Green (good, minimal) categories.",
+      "optionExplanations": {
+        "A": "This describes the lower-duplication category.",
+        "B": "Moderate duplication is the Yellow category.",
+        "C": "Red denotes higher duplication with grouping strongly recommended.",
+        "D": "Red duplication is not itself a test-execution blocking error."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-f79049c28145"
     },
     {
       "questionId": "Q3",
@@ -159,7 +175,15 @@
         "C"
       ],
       "hint": "It's a small but specific number.",
-      "rationale": "A candidate group's composition can be edited (steps added/removed), but it requires a minimum of 3 steps — shorter sequences aren't eligible for the Auto Grouping workflow."
+      "rationale": "A candidate group's composition can be edited (steps added/removed), but it requires a minimum of 3 steps — shorter sequences aren't eligible for the Auto Grouping workflow.",
+      "optionExplanations": {
+        "A": "One step is below this suggestion workflow’s minimum.",
+        "B": "Two steps are below the documented minimum.",
+        "C": "The editing workflow requires at least three selected steps.",
+        "D": "The suggestion-editing workflow has a documented minimum."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-9fc4502de4c3"
     },
     {
       "questionId": "Q4",
@@ -172,7 +196,7 @@
         },
         {
           "id": "B",
-          "text": "Parameters are generated automatically as needed during group creation."
+          "text": "Parameters can be generated, with an extra step to provide their names."
         },
         {
           "id": "C",
@@ -187,7 +211,15 @@
         "B"
       ],
       "hint": "The workflow is designed to minimize manual setup.",
-      "rationale": "When creating the shared group — after selecting affected tests, naming it, and choosing a branch — parameters are generated automatically as needed, rather than requiring manual, step-by-step definition."
+      "rationale": "Group creation can generate parameters where needed and then asks for their names. Inspect the resulting references and tests before merging.",
+      "optionExplanations": {
+        "A": "The feature can generate needed parameters rather than requiring every definition beforehand.",
+        "B": "Generated parameters require user-supplied names in an extra creation step.",
+        "C": "Parameterized groups are supported.",
+        "D": "The workflow does not require hardcoded values in every caller."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-9fc4502de4c3"
     },
     {
       "questionId": "Q5",
@@ -215,13 +247,21 @@
         "B"
       ],
       "hint": "It's about finding repetition, not speed or translation.",
-      "rationale": "Auto grouping identifies duplicate test step sequences across your project and allows replacing them with reusable groups — a maintenance/refactoring feature, not a performance or translation one."
+      "rationale": "Auto grouping identifies duplicate test step sequences across your project and allows replacing them with reusable groups — a maintenance/refactoring feature, not a performance or translation one.",
+      "optionExplanations": {
+        "A": "Grouping is not parallel execution.",
+        "B": "It finds repeat sequences for reusable grouping.",
+        "C": "It does not automatically assert every step outcome.",
+        "D": "It does not translate frameworks."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-9fc4502de4c3"
     }
   ],
   "quickRecap": [
     {
       "key": "Duplication score",
-      "value": "0–100, DRY-based measure of repeated step content across the project."
+      "value": "Weekly 0–100 estimate of ungrouped repetition on master, not a live correctness measure."
     },
     {
       "key": "Green / Yellow / Red",
@@ -233,7 +273,7 @@
     },
     {
       "key": "Group creation",
-      "value": "Pick affected tests + name + branch; parameters auto-generated as needed."
+      "value": "Select usages/name/eligible branch; supply generated parameter names and review before merging."
     }
   ],
   "topics": [
@@ -242,5 +282,7 @@
       "url": "https://docs.tricentis.com/testim/content/advanced-editing/auto-grouping2.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }
