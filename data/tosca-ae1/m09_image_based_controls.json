@@ -4,9 +4,9 @@
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
   "learningObjectives": [
     "Create an image-based control using Advanced Identification in XScan.",
-    "Explain why Image-Based Test Automation is positioned as a last-resort identification method.",
+    "Evaluate image identification against alternative methods and its execution-environment constraints.",
     "Apply the multi-screenshot technique for controls that do not always look the same.",
-    "Distinguish image-based identification from anchor-based identification and state the anchor rules."
+    "Distinguish XScan anchor algorithms from PDF-specific anchor requirements."
   ],
   "estTime": "30 min",
   "studyGuide": [
@@ -16,21 +16,21 @@
         {
           "type": "concept",
           "term": "Identifying by what it looks like",
-          "description": "Every identification method covered so far works on structure — properties, the control tree, the UI Automation interface. Image-based identification abandons structure entirely and identifies a control by one or more screenshots of it. Tosca finds the control by locating that image on screen at execution time."
+          "description": "XScan can pair a selected control with one or more screenshot identifiers. Image matching provides appearance-based identification when that fits the target, but still requires a visible, sufficiently distinctive identifier."
         },
         {
           "type": "concept",
           "term": "How to create one",
-          "description": "In XScan, select the control you want to identify, then in the Identification methods pane choose ADVANCED IDENTIFICATION → IMAGE. You then supply the screenshot or screenshots that represent the control."
+          "description": "In XScan Advanced View, select the control and choose ADVANCED IDENTIFICATION → IMAGE. Add an identifier image, capture its region and inspect uniqueness. Set Accuracy and choose Method Fullscreen, Controlbased or Auto as appropriate."
         },
         {
           "type": "warning",
-          "text": "Tricentis' own positioning is explicit: image-based identification is recommended for controls where nothing else works. It is a fallback, not a convenience. Reaching for it early produces automation that breaks on a theme change, a font update, a different screen resolution, or a browser zoom level — none of which would trouble structural identification."
+          "text": "Evaluate properties, index and anchors alongside image identification. The current public image guide describes alternatives rather than prescribing a universal five-step order. Image matching is sensitive to design, resolution, color depth and scrolling; structural identification can also fail after UI changes."
         }
       ],
       "bulletPoints": [
-        "XScan → select control → ADVANCED IDENTIFICATION → IMAGE.",
-        "Documented as the method for controls where nothing else works."
+        "Select a control in XScan Advanced View, add image identifiers and check their uniqueness.",
+        "Validate the chosen Accuracy and search Method under the intended execution settings."
       ],
       "sectionId": "section-34fa63c2a51c"
     },
@@ -40,17 +40,17 @@
         {
           "type": "concept",
           "term": "Use more than one screenshot",
-          "description": "The single most useful technique in this lesson: supply more than one screenshot to identify a control, especially when the control does not always look the same. A button with hover, focused, and default states, or an icon that changes slightly by context, will fail against a single reference image but match reliably against a set covering its variations."
+          "description": "Capture necessary variants when a control’s appearance changes. Tosca tries identifiers sequentially until it finds a match, so additional images increase execution time. Limit them to what is needed, and verify that each identifier selects the intended control."
         },
         {
           "type": "concept",
           "term": "What still breaks it",
-          "description": "Multiple screenshots handle variation the control was designed to have. They do not protect against changes to the environment: display scaling, resolution, colour scheme or theme, anti-aliasing differences between machines, or a redesign. This is why image-based controls are also the most machine-sensitive form of automation — a TestCase that passes on the author's laptop can fail on an execution agent with different display settings."
+          "description": "Keep scan and execution display settings consistent. Multiple identifiers can cover known variants; they do not guarantee tolerance of arbitrary redesigns, scaling or rendering changes. A non-unique identifier remains unreliable even if Module creation is permitted."
         }
       ],
       "bulletPoints": [
-        "More than one screenshot = the fix for controls with several visual states.",
-        "Screenshots cannot absorb resolution, scaling or theme differences — plan execution environments accordingly."
+        "Use necessary appearance variants; adding screenshots increases search time.",
+        "Check visible identifiers for uniqueness and validate the execution environment."
       ],
       "sectionId": "section-b92eea79ceb1"
     },
@@ -60,25 +60,25 @@
         {
           "type": "concept",
           "term": "Identify by anchor",
-          "description": "Sitting alongside IMAGE in the same pane is ANCHOR — select the control, then ADVANCED IDENTIFICATION → ANCHOR. Rather than matching appearance, this identifies the target control by its location in relation to another element, the anchor control. It is often the better answer when a control has no stable properties of its own but sits next to something that does."
+          "description": "In XScan Advanced View, select the target and choose ADVANCED IDENTIFICATION → ANCHOR. Assign a reference control from the tree, screen or Auto Select. This establishes an anchor context for locating the target; it is not the PDF Scan’s text/image/same-page rule set."
         },
         {
           "type": "list",
-          "title": "Anchor rules — the same three you met in the PDF lesson",
+          "title": "XScan Relative Algorithm choices",
           "items": [
-            "The anchor control must be a text or an image.",
-            "It must be uniquely identifiable — repetitive areas cannot be used as anchors.",
-            "It must be on the same page as the target control."
+            "ShortestPath — searches from the anchor’s children and expands through tree levels toward the root.",
+            "Coordinate — uses anchor coordinates to define the search angle.",
+            "Auto — the default; tries ShortestPath and falls back to Coordinate."
           ]
         },
         {
           "type": "note",
-          "text": "This consistency is worth noticing: anchors work the same way whether you are scanning a PDF with the PDF Engine or a UI control in XScan. Learn the three rules once and they apply in both places."
+          "text": "PDF and XScan anchors share the idea of a reference but have different documented identification mechanisms. Do not transfer the PDF-specific three conditions into a universal XScan rule."
         }
       ],
       "bulletPoints": [
-        "ANCHOR and IMAGE are siblings under Advanced Identification — try ANCHOR first.",
-        "Anchor rules are identical to the PDF Engine's: text or image · unique · same page."
+        "Assign an anchor and inspect its identification properties.",
+        "Relative Algorithm choices: ShortestPath, Coordinate, Auto (default)."
       ],
       "sectionId": "section-26420517b686"
     },
@@ -87,18 +87,17 @@
       "elements": [
         {
           "type": "list",
-          "title": "Full order of preference",
+          "title": "Independent method-selection guidance",
           "items": [
-            "1. Standard identification by properties — the default and the goal.",
-            "2. Anchor-based identification — when the control has no stable properties but a stable neighbour.",
-            "3. Alternative engine — for Windows, rescanning with UIA instead of WinX or vice versa (Lesson 4).",
-            "4. Custom control — a DLL that makes Tosca recognise the widget properly (Lesson 6).",
-            "5. Image-based identification — appearance matching, when nothing else works."
+            "Evaluate supported properties and index selection.",
+            "Consider an anchor that provides useful, identifiable context.",
+            "Evaluate supported alternative engines or compatible adapters when applicable.",
+            "Use image identification when its appearance and environment assumptions fit, and test uniqueness and search cost."
           ]
         },
         {
           "type": "note",
-          "text": "Self-healing (Lesson 5) does not appear in this list because it is not an identification method — it is a recovery mechanism that operates when the chosen method fails at runtime. It also does not apply to image-based controls, whose supported-engine list does not include an image matcher."
+          "text": "Self-healing is an execution-time recovery feature for documented supported engines. The support list alone does not establish that every identification mode is covered. Validate the actual control/engine combination; do not assume that it will repair an image mismatch."
         },
         {
           "type": "note",
@@ -106,7 +105,7 @@
         }
       ],
       "bulletPoints": [
-        "Image-based is step 5 of 5 — genuinely the last option, not a shortcut."
+        "Choose and validate a method for the actual control; the sequence is independent guidance, not an official universal ranking."
       ],
       "sectionId": "section-138c7e443073"
     }
@@ -115,34 +114,34 @@
     {
       "title": "Using image-based identification as a first resort",
       "trapDescription": "Switching to IMAGE identification as soon as a control is awkward to identify by properties, because it is quick to set up.",
-      "bestPractice": "Tricentis recommends image-based identification for controls where nothing else works. Try standard properties, then anchors, then an alternative engine, then a custom control before falling back on appearance matching."
+      "bestPractice": "Evaluate supported properties, index, anchors and relevant alternatives before committing to appearance matching. This is an engineering choice; the current guide does not establish a mandatory five-step order."
     },
     {
       "title": "Supplying a single screenshot for a control with several visual states",
       "trapDescription": "Capturing one image of a button and finding the TestCase fails intermittently when the button is hovered or focused.",
-      "bestPractice": "Use more than one screenshot to identify a control, particularly when controls don't always look the same. A set of images covering the variations is what makes image identification usable."
+      "bestPractice": "Capture necessary known variants, inspect uniqueness and verify execution. Extra screenshots add search time and do not themselves guarantee a correct match."
     },
     {
       "title": "Assuming image-based controls port cleanly between machines",
       "trapDescription": "Authoring image-based controls on a high-DPI laptop and deploying to execution agents with different display settings.",
-      "bestPractice": "Image matching is sensitive to resolution, display scaling, theme and rendering differences. Screenshots cannot absorb environment changes, so keep the execution environment consistent with where the images were captured."
+      "bestPractice": "Keep scan and execution display settings consistent and test the actual environments. Known image variants are not a guarantee against every environment change."
     },
     {
       "title": "Confusing anchor identification with image identification",
       "trapDescription": "Treating ANCHOR and IMAGE as the same fallback because they sit next to each other under Advanced Identification.",
-      "bestPractice": "ANCHOR identifies a control by its position relative to another element and remains a structural method; IMAGE matches appearance. Anchor is the earlier and more robust option of the two."
+      "bestPractice": "XScan anchors use reference context with ShortestPath, Coordinate or Auto. Image identification searches screenshot identifiers. PDF-specific text/image/same-page conditions are not a universal XScan rule."
     },
     {
       "title": "Expecting self-healing to rescue an image-based control",
       "trapDescription": "Enabling the SelfHealing TCP and assuming image-identified controls are now resilient too.",
-      "bestPractice": "Self-healing is supported for DotNet, Java, Oracle, UIA, XBrowser and Salesforce — it works on control properties, which image identification does not use. An image-based control that stops matching has to be recaptured."
+      "bestPractice": "Do not infer image-mode support from an engine’s general self-healing support. Check the actual combination and investigate failed image matches, including uniqueness, appearance and search settings."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "According to Tricentis, when should image-based identification be used?",
+      "scenario": "When is it reasonable to evaluate image-based identification?",
       "options": [
         {
           "id": "A",
@@ -150,7 +149,7 @@
         },
         {
           "id": "B",
-          "text": "For controls where nothing else works — it is a last resort."
+          "text": "When other supported identification methods are unsuitable and its visual/environment assumptions can be validated."
         },
         {
           "id": "C",
@@ -164,8 +163,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "The documentation is explicit about its position among the methods.",
-      "rationale": "Image-based identification is recommended for controls where nothing else works. Because it matches appearance rather than structure, it breaks on theme, resolution and rendering changes that structural identification would survive."
+      "hint": "Check whether the method’s assumptions fit the target.",
+      "rationale": "Image identification is a possible choice alongside properties, index and anchors. Validate known appearance, uniqueness and execution settings rather than treating convenience as sufficient.",
+      "optionExplanations": {
+        "A": "Setup speed alone does not validate identifier uniqueness or execution constraints.",
+        "B": "Evaluate alternatives and verify that appearance and environment assumptions fit the target.",
+        "C": "The method is not mandated for all Windows controls.",
+        "D": "XScan image identification is not limited to PDF document controls."
+      },
+      "lessonSection": "section-34fa63c2a51c",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -193,7 +200,15 @@
         "B"
       ],
       "hint": "The documented technique addresses controls that don't always look the same.",
-      "rationale": "Tricentis recommends using more than one screenshot to identify a control, especially when controls don't always look the same. A set of reference images covering each visual state makes the identification reliable."
+      "rationale": "Multiple necessary reference images can cover known visual states. Tosca searches sequentially, so test uniqueness and accuracy and account for additional execution time; success is not guaranteed merely by adding images.",
+      "optionExplanations": {
+        "A": "Broadly weakening accuracy can accept an unintended identifier instead of representing known states.",
+        "B": "Necessary images can cover known variants, with uniqueness checks and additional search cost.",
+        "C": "An engine change alone does not address these stated screenshot variants.",
+        "D": "A higher-resolution capture does not by itself cover different visual states."
+      },
+      "lessonSection": "section-b92eea79ceb1",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
@@ -221,28 +236,36 @@
         "B"
       ],
       "hint": "It lives next to the ANCHOR option.",
-      "rationale": "You select the control and then choose ADVANCED IDENTIFICATION → IMAGE in the Identification methods pane. ANCHOR is the sibling option in the same pane."
+      "rationale": "You select the control and then choose ADVANCED IDENTIFICATION → IMAGE in the Identification methods pane. ANCHOR is the sibling option in the same pane.",
+      "optionExplanations": {
+        "A": "Self-Healing Properties is not the identifier image configuration pane.",
+        "B": "Advanced View’s IMAGE pane configures screenshot identifiers and their search properties.",
+        "C": "This is a selected control’s identification workflow, not the stated project setting.",
+        "D": "The application tile chooses scan technology rather than configuring this selected control’s images."
+      },
+      "lessonSection": "section-34fa63c2a51c",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
       "type": "multi-select",
-      "scenario": "Which conditions must an anchor control satisfy when using anchor-based identification? (three correct answers)",
+      "scenario": "Which Relative Algorithm choices does the on-prem XScan anchor reference list? (three correct answers)",
       "options": [
         {
           "id": "A",
-          "text": "It must be a text or an image."
+          "text": "ShortestPath"
         },
         {
           "id": "B",
-          "text": "It must be uniquely identifiable — repetitive areas cannot be used."
+          "text": "Coordinate"
         },
         {
           "id": "C",
-          "text": "It must be on the same page as the target control."
+          "text": "Auto"
         },
         {
           "id": "D",
-          "text": "It must have been captured as a screenshot first."
+          "text": "ByteCompare"
         }
       ],
       "correctOptions": [
@@ -250,13 +273,21 @@
         "B",
         "C"
       ],
-      "hint": "The same three rules apply here as in the PDF Engine lesson.",
-      "rationale": "Anchor rules are consistent across Tosca: the anchor must be a text or image, uniquely identifiable (no repetitive areas), and on the same page as the target. Screenshots belong to image-based identification, which is a separate method."
+      "hint": "Auto combines the two explicit search algorithms.",
+      "rationale": "XScan lists ShortestPath and Coordinate, with Auto as the default that tries ShortestPath before Coordinate. These are distinct from PDF anchor requirements.",
+      "optionExplanations": {
+        "A": "ShortestPath is a documented Relative Algorithm.",
+        "B": "Coordinate is a documented Relative Algorithm.",
+        "C": "Auto is the default, using ShortestPath then Coordinate fallback.",
+        "D": "ByteCompare is not one of the listed XScan anchor Relative Algorithms."
+      },
+      "lessonSection": "section-26420517b686",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "A control has no usable properties of its own, but sits directly beside a unique static label on the same screen. What should you try before image-based identification?",
+      "scenario": "A target lacks unique properties but has a distinctive nearby reference control. What can be evaluated before using screenshot matching?",
       "options": [
         {
           "id": "A",
@@ -279,7 +310,15 @@
         "A"
       ],
       "hint": "A unique neighbour on the same page is exactly what one method is designed to exploit.",
-      "rationale": "Anchor-based identification locates the target relative to a stable neighbouring element, and a unique static label on the same page satisfies all three anchor conditions. It remains a structural method, so it is more robust than falling back on appearance matching."
+      "rationale": "A useful reference control can support XScan anchor identification. Evaluate the Relative Algorithm and verify the target; a nearby label alone is not a guarantee that identification will work.",
+      "optionExplanations": {
+        "A": "A suitable reference label can be evaluated as an XScan anchor.",
+        "B": "The target’s missing properties do not eliminate reference-based identification.",
+        "C": "Self-healing alone does not define the missing target’s suitable identification method.",
+        "D": "Deleting the whole application model is not required to evaluate a local anchor."
+      },
+      "lessonSection": "section-26420517b686",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
@@ -293,7 +332,7 @@
     },
     {
       "key": "When to use it",
-      "value": "For controls where nothing else works — documented as a last resort."
+      "value": "Evaluate image matching alongside properties, index and anchors; no mandatory universal ranking is asserted."
     },
     {
       "key": "Key technique",
@@ -301,19 +340,19 @@
     },
     {
       "key": "What breaks it",
-      "value": "Resolution, display scaling, theme, rendering differences, redesigns — none of which structural methods care about."
+      "value": "Design, resolution, color depth, scrolling and rendering changes can affect matching; structural methods also require validation."
     },
     {
       "key": "Sibling method: ANCHOR",
-      "value": "Identifies by position relative to another element. Anchor must be text or image · unique · same page."
+      "value": "XScan reference context with ShortestPath, Coordinate or Auto; do not substitute PDF-specific rules."
     },
     {
       "key": "Escalation order",
-      "value": "Properties → anchor → alternative engine → custom control → image."
+      "value": "Independent guidance: assess supported alternatives, environment assumptions, uniqueness and search cost."
     },
     {
       "key": "Self-healing",
-      "value": "Does not apply — it works on control properties, which image identification does not use."
+      "value": "Check the actual engine/identification combination; do not assume recovery of an image mismatch."
     }
   ],
   "topics": [
@@ -329,8 +368,10 @@
     },
     {
       "title": "Identify controls by anchor (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-cloud/en-us/content/references/control_identification_anchor.htm",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/xscan_identify_via_anchor.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS public documentation; original AE1 exercises unverified",
+  "sourceReviewedOn": "2026-10-06"
 }

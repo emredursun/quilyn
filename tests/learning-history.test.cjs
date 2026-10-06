@@ -1100,3 +1100,13 @@ test('AE1 standard Modules review corrects name editing, dialog scope and execut
  assert.match(d.studyGuide[3].elements[2].description,/permission, lock or path errors/);
  assert.doesNotMatch(JSON.stringify(d),/wildcarded Module actually bind|same TestStep.*any webpage|TBox XEngines|today's date is later than yesterday's/);
 });
+
+test('AE1 image review distinguishes XScan anchors from PDF and checks identifier reliability',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m09_image_based_controls.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['B'],['A','B','C'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].description,/sequentially.*increase execution time/);
+ assert.match(d.studyGuide[1].elements[1].description,/non-unique identifier remains unreliable/);
+ assert.deepEqual(d.studyGuide[2].elements[1].items.map(s=>s.split(' — ')[0]),['ShortestPath','Coordinate','Auto']);
+ assert.match(d.studyGuide[2].elements[0].description,/not the PDF Scan/);
+ assert.match(d.studyGuide[3].elements[1].text,/does not establish that every identification mode is covered/);
+});
