@@ -1552,3 +1552,12 @@ test('Testim streamlining review scopes Turbo artifacts and removes unsupported 
  assert.match(d.practiceQuiz[2].options[1].text,/Connect Testim/);
  assert.doesNotMatch(JSON.stringify(d),/video is saved.*test results|up to 30% faster|just your own recent activity/);
 });
+
+test('Testim project review distinguishes membership and built-in audit and protects sole owners',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m28_configuring_managing_projects.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['A','D'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[0].description,/only to projects the inviter can access.*Audit Log.*owners/);
+ assert.match(d.studyGuide[1].elements[1].description,/does not remove them from the company.*sole project owner/);
+ assert.match(d.studyGuide[0].elements[1].description,/alone does not establish execution readiness/);
+ assert.doesNotMatch(JSON.stringify(d),/course credits|course's answer key|will need to integrate another project management/);
+});
