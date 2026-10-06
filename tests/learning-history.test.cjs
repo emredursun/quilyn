@@ -1464,3 +1464,20 @@ test('Testim result review separates local debug modes, failure cause tags and i
  assert.match(d.studyGuide[2].elements[2].text,/create\/publish.*not universally required/);
  assert.match(d.studyGuide[1].elements[1].description,/--result-label.*250-character/);
 });
+
+test('Testim CLI review scopes installation, individual timeout and multiple intersection operands',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m17_leveraging_cli.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['A'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[0].options[0].text,/npm install -g/);
+ assert.match(d.studyGuide[1].elements[0].items[2],/OR semantics by default.*--intersect-with-operand/);
+ assert.match(d.studyGuide[1].elements[0].items[3],/individual test.*not.*total suite duration/);
+});
+
+test('Testim cross-browser review corrects grid selection flag and separates matrix from device coverage',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m18_executing_tests_multiple_browsers.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.equal(d.practiceQuiz[2].options[2].text,'--grid');
+ assert.match(d.studyGuide[0].elements[2].description,/--grid selects.*--test-config selects/);
+ assert.match(d.studyGuide[0].elements[1].description,/single grid test.*not evidence of physical-device/);
+ assert.doesNotMatch(JSON.stringify(d),/--test-config.*sets which grid|--test-config is used to add\/update the grid/);
+});

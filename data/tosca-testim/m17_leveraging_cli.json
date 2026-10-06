@@ -15,12 +15,12 @@
         {
           "type": "concept",
           "term": "Installation",
-          "description": "The Testim CLI is installed with npm: `npm i @testim/testim-cli`. It can then run commands either locally or remotely."
+          "description": "Use a supported Node.js LTS/runtime and install the npm CLI package. The documented global workflow is npm install -g @testim/testim-cli followed by testim connect; a local package install needs the applicable local launcher rather than assuming a global testim command appears."
         },
         {
           "type": "concept",
           "term": "Why use the CLI at all",
-          "description": "The CLI is the mechanism behind everything the editor/Test List local run can't do: cross-browser execution, parallel execution, CI/CD integration, and branch-scoped or data-driven runs across every data set (not just the first, as an editor run does)."
+          "description": "CLI supports configured test selection, grids, parallelism, data sets and CI invocation. It is not the sole mechanism for all non-local execution: the editor can run a single grid test and Scheduler can trigger configured matrices."
         },
         {
           "type": "concept",
@@ -29,7 +29,7 @@
         }
       ],
       "bulletPoints": [
-        "Install: npm i @testim/testim-cli.",
+        "Documented global install: npm install -g @testim/testim-cli; connect and configure the runner.",
         "The CLI unlocks cross-browser, parallel, CI/CD, branch-scoped, and full data-driven runs.",
         "A config file (e.g. testimConfig.js) drives which tests run and how — project ID, token, labels, grid, base URL overrides."
       ],
@@ -44,8 +44,8 @@
           "items": [
             "--label / -l, --name / -n, --testId / -t, --suite, --suite-id, --test-plan — different ways to select which tests a run should execute.",
             "--rerun-failed-by-run-id — re-executes only the tests that FAILED in a specific previous remote run, instead of the whole suite.",
-            "--intersect-with-label / --intersect-with-suite — runs the subset of tests matching BOTH criteria at once (an intersection), not just either one.",
-            "--timeout — sets the execution abort threshold in milliseconds; defaults to 10 minutes, with a maximum of 3 hours.",
+            "For a single intersection filter, intersect requested selection with the label/suite. Multiple intersection flags use documented OR semantics by default; --intersect-with-operand controls AND/OR for label intersection flags.",
+            "--timeout is the individual test limit in milliseconds (10-minute default, three-hour maximum), not a guaranteed total suite duration.",
             "--retries — sets how many times a failed test automatically re-runs.",
             "--set-retention — configures how many days (1–10) results are retained before deletion."
           ]
@@ -53,8 +53,8 @@
       ],
       "bulletPoints": [
         "--rerun-failed-by-run-id re-runs only what failed last time, not the full suite.",
-        "Default execution timeout: 10 minutes; max configurable via --timeout: 3 hours.",
-        "--intersect-with-label/--intersect-with-suite run an intersection of criteria, not a union."
+        "Individual test timeout: 10-minute default, three-hour maximum; total execution is distinct.",
+        "Single versus multiple intersection filters have different composition; check the default OR and label operand setting."
       ],
       "sectionId": "section-1763bc21539f"
     }
@@ -63,18 +63,18 @@
     {
       "title": "Expecting a plain editor run to do everything the CLI can",
       "trapDescription": "Trying to achieve cross-browser or parallel execution from the editor Play button alone.",
-      "bestPractice": "Cross-browser execution, parallel runs, CI/CD integration, and running every data-driven data set all require the CLI (or Scheduler) — not a local editor/Test List run."
+      "bestPractice": "Choose CLI or Scheduler for configured matrices. A single editor grid run is supported, while ordinary embedded-data editor playback uses the first data set. Inspect the actual runner and results."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "How is the Testim CLI installed?",
+      "scenario": "Which command performs the documented global npm installation of Testim CLI?",
       "options": [
         {
           "id": "A",
-          "text": "npm i @testim/testim-cli"
+          "text": "npm install -g @testim/testim-cli"
         },
         {
           "id": "B",
@@ -93,7 +93,15 @@
         "A"
       ],
       "hint": "It's an npm package.",
-      "rationale": "The Testim CLI is installed by running `npm i @testim/testim-cli` — it's a Node.js/npm package, not a standalone installer or a Python package."
+      "rationale": "The documented global workflow installs the npm CLI package and uses testim connect afterward. A supported Node.js runtime and execution configuration are required.",
+      "optionExplanations": {
+        "A": "This is the documented global npm installation command.",
+        "B": "The documented npm workflow is not exe-only.",
+        "C": "A project does not automatically install the machine’s CLI runtime.",
+        "D": "This is not a Python package workflow."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-be3f58296485"
     },
     {
       "questionId": "Q2",
@@ -121,7 +129,15 @@
         "B"
       ],
       "hint": "It's about which tests run, where, and against what.",
-      "rationale": "A config file can include the project ID, token, labels to specify which tests to run, the Selenium grid, and base URL overrides — controlling what the CLI run actually executes and against what environment."
+      "rationale": "A config file can include the project ID, token, labels to specify which tests to run, the Selenium grid, and base URL overrides — controlling what the CLI run actually executes and against what environment.",
+      "optionExplanations": {
+        "A": "Execution config controls more than display theme.",
+        "B": "These are supported run configuration fields.",
+        "C": "Run configuration is not personal-account password management.",
+        "D": "The CLI supports configuration files."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-be3f58296485"
     },
     {
       "questionId": "Q3",
@@ -149,12 +165,20 @@
         "A"
       ],
       "hint": "It targets a specific prior run's failures, by that run's ID.",
-      "rationale": "--rerun-failed-by-run-id re-executes only the tests that failed in a given previous run, letting you re-verify fixes without re-running the entire suite."
+      "rationale": "--rerun-failed-by-run-id re-executes only the tests that failed in a given previous run, letting you re-verify fixes without re-running the entire suite.",
+      "optionExplanations": {
+        "A": "This flag targets failures from the specified prior run.",
+        "B": "General retry count is different from selecting a prior run’s failed tests.",
+        "C": "This disables timeout retry rather than selecting prior failures.",
+        "D": "Branch selection does not itself select only prior failures."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-1763bc21539f"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "What is the default execution timeout for a Testim CLI run, and what's the maximum it can be configured to via --timeout?",
+      "scenario": "What is the documented default and maximum individual test timeout for the Testim CLI --timeout flag?",
       "options": [
         {
           "id": "A",
@@ -177,12 +201,20 @@
         "A"
       ],
       "hint": "It's measured in milliseconds under the hood.",
-      "rationale": "A CLI run aborts after 10 minutes by default; --timeout can raise that threshold up to a maximum of 3 hours."
+      "rationale": "--timeout sets the individual test limit in milliseconds, with a 10-minute default and three-hour maximum. This is distinct from total suite duration or temporary execution-list status.",
+      "optionExplanations": {
+        "A": "These are the documented individual test bounds.",
+        "B": "These bounds are not the documented defaults/maximum.",
+        "C": "The CLI has a documented default limit.",
+        "D": "These bounds do not match the documented test timeout."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-1763bc21539f"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "You want to run only the tests that belong to a specific Suite AND also carry a specific label — the intersection of both, not either one alone. Which flag combination achieves this?",
+      "scenario": "With one selected suite and one intersection label (no other intersection flags), which combination narrows execution to tests in that suite that also carry the label?",
       "options": [
         {
           "id": "A",
@@ -205,13 +237,21 @@
         "B"
       ],
       "hint": "There's a flag specifically named for intersecting selection criteria.",
-      "rationale": "--intersect-with-label (or --intersect-with-suite) narrows a run to tests matching BOTH the suite and label criteria at once, rather than the broader union of tests matching either one."
+      "rationale": "--suite with a single --intersect-with-label narrows the requested suite to label matches. Multiple intersection flags have separately documented default OR composition; do not generalize this single-filter example to every combination.",
+      "optionExplanations": {
+        "A": "Suite selection alone does not impose the specified label filter.",
+        "B": "One suite plus one intersection-label filter implements the stated selection.",
+        "C": "A plan does not automatically apply this requested intersection.",
+        "D": "The documented intersection filter supports this selection."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-1763bc21539f"
     }
   ],
   "quickRecap": [
     {
       "key": "Install",
-      "value": "npm i @testim/testim-cli."
+      "value": "Global npm CLI install plus testim connect; use supported Node.js and actual runner configuration."
     },
     {
       "key": "Why the CLI",
@@ -227,7 +267,7 @@
     },
     {
       "key": "Timeout",
-      "value": "Default 10 min, max 3 hours via --timeout."
+      "value": "Individual test limit: 10 minutes by default, up to three hours via --timeout in milliseconds."
     }
   ],
   "topics": [
@@ -235,6 +275,18 @@
       "title": "Command line interface (CLI) (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/running-tests/the-command-line-cli/index.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Index (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/configuration-file-run-hooks/index.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Running tests overview (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/running-tests-overview.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }
