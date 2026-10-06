@@ -21,7 +21,7 @@
         {
           "type": "concept",
           "term": "Condition types",
-          "description": "Testim supports several condition types, including Element (does an element exist/is it visible), Element text (does an element contain specific text), and Custom (a JavaScript expression you write yourself) — covering everything from simple presence checks to fully custom runtime logic."
+          "description": "Element conditions use visibility; Element text checks the selected target’s text; Custom permits JavaScript logic. Always Run and Never (skip) are additional execution choices. A condition gates execution, not an assertion that a business outcome occurred."
         },
         {
           "type": "concept",
@@ -39,7 +39,7 @@
           "items": [
             "A Shared login group is called at the start of many tests.",
             "Some of those tests already start in a logged-in session (e.g. persisted cookies); others don't.",
-            "Attaching an Element condition to the login group — 'run only if the login button is visible' — makes the SAME shared group work correctly in both cases, without branching the test itself."
+            "A visibility condition can gate the shared login group. Independently establish the intended account/session state and assert the login outcome; a missing login button alone does not prove correct authentication."
           ]
         }
       ],
@@ -48,7 +48,7 @@
         "Element, Element text, and Custom (JS) are the core condition types.",
         "Retry settings let a condition keep re-checking for a defined period instead of failing on the first false result.",
         "Custom condition entry point: step's gear icon → Properties → 'When to run step' → Custom.",
-        "Classic use case: conditioning a shared login step on whether the login button is actually visible, so it safely runs (or skips) regardless of starting session state."
+        "Gate optional login on inspected state, then assert the intended account and outcome."
       ],
       "sectionId": "section-5864d4b0c305"
     },
@@ -67,7 +67,7 @@
         },
         {
           "type": "note",
-          "text": "This is what makes a Shared login group genuinely reusable across many tests with different credentials: the group's steps stay identical, only the parameter values (username/password) differ per caller."
+          "text": "Shared parameter definitions support reuse, with values supplied by each caller. Parameters must be used in supported fields; Variable Name, Description and Date Format are documented exceptions."
         }
       ],
       "bulletPoints": [
@@ -82,27 +82,27 @@
         {
           "type": "concept",
           "term": "Generate random value",
-          "description": "Found under the predefined steps menu ('M' icon) → Actions → Generate random value. Produces a random string (letters, numbers, or both, via String type), with optional Add Prefix / Add Suffix and a configurable Length — used to avoid hardcoding a value that must be unique or unpredictable on every run, like a test username or email local-part."
+          "description": "Add Generate random value through predefined Actions. Configure character type, random length and optional prefix/suffix, then reference the stored variable in a later input. Randomness does not guarantee uniqueness; verify collision handling when uniqueness is required."
         },
         {
           "type": "concept",
           "term": "Generate date",
-          "description": "Also under the predefined steps menu → Actions → Generate date. Produces a date value offset from the current browser time (or UTC), controlled by Time difference and Use UTC, with a configurable Date format (default 'YYYY-MM-DD', or any JS date format)."
+          "description": "Add Generate date through predefined Actions. Configure the date format (default YYYY-MM-DD), signed offset and browser time or UTC. Match the application’s actual clock, timezone and required calendar semantics."
         },
         {
           "type": "list",
           "title": "A canonical Generate date use case",
           "items": [
-            "An application enforces an age restriction (e.g. must be 18+ to register).",
-            "Generate date can produce a birthdate exactly N years in the past relative to today (via Time difference), rather than a fixed hardcoded date that would eventually become stale as 'today' moves forward.",
-            "This lets a single test keep correctly exercising the age-restriction boundary indefinitely, without maintenance."
+            "For an age-restricted registration example, derive representative dates relative to the intended reference clock.",
+            "Verify the produced date against the application’s age rule, timezone and leap-day policy.",
+            "Add explicit boundary cases on either side of the threshold; a single generated date is not maintenance-free proof of all age behavior."
           ]
         }
       ],
       "bulletPoints": [
         "Generate random value and Generate date both live under the 'M' predefined steps menu → Actions.",
         "Generate random value: String type + Length + optional Prefix/Suffix.",
-        "Generate date: Time difference + Use UTC + Date format — ideal for relative-to-today values like an age-restriction birthdate that must never go stale."
+        "Generate date supplies relative values; validate clock, calendar and boundary expectations."
       ],
       "sectionId": "section-dca8644ae4de"
     },
@@ -112,17 +112,17 @@
         {
           "type": "concept",
           "term": "Search within a test",
-          "description": "Typing at least three characters into a test's search field searches across the test's Step description, JS Code, Parameters, Base URL, the URL inside a Navigation Step or an Add API Action step, Test Data, and Condition — a broad sweep across nearly everything a step can contain, not just visible step names. The search is not case sensitive."
+          "description": "Within-test search is case-insensitive and requires at least three characters. It searches descriptions, code, parameters, supported URLs, data and conditions, but not every property. Documented exclusions include Sleep duration, Extract variable name and generated-value settings other than descriptions."
         },
         {
           "type": "concept",
           "term": "Recovering an unsaved test",
-          "description": "Changes to a test are auto-saved locally as a draft in the browser's cache every 30 seconds. If the browser closes, you log out, the page reloads, or anything else interrupts editing on the same computer, reopening the test shows a recovery dialog with two choices: Recover opens the draft with the unsaved changes intact; Dismiss discards the draft and opens the test in its last saved state instead. After recovering, it's recommended to click Save — the auto-recovery draft itself isn't meant to be relied on as permanent storage."
+          "description": "Testim stores a local recovery draft every 30 seconds. Recover restores the last available cached draft, so edits after that snapshot may be missing; cleared/unavailable cache cannot be treated as durable backup. Dismiss opens the last saved test. Save deliberately after recovery."
         }
       ],
       "bulletPoints": [
-        "Search within a test is NOT case sensitive, and scans step descriptions, JS code, parameters, URLs, test data, and conditions — not just step titles.",
-        "Drafts auto-save every 30 seconds; Recover = resume the unsaved draft, Dismiss = revert to the last explicitly saved version.",
+        "Within-test search is case-insensitive and covers supported fields, with explicit exclusions.",
+        "Recover uses the last available local draft; Dismiss opens the saved test.",
         "Always click Save after recovering — don't treat the auto-recovery draft as durable storage."
       ],
       "sectionId": "section-86d1a598fde8"
@@ -133,16 +133,16 @@
         {
           "type": "concept",
           "term": "Wait For step",
-          "description": "Rather than inserting an arbitrary fixed-time delay (which either wastes time or isn't long enough), a Wait For step pauses the test until a specific condition becomes true — for example, an element becoming visible — before continuing to the next step."
+          "description": "Condition-based waits retry until the required state is detected or the step timeout is reached. A condition that never becomes true must not hang indefinitely. Select a timeout and failure handling for the scenario."
         },
         {
           "type": "note",
-          "text": "This is the same underlying idea as Conditions applied specifically to timing: instead of guessing how long an async operation takes, the test waits exactly as long as needed and no longer."
+          "text": "Condition-based synchronization can reduce unnecessary fixed delays, but polling and execution overhead mean it is not an exact-duration or no-flakiness guarantee. Sleep remains supported for deliberate fixed pauses."
         }
       ],
       "bulletPoints": [
-        "Wait For pauses until a condition is true, rather than for a fixed, guessed duration.",
-        "It avoids both flaky 'too short' waits and wasteful 'too long' waits."
+        "Wait for detected readiness with a bounded timeout.",
+        "A timeout or wrong readiness condition still requires diagnosis."
       ],
       "sectionId": "section-bc813c43ea6c"
     }
@@ -151,7 +151,7 @@
     {
       "title": "Using a fixed-time delay instead of Wait For",
       "trapDescription": "Adding an arbitrary pause (e.g. 'wait 5 seconds') to work around a slow-loading element.",
-      "bestPractice": "Use a Wait For step tied to the actual condition (e.g. element visible) so the test waits exactly as long as needed — no more, no less — instead of a guessed fixed delay that is either flaky or wasteful."
+      "bestPractice": "Wait for the actual readiness condition with an appropriate timeout. This can reduce brittle fixed delays but does not guarantee faster execution or eliminate all timing failures."
     },
     {
       "title": "Duplicating steps instead of parameterizing them",
@@ -166,12 +166,12 @@
     {
       "title": "Hardcoding a fixed birthdate to test an age restriction",
       "trapDescription": "Hardcoding a literal date like '2000-01-01' to represent 'a user who just turned 18', which silently drifts further from the boundary being tested as real time passes.",
-      "bestPractice": "Use Generate date with a Time difference relative to today (e.g. exactly 18 years ago) so the test keeps correctly exercising the age-restriction boundary indefinitely, with no maintenance required."
+      "bestPractice": "Generate representative relative dates and verify the application clock, timezone and calendar boundary policy. Maintain explicit before/at/after-threshold expectations instead of assuming a generated offset is permanently correct."
     },
     {
       "title": "Clicking Dismiss when you actually wanted the unsaved changes back",
       "trapDescription": "Reopening a test after an interruption, clicking Dismiss out of habit, and losing edits that were sitting in the auto-saved draft.",
-      "bestPractice": "Recover resumes the draft with unsaved changes intact; Dismiss discards that draft and reverts to the last explicitly saved version. Choose deliberately, and click Save promptly after recovering rather than relying on the draft as durable storage."
+      "bestPractice": "Recover restores the last available cached snapshot; Dismiss opens the saved test. Save after recovery and do not assume every unsaved edit survived."
     }
   ],
   "practiceQuiz": [
@@ -201,12 +201,20 @@
         "B"
       ],
       "hint": "The default behavior has no retry unless you configure one.",
-      "rationale": "By default, if a condition for a step is false, the step is skipped immediately (a loop would end immediately). Retrying requires explicitly enabling the retry setting in Advanced Condition Settings."
+      "rationale": "By default, if a condition for a step is false, the step is skipped immediately (a loop would end immediately). Retrying requires explicitly enabling the retry setting in Advanced Condition Settings.",
+      "optionExplanations": {
+        "A": "A false gate normally skips the step rather than failing the entire test.",
+        "B": "The default false-condition behavior is immediate skipping.",
+        "C": "Retries require explicit finite settings; they are not indefinite by default.",
+        "D": "The execution gate is not ignored."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-5864d4b0c305"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "Which condition type would you use to run a step only if the JavaScript expression `cart.itemCount > 0` is true?",
+      "scenario": "A defined JavaScript parameter cart is available to the step. Which condition type supports evaluating cart.itemCount > 0 to gate execution?",
       "options": [
         {
           "id": "A",
@@ -229,7 +237,15 @@
         "C"
       ],
       "hint": "You need arbitrary logic, not just a presence or text check.",
-      "rationale": "The Custom condition type lets you write your own JavaScript expression for runtime logic that doesn't map to a simple element-presence or element-text check. Element and Element text are narrower, purpose-built condition types; Wait For is a separate mechanism for pausing, not a condition type."
+      "rationale": "The Custom condition type lets you write your own JavaScript expression for runtime logic that doesn't map to a simple element-presence or element-text check. Element and Element text are narrower, purpose-built condition types; Wait For is a separate mechanism for pausing, not a condition type.",
+      "optionExplanations": {
+        "A": "Element conditions check visibility, not arbitrary cart logic.",
+        "B": "Element text checks target text, not arbitrary cart state.",
+        "C": "Custom supports the defined JavaScript expression.",
+        "D": "Wait For is a synchronization step, not this condition type."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-5864d4b0c305"
     },
     {
       "questionId": "Q3",
@@ -257,7 +273,15 @@
         "B"
       ],
       "hint": "This is exactly what Parameters on a shared group exist for.",
-      "rationale": "Parameters on a shared group stay available to every calling test; each test just sets its own parameter values, keeping the underlying steps single-sourced instead of duplicated 12 times."
+      "rationale": "Parameters on a shared group stay available to every calling test; each test just sets its own parameter values, keeping the underlying steps single-sourced instead of duplicated 12 times.",
+      "optionExplanations": {
+        "A": "Copies duplicate maintenance rather than share the logic.",
+        "B": "Each caller supplies credentials to one parameterized group.",
+        "C": "One hardcoded account does not implement differing credentials.",
+        "D": "An execution condition does not replace parameter inputs."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-61c952d2a22b"
     },
     {
       "questionId": "Q4",
@@ -270,7 +294,7 @@
         },
         {
           "id": "B",
-          "text": "Wait For pauses exactly until the condition is true, avoiding both flaky too-short waits and wasteful too-long waits."
+          "text": "It checks the readiness condition until detected or timeout, reducing dependence on a guessed fixed delay."
         },
         {
           "id": "C",
@@ -285,7 +309,15 @@
         "B"
       ],
       "hint": "It's about matching the wait to the actual condition, not raw speed.",
-      "rationale": "A Wait For step pauses until a specific condition (e.g. element visible) becomes true, so the test waits exactly as long as needed — avoiding the flakiness of a too-short fixed delay and the wasted time of a too-long one."
+      "rationale": "Condition-based waits synchronize with detected readiness up to the configured timeout. They do not guarantee exact timing, faster execution in every case or elimination of all failures; Sleep remains supported.",
+      "optionExplanations": {
+        "A": "Wait duration and success depend on actual readiness and timeout.",
+        "B": "Readiness polling can reduce dependence on a fixed guess and has a timeout.",
+        "C": "Sleep is supported for fixed pauses.",
+        "D": "Waiting contributes to elapsed runtime."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-bc813c43ea6c"
     },
     {
       "questionId": "Q5",
@@ -313,12 +345,20 @@
         "B"
       ],
       "hint": "It's the canonical login-group example: gate the step on whether login is actually needed.",
-      "rationale": "Conditions are for gating whether a step runs — the classic case being a login shared step that should only execute when a specific UI element (like a login button) is actually visible. Cross-browser execution, random data generation, and CLI debugging are each handled by different, unrelated features."
+      "rationale": "Conditions are for gating whether a step runs — the classic case being a login shared step that should only execute when a specific UI element (like a login button) is actually visible. Cross-browser execution, random data generation, and CLI debugging are each handled by different, unrelated features.",
+      "optionExplanations": {
+        "A": "Browser configurations, not a visibility gate, define cross-browser coverage.",
+        "B": "A visibility gate can conditionally run a login group.",
+        "C": "Generation and assertions are different mechanisms.",
+        "D": "CLI debugging is not the purpose of an execution condition."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-5864d4b0c305"
     },
     {
       "questionId": "Q6",
       "type": "single-select",
-      "scenario": "Which of the following demonstrates how to use custom conditions with JavaScript in Testim to define test data?",
+      "scenario": "Where do you configure a Custom JavaScript execution condition on a shared step, rather than define test data?",
       "options": [
         {
           "id": "A",
@@ -341,7 +381,15 @@
         "C"
       ],
       "hint": "It's the same gear-icon → Properties → 'When to run step' path used to set any condition type.",
-      "rationale": "A Custom JavaScript condition is set via the step's gear icon → Properties → 'When to run step' → Custom — the standard entry point for any condition type, not a dropdown of canned data, a direct SQL query, or a JSON import."
+      "rationale": "A Custom JavaScript condition is set via the step's gear icon → Properties → 'When to run step' → Custom — the standard entry point for any condition type, not a dropdown of canned data, a direct SQL query, or a JSON import.",
+      "optionExplanations": {
+        "A": "A data dropdown does not configure Custom execution gating.",
+        "B": "Fetching database input is distinct from this condition setting.",
+        "C": "Properties > When to run step > Custom opens the execution condition configuration.",
+        "D": "JSON import does not configure the step gate."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-5864d4b0c305"
     },
     {
       "questionId": "Q7",
@@ -369,12 +417,20 @@
         "A"
       ],
       "hint": "It's a predefined step, added the same way as a validation or navigation step.",
-      "rationale": "Generate random value is found under the predefined steps menu ('M' icon) → Actions → Generate random value — the same menu used to add other predefined action/validation steps, not something tied to Shared Steps, Step Properties, or the Test Library."
+      "rationale": "Generate random value is found under the predefined steps menu ('M' icon) → Actions → Generate random value — the same menu used to add other predefined action/validation steps, not something tied to Shared Steps, Step Properties, or the Test Library.",
+      "optionExplanations": {
+        "A": "Generate random value is a predefined Action.",
+        "B": "It is not added from the shared-group list.",
+        "C": "Properties configure an existing generator after insertion.",
+        "D": "The library is not the documented insertion menu."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-dca8644ae4de"
     },
     {
       "questionId": "Q8",
       "type": "single-select",
-      "scenario": "In which of the following scenarios would it be most appropriate to use the Generate date feature in Testim?",
+      "scenario": "Which scenario specifically benefits from generated date input with verified reference-clock and boundary expectations?",
       "options": [
         {
           "id": "A",
@@ -382,7 +438,7 @@
         },
         {
           "id": "B",
-          "text": "When verifying whether the AUT enforces age restrictions correctly."
+          "text": "Supplying relative birthdate inputs when checking an age restriction."
         },
         {
           "id": "C",
@@ -397,12 +453,20 @@
         "B"
       ],
       "hint": "It needs a date that stays correct relative to 'today', like a birthdate.",
-      "rationale": "Generate date can produce a date offset from the current time (e.g. a birthdate exactly N years ago), which is exactly what's needed to reliably test an age-restriction rule without the test's hardcoded date going stale. A static image, a locator-debugging session, or a generic invalid-input error message have nothing to do with generating dynamic dates."
+      "rationale": "An age restriction needs date inputs and explicit expected boundary behavior. Verify the generated calendar date and clock policy; generation alone does not certify correctness indefinitely.",
+      "optionExplanations": {
+        "A": "Image presence does not require generated date input.",
+        "B": "Relative birthdates are relevant date inputs; assert the required boundaries.",
+        "C": "Date generation does not repair locators.",
+        "D": "A generic invalid-field message need not involve dates."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-dca8644ae4de"
     },
     {
       "questionId": "Q9",
       "type": "single-select",
-      "scenario": "Which statement about the Search feature in Testim is correct?",
+      "scenario": "Which statement about Search within a test (not Shared Steps Library search) is correct?",
       "options": [
         {
           "id": "A",
@@ -425,7 +489,15 @@
         "B"
       ],
       "hint": "Also worth knowing: it scans far more than just step titles.",
-      "rationale": "Search within a test is not case sensitive, and it scans a broad set of fields — step description, JS code, parameters, base URL, navigation/API URLs, test data, and conditions — not just JavaScript code, and not requiring exact-match text."
+      "rationale": "Search within a test is not case sensitive, and it scans a broad set of fields — step description, JS code, parameters, base URL, navigation/API URLs, test data, and conditions — not just JavaScript code, and not requiring exact-match text.",
+      "optionExplanations": {
+        "A": "Within-test search is case-insensitive.",
+        "B": "The documented within-test search ignores case.",
+        "C": "It supports partial text matches with at least three characters.",
+        "D": "It searches supported fields beyond JavaScript code."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-86d1a598fde8"
     },
     {
       "questionId": "Q10",
@@ -438,7 +510,7 @@
         },
         {
           "id": "B",
-          "text": "\"Recover\" opens the draft with unsaved changes, whereas \"Dismiss\" opens the test as it was last saved."
+          "text": "Recover opens the last available cached draft; Dismiss opens the last explicitly saved test."
         },
         {
           "id": "C",
@@ -453,7 +525,15 @@
         "B"
       ],
       "hint": "One option resumes the draft; the other reverts to what was explicitly saved.",
-      "rationale": "Recover opens the unsaved draft (auto-saved every 30 seconds) with its changes intact. Dismiss discards that draft and opens the test in its last explicitly saved state — it does not save the draft, delete the test, or merely refresh the page."
+      "rationale": "Recover uses the available locally cached draft, not necessarily the very latest edit. Dismiss opens the last saved test. Neither choice makes local draft caching a durable backup.",
+      "optionExplanations": {
+        "A": "This reverses the documented choices.",
+        "B": "Recovery uses the available draft; dismissal opens the saved test.",
+        "C": "Dismiss does not delete the entire saved test.",
+        "D": "The choices concern draft recovery, not merely page refresh."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-86d1a598fde8"
     }
   ],
   "quickRecap": [
@@ -475,7 +555,7 @@
     },
     {
       "key": "Wait For",
-      "value": "Condition-based pause — waits exactly as long as needed, not a guessed fixed delay."
+      "value": "Checks readiness until detected or timeout; not an exact-duration or guaranteed-success wait."
     },
     {
       "key": "Custom condition entry point",
@@ -487,11 +567,11 @@
     },
     {
       "key": "Search within a test",
-      "value": "Not case sensitive; scans step descriptions, JS code, parameters, URLs, test data, and conditions."
+      "value": "Case-insensitive, minimum three characters; supported fields have documented exclusions."
     },
     {
       "key": "Recover vs. Dismiss",
-      "value": "Recover = resume the auto-saved draft (unsaved changes). Dismiss = revert to the last explicitly saved version."
+      "value": "Recover restores the available cached snapshot; Dismiss opens the saved test. Save after recovery."
     }
   ],
   "topics": [
@@ -522,8 +602,25 @@
     },
     {
       "title": "Recovering a test that was not saved (Tricentis docs)",
-      "url": "https://help.testim.io/docs/recovering-a-test-that-was-not-saved",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/recovering-a-test-that-was-not-saved.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Parameters for groups (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/parameters/parameters-for-groups.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Generating a random value (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/generating-a-random-value.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Generating a date (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/generating-a-date.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }
