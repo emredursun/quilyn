@@ -1455,3 +1455,12 @@ test('Testim hook review applies configuration and Run on choices and separates 
  assert.match(d.practiceQuiz[2].options[0].text,/Configuration File beforeTest/);
  assert.doesNotMatch(JSON.stringify(d),/no per-test manual wiring|repairs?.*correct.*stale state/);
 });
+
+test('Testim result review separates local debug modes, failure cause tags and integrated issue publishing',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m16_managing_analyzing_test_results.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D'],['D'],['A','C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/nearest step boundary.*without debugging does not pause/);
+ assert.match(d.studyGuide[2].elements[0].description,/Bug in app.*distinct from engine errors/);
+ assert.match(d.studyGuide[2].elements[2].text,/create\/publish.*not universally required/);
+ assert.match(d.studyGuide[1].elements[1].description,/--result-label.*250-character/);
+});

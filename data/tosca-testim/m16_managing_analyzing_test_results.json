@@ -15,17 +15,17 @@
         {
           "type": "concept",
           "term": "Stop, Pause, Step",
-          "description": "Rather than always running a test start to finish, Testim lets you Pause execution at any point, resume with Play, or run step-by-step to inspect state between actions. Breakpoints (manual, set by you, or virtual, created automatically when using step into/out/over or pause) mark exactly where execution should halt."
+          "description": "Local debug mode supports Pause/Continue, stepping and breakpoints. Pause stops at the nearest step boundary, not an arbitrary instant inside any action. Local playback without debugging does not pause at breakpoints; remote grid execution is not this local debug mode."
         },
         {
           "type": "concept",
           "term": "Resuming from a breakpoint",
-          "description": "After a test pauses at a breakpoint, clicking the Play button ('Run Test') in the action menu resumes the test from that exact step — not from the beginning, and not skipping ahead. The breakpoint itself isn't removed just because execution passed through it."
+          "description": "Continue/Play resumes a paused run from the current location, unlike Rerun, which restarts. Distinguish manual breakpoints from temporary virtual debug locations rather than promising every breakpoint marker remains unchanged."
         },
         {
           "type": "concept",
           "term": "Running from a specific step",
-          "description": "You don't have to start from the very beginning to debug a later part of a test: hovering the arrow between two steps and clicking Play from here starts the run from the step right after that point — useful for quickly re-checking just the part of the test that's actually under investigation."
+          "description": "Play from here starts after the selected arrow. Establish earlier required state, such as authentication and variables; skipping setup can cause failure. This is partial debugging, not full-flow coverage."
         },
         {
           "type": "note",
@@ -33,9 +33,9 @@
         }
       ],
       "bulletPoints": [
-        "Pause/Play, step-by-step execution, and manual/virtual breakpoints let you debug mid-run instead of only after the fact.",
-        "Clicking Run Test (Play) after a breakpoint resumes from that exact step — it doesn't restart, skip ahead, or remove the breakpoint.",
-        "Play from here (on the arrow between two steps) starts a run from a specific point, without repeating everything before it."
+        "Use local debug mode for pause/continue, stepping and breakpoints.",
+        "Pause is at a step boundary; Continue differs from restarting with Rerun.",
+        "Play from here needs the required prior state and does not establish whole-flow coverage."
       ],
       "sectionId": "section-eadfe80e8785"
     },
@@ -50,13 +50,13 @@
         {
           "type": "concept",
           "term": "Adding and filtering by result labels",
-          "description": "Result labels are added as part of a Scheduler's Advanced Options when setting up a scheduled run. Once runs carry labels, both the Suite Runs / Test Runs pages and the Filter Remote Runs pane let you filter directly by a result label — alongside filtering by execution type (Execution, Label, Plan, Scheduler), branch, or browser."
+          "description": "Add remote-run result labels with CLI --result-label or Scheduler Advanced Options. Each label has a 250-character maximum. Run pages support filtering; test-definition Labels are a separate selection/organization mechanism."
         }
       ],
       "bulletPoints": [
         "Result labels ≠ Test Library labels — they tag a RUN, not a test definition.",
         "Common uses: environment, application version, or the user/system (Jenkins, a scheduler) that triggered the run.",
-        "Added via a Scheduler's Advanced Options; filterable on Suite Runs / Test Runs and in Reports."
+        "CLI and Scheduler add remote-run labels; these do not replace test-definition Labels."
       ],
       "sectionId": "section-aadd2b2f7d86"
     },
@@ -66,7 +66,7 @@
         {
           "type": "concept",
           "term": "Tagging a failure",
-          "description": "A failed run can be tagged with a failure-type reason, turning a raw 'failed' status into a categorized one — the same kind of categorization used by the Failure Types report covered in test-results modules (e.g. Element not found, Element not visible, JavaScript Error)."
+          "description": "Tag remote-run failures using the documented categories: Bug in app, Environment issue, Invalid test data, Test design or Other. These human-selected cause categories are distinct from engine errors such as Element not found or JavaScript Error."
         },
         {
           "type": "concept",
@@ -75,14 +75,14 @@
         },
         {
           "type": "note",
-          "text": "What tagging does NOT do: it doesn't automatically fix the failing test, and it doesn't eliminate the need to manually log a defect in a bug tracker — it's a categorization and analysis aid, not an automated remediation."
+          "text": "Tagging does not repair the defect. With a configured tracker connection, the same dialog can link an existing issue or create/publish a new one, so separate manual re-entry is not universally required."
         }
       ],
       "bulletPoints": [
         "Tagging a failed run with a failure type turns it into filterable, reportable data.",
         "Reports' donut chart shows the % distribution of failure types over a period, revealing trends.",
         "Clicking a failure tag jumps to the Test Runs screen filtered to that type.",
-        "Tagging does NOT auto-fix tests or eliminate manual defect logging — it's an analysis aid."
+        "Tagging does not fix defects; a configured tracker can receive a linked or newly published issue."
       ],
       "sectionId": "section-36f67614961b"
     }
@@ -91,7 +91,7 @@
     {
       "title": "Assuming Run Test after a breakpoint restarts the whole test",
       "trapDescription": "Expecting clicking Play/Run Test after a paused breakpoint to start the test over from step one.",
-      "bestPractice": "Run Test resumes from the exact step where the test was paused — it doesn't restart, skip ahead, or clear the breakpoint that caused the pause."
+      "bestPractice": "Continue a paused local debug run from its current location; use Rerun to restart. Distinguish manual and virtual breakpoint behavior."
     },
     {
       "title": "Confusing Result labels with Test Library labels",
@@ -101,14 +101,14 @@
     {
       "title": "Treating failure-type tagging as an automated fix",
       "trapDescription": "Assuming tagging a failed run somehow resolves the underlying issue or removes the need to file a bug.",
-      "bestPractice": "Tagging is purely a categorization/analysis aid — it enables filtering and trend reporting, but the test still needs investigating and any real defect still needs to be logged manually."
+      "bestPractice": "Investigate the cause and choose the appropriate tag. With tracker integration, link or publish an issue through the tagging workflow; the tag itself does not remediate the defect."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "What happens when the user clicks \"Run Test\" after reaching a breakpoint in Testim?",
+      "scenario": "A local debug run is paused at a step boundary. What does Play/Continue do, as distinct from Rerun?",
       "options": [
         {
           "id": "A",
@@ -131,7 +131,15 @@
         "D"
       ],
       "hint": "It resumes exactly where it left off.",
-      "rationale": "Clicking Play ('Run Test') resumes the test from the exact step where it was previously paused — it doesn't end the test, skip the next step, or remove the breakpoint."
+      "rationale": "Play/Continue resumes the paused run from its current location. Rerun restarts; local playback without debugging does not pause at breakpoints.",
+      "optionExplanations": {
+        "A": "Continue does not mean Stop Run.",
+        "B": "It resumes from the current debug location, not intentionally skipping an unexecuted step.",
+        "C": "Continuing is not the command to remove a manual breakpoint.",
+        "D": "Continue resumes the paused run rather than restarting."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-eadfe80e8785"
     },
     {
       "questionId": "Q2",
@@ -159,13 +167,21 @@
         "D"
       ],
       "hint": "Think environment, version, and the system that triggered the run.",
-      "rationale": "Result labels are commonly used to record things like which application environment or version was tested, or which user/system triggered the run — letting you track and filter execution across those different environments, not to reduce test count, execution time, or handle archiving."
+      "rationale": "Result labels are commonly used to record things like which application environment or version was tested, or which user/system triggered the run — letting you track and filter execution across those different environments, not to reduce test count, execution time, or handle archiving.",
+      "optionExplanations": {
+        "A": "Result labels organize run metadata rather than reduce selected tests.",
+        "B": "Labels do not guarantee faster execution.",
+        "C": "Labels are not a retention/archive guarantee.",
+        "D": "They allow environment/version/source metadata to be tracked and filtered."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-aadd2b2f7d86"
     },
     {
       "questionId": "Q3",
       "type": "multi-select",
       "selectCount": 2,
-      "scenario": "What are the benefits of tagging test failures in Testim?",
+      "scenario": "Which TWO are analysis benefits of tagging remote-run failures, distinct from repairing the defect or configuring tracker integration?",
       "options": [
         {
           "id": "A",
@@ -189,21 +205,29 @@
         "C"
       ],
       "hint": "It's an analysis/filtering aid, not an automated fix.",
-      "rationale": "Tagging failures lets you filter runs by failure type over a selected period and see the percentage distribution of failure types in Reports — it does not automatically fix tests, and it doesn't remove the need to manually log real defects."
+      "rationale": "Tags support failure-type filtering and reporting. They do not automatically repair tests; tracker integration can link/create an issue but is separate from the analysis benefit.",
+      "optionExplanations": {
+        "A": "Tagged runs can be filtered over a selected period.",
+        "B": "A category tag does not repair the failing code or application.",
+        "C": "Reports can show distributions of selected cause categories.",
+        "D": "Tagging alone is not universal defect logging; tracker connection and publish actions remain separate."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-36f67614961b"
     }
   ],
   "quickRecap": [
     {
       "key": "Run Test after breakpoint",
-      "value": "Resumes from the exact paused step — no restart, no skip, breakpoint stays."
+      "value": "Continue resumes a paused local debug run; Rerun starts over."
     },
     {
       "key": "Play from here",
-      "value": "Starts a run from a specific step, skipping everything before it."
+      "value": "Starts after a selected arrow; prior dependencies must be established."
     },
     {
       "key": "Result labels",
-      "value": "Tag a RUN (environment/version/trigger source) — added via Scheduler Advanced Options, filterable on Runs/Reports."
+      "value": "Remote-run metadata via CLI/Scheduler; up to 250 characters per label, distinct from test-definition labels."
     },
     {
       "key": "Failure-type tagging",
@@ -225,6 +249,13 @@
       "title": "Tagging failed runs with failure types (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/results/tag-remote-runs-failures.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Stop, pause and state-dependent partial debugging",
+      "url": "https://docs.tricentis.com/testim/content/results/stop-pause-debug-tests.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }
