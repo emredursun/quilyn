@@ -962,3 +962,14 @@ test('AS2 execution review separates specified coverage, completion and synchron
  assert.match(d.studyGuide[0].elements[0].text,/Alternatively, dropping/);
  assert.doesNotMatch(JSON.stringify(d),/never individual TestCases|must be set to COMPLETED|updates every linked ExecutionList/);
 });
+
+test('AS2 recap distinguishes generated negative paths, Character and bounded state waits',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as2/m07_build_template_link_values_recap.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['C'],['D'],['B'],['A'],['B'],['A'],['A'],['A'],['A'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[4].elements[0].text,/including Straight Through/);
+ assert.match(d.studyGuide[4].elements[0].text,/rather than jumping folders at runtime/);
+ assert.match(d.practiceQuiz[8].scenario,/independent negative-test specification/);
+ assert.match(d.practiceQuiz[9].options[0].text,/rescan only when needed/);
+ assert.doesNotMatch(JSON.stringify(d),/discount must verify as a negative number|must be typed manually, not drag-and-dropped|usually indicates an unstable module/);
+});
