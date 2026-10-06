@@ -1595,3 +1595,9 @@ test('PBA workflow review distinguishes Stage skip and Process start polarity an
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===3?['A','B','C']:q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[4].elements[0].description,/Create cannot be skipped.*false Process start condition skips/);assert.match(d.practiceQuiz[2].rationale,/opposite polarity/);assert.match(d.studyGuide[1].elements[1].text,/Constellation needs a workaround/);assert.equal(d.practiceQuiz[5].options[0].text,'Send an email / run a Data Transform');assert.match(d.studyGuide[3].elements[2].items[1],/class\/ruleset context/);
 });
+
+test('PBA Case relationship review requires existing all-child dependencies and distinguishes resolved from successful',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/business-architect/m13_managing_case_relationships.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[2].options[0].text,/all already-created.*without user cancellation/);assert.match(d.practiceQuiz[2].rationale,/Resolved-prefixed.*specific success status/);assert.match(d.studyGuide[0].elements[3].description,/copying does not create ongoing synchronization/);assert.match(d.practiceQuiz[6].hint,/Resolved-Duplicate/);assert.match(d.topics[2].url,/duplicate-search\/v7/);
+});

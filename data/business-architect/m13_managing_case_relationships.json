@@ -17,7 +17,7 @@
         {
           "type": "concept",
           "term": "Parent and child Cases",
-          "description": "Case relationships let you decompose complex business processes into focused, modular Case Types that work together. A parent Case orchestrates child Cases and waits on their completion."
+          "description": "A parent/child hierarchy decomposes complex work into independently processed Cases. Configure the parent’s dependency on the required child outcomes; creating children alone does not establish every waiting rule."
         },
         {
           "type": "concept",
@@ -27,6 +27,11 @@
         {
           "type": "analogy",
           "text": "A parent Case is the general contractor; child Cases are the specialized subcontractors (plumbing, electrical) working in parallel. The contractor coordinates them and finishes once their work is done."
+        },
+        {
+          "type": "concept",
+          "term": "Snapshot propagation versus reference",
+          "description": "Create Case can copy selected parent values into the child as a snapshot at creation. If the child must follow later parent changes, configure a reference instead; copying does not create ongoing synchronization."
         }
       ],
       "bulletPoints": [
@@ -47,7 +52,7 @@
         {
           "type": "concept",
           "term": "Two Wait types",
-          "description": "(1) Case-dependency Wait — pauses until one or more specified Cases reach a particular status. (2) Timer Wait — pauses until a specific date and time is reached, then continues automatically."
+          "description": "Case Dependency pauses for any or all children of a configured type to reach a specified status. To be resolved accepts statuses beginning Resolved, including rejected/duplicate outcomes; it is not the same as requiring successful completion. Timer waits for a duration or reference timestamp."
         },
         {
           "type": "analogy",
@@ -55,8 +60,10 @@
         }
       ],
       "bulletPoints": [
-        "Use a case-dependency Wait when the parent must not proceed until child Cases reach a status (e.g., Resolved).",
-        "Use a timer Wait when the Case must pause until a specific date/time or for a set duration."
+        "Children must already exist in the hierarchy before Wait; otherwise no dependencies exist and Wait is skipped.",
+        "Choose any/all, target type/status and current-versus-subsequent-status behavior deliberately.",
+        "For an enforced dependency, do not enable user cancellation that bypasses the required wait.",
+        "Timer date calculation, business calendars and user-assignment delays are separate from Case Dependency."
       ],
       "sectionId": "section-aac55f69f10d"
     },
@@ -93,7 +100,7 @@
         }
       ],
       "bulletPoints": [
-        "Example: date of birth = basic condition; surgeon name, surgical type, procedure, procedure date = weighted conditions (25 each), threshold 50. A match totaling 100 exceeds 50 → flagged duplicate.",
+        "Example: DOB basic match plus four weighted matches at 25 each yields 100 against threshold 50: potential duplicate, requiring review.",
         "Resolved-Duplicate ends processing; the user continues with the original Case."
       ],
       "sectionId": "section-2b370616c705"
@@ -133,7 +140,7 @@
     {
       "title": "Parent waits for children",
       "trapDescription": "To make a parent depend on child completion, use a Wait Step configured for case dependency — not an SLA.",
-      "bestPractice": "Parent must not proceed until children reach a status → case-dependency Wait Step."
+      "bestPractice": "Create children before Wait; choose all/any and required status, and disable user cancellation for a strict dependency."
     }
   ],
   "practiceQuiz": [
@@ -163,14 +170,14 @@
         "A"
       ],
       "hint": "Parent/child Case relationships decompose complex work into modular Case Types that collaborate.",
-      "rationale": "Decomposing complex work into focused, modular Case Types that collaborate uses parent/child Case relationships. The parent orchestrates child Cases and waits on their completion. The other options describe unrelated features.",
+      "rationale": "Focused child Cases contribute to a parent outcome. Configure any required waiting explicitly; hierarchy alone does not define the whole dependency policy.",
       "optionExplanations": {
         "A": "Focused child cases contribute to the parent's overall outcome.",
         "B": "A monolithic case does not provide the separate case types requested.",
         "C": "Queues allocate work rather than define this case hierarchy.",
         "D": "Ruleset ordering does not create parent-child case relationships."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-d41607508072"
     },
     {
@@ -208,7 +215,7 @@
         "C": "Child work still needs data to complete its outcome.",
         "D": "The parent coordinates the overall outcome rather than disappear."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-d41607508072"
     },
     {
@@ -218,7 +225,7 @@
       "options": [
         {
           "id": "A",
-          "text": "A Wait Step configured for a case dependency (wait until the child Cases reach a status)"
+          "text": "A Case Dependency Wait for all already-created required children to be resolved, without user cancellation"
         },
         {
           "id": "B",
@@ -236,15 +243,15 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "A case-dependency Wait pauses the parent Case until specified child Cases reach a target status.",
-      "rationale": "A case-dependency Wait Step pauses the parent Case until one or more specified Cases — typically child Cases — reach a particular status such as Resolved-Completed. SLAs, routing, and duplicate-search Steps do not enforce inter-Case dependencies.",
+      "hint": "Any is not All, and resolved is not necessarily successfully completed.",
+      "rationale": "Create the children before Wait, choose all required child dependencies and prevent user cancellation if the requirement is strict. To be resolved includes any Resolved-prefixed status; require a specific success status if rejection must block progress.",
       "optionExplanations": {
         "A": "Waiting for all existing children to resolve enforces the dependency.",
         "B": "A deadline schedules escalation rather than wait for child resolution.",
         "C": "Queue placement does not enforce a child-status dependency.",
         "D": "Duplicate detection does not wait for child completion."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-aac55f69f10d"
     },
     {
@@ -273,14 +280,14 @@
         "A"
       ],
       "hint": "A timer Wait Step pauses the Case until a specific date and time arrives, not until another Case resolves.",
-      "rationale": "Pausing until a specific date and time uses a timer Wait Step. A case-dependency Wait pauses on another Case's status. The other options — Change Stage and SLA — serve different workflow purposes.",
+      "rationale": "A timer pauses until the configured timestamp. Calculate the first-business-day date according to the relevant calendar; the wait type itself does not infer that business date.",
       "optionExplanations": {
         "A": "A timer can wait until the configured reference timestamp.",
         "B": "Dependency waiting responds to case status rather than this date.",
         "C": "Ordered approval is not a time-based pause.",
         "D": "A table selects a result rather than schedule continuation."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-aac55f69f10d"
     },
     {
@@ -316,7 +323,7 @@
         "C": "Service levels do not define duplicate identity matching.",
         "D": "Permissions do not define the duplicate search's basic criterion."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-2b370616c705"
     },
     {
@@ -352,7 +359,7 @@
         "C": "A candidate requires a decision rather than automatic deletion.",
         "D": "A threshold of two hundred would exceed this score."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-2b370616c705"
     },
     {
@@ -380,7 +387,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "A resolved child Case reaches a specific resolution status, such as Resolved-Completed, to signal completion.",
+      "hint": "A confirmed duplicate uses Resolved-Duplicate; this is not a child-completion question.",
       "rationale": "A confirmed duplicate is resolved as Resolved-Duplicate and processing ends; the flow can be customized so the user opens the original Case to update it.",
       "optionExplanations": {
         "A": "The duplicate status ends the redundant case's processing.",
@@ -388,7 +395,7 @@
         "C": "Indefinite queueing preserves unnecessary duplicate work.",
         "D": "Higher priority does not resolve duplication."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-2b370616c705"
     },
     {
@@ -424,7 +431,7 @@
         "C": "Ruleset revisions do not describe duplicate business data.",
         "D": "Candidate matching is a configured search rather than customer routing."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-2b370616c705"
     },
     {
@@ -460,7 +467,7 @@
         "C": "A Create Case automation can create child cases.",
         "D": "Separate child workflows can have their own assignments."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-d41607508072"
     },
     {
@@ -496,7 +503,7 @@
         "C": "Duplicate matching is a different workflow purpose.",
         "D": "User routing is assignment allocation rather than dependency waiting."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-aac55f69f10d"
     },
     {
@@ -532,7 +539,7 @@
         "C": "Valid work still needs deadline management.",
         "D": "Hierarchical case design is independent of duplicate detection."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-2b370616c705"
     },
     {
@@ -568,7 +575,7 @@
         "C": "Producing more duplicates defeats the detection purpose.",
         "D": "The original case holds the work that should continue."
       },
-      "explanationReviewedOn": "2026-10-02",
+      "explanationReviewedOn": "2026-10-06",
       "lessonSection": "section-2b370616c705"
     }
   ],
@@ -579,7 +586,7 @@
     },
     {
       "key": "Wait Step",
-      "value": "Pauses a Case. Case dependency = wait until other/child Cases reach a status; Timer = wait until a date/time."
+      "value": "Case Dependency requires existing hierarchical children with any/all and target-status choices; Timer waits for a duration/timestamp. Resolved does not imply successful completion."
     },
     {
       "key": "Duplicate detection",
@@ -606,9 +613,11 @@
       "duration": "10 min"
     },
     {
-      "title": "Duplicate Case search",
-      "url": "https://academy.pega.com/topic/duplicate-case-search/v2/in/93701/80791",
+      "title": "Duplicate search",
+      "url": "https://academy.pega.com/topic/duplicate-search/v7/in/93701/80791",
       "duration": "5 min"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Pega Platform '24.2 — module v2, linked bodies checked 2026-10-06"
 }
