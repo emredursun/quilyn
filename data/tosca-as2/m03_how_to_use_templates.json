@@ -15,20 +15,20 @@
       "elements": [
         {
           "type": "text",
-          "text": "A Template alone can't run as a test — it needs the TestSheet to supply the specific data for each generated TestCase (like knowing what color and transmission to put in our car-blueprint analogy)."
+          "text": "A TestSheet or Class supplies data to the Template. The Template models the flow; a TemplateInstance contains the generated concrete tests."
         },
         {
           "type": "steps",
           "title": "Link the TestSheet",
           "items": [
-            "Select the TestSheet in the TestCaseDesign section, then drag and drop it onto the Template in the TestCase section.",
-            "Best practice: link a TestSheet to a Template as soon as it's created, to avoid confusion later about which Template relates to which TestSheet.",
-            "Each TestSheet should be linked to exactly ONE Template. If you need the same data in multiple Templates, use Classes (covered in Test Design Specialist Level 1) — do not link one TestSheet to several Templates."
+            "Drag the TestSheet or Class onto the Template.",
+            "Inspect SchemaName to confirm the source type and name.",
+            "Plan reuse intentionally. The documentation does not impose a universal one-TestSheet/one-Template restriction; Classes can centralize shared business-data structure."
           ]
         },
         {
           "type": "note",
-          "text": "Jump to Schema Definition — once linked, a new ribbon option appears under the TestCase tab. Right-click the Template → Jump to Schema Definition (shortcut: Ctrl+J) to instantly navigate to its linked TestSheet. You can also confirm the linked TestSheet's name via the Property tab."
+          "text": "With the Template selected, Jump to Schema Definition (Ctrl+J) navigates to its schema. SchemaName also identifies its linked TestCase-Design source."
         }
       ],
       "sectionId": "section-2ef3ff632198"
@@ -38,29 +38,29 @@
       "elements": [
         {
           "type": "text",
-          "text": "Linking the TestSheet doesn't automatically tell Tosca which TestStepValue uses which piece of data — you must link the individual Values."
+          "text": "Tosca can create XL paths automatically for empty TestStepValues whose names uniquely match source Attribute names. Inspect those generated paths. Other values need an explicit path; linking a source does not guarantee every mapping is complete."
         },
         {
           "type": "steps",
           "title": "Link TestSheet Values to TestStepValues",
           "items": [
-            "Best practice: drag and drop each Value from the TestSheet onto the relevant TestStepValue in the TestCase.",
-            "Example: drag the Attribute 'Size' from the TestSheet onto the 'Size' TestStepValue — this automatically creates an XL reference.",
-            "The XL reference contains the path Tosca follows to find the value in the TestSheet at runtime."
+            "Use the required source Attribute path for each mapped TestStepValue.",
+            "Paths such as {XL[Person.First Name]} follow the source hierarchy.",
+            "Check each created path and the intended input/assertion ActionMode."
           ]
         },
         {
           "type": "concept",
           "term": "Check Template",
-          "description": "Right-click the Template → Check Template to validate that all XL references actually resolve to something in the TestSheet. Important: this ONLY checks that the links exist — it does NOT check for functionality errors in TestSteps or formulas. The function highlights the TestStepValue containing the broken link, not the XL reference text itself."
+          "description": "Check Template compares the model against its schema, including Attribute references, specified conditions, custom properties, TCPs and InstanceName. It does not prove correct business logic or successful live-SUT execution."
         },
         {
           "type": "warning",
-          "text": "Check Template validates reference EXISTENCE only. It will not catch a wrong formula, a bad Condition, or incorrect TestStep logic — those still need manual review or a test run to surface."
+          "text": "A successful schema check is not an execution test. Review expected results and run the generated cases."
         },
         {
           "type": "note",
-          "text": "An XL reference can also be typed manually, using the syntax {XL[Attribute.SubAttribute]} or {XL[Attribute.SubAttribute.SubSubAttribute]} — but this is NOT best practice. Drag-and-drop is preferred since it avoids typos and guarantees the path actually matches the TestSheet's structure."
+          "text": "Manual XL paths such as {XL[Attribute.SubAttribute]} are supported. Automatic mapping or drag-and-drop can reduce typing, but neither guarantees semantic correctness; inspect the source path and expected meaning."
         }
       ],
       "sectionId": "section-d46538a26556"
@@ -70,32 +70,31 @@
       "elements": [
         {
           "type": "text",
-          "text": "Once the Template is complete and its Workstate is set to COMPLETE, the next step is Instantiation — the process where Tosca creates actual TestCases based on the TestSheet (and any Conditions, covered in a later lesson)."
+          "text": "Instantiation needs a Template, a linked data source and correctly mapped values. WorkState is inherited by generated cases; Completed is not listed as a universal prerequisite for creating the TemplateInstance."
         },
         {
           "type": "steps",
           "title": "Instantiate",
           "items": [
-            "Select the Template → click Instantiate in the Ribbon's TestCase tab, OR",
-            "Right-click the Template → Create TemplateInstance from the Mini Toolbar, then confirm 'start instantiation now?', OR",
-            "Use the keyboard shortcut Ctrl+N, Ctrl+I.",
-            "The Template itself is unchanged; a new TemplateInstance folder appears below it containing the generated TestCases.",
-            "Run all TestCases in the Scratchbook to confirm they behave as expected."
+            "Create TemplateInstance from the selected Template, use Instantiate in the ribbon, or Ctrl+N, Ctrl+I.",
+            "Inspect the generated cases and their intended data/conditions.",
+            "Run a small representative selection in ScratchBook before organizing formal execution.",
+            "When model or data changes, review manual edits and reinstantiate the appropriate TemplateInstance."
           ]
         },
         {
           "type": "note",
-          "text": "For our example, instantiation creates 4 TestCases — one per TestSheet Instance. Each generated TestCase shows only the steps/values relevant to it (e.g. the ValidValues TestCase uses the default size M; the Wrong-size TestCase uses the invalid XL) — Values from the TestSheet replace the References."
+          "text": "For the hypothetical four-combination example, inspect the generated set rather than assuming each Attribute value becomes one test. Conditions, Break and selectors may affect the generated subset; the Template and data links remain model dependencies."
         }
       ],
       "sectionId": "section-3fe93756551b"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 3 — Link Template and Values, Instantiation",
+      "sectionTitle": "Independent Practice: Mapping and Generation",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS2 Exercise 3 — Link Template and Values, Instantiation — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+          "text": "Use synthetic login combinations. Link their TestSheet, inspect each XL path, check the model and generate a TemplateInstance. Compare a representative valid and negative case with the intended assertions. Original Academy exercise instructions were inaccessible and remain unverified."
         }
       ],
       "sectionId": "section-e812ca31d672"
@@ -103,24 +102,24 @@
   ],
   "examPitfalls": [
     {
-      "title": "Thinking Check Template catches all errors",
-      "trapDescription": "Candidates assume a passed Check Template means the Template is fully correct.",
-      "bestPractice": "Check Template only validates that XL references resolve to something in the TestSheet — it does NOT check TestStep functionality, formulas, or logic errors."
+      "title": "Schema validation is broader than reference existence",
+      "trapDescription": "Ignoring conditions and model properties, or treating a schema check as execution proof.",
+      "bestPractice": "Inspect Check Template findings, then separately validate actual test behavior."
     },
     {
-      "title": "Linking one TestSheet to multiple Templates",
-      "trapDescription": "Learners reuse the same TestSheet across several Templates to save time.",
-      "bestPractice": "Each TestSheet should link to exactly one Template. For shared data across multiple Templates, use Classes instead (Test Design Specialist Level 1 topic)."
+      "title": "Mapping is conditional",
+      "trapDescription": "Assuming all values map automatically, or that none can map automatically.",
+      "bestPractice": "Automatic paths require empty values and unique matching names; inspect every mapping."
     },
     {
-      "title": "Forgetting to check the linked TestSheet before troubleshooting",
-      "trapDescription": "Candidates manually search for which TestSheet is linked to a Template.",
-      "bestPractice": "Right-click the Template → Jump to Schema Definition (Ctrl+J) instantly navigates to the linked TestSheet; the Property tab also shows its name."
+      "title": "Model reuse is intentional",
+      "trapDescription": "Treating one-TestSheet/one-Template as an engine restriction.",
+      "bestPractice": "Choose a maintainable data model; verify the actual source attached to each Template."
     },
     {
-      "title": "Typing XL references manually instead of drag-and-drop",
-      "trapDescription": "Candidates hand-type {XL[Attribute.SubAttribute]} paths to save a step, introducing typos that silently break the link.",
-      "bestPractice": "XL references CAN be typed manually with {XL[Attribute.SubAttribute]} syntax, but this is not best practice — drag-and-drop from the TestSheet is safer and guarantees the path is correct."
+      "title": "Manual paths are supported",
+      "trapDescription": "Assuming typed XL paths are invalid or generated paths are always correct.",
+      "bestPractice": "Use supported syntax and inspect both the path and its intended meaning."
     }
   ],
   "practiceQuiz": [
@@ -150,7 +149,15 @@
         "C"
       ],
       "hint": "It's a drag-and-drop action, same direction as most Tosca linking.",
-      "rationale": "You select the TestSheet from TestCaseDesign and drag it onto the Template in the TestCase section to link them."
+      "rationale": "You select the TestSheet from TestCaseDesign and drag it onto the Template in the TestCase section to link them.",
+      "optionExplanations": {
+        "A": "A newly created Template is not automatically linked to the last TestSheet.",
+        "B": "Import TestSheet is not the documented linking operation here.",
+        "C": "Drop the TestSheet onto the Template to assign its source.",
+        "D": "Pasting XML is not the documented source-assignment workflow."
+      },
+      "lessonSection": "section-2ef3ff632198",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -171,14 +178,22 @@
         },
         {
           "id": "D",
-          "text": "That the XL references in the Template resolve to existing values in the linked TestSheet — nothing about TestStep functionality or formulas."
+          "text": "Schema-based references, specified conditions and relevant properties including TCPs and InstanceName; this does not guarantee live execution success."
         }
       ],
       "correctOptions": [
         "D"
       ],
-      "hint": "It's about reference existence, not runtime correctness.",
-      "rationale": "Check Template only validates that XL references exist and resolve correctly in the linked TestSheet. It does not catch functionality errors in TestSteps or formulas — that's a common exam trap."
+      "hint": "Distinguish model validation from successful business assertions at execution.",
+      "rationale": "Check Template considers more than existence of XL links, but it does not run every test against the SUT.",
+      "optionExplanations": {
+        "A": "Model checking does not establish correct business outcomes for all formulas.",
+        "B": "This is a Template/schema check, not complete execution-list validation.",
+        "C": "It does not execute every TestStep against the live system.",
+        "D": "The check includes schema-based conditions and properties, beyond link existence."
+      },
+      "lessonSection": "section-d46538a26556",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
@@ -206,16 +221,24 @@
         "B"
       ],
       "hint": "Not the same shortcut as Instantiate.",
-      "rationale": "Ctrl+J is the shortcut for 'Jump to Schema Definition', which navigates from the Template directly to its linked TestSheet. Ctrl+N, Ctrl+I is the Instantiate shortcut, not this one."
+      "rationale": "Ctrl+J is the shortcut for 'Jump to Schema Definition', which navigates from the Template directly to its linked TestSheet. Ctrl+N, Ctrl+I is the Instantiate shortcut, not this one.",
+      "optionExplanations": {
+        "A": "F9 toggles visibility in the active context.",
+        "B": "With the Template selected this command jumps to its schema definition.",
+        "C": "Ctrl+T searches and adds a TestStep.",
+        "D": "This chord creates a TemplateInstance rather than navigating the schema."
+      },
+      "lessonSection": "section-2ef3ff632198",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "How do you link a value from the TestSheet to a specific TestStepValue in the Template?",
+      "scenario": "Which description correctly explains XL mapping when linking a TestSheet to a Template?",
       "options": [
         {
           "id": "A",
-          "text": "Drag and drop the value from the TestSheet directly onto the TestStepValue — this creates an XL reference."
+          "text": "Empty TestStepValues with uniquely matching Attribute names can get automatic XL paths; inspect them and explicitly map the remaining values."
         },
         {
           "id": "B",
@@ -234,7 +257,15 @@
         "A"
       ],
       "hint": "Same drag-and-drop pattern as linking the TestSheet itself.",
-      "rationale": "Dragging and dropping a TestSheet value onto a TestStepValue creates an XL reference — the path Tosca follows at runtime to fetch the value from the TestSheet."
+      "rationale": "Automatic mapping has specific conditions. Manually specified paths are also supported; Check Template does not supply every missing mapping.",
+      "optionExplanations": {
+        "A": "The documented automatic mapping conditions are empty values and unique matching names.",
+        "B": "A bare name alone is not the XL expression for a data path.",
+        "C": "Manual paths are supported; instantiation is not their only creation mechanism.",
+        "D": "Checking validates the model rather than guaranteeing all missing values are mapped."
+      },
+      "lessonSection": "section-d46538a26556",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
@@ -265,12 +296,20 @@
         "D"
       ],
       "hint": "One is a ribbon button, one is a context menu action, one is a keyboard shortcut.",
-      "rationale": "Instantiation can be triggered via the Ribbon's Instantiate button, via right-click → Create TemplateInstance, or via the Ctrl+N, Ctrl+I shortcut. Renaming does nothing functionally. No partial credit."
+      "rationale": "Instantiation can be triggered via the Ribbon's Instantiate button, via right-click → Create TemplateInstance, or via the Ctrl+N, Ctrl+I shortcut. Renaming does nothing functionally. No partial credit.",
+      "optionExplanations": {
+        "A": "The context command creates the TemplateInstance from the selected model.",
+        "B": "This is the documented creation/instantiation chord.",
+        "C": "Renaming does not generate concrete cases.",
+        "D": "Instantiate is also available through the TestCases ribbon."
+      },
+      "lessonSection": "section-3fe93756551b",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q6",
       "type": "single-select",
-      "scenario": "If the same test data is required across several different Templates, what should you use instead of linking one TestSheet to all of them?",
+      "scenario": "Which TestCase-Design structure can centralize reusable business-data definitions across different TestSheets?",
       "options": [
         {
           "id": "A",
@@ -292,8 +331,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "This is flagged in the course as a Test Design Specialist Level 1 topic.",
-      "rationale": "Tosca recommends using Classes when the same data is needed across multiple Templates, rather than linking one TestSheet to several Templates (which is harder to maintain)."
+      "hint": "Choose a reusable data-design structure rather than an execution or risk container.",
+      "rationale": "Classes centralize reusable data structure; this is separate from an unsupported claim that a TestSheet can only ever feed one Template.",
+      "optionExplanations": {
+        "A": "Classes model reusable data definitions for different design structures.",
+        "B": "Copies create separate definitions and increase duplicated maintenance.",
+        "C": "RequirementSets organize risk/coverage rather than this reusable data structure.",
+        "D": "ExecutionLists organize test runs rather than shared data definitions."
+      },
+      "lessonSection": "section-2ef3ff632198",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q7",
@@ -306,7 +353,7 @@
         },
         {
           "id": "B",
-          "text": "{XL[Attribute.SubAttribute]} — valid, but not best practice compared to drag-and-drop."
+          "text": "{XL[Attribute.SubAttribute]} is supported; inspect its source hierarchy and intended meaning, whether typed or generated."
         },
         {
           "id": "C",
@@ -321,48 +368,53 @@
         "B"
       ],
       "hint": "Don't confuse this with the {CP[...]} syntax used for Test Configuration Parameters.",
-      "rationale": "An XL reference can be typed manually as {XL[Attribute.SubAttribute]} or {XL[Attribute.SubAttribute.SubSubAttribute]}, but Tosca's official guidance flags this as NOT best practice — drag-and-drop from the TestSheet is safer and avoids typos."
+      "rationale": "Dot-separated Attribute levels within an XL expression are supported. Typing is valid, and generated paths also require inspection.",
+      "optionExplanations": {
+        "A": "This is not supported XL data-path syntax.",
+        "B": "XL with dot-separated levels is supported; inspect its hierarchy and meaning.",
+        "C": "Typed paths are supported, so drag-and-drop is not the sole method.",
+        "D": "CP recalls a configuration parameter, not the TestSheet Attribute path."
+      },
+      "lessonSection": "section-d46538a26556",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
     {
-      "key": "Link TestSheet → Template",
-      "value": "Drag & drop TestSheet (TestCaseDesign) onto the Template (TestCase section)."
+      "key": "Source",
+      "value": "Drop a TestSheet or Class on the Template and inspect SchemaName."
     },
     {
-      "key": "1 TestSheet : 1 Template",
-      "value": "Use Classes if the same data must feed multiple Templates."
+      "key": "Automatic mapping",
+      "value": "Requires empty values with uniquely matching Attribute names; inspect all paths."
     },
     {
-      "key": "Jump to Schema Definition",
-      "value": "Ctrl+J — jumps from Template to its linked TestSheet."
+      "key": "Validation",
+      "value": "Check Template includes schema references, conditions and relevant properties, not live execution proof."
     },
     {
-      "key": "Link Values",
-      "value": "Drag TestSheet value onto TestStepValue → creates an XL reference."
+      "key": "Generation",
+      "value": "Create TemplateInstance, inspect and trial-run; model changes require reinstantiation."
     },
     {
-      "key": "Check Template",
-      "value": "Validates XL reference existence ONLY — not TestStep/formula correctness."
-    },
-    {
-      "key": "Instantiate",
-      "value": "Ribbon button, right-click → Create TemplateInstance, or Ctrl+N, Ctrl+I."
-    },
-    {
-      "key": "Result",
-      "value": "A TemplateInstance folder with one generated TestCase per TestSheet Instance."
-    },
-    {
-      "key": "Manual XL syntax",
-      "value": "{XL[Attribute.SubAttribute]} — valid but NOT best practice; prefer drag-and-drop."
+      "key": "Paths",
+      "value": "Manual {XL[Attribute.SubAttribute]} syntax is supported."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 03 - How to Use Templates",
-      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
-      "duration": "video"
+      "title": "Template models",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/testcase_templates.htm"
+    },
+    {
+      "title": "Linking TestSheet data",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/testcase_design/testcase_templates.htm"
+    },
+    {
+      "title": "Instantiation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/instantiating_testcases.htm"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1",
+  "sourceReviewedOn": "2026-10-06"
 }

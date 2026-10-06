@@ -927,3 +927,15 @@ test('AS2 foundations separate official policy, instance Character and negative-
  assert.doesNotMatch(JSON.stringify(docs[1]),/var\(--pa-ink-[23]\)|shown in the official Exercise/);
  ['data/tosca-as1/m03_testcases.json','data/tosca-as1/m04_advanced_module_actions.json'].forEach(file=>assert.doesNotMatch(fs.readFileSync(file,'utf8'),/var\(--pa-ink-[23]\)/));
 });
+
+test('AS2 template review covers broader validation and explicit regeneration without mandatory reference resolution',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ const docs=['m02_templates.json','m03_how_to_use_templates.json'].map((file,n)=>{const bytes=fs.readFileSync('data/tosca-as2/'+file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,(n?[['C'],['D'],['B'],['A'],['A','B','D'],['A'],['B']]:[['B'],['B'],['C'],['C'],['A'],['D'],['D']])[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});return d;});
+ assert.match(docs[0].studyGuide[0].elements[2].description,/need reinstantiation/);
+ assert.match(docs[0].studyGuide[1].elements[0].text,/not a universal conversion prerequisite/);
+ assert.match(docs[0].practiceQuiz[3].options[2].text,/information is lost/);
+ assert.match(docs[1].studyGuide[1].elements[0].text,/empty.*uniquely match/);
+ assert.match(docs[1].practiceQuiz[1].options[3].text,/conditions.*TCPs and InstanceName/);
+ assert.match(docs[1].studyGuide[2].elements[0].text,/Completed is not listed/);
+ docs.forEach(d=>assert.doesNotMatch(JSON.stringify(d),/ONLY checks that the links exist|only validates that XL references exist|exactly ONE Template|Undo ONLY before|BEFORE the project is saved/i));
+});

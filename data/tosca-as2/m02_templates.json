@@ -13,7 +13,7 @@
       "elements": [
         {
           "type": "text",
-          "text": "Creating one individual TestCase per TestSheet row works, but it's repetitive and each TestCase needs individual maintenance — especially when a change falls in an area not suitable for a ReusableTestStepBlock. A Template solves this: it's a single TestCase that automatically generates a whole series of TestCases from the data in a TestSheet."
+          "text": "Independent example: four selected size combinations share an automated flow. A Template models that flow and linked data supplies its variations; generate concrete tests through a TemplateInstance."
         },
         {
           "type": "analogy",
@@ -22,7 +22,7 @@
         {
           "type": "concept",
           "term": "Template",
-          "description": "Designed to contain all possible paths of a linked TestSheet. When the Template is modified to reflect a SUT change, those modifications automatically feed through to every TestCase generated from it — centralizing maintenance and making full risk coverage far more time-efficient."
+          "description": "Centralize the common flow in the Template. Existing generated tests need reinstantiation to reflect later model/data edits; merely editing the Template does not update every generated case. Review manual changes before regeneration."
         }
       ],
       "sectionId": "section-32255b09752a"
@@ -32,31 +32,31 @@
       "elements": [
         {
           "type": "text",
-          "text": "In our shirt-size example, the TestSheet covers 4 possible paths (S, M, L valid + XL invalid). We'll create a Template from an existing TestCase that already has References to ReusableTestStepBlocks in the Library, so it can generate all 4 TestCases."
+          "text": "Use the independent size-data example from the preceding lesson. Reusable block references are supported in Templates; resolving all references is not a universal conversion prerequisite."
         },
         {
           "type": "steps",
           "title": "Prepare and convert",
           "items": [
-            "Right-click the folder → Resolve Reference, to remove/resolve References to the Library (as in AS1) — this lets you edit TestSteps freely without changing the shared Library.",
-            "Once ready, right-click the TestCase → Convert to Template.",
-            "A blue square with a \"T\" now appears in front of the TestCase icon — it is now a Template.",
-            "If needed, right-click again → Convert to TestCase to revert it."
+            "Review shared block references and decide whether a local variation is needed.",
+            "For a deliberate local variation, select that block reference and Resolve Reference; Module/configuration dependencies remain.",
+            "Select the TestCase and Convert to Template.",
+            "Link the intended data source, check paths and instantiate. Convert to TestCase is available, but loses template information."
           ]
         },
         {
           "type": "note",
-          "text": "In the next lesson, this Template will be used to create the 4 TestCases defined in the linked TestSheet."
+          "text": "Preserve a recoverable copy before changing model structure. Do not assume that saving defines a universal Undo boundary."
         }
       ],
       "sectionId": "section-59c344e3c2ed"
     },
     {
-      "sectionTitle": "Hands-On: Exercise 2 — Build the Log In Process Template",
+      "sectionTitle": "Independent Practice: Login Template",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS2 Exercise 2 — Log In Process, Resolve Reference & Convert to Template — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+          "text": "Build a small hypothetical login flow with synthetic data, convert it to a Template and plan its data references. Original Academy exercise instructions and source workspaces were inaccessible; this local task is independent practice."
         }
       ],
       "sectionId": "section-d5c0a54b1910"
@@ -64,19 +64,19 @@
   ],
   "examPitfalls": [
     {
-      "title": "Converting to a Template without resolving References first",
-      "trapDescription": "Candidates convert a TestCase straight to a Template while it still has unresolved References to ReusableTestStepBlocks, then try to edit TestSteps — accidentally changing the shared Library.",
-      "bestPractice": "Resolve References (right-click folder → Resolve Reference) before converting to a Template, so TestStep edits stay local to the Template."
+      "title": "Generated tests require regeneration",
+      "trapDescription": "Editing the model and assuming previously generated cases immediately change.",
+      "bestPractice": "Review the impact and reinstantiate the linked TemplateInstance."
     },
     {
-      "title": "Not recognizing the Template icon",
-      "trapDescription": "Learners can't tell a Template apart from a regular TestCase in the Navigation pane.",
-      "bestPractice": "A Template shows a blue square with a 'T' in front of the TestCase icon. No blue 'T' = still a plain TestCase."
+      "title": "Shared references are supported",
+      "trapDescription": "Resolving every Library block as an unconditional preparation step.",
+      "bestPractice": "Keep deliberate reuse; resolve a specific reference only when local customization is required."
     },
     {
-      "title": "Assuming Resolve Reference can always be undone",
-      "trapDescription": "Candidates resolve a Reference, save the project, then try to undo it to restore the link to the Library.",
-      "bestPractice": "Resolve Reference can only be undone via Tosca's Undo arrow BEFORE the project is saved. Once saved, the action is permanent."
+      "title": "Converting back loses information",
+      "trapDescription": "Treating Convert to TestCase as a harmless preview toggle.",
+      "bestPractice": "Preserve template information before reverting the object type."
     }
   ],
   "practiceQuiz": [
@@ -91,7 +91,7 @@
         },
         {
           "id": "B",
-          "text": "A Template acts as a blueprint that automatically generates all 4 TestCases from the TestSheet, centralizing future maintenance."
+          "text": "A Template models the shared flow and generates the four selected combinations through a TemplateInstance; later changes require regeneration."
         },
         {
           "id": "C",
@@ -106,7 +106,15 @@
         "B"
       ],
       "hint": "Think of the car-design analogy — one blueprint, many variations.",
-      "rationale": "A Template is a blueprint TestCase. Linked to a TestSheet, it generates a full set of TestCases automatically, and future SUT changes only need to be applied once, in the Template."
+      "rationale": "Model and data centralize maintenance; existing generated tests are refreshed through reinstantiation.",
+      "optionExplanations": {
+        "A": "Multiple manual TestCases are allowed; this is not the reason for templates.",
+        "B": "One flow model and chosen data combinations centralize generation and maintenance.",
+        "C": "A model is not an execution-speed guarantee.",
+        "D": "The scenario uses a TestSheet data source rather than eliminating it."
+      },
+      "lessonSection": "section-32255b09752a",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -119,7 +127,7 @@
         },
         {
           "id": "B",
-          "text": "Whether it has References to ReusableTestStepBlocks that need to be resolved first."
+          "text": "Whether shared references should remain reusable or need deliberate local customization."
         },
         {
           "id": "C",
@@ -134,7 +142,15 @@
         "B"
       ],
       "hint": "This step also appeared in AS1 when editing shared Library content.",
-      "rationale": "Resolving References first (right-click → Resolve Reference) ensures that TestStep modifications made to the Template don't change the shared Library."
+      "rationale": "Templates support reusable block references. Resolve a particular reference when a local editable copy is intended, rather than as a universal conversion rule.",
+      "optionExplanations": {
+        "A": "Preparation includes intentional reuse and mapping decisions.",
+        "B": "Choose between shared reuse and a deliberate local editable block copy.",
+        "C": "An existing ExecutionList is not a conversion prerequisite.",
+        "D": "A fixed count of 100 Instances is not required."
+      },
+      "lessonSection": "section-59c344e3c2ed",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
@@ -162,40 +178,56 @@
         "C"
       ],
       "hint": "It's a single right-click action on the TestCase itself.",
-      "rationale": "Right-clicking the TestCase and selecting 'Convert to Template' converts it — shown by a blue square with a 'T' appearing in front of the icon."
+      "rationale": "Convert to Template acts on the selected TestCase and changes its object type; naming alone does not convert it.",
+      "optionExplanations": {
+        "A": "A TestSheet is a data-design object, not the TestCase being converted.",
+        "B": "Renaming does not change the object type.",
+        "C": "This context command converts the selected TestCase.",
+        "D": "Dropping a case onto a sheet is not this conversion command."
+      },
+      "lessonSection": "section-59c344e3c2ed",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "How can you visually confirm a TestCase has been successfully converted to a Template?",
+      "scenario": "What risk should you account for when using Convert to TestCase on a Template?",
       "options": [
         {
           "id": "A",
-          "text": "The icon disappears entirely."
+          "text": "The entire Tosca installation is removed."
         },
         {
           "id": "B",
-          "text": "The TestCase turns red."
+          "text": "All RequirementSets are deleted."
         },
         {
           "id": "C",
-          "text": "A blue square containing a 'T' appears in front of the TestCase icon."
+          "text": "Template information is lost, so preserve it before converting back."
         },
         {
           "id": "D",
-          "text": "A green checkmark appears next to the TestSheet."
+          "text": "All browser tabs automatically close."
         }
       ],
       "correctOptions": [
         "C"
       ],
-      "hint": "It's a small blue marker with a letter on it.",
-      "rationale": "The blue square with a 'T' in front of the icon is Tosca's visual indicator that a TestCase is now a Template."
+      "hint": "Object-type conversion is more than changing a display label.",
+      "rationale": "The documented reverse conversion loses the information stored in the Template.",
+      "optionExplanations": {
+        "A": "Conversion does not uninstall the product.",
+        "B": "Template conversion is unrelated to deleting RequirementSets.",
+        "C": "Reverse conversion loses stored template information.",
+        "D": "Browser-tab state is not the documented consequence."
+      },
+      "lessonSection": "section-59c344e3c2ed",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "In the Log In Process exercise, how does a TestStep reference the project-wide Email Test Configuration Parameter?",
+      "scenario": "Which expression recalls the Email Test Configuration Parameter in a hypothetical login TestStep?",
       "options": [
         {
           "id": "A",
@@ -218,35 +250,51 @@
         "A"
       ],
       "hint": "It's the same syntax introduced back in AS1's Test Configuration Parameters lesson.",
-      "rationale": "Test Configuration Parameters are referenced inside TestSteps using {CP[ParameterName]} — e.g. {CP[Email]} and {CP[Password]}, as recapped from AS1 Lesson 14."
+      "rationale": "CP recalls a named configuration parameter. Resolution follows its available scope, not necessarily a project-wide value.",
+      "optionExplanations": {
+        "A": "CP is the supported parameter-recall command with the name in brackets.",
+        "B": "This placeholder is not Tosca CP recall syntax.",
+        "C": "Dollar-delimited text is not this parameter expression.",
+        "D": "This dotted property text is not the documented dynamic recall."
+      },
+      "lessonSection": "section-59c344e3c2ed",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q6",
       "type": "single-select",
-      "scenario": "You resolved a Reference on a Reusable TestStepBlock, then saved the Tosca project. You now want to undo the Resolve Reference action. What happens?",
+      "scenario": "What does Resolve Reference do to a selected reusable block reference?",
       "options": [
         {
           "id": "A",
-          "text": "The project must be fully reinstalled to undo it."
+          "text": "It uninstalls Commander."
         },
         {
           "id": "B",
-          "text": "Resolve Reference is always reversible via a dedicated 'Restore Reference' command."
+          "text": "It makes all Library references receive this one test’s local changes."
         },
         {
           "id": "C",
-          "text": "Ctrl+Z always reverts it, saved or not."
+          "text": "It duplicates every Module and configuration value."
         },
         {
           "id": "D",
-          "text": "It's too late — the Undo option to revert Resolve Reference is only available before the project is saved."
+          "text": "It creates locally editable steps that stop receiving that Library block’s changes, while other dependencies remain."
         }
       ],
       "correctOptions": [
         "D"
       ],
-      "hint": "Timing relative to saving is the key detail here.",
-      "rationale": "Resolve Reference can only be undone via Tosca's Undo arrow, and only before the project has been saved. Once saved, the action is permanent."
+      "hint": "The shared block link and technical dependencies are different.",
+      "rationale": "Resolve creates an editable copy of the referenced steps; it does not copy every Module or TCP.",
+      "optionExplanations": {
+        "A": "Reference resolution changes the model, not installation.",
+        "B": "A local resolved block no longer propagates edits through that shared reference.",
+        "C": "Module/configuration dependencies remain rather than being universally cloned.",
+        "D": "The local step copy is editable independently of the Library block."
+      },
+      "lessonSection": "section-59c344e3c2ed",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q7",
@@ -274,48 +322,53 @@
         "D"
       ],
       "hint": "Think 'T' for TestStep.",
-      "rationale": "Ctrl+T opens the 'Add TestStep' search, letting you quickly find and insert TestSteps or Reusable TestStepBlocks into a TestCase."
+      "rationale": "Ctrl+T opens the 'Add TestStep' search, letting you quickly find and insert TestSteps or Reusable TestStepBlocks into a TestCase.",
+      "optionExplanations": {
+        "A": "This creation chord does not open Search and Add TestStep.",
+        "B": "F9 changes visibility rather than adding a step.",
+        "C": "Jump commands navigate an existing association rather than search/add.",
+        "D": "Ctrl+T opens the TestStep search/add dialog."
+      },
+      "lessonSection": "section-59c344e3c2ed",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
     {
       "key": "Template",
-      "value": "A blueprint TestCase that generates a series of similar TestCases from a linked TestSheet."
+      "value": "A model for concrete data-driven tests; model edits require reinstantiation of existing generated cases."
     },
     {
-      "key": "Why",
-      "value": "Centralizes maintenance — one change in the Template feeds through to every generated TestCase."
+      "key": "Reuse",
+      "value": "Supported shared block references need not all be resolved."
     },
     {
-      "key": "Before converting",
-      "value": "Resolve any References to ReusableTestStepBlocks first."
+      "key": "Conversion",
+      "value": "Convert the selected TestCase; reverse conversion loses template information."
     },
     {
-      "key": "Convert to Template",
-      "value": "Right-click TestCase → Convert to Template (shown by a blue 'T' icon)."
+      "key": "TCP",
+      "value": "Recall an available named configuration value with {CP[Name]}."
     },
     {
-      "key": "Convert back",
-      "value": "Right-click Template → Convert to TestCase."
-    },
-    {
-      "key": "Test Configuration Parameter syntax",
-      "value": "{CP[ParameterName]} — e.g. {CP[Email]}, {CP[Password]} (recap from AS1 Lesson 14)."
-    },
-    {
-      "key": "Add TestStep shortcut",
-      "value": "Ctrl+T — search and insert a TestStep or Reusable TestStepBlock."
-    },
-    {
-      "key": "Resolve Reference undo window",
-      "value": "Reversible via Undo ONLY before the project is saved."
+      "key": "Search",
+      "value": "Ctrl+T opens Search and Add TestStep."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 02 - Templates",
-      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
-      "duration": "video"
+      "title": "Template models",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/testcase_templates.htm"
+    },
+    {
+      "title": "Linking TestSheet data",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/testcase_design/testcase_templates.htm"
+    },
+    {
+      "title": "Instantiation",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/instantiating_testcases.htm"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1",
+  "sourceReviewedOn": "2026-10-06"
 }
