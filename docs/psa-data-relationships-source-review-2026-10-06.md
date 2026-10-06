@@ -11,3 +11,7 @@ Changes distinguish Case ownership from physical database layout, locally mainta
 Both local SVG texts and all four scripted scenario answer/feedback paths were read. Incorrect external-only, pyID and guaranteed live-link wording was qualified. Source figures failed to fetch; original hotspots and knowledge checks were not inspected. Browser rendering and execution of the local illustrations/interactions remain open. No live Pega exercise or physical-device/AT test is claimed.
 
 Validation: regression test covers explanation/anchor completeness, retained keys, inventory hash and the corrected storage/source distinctions. Generated content is refreshed with `npm run manifest:content`; `npm run check`: 191/191 tests passed; initial shell remains under 300 KB. Changes are local only; no push.
+
+## Local browser follow-up
+
+All four correct simulator branches reached 4/4; the answered options disable. Corrected the score header to update immediately. Verified SVG theme colors in dark/light and horizontal diagram scrolling at 390 px in a clean loopback origin. These checks close local rendering/execution follow-up; original source figures/interactions remain outside the evidence. See `docs/release/content-and-visual-review-2026-10-06.md` for exact scope and current validation.

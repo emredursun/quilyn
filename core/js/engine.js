@@ -557,7 +557,7 @@
         } else if (el.type === "diagram") {
           // Authored, trusted inline SVG — injected raw so it renders as a figure.
           inner +=
-            '<figure class="pa-figure">' + (el.svg || "") +
+            '<figure class="pa-figure" tabindex="0" aria-label="Lesson diagram" title="On narrow screens, scroll horizontally to explore the diagram.">' + (el.svg || "") +
             (el.caption ? "<figcaption>" + esc(el.caption) + "</figcaption>" : "") +
             "</figure>";
         } else if (el.type === "pdf") {

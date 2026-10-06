@@ -7,7 +7,7 @@ var h='<div class="lbl">'+s.label+'</div><div class="sc">'+s.scenario+'</div>';
 s.opts.forEach(function(o,i){h+='<button class="opt" data-quilyn-action="ans('+i+')">'+o+'</button>';});
 document.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}
 function ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});
-var ok=i===s.correct;if(ok)score++;
+var ok=i===s.correct;if(ok)score++;document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;
 s.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});
 var fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];
 document.getElementById('qc').appendChild(fb);
