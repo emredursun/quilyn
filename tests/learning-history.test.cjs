@@ -1526,3 +1526,11 @@ test('Testim Dashboard review distinguishes Flaky classification and pane units 
  assert.match(d.studyGuide[1].elements[1].text,/switches from executions to owned-test runs.*time\/filter selection does not change/);
  assert.match(d.studyGuide[0].elements[1].description,/lower activity does not by itself establish shrinking test coverage/);
 });
+
+test('Testim prerequisite review avoids interpreting previous versions as major lines or historic LTS as current support',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m25_identifying_cli_prerequisites.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['B'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[3].description,/does not define.*previous major releases.*end-of-life/);
+ assert.match(d.studyGuide[0].elements[2].description,/runtime prerequisites alone do not establish readiness/);
+ assert.doesNotMatch(d.practiceQuiz[3].scenario,/prior major versions/);
+});
