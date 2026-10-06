@@ -13,253 +13,254 @@
       "sectionTitle": "Scenario: A New SUT Feature to Verify",
       "elements": [
         {
-          "type": "text",
-          "text": "The SUT (built with Agile) added a new feature: after clicking Add to Cart with a chosen quantity, a message appears — green/success for a positive whole number, red/error for a negative one. You already have Modules, Template, TestCases, and TemplateInstances from the previous version; you now receive an updated TestSheet with new Verification Attributes to test this message."
-        },
-        {
-          "type": "concept",
-          "term": "Verification Attribute",
-          "description": "A new type of Attribute — shown in green — that is NOT an input to the SUT. Instead, it holds a value Tosca compares against the SUT's actual output. If the two values match once entered into the TestCase, the verification succeeds; otherwise it fails."
-        },
-        {
-          "type": "text",
-          "text": "In the new TestSheet, the Quantity Attribute has 2 Instances: +4 (valid) and -4 (invalid). For +4, the Verification Attribute checks for the message \"The product has been added to your shopping cart\"; for -4, it checks for \"Quantity should be positive\". After modifying the Template and Instantiating, this produces 2 TestCases that validate the system message."
+          "type": "note",
+          "text": "Independent hypothetical requirement: positive quantity 4 should produce a success message, while -4 should produce a defined validation error. Model the expected output in an Attribute with BusinessRelevant = Result and map it to a Verify TestStepValue. The Attribute property alone does not change a TestStepValue’s ActionMode. Review the assertion’s expected text and the actual control/property being verified. This example does not certify the current Demo Web Shop behavior."
         }
       ],
-      "sectionId": "section-424cd3b0ea0b"
+      "sectionId": "section-424cd3b0ea0b",
+      "bulletPoints": []
     },
     {
       "sectionTitle": "Modifying an Existing Template",
       "elements": [
         {
-          "type": "steps",
-          "title": "Modification workflow",
-          "items": [
-            "Check the Template for any References to resolve BEFORE modifying it, so changes don't feed through to the shared Library.",
-            "Identify all TestSteps that need modification, and add any new steps required to verify the new message(s).",
-            "Link the new, revised TestSheet to the Template — linking a new TestSheet automatically removes the link to the old one.",
-            "Check the XL links: if Attributes/Instances are named identically in both old and new TestSheets, Tosca updates the links automatically — but verify them carefully.",
-            "Manually add any brand-new links (like the Verification Values) to their respective TestStepValues.",
-            "Run Check Template again to catch missed or forgotten links.",
-            "Delete the OLD TemplateInstance folder before instantiating with the new TestSheet."
-          ]
-        },
-        {
-          "type": "warning",
-          "text": "Changes and new values are NOT reflected in existing TemplateInstances until you Instantiate again. Skipping this step means your 'updated' TestCases still run on old data."
-        },
-        {
           "type": "note",
-          "text": "A TestStepValue can only hold one link at a time. Before linking a NEW Attribute to a TestStepValue that's already linked to a different Attribute, you must first delete the existing Value — otherwise the new link won't take."
+          "text": "Inspect the intended model and data changes. Keep shared Library reuse unless a deliberate local copy is needed. Confirm SchemaName and the TemplateInstance data source rather than assuming a new schema link redirects every existing instance. Inspect all XL paths, map expected output to Verify, and run Check Template. Preserve manual edits and relevant execution evidence before regeneration; deleting the old TemplateInstance is not a universal prerequisite. A TestStepValue can contain a composed expression, so it is not universally limited to one XL reference. When deliberately replacing its mapping, edit the expression and inspect the resulting path."
         }
       ],
-      "sectionId": "section-fd8f9e06a587"
+      "sectionId": "section-fd8f9e06a587",
+      "bulletPoints": []
     },
     {
       "sectionTitle": "Instantiate vs. Re-Instantiate",
       "elements": [
         {
-          "type": "table",
-          "headers": [
-            "Situation",
-            "What to do"
-          ],
-          "rows": [
-            [
-              "Test Design Specialist provided a brand-new TestSheet",
-              "Link the new TestSheet (removes old link) → delete the old TemplateInstance folder → Instantiate (Ctrl+N, Ctrl+I)."
-            ],
-            [
-              "Test Design Specialist amended the EXISTING TestSheet (same file, new rows/values)",
-              "Modify the Template if needed → use Re-Instantiate — it refreshes existing TemplateInstances AND adds any new ones, without deleting anything manually."
-            ]
-          ]
-        },
-        {
           "type": "note",
-          "text": "Re-Instantiate can be run by right-clicking the TemplateInstance folder → ReInstantiate. It's the safer, additive option when the underlying TestSheet was just updated rather than replaced."
+          "text": "Create TemplateInstance generates a container of concrete tests. Reinstantiate Instance repeats generation for the selected existing TemplateInstance and needs its data source. It is not a guaranteed additive merge that preserves all manual edits or stale cases. ChangedManually records edits since generation and resets when cases are generated again. Inspect the selected data source, selector and intended generated subset; compare the resulting cases before execution."
         }
       ],
-      "sectionId": "section-1576ef4b3eb4"
+      "sectionId": "section-1576ef4b3eb4",
+      "bulletPoints": []
     },
     {
-      "sectionTitle": "Hands-On: Exercise 4 — Adapt the TestSheet and the Template",
+      "sectionTitle": "Independent Practice: Update Expected Outcomes",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS2 Exercise 4 — Adapt the TestSheet and the Template — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+          "text": "Independent practice: add a hypothetical expected login outcome to synthetic user data. Map it to Verify, inspect paths and conditions, regenerate the selected TemplateInstance and trial-run representative cases. Original Academy exercise files and solution workspaces were inaccessible and have not been verified."
         }
       ],
-      "sectionId": "section-8a16c4aac028"
+      "sectionId": "section-8a16c4aac028",
+      "bulletPoints": []
     }
   ],
   "examPitfalls": [
     {
-      "title": "Forgetting to (re)instantiate after modifying a Template",
-      "trapDescription": "Candidates update a Template's links and TestSteps but never re-run instantiation, then wonder why the TestCases still show old behavior.",
-      "bestPractice": "Modifications only reach the TestCasesInstances after Instantiation (new TestSheet) or Re-Instantiation (amended TestSheet)."
+      "title": "Regeneration can affect manual work",
+      "trapDescription": "Treating reinstantiation as a harmless additive refresh.",
+      "bestPractice": "Review manual edits, sources and execution evidence before generation."
     },
     {
-      "title": "Not deleting the old TemplateInstance folder before a new TestSheet link",
-      "trapDescription": "When replacing the TestSheet entirely, learners instantiate without removing the previous TemplateInstance folder, leading to duplicate/stale TestCases.",
-      "bestPractice": "When linking a completely NEW TestSheet, delete the old TemplateInstance folder before Instantiating. Re-Instantiate is only for an amended (same) TestSheet."
+      "title": "Expected data is not an ActionMode",
+      "trapDescription": "Assuming a Result Attribute alone creates a working assertion.",
+      "bestPractice": "Map expected data to the appropriate Verify value and inspect the control/property."
     },
     {
-      "title": "Assuming an Attribute is a Verification Attribute by default",
-      "trapDescription": "Candidates confuse a normal input Attribute with a Verification Attribute.",
-      "bestPractice": "A Verification Attribute is shown in GREEN and is compared against the SUT's actual output, not fed in as input."
+      "title": "Source selection must be checked",
+      "trapDescription": "Assuming a changed Template schema redirects all existing TemplateInstances.",
+      "bestPractice": "Inspect both the schema and the chosen instance’s data source."
     },
     {
-      "title": "Trying to re-link a TestStepValue without clearing the old value first",
-      "trapDescription": "Candidates drag a new Attribute onto a TestStepValue that's already linked to a different Attribute, and the new link doesn't take (or silently conflicts).",
-      "bestPractice": "A TestStepValue holds only one link at a time. Delete the existing Value first, then drag the new Attribute onto the now-empty TestStepValue."
+      "title": "Do not delete as a routine update step",
+      "trapDescription": "Removing the previous TemplateInstance and its useful history without reviewing the consequences.",
+      "bestPractice": "Plan regeneration or replacement deliberately and preserve needed work first."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "What color is a Verification Attribute shown in, and what is its purpose?",
+      "scenario": "How should a TestCase-Design expected-output Attribute be used in an assertion?",
       "options": [
         {
           "id": "A",
-          "text": "Blue — it indicates the Attribute belongs to a Template."
+          "text": "Treat its icon color as sufficient proof that execution will verify it."
         },
         {
           "id": "B",
-          "text": "Red — it marks an Attribute as required."
+          "text": "Use it only to rename the Template."
         },
         {
           "id": "C",
-          "text": "Verification Attributes have no distinct color; they're identical to regular Attributes."
+          "text": "Assume its Character always forces a Failed result."
         },
         {
           "id": "D",
-          "text": "Green — its value is compared against the SUT's actual output rather than being fed in as an input."
+          "text": "Set BusinessRelevant to Result where appropriate, map its expected value to Verify, and inspect the assertion."
         }
       ],
       "correctOptions": [
         "D"
       ],
-      "hint": "It's the same color used for 'success' states in many UIs.",
-      "rationale": "A Verification Attribute is shown in green. Its value is used by Tosca to verify the SUT's output — not as input data — and the TestCase step succeeds only if the two values match."
+      "hint": "Inspect the documented model, data source and generation step.",
+      "rationale": "The expected data must be connected to an actual verification with the intended target.",
+      "optionExplanations": {
+        "A": "An icon or data property alone does not establish the execution ActionMode.",
+        "B": "Expected output supports an assertion rather than merely object naming.",
+        "C": "Character describes input validity, not an automatic execution-failure status.",
+        "D": "The expected data must be connected to an actual verification with the intended target."
+      },
+      "lessonSection": "section-424cd3b0ea0b",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "You link a brand-new TestSheet (replacing the old one) to an existing Template. What must you do before Instantiating?",
+      "scenario": "Before replacing the data source or regenerating an existing TemplateInstance, which preparation is appropriate?",
       "options": [
         {
           "id": "A",
-          "text": "Delete the old TemplateInstance folder first."
+          "text": "Inspect the instance’s source and selectors, preserve needed manual edits/evidence, and plan regeneration or replacement deliberately."
         },
         {
           "id": "B",
-          "text": "Nothing extra — Instantiate always overwrites old TemplateInstances automatically."
+          "text": "Always delete the previous instance without examining its contents."
         },
         {
           "id": "C",
-          "text": "Rename the Template."
+          "text": "Only rename the Template."
         },
         {
           "id": "D",
-          "text": "Convert the Template back to a TestCase first."
+          "text": "Convert it back to TestCase as a harmless refresh."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "This step is different from a Re-Instantiate scenario.",
-      "rationale": "When replacing the TestSheet entirely, you must delete the old TemplateInstance folder before Instantiating, to avoid duplicate or stale TestCases."
+      "hint": "Inspect the documented model, data source and generation step.",
+      "rationale": "This reviews the intended generation and preserves useful existing work.",
+      "optionExplanations": {
+        "A": "This reviews the intended generation and preserves useful existing work.",
+        "B": "Deletion can discard useful work/evidence and is not universally required.",
+        "C": "Renaming does not review or change the instance data source.",
+        "D": "Reverse conversion loses template information instead of harmlessly refreshing it."
+      },
+      "lessonSection": "section-fd8f9e06a587",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "The Test Design Specialist just added 2 new rows to the SAME existing TestSheet (didn't replace the file). What is the correct next action?",
+      "scenario": "The linked data combinations changed. How do you regenerate an existing TemplateInstance?",
       "options": [
         {
           "id": "A",
-          "text": "Nothing needs to be done since the TestSheet wasn't replaced."
+          "text": "Assume the existing cases update immediately."
         },
         {
           "id": "B",
-          "text": "Use Re-Instantiate — it refreshes existing TemplateInstances and adds new ones."
+          "text": "Select the intended TemplateInstance and Reinstantiate, after reviewing its source and manual changes."
         },
         {
           "id": "C",
-          "text": "Delete the entire TemplateInstance folder and Instantiate from scratch."
+          "text": "Always delete the entire instance as the only supported method."
         },
         {
           "id": "D",
-          "text": "Manually create the 2 new TestCases by hand."
+          "text": "Hand-create each new case as the only supported method."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "This is the safer, additive option for an amended (not replaced) TestSheet.",
-      "rationale": "Re-Instantiate is designed for exactly this case: an amended existing TestSheet. It refreshes data in existing TemplateInstances and adds any new ones without manual deletion."
+      "hint": "Inspect the documented model, data source and generation step.",
+      "rationale": "The selected existing container is regenerated from its configured source.",
+      "optionExplanations": {
+        "A": "Existing generated cases require generation to reflect model/data changes.",
+        "B": "The selected existing container is regenerated from its configured source.",
+        "C": "Reinstantiate is supported, so deletion is not the only update path.",
+        "D": "The documented generation workflow avoids manually rebuilding every combination."
+      },
+      "lessonSection": "section-1576ef4b3eb4",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "When you link a new TestSheet to a Template that already had one linked, what happens to the old link?",
+      "scenario": "After assigning a TestSheet to a Template, where can you confirm the linked TestCase-Design source type and name?",
       "options": [
         {
           "id": "A",
-          "text": "It's automatically removed when the new TestSheet is linked."
+          "text": "Inspect SchemaName in the Template Properties pane."
         },
         {
           "id": "B",
-          "text": "The Template becomes invalid and must be recreated."
+          "text": "Assume all existing TemplateInstances now use that source without checking."
         },
         {
           "id": "C",
-          "text": "The old TestSheet link must be manually removed first, or the Template will error."
+          "text": "Recreate the entire Template to view the name."
         },
         {
           "id": "D",
-          "text": "Both TestSheets remain linked simultaneously."
+          "text": "Look only at a browser TCP."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Tosca handles this switch automatically.",
-      "rationale": "Linking a new TestSheet automatically removes the link to the previous one — a Template can only have one linked TestSheet at a time."
+      "hint": "Inspect the documented model, data source and generation step.",
+      "rationale": "SchemaName identifies the linked TestCase-Design source type and name.",
+      "optionExplanations": {
+        "A": "SchemaName identifies the linked TestCase-Design source type and name.",
+        "B": "A schema change is not proof that every instance source has changed.",
+        "C": "The property can be inspected without rebuilding the model.",
+        "D": "Browser TCP selection does not identify the linked TestSheet."
+      },
+      "lessonSection": "section-fd8f9e06a587",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "A TestStepValue is already linked to the Attribute 'Email'. You now want to link it instead to a new Attribute, 'Value - Email', from an updated TestSheet. What must you do first?",
+      "scenario": "A TestStepValue uses an old Email XL path. You deliberately want a new mapping. What is a controlled change?",
       "options": [
         {
           "id": "A",
-          "text": "Delete and recreate the entire TestStep."
+          "text": "Delete the entire TestStep as a prerequisite."
         },
         {
           "id": "B",
-          "text": "Nothing — dragging the new Attribute automatically replaces the old link."
+          "text": "Assume a drag operation guarantees the intended new semantic mapping."
         },
         {
           "id": "C",
-          "text": "Rename the TestStepValue first."
+          "text": "Rename the TestStepValue and leave its Value unchanged."
         },
         {
           "id": "D",
-          "text": "Delete the existing Value from the TestStepValue, then drag the new Attribute onto it."
+          "text": "Replace the old expression deliberately, inspect the new XL path and recheck the Template."
         }
       ],
       "correctOptions": [
         "D"
       ],
-      "hint": "A TestStepValue can only hold one link at a time.",
-      "rationale": "A TestStepValue holds only one link at a time. Before linking a new Attribute to a TestStepValue that already has a value from a different Attribute, you must delete the existing Value first — otherwise the new link won't take."
+      "hint": "Inspect the documented model, data source and generation step.",
+      "rationale": "A deliberate expression change and validation addresses the actual mapping.",
+      "optionExplanations": {
+        "A": "The expression can be edited without removing the whole step.",
+        "B": "Generated or dragged paths still need semantic inspection.",
+        "C": "Changing the name alone leaves the old Value expression intact.",
+        "D": "A deliberate expression change and validation addresses the actual mapping."
+      },
+      "lessonSection": "section-fd8f9e06a587",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q6",
       "type": "single-select",
-      "scenario": "What is the correct process to link a TestSheet to a Template?",
+      "scenario": "What is the documented direction for linking a TestSheet to a Template?",
       "options": [
         {
           "id": "A",
@@ -281,13 +282,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "It's a direct drag-and-drop action between the two objects, not a menu selection.",
-      "rationale": "You link a TestSheet to a Template by dragging it from the TestCaseDesign section and dropping it directly onto the Template in the TestCase section — not via Instantiation, a TestSheet-side menu, or the TemplateInstances folder."
+      "hint": "Inspect the documented model, data source and generation step.",
+      "rationale": "Drop the TestSheet directly onto the Template to link the data source.",
+      "optionExplanations": {
+        "A": "This is not the documented TestSheet-to-Template assignment operation.",
+        "B": "Drop the TestSheet directly onto the Template to link the data source.",
+        "C": "The described reverse-side menu is not this documented procedure.",
+        "D": "The target in this schema-assignment procedure is the Template itself."
+      },
+      "lessonSection": "section-fd8f9e06a587",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q7",
       "type": "single-select",
-      "scenario": "Is it necessary to Instantiate a Template?",
+      "scenario": "In the normal Template generation workflow, why create a TemplateInstance?",
       "options": [
         {
           "id": "A",
@@ -295,7 +304,7 @@
         },
         {
           "id": "B",
-          "text": "Yes, because {XL[ ]} References are only translated during Instantiation."
+          "text": "To generate concrete TestCases from the model and its selected data."
         },
         {
           "id": "C",
@@ -309,41 +318,46 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Recall: 'a Template cannot be run as a test itself' — it needs one more step first.",
-      "rationale": "Yes, Instantiation is required. A Template cannot be run as a TestCase on its own — its {XL[ ]} References only get translated into actual, usable values when the Template is Instantiated, which is what produces the real, runnable TestCases in the TemplateInstance folder."
+      "hint": "Inspect the documented model, data source and generation step.",
+      "rationale": "The TemplateInstance contains the generated concrete tests.",
+      "optionExplanations": {
+        "A": "The stated model-generation workflow creates concrete tests before execution.",
+        "B": "The TemplateInstance contains the generated concrete tests.",
+        "C": "Schema linking and instantiation are distinct operations.",
+        "D": "Generation is an explicit model operation, not guaranteed at runtime."
+      },
+      "lessonSection": "section-1576ef4b3eb4",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
     {
-      "key": "Verification Attribute",
-      "value": "Green Attribute — its value is checked against the SUT's actual output, not used as input."
+      "key": "Expected output",
+      "value": "BusinessRelevant = Result supplies expected data; map it to Verify."
     },
     {
-      "key": "Modify workflow",
-      "value": "Resolve refs → edit/add TestSteps → link new TestSheet → verify XL links → add new links manually → Check Template."
+      "key": "Updates",
+      "value": "Review schema, instance source, selectors and manual edits before regeneration."
     },
     {
-      "key": "New TestSheet (replaced)",
-      "value": "Delete old TemplateInstance folder → Instantiate (Ctrl+N, Ctrl+I)."
+      "key": "Reinstantiate",
+      "value": "Repeat generation for the chosen existing instance; do not assume an additive merge."
     },
     {
-      "key": "Amended TestSheet (same file)",
-      "value": "Use Re-Instantiate — refreshes + adds instances, no manual deletion."
-    },
-    {
-      "key": "Auto-linking",
-      "value": "If Attribute/Instance names match old vs new TestSheet, Tosca updates XL links automatically — but verify."
-    },
-    {
-      "key": "Re-linking a TestStepValue",
-      "value": "Delete the existing Value first — a TestStepValue holds only one link at a time."
+      "key": "Mapping",
+      "value": "A composed Value may contain multiple expressions; inspect intended XL references."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 04 - Modifications to Templates",
-      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
-      "duration": "video"
+      "title": "Conditional instantiation and paths",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/combining_templates.htm"
+    },
+    {
+      "title": "Generating and reinstantiating tests",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/instantiating_testcases.htm"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1",
+  "sourceReviewedOn": "2026-10-06"
 }

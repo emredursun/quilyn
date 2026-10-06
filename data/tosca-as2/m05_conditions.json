@@ -13,149 +13,78 @@
       "sectionTitle": "Why Conditions Are Needed",
       "elements": [
         {
-          "type": "analogy",
-          "text": "You want to validate that a green car is automatic and a blue one is manual. If both validations sit in the same TestStep, the TestCase would try to check for BOTH transmissions at once — and always fail, since a single car can't have two competing validations."
-        },
-        {
-          "type": "text",
-          "text": "Conditions solve this: they tell Tosca to apply a validation (or any TestStep/Folder/Value) ONLY when a specific prerequisite is met — e.g., verify the green success message only when a positive quantity was entered, and skip it when a negative one was."
-        },
-        {
-          "type": "concept",
-          "term": "Three levels Conditions can be set on",
-          "description": "Conditions instruct Tosca when to use — or skip — certain elements:",
-          "items": [
-            "TestStepFolder level — the rule applies to running the ENTIRE folder's contents.",
-            "TestStep level — applies to that one TestStep.",
-            "TestStepValue level — applies to just that specific Value."
-          ]
-        },
-        {
-          "type": "text",
-          "text": "Using Conditions well means only ONE Template is needed to cover multiple paths — instead of maintaining several near-duplicate Templates by hand. Changes only need to be made in one place, and they apply automatically to every generated TestCase."
+          "type": "note",
+          "text": "Conditional instantiation controls which model elements are generated for each data combination. It is different from evaluating an IF or WHILE against the live SUT at execution. Supported conditional targets include the Template, TemplateInstance, TestStep folders, TestSteps/XTestSteps and XTestStepValues. Use the narrowest intended scope. Later condition edits require regeneration of existing cases."
         }
       ],
-      "sectionId": "section-b31763ff25da"
+      "sectionId": "section-b31763ff25da",
+      "bulletPoints": []
     },
     {
       "sectionTitle": "Setting a Condition",
       "elements": [
         {
-          "type": "steps",
-          "title": "Add a Condition",
-          "items": [
-            "Make the Condition column visible via the column chooser.",
-            "Drag and drop the relevant Instance from the TestSheet onto the Template's Condition cell for that TestStepFolder/TestStep/TestStepValue.",
-            "By default, the logical statement shown is == (equal to)."
-          ]
-        },
-        {
-          "type": "table",
-          "headers": [
-            "Operator / Statement",
-            "Meaning",
-            "Example"
-          ],
-          "rows": [
-            [
-              "==",
-              "The element must equal this value for Tosca to run the TestStep.",
-              "Instance must be 'Valid' for this TestStep to run."
-            ],
-            [
-              "!=",
-              "Not equal to / everything except — runs for every value EXCEPT the one specified.",
-              "'Take the exam' != 'Teacher' → only students take the exam."
-            ],
-            [
-              "AND",
-              "ALL listed conditions must be met.",
-              "Used when multiple conditions must simultaneously hold."
-            ],
-            [
-              "OR",
-              "ANY ONE of the listed conditions must be met (Tosca's default when combining 2+ conditions).",
-              "Avoid stacking many ORs — it gets hard to read/maintain."
-            ]
-          ]
-        },
-        {
           "type": "note",
-          "text": "Real example from the Payment Process Template: 'Workflow.Payment Method.Credit Card' != \"No Credit Card used\" runs the TestStep for ANY credit card used, using a single != condition instead of one OR per card type — far more business-readable."
-        },
-        {
-          "type": "warning",
-          "text": "Prefer != over stacking many OR conditions. Piling up several OR layers to cover 'everything except X' makes the Condition set hard to read and maintain — a single != achieves the same result more simply."
-        },
-        {
-          "type": "note",
-          "text": "How to tell if an element already has a Condition set: check whether its icon has changed in the Navigation pane — Tosca visually marks TestStepFolders, TestSteps, and TestStepValues that carry a Condition, so you don't have to open each one to check."
+          "text": "Add Condition through Column Chooser or edit the property. Link the Template to its data source first. Dragging an ordinary Instance into a Condition creates an equality comparison; inspect the generated expression. Attribute conditions default to a non-null check, with special handling for NULL and EMPTY Instances. Use == for equality and != for inequality; && combines required clauses and || accepts either clause. Do not rely on an assumed default OR. Quoted strings and valid source paths matter. A != exclusion also accepts other unexpected values, so use it only when the intended domain makes that safe. Numeric comparison should use the documented numeric syntax or conversion. Dotted icon outlines indicate condition-based instantiation."
         }
       ],
-      "sectionId": "section-3036fd8bd515"
+      "sectionId": "section-3036fd8bd515",
+      "bulletPoints": []
     },
     {
       "sectionTitle": "After Setting Conditions",
       "elements": [
         {
-          "type": "steps",
-          "title": "Final steps",
-          "items": [
-            "Use Check Template to catch any errors in the newly added Conditions/links.",
-            "Re-Instantiate the Template.",
-            "You now have a complete, working set of TestCases ready for testing."
-          ]
+          "type": "note",
+          "text": "Run Check Template, inspect the selected instance source and manual changes, then regenerate. Inspect which cases and steps were actually generated and trial-run meaningful valid/negative paths. Generation and schema checking alone do not certify a complete working test set."
         }
       ],
-      "sectionId": "section-2f482cad9bcb"
+      "sectionId": "section-2f482cad9bcb",
+      "bulletPoints": []
     },
     {
-      "sectionTitle": "Hands-On: Exercise 5 — Set Conditions and Instantiate",
+      "sectionTitle": "Independent Practice: Conditional Payment Paths",
       "elements": [
         {
           "type": "note",
-          "text": "📄 AS2 Exercise 5 — Set Conditions and Instantiate — Official Tricentis Academy course material, not redistributed here. Access it inside the official course: https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2/lessons/2284/automation-specialist-level-2-introduction"
+          "text": "Independent practice: synthetic payment data includes a controlled non-null domain of Visa, MasterCard and No Credit Card used. Compare a deliberate exclusion with an explicit allowed-value condition, inspect generated subsets and their assertions. Original Academy payment exercise material was inaccessible and remains unverified."
         }
       ],
-      "sectionId": "section-0686d6ab8e6c"
+      "sectionId": "section-0686d6ab8e6c",
+      "bulletPoints": []
     }
   ],
   "examPitfalls": [
     {
-      "title": "Overusing OR conditions instead of !=",
-      "trapDescription": "Candidates stack many OR conditions to express 'run for everything except this one value', producing a long, unreadable Condition set.",
-      "bestPractice": "Use the != operator to express 'run for everything except X' in one simple, business-readable condition, instead of many ORs."
+      "title": "Generation and execution conditions differ",
+      "trapDescription": "Expecting a generation condition to inspect live runtime state.",
+      "bestPractice": "Use conditional instantiation for model/data selection and runtime IF/loops for runtime branching."
     },
     {
-      "title": "Setting a Condition at the wrong level",
-      "trapDescription": "Learners set a Condition on a whole TestStepFolder when they only meant to gate a single Value (or vice versa), unintentionally skipping unrelated steps.",
-      "bestPractice": "Match the Condition level to its intended scope: TestStepFolder gates the whole folder's contents; TestStepValue gates just that one value."
+      "title": "Exclusion is broader than an allowlist",
+      "trapDescription": "Using != as a universal substitute for listing allowed values.",
+      "bestPractice": "Check the complete domain, including missing or unexpected values."
     },
     {
-      "title": "Forgetting the two post-modification steps",
-      "trapDescription": "After adding Conditions, candidates run the TestCases without first validating and refreshing them.",
-      "bestPractice": "Always run Check Template, then Re-Instantiate, after any Template modification — including adding Conditions."
+      "title": "Scope changes generated structure",
+      "trapDescription": "Gating a whole folder when only one value should vary.",
+      "bestPractice": "Use the intended object scope and inspect generated steps."
     },
     {
-      "title": "Not knowing how to spot an existing Condition",
-      "trapDescription": "Candidates open every TestStepFolder/TestStep/TestStepValue one by one to check whether a Condition was already set.",
-      "bestPractice": "Tosca changes the icon of any element that carries a Condition — glance at the Navigation pane instead of opening each element individually."
-    },
-    {
-      "title": "A trailing space in the Property Name breaks the match",
-      "trapDescription": "When setting up a verification TestStepValue (e.g. for 'Wrong Password' or 'Wrong Email Error'), typing the property name with an invisible trailing space — \"InnerText \" instead of \"InnerText\" — makes ScratchBook fail with 'The property \"InnerText \" was not found.', even though the name looks correct at a glance.",
-      "bestPractice": "If a Verify TestStepValue fails with 'The property \"X\" was not found', re-type the property Name field from scratch instead of trusting what's visually there — a stray leading/trailing space is invisible but breaks the exact-string match Tosca uses to look up the property on the scanned Module."
+      "title": "Validation does not certify execution",
+      "trapDescription": "Declaring the generated set working before assertions run.",
+      "bestPractice": "Validate the model, regenerate and trial-run the intended outcomes."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "At which THREE levels can Conditions be set in a Template? (choose the option listing all three correctly)",
+      "scenario": "Which listed group contains supported scopes within a Template for conditional instantiation (not an exhaustive list)?",
       "options": [
         {
           "id": "A",
-          "text": "TestStepFolder, TestStep, and TestStepValue level."
+          "text": "TestStepFolder, TestStep and XTestStepValue."
         },
         {
           "id": "B",
@@ -174,12 +103,20 @@
         "A"
       ],
       "hint": "These are the three levels of granularity inside a Template.",
-      "rationale": "Conditions can be set at TestStepFolder level (gates the whole folder), TestStep level, or TestStepValue level (gates just that value)."
+      "rationale": "These are supported targets; the Template and TemplateInstance are also supported. These conditions choose generated elements, not runtime IF branches.",
+      "optionExplanations": {
+        "A": "These are supported internal scopes, though other targets are also supported.",
+        "B": "These are not the listed internal Template scopes for conditional instantiation.",
+        "C": "Module scanning and source design objects are not this set of Template targets.",
+        "D": "The mechanism is not limited to the TestCase itself."
+      },
+      "lessonSection": "section-b31763ff25da",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "You want a TestStep to run for every credit card type EXCEPT when no card is used at all. Which is the best-practice Condition?",
+      "scenario": "A controlled, non-null payment domain contains only Visa, MasterCard and No Credit Card used. Which compact condition includes the two card choices during generation?",
       "options": [
         {
           "id": "A",
@@ -202,12 +139,20 @@
         "D"
       ],
       "hint": "A single != is simpler and more business-readable than many ORs.",
-      "rationale": "Using != lets you express 'run for anything except this one case' in a single, readable condition, avoiding a long chain of OR statements for every possible card type."
+      "rationale": "Within this explicitly limited domain, excluding the sentinel selects the two intended card choices. Outside that domain, != can include unintended values.",
+      "optionExplanations": {
+        "A": "A brand-by-brand enumeration is unnecessary for the controlled domain stated.",
+        "B": "Without a condition the sentinel combination is not excluded here.",
+        "C": "This incomplete OR text is not the single compact exclusion requested.",
+        "D": "Excluding the sentinel selects the two card values in this explicitly limited domain."
+      },
+      "lessonSection": "section-3036fd8bd515",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "When multiple Conditions are added to the same TestStep, what logical statement does Tosca apply by default?",
+      "scenario": "What does the explicit logical operator || mean in a conditional-instantiation expression?",
       "options": [
         {
           "id": "A",
@@ -230,7 +175,15 @@
         "C"
       ],
       "hint": "It's the more permissive of the two common logical operators.",
-      "rationale": "By default, Tosca sets the logical statement to OR when more than one condition is added to a TestStep — meaning any single one of them being true is enough."
+      "rationale": "OR accepts either clause; it is not a claim that Tosca always inserts OR when multiple conditions are added.",
+      "optionExplanations": {
+        "A": "NOT negates a clause rather than accepting either.",
+        "B": "AND requires both clauses, unlike the operator asked about.",
+        "C": "OR accepts either clause, including the case where both hold.",
+        "D": "XOR requires exactly one true clause and is not the meaning of ||."
+      },
+      "lessonSection": "section-3036fd8bd515",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
@@ -258,12 +211,20 @@
         "D"
       ],
       "hint": "It's a standard Tosca grid customization step.",
-      "rationale": "You must first make the Condition column visible via the column chooser before you can drag and drop Instances into it."
+      "rationale": "You must first make the Condition column visible via the column chooser before you can drag and drop Instances into it.",
+      "optionExplanations": {
+        "A": "XL expressions are values, not the Condition grid column.",
+        "B": "RequirementSet is unrelated to adding this column.",
+        "C": "The property is another edit location, but the question asks about the grid.",
+        "D": "Column Chooser makes Condition available in the Details grid."
+      },
+      "lessonSection": "section-3036fd8bd515",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "After adding new Conditions to a Template, what two steps should you do before the TestCases are ready to use?",
+      "scenario": "After changing a generation condition, what should you do before trial-running the updated generated cases?",
       "options": [
         {
           "id": "A",
@@ -271,7 +232,7 @@
         },
         {
           "id": "B",
-          "text": "Run Check Template, then Re-Instantiate."
+          "text": "Check the model, review the instance’s source/manual edits, and regenerate it."
         },
         {
           "id": "C",
@@ -286,7 +247,15 @@
         "B"
       ],
       "hint": "Same 2-step pattern used after any Template modification.",
-      "rationale": "As with any Template change, you must Check Template to catch errors, then Re-Instantiate so the Conditions actually take effect in the generated TestCases."
+      "rationale": "The existing generated set must be refreshed deliberately; schema validation alone does not prove successful runtime behavior.",
+      "optionExplanations": {
+        "A": "Reverse conversion loses model information and is unnecessary here.",
+        "B": "Model checking and deliberate regeneration refresh the concrete set before trial execution.",
+        "C": "Existing generated cases do not automatically adopt the edited condition.",
+        "D": "Deleting the data source discards useful structure rather than applying the change."
+      },
+      "lessonSection": "section-2f482cad9bcb",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q6",
@@ -295,7 +264,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Its icon changes in the Navigation pane."
+          "text": "Its condition-based instantiation icon has a dotted outline."
         },
         {
           "id": "B",
@@ -314,80 +283,81 @@
         "A"
       ],
       "hint": "It's a visual, at-a-glance indicator in the tree, not a popup or text change.",
-      "rationale": "Tosca changes the icon of any TestStepFolder, TestStep, or TestStepValue that carries a Condition, so you can spot conditioned elements directly in the Navigation pane without opening each one."
+      "rationale": "The current documentation shows dotted outlines for objects instantiated through conditions.",
+      "optionExplanations": {
+        "A": "Dotted outlines identify condition-based instantiation in the documented UI.",
+        "B": "There is a documented visual indicator.",
+        "C": "Bold usage marks are not the documented condition indicator.",
+        "D": "A notification for each condition is not the described mechanism."
+      },
+      "lessonSection": "section-3036fd8bd515",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q7",
       "type": "single-select",
-      "scenario": "A Verify TestStepValue fails in the ScratchBook with the Loginfo: 'The property \"InnerText \" was not found.' The Name field visually looks correct. What is the most likely cause?",
+      "scenario": "What distinguishes a Template instantiation Condition from an execution-time IF condition?",
       "options": [
         {
           "id": "A",
-          "text": "The Condition column is not visible."
+          "text": "Instantiation Conditions continually inspect live UI state at runtime."
         },
         {
           "id": "B",
-          "text": "The TestStepValue's ActionMode should be 'Input' instead of 'Verify'."
+          "text": "They are exactly the same mechanism with different colors."
         },
         {
           "id": "C",
-          "text": "An invisible leading or trailing space in the property Name field, breaking the exact-string match."
+          "text": "Instantiation Conditions select model elements using source data during generation; runtime IF branches during execution."
         },
         {
           "id": "D",
-          "text": "The Module was never scanned and doesn't exist at all."
+          "text": "Instantiation Conditions can only be used on ExecutionLists."
         }
       ],
       "correctOptions": [
         "C"
       ],
-      "hint": "Notice the space right before the closing quote in the error message itself.",
-      "rationale": "Tosca matches property names as exact strings. A stray space (like 'InnerText ' instead of 'InnerText') is invisible in the UI but causes an exact 'property not found' error — retype the Name field from scratch to fix it."
+      "hint": "Ask when the condition is evaluated and what data it uses.",
+      "rationale": "A generation condition determines the concrete model created; runtime branching is a separate TestCase mechanism.",
+      "optionExplanations": {
+        "A": "Live-UI evaluation describes runtime behavior, not data-based generation selection.",
+        "B": "The evaluation phase and purpose differ, not merely appearance.",
+        "C": "Generation conditions choose concrete structure; execution IF chooses the runtime branch.",
+        "D": "Supported targets include Templates and their internal model elements."
+      },
+      "lessonSection": "section-b31763ff25da",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
     {
-      "key": "Why Conditions",
-      "value": "Let ONE Template cover multiple test paths without competing/contradictory validations."
+      "key": "Phase",
+      "value": "Conditional instantiation chooses generated structure, distinct from execution-time IF."
     },
     {
-      "key": "3 levels",
-      "value": "TestStepFolder, TestStep, TestStepValue."
+      "key": "Scope",
+      "value": "Template, TemplateInstance and supported internal folders/steps/values can carry conditions."
     },
     {
-      "key": "Set a Condition",
-      "value": "Show Condition column (column chooser) → drag & drop Instance from TestSheet."
+      "key": "Logic",
+      "value": "&& means AND and || means OR; inspect the complete expression and domain."
     },
     {
-      "key": "==",
-      "value": "Default operator — element must equal the value."
-    },
-    {
-      "key": "!=",
-      "value": "Not equal to / everything except — avoids stacking many ORs."
-    },
-    {
-      "key": "AND / OR",
-      "value": "AND = all must be true; OR = any one is enough (Tosca's default for 2+ conditions)."
-    },
-    {
-      "key": "After adding Conditions",
-      "value": "Check Template → Re-Instantiate."
-    },
-    {
-      "key": "Spotting a Condition",
-      "value": "The element's icon changes in the Navigation pane — no need to open each one."
-    },
-    {
-      "key": "\"Property not found\" error",
-      "value": "Often an invisible trailing/leading space in the Name field — retype it instead of trusting how it looks."
+      "key": "Validation",
+      "value": "Check, regenerate deliberately, inspect the subset and trial-run assertions."
     }
   ],
   "topics": [
     {
-      "title": "Lesson 05 - Conditions",
-      "url": "https://academy.tricentis.com/learn/courses/568/tricentis-tosca-fundamentals-optimizing-test-automation-with-centralized-test-data-as2",
-      "duration": "video"
+      "title": "Conditional instantiation and paths",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/combining_templates.htm"
+    },
+    {
+      "title": "Generating and reinstantiating tests",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tosca_commander/instantiating_testcases.htm"
     }
-  ]
+  ],
+  "platformVersion": "Tosca On-Premises 2026.1",
+  "sourceReviewedOn": "2026-10-06"
 }

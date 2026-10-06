@@ -939,3 +939,15 @@ test('AS2 template review covers broader validation and explicit regeneration wi
  assert.match(docs[1].studyGuide[2].elements[0].text,/Completed is not listed/);
  docs.forEach(d=>assert.doesNotMatch(JSON.stringify(d),/ONLY checks that the links exist|only validates that XL references exist|exactly ONE Template|Undo ONLY before|BEFORE the project is saved/i));
 });
+
+test('AS2 modification and conditions distinguish generation, safe updates and runtime branching',()=>{
+ const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
+ const docs=['m04_modifications_to_templates.json','m05_conditions.json'].map((file,n)=>{const bytes=fs.readFileSync('data/tosca-as2/'+file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,(n?[['A'],['D'],['C'],['D'],['B'],['A'],['C']]:[['D'],['A'],['B'],['A'],['D'],['B'],['B']])[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});return d;});
+ assert.match(docs[0].studyGuide[0].elements[0].text,/property alone does not change.*ActionMode/);
+ assert.match(docs[0].studyGuide[1].elements[0].text,/deleting.*not a universal prerequisite/i);
+ assert.match(docs[0].studyGuide[2].elements[0].text,/not a guaranteed additive merge/);
+ assert.match(docs[1].practiceQuiz[1].scenario,/controlled, non-null/);
+ assert.match(docs[1].practiceQuiz[2].scenario,/explicit logical operator/);
+ assert.match(docs[1].practiceQuiz[6].options[2].text,/during generation.*during execution/);
+ docs.forEach(d=>assert.doesNotMatch(JSON.stringify(d),/delete the OLD TemplateInstance|holds only one link|safer, additive option|Tosca's default for 2\+ conditions/));
+});
