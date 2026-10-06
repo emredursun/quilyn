@@ -21,7 +21,7 @@
         {
           "type": "concept",
           "term": "Base URL",
-          "description": "Each project/test has a base URL — the starting address the AUT browser opens before a recording or run begins. Getting the base URL right (and open) is a prerequisite for actions like Reassign and Improve on a target element, which need the AUT browser open at that URL to let you re-select an element."
+          "description": "The project default base URL initializes new tests; an individual test can use another URL. It is the starting AUT address, not the editor address. For target editing, open the AUT and reach the relevant test state; opening only the initial page may not expose a later target."
         }
       ],
       "bulletPoints": [
@@ -36,7 +36,7 @@
         {
           "type": "concept",
           "term": "Running from the editor",
-          "description": "Clicking Play in the editor's toolbar opens a new browser and runs the currently open test's actions against the AUT. This is the fastest feedback loop while actively building or editing a single test."
+          "description": "The editor runs the open test locally or on a configured remote grid. Use the Play dropdown for Run on grid and choose the applicable configuration. Local editor playback uses Chrome; a single grid run is distinct from a cross-browser matrix."
         },
         {
           "type": "concept",
@@ -45,13 +45,13 @@
         },
         {
           "type": "note",
-          "text": "Local runs are limited to the Chrome browser. Running on other browsers (Firefox, Safari, Edge) or in parallel requires the CLI or Scheduler rather than a plain editor/Test List run — this becomes important later in the 'Executing tests across multiple browsers' module."
+          "text": "Local web playback uses Chrome. The editor also supports a single remote grid run. Use the documented CLI or Scheduler workflow for a cross-browser matrix with suitable grid configurations."
         }
       ],
       "bulletPoints": [
-        "Editor Play = fastest loop for the single test you're currently editing.",
-        "Test List Play = run a selected batch of tests locally in one go.",
-        "Local runs are Chrome-only; other browsers need the CLI/Scheduler."
+        "Editor playback supports local Chrome or a configured remote grid run.",
+        "Test List local batch playback uses Chrome.",
+        "CLI/Scheduler workflows provide configured cross-browser matrix execution."
       ],
       "sectionId": "section-33d99048f399"
     },
@@ -61,27 +61,27 @@
         {
           "type": "concept",
           "term": "Why validations matter",
-          "description": "A recording by itself only proves the AUT can be clicked through without crashing — it does not verify the application behaved correctly. Validation steps turn a recording into a real test by asserting specific, expected outcomes."
+          "description": "Successful action replay establishes that those steps executed, not every business outcome or overall application health. Add assertions at meaningful outcomes; a click-through recording alone does not establish correctness."
         },
         {
           "type": "concept",
           "term": "Core validation types",
-          "description": "Validate element visible checks that an expected element is present on the page. Validate element text checks that a specific text value appears in a specified element (Testim supports Regex in the Expected Value field). Validate element not visible checks the opposite — that an element has disappeared, e.g. after closing a modal."
+          "description": "Visible checks element existence and visibility, not its specific content. Text checks the chosen element’s expected content and supports Regex in Expected Value. The documented not-visible step is web-only: it asserts absence from view, not necessarily removal from the DOM."
         },
         {
           "type": "list",
           "title": "Adding a validation step",
           "items": [
-            "Hover over the arrow where you want to insert the step.",
-            "Click the predefined-steps icon ('M') and choose Validations.",
-            "Pick the validation type and target the element/text to check."
+            "Reach the relevant AUT state, using a breakpoint and playback when needed.",
+            "At the insertion arrow, open predefined steps (M), then Validations.",
+            "Select the supported validation and target; set expected text where applicable, remove the breakpoint and run to check the result."
           ]
         }
       ],
       "bulletPoints": [
-        "A recording without validations only proves 'nothing crashed', not 'the app behaved correctly'.",
-        "Validate element visible / not visible / text are the three foundational validation steps.",
-        "Element Text validation supports Regex for flexible expected-value matching."
+        "Replay success does not establish all business outcomes.",
+        "Visibility, text and web-only not-visible checks assert different properties.",
+        "Expected Value supports Regex; choose matching criteria for the required outcome."
       ],
       "sectionId": "section-5e51b357ff37"
     }
@@ -95,7 +95,7 @@
     {
       "title": "Expecting a Test List run to cover cross-browser coverage",
       "trapDescription": "Assuming that running tests from the Test List exercises multiple browsers automatically.",
-      "bestPractice": "Local runs (editor and Test List) are Chrome-only. Cross-browser execution requires the CLI or Scheduler, which is covered in its own module later in this path."
+      "bestPractice": "Test List local runs use Chrome. The editor can also run a single test on a configured grid; CLI/Scheduler provide the documented cross-browser matrix workflow."
     }
   ],
   "practiceQuiz": [
@@ -125,7 +125,15 @@
         "B"
       ],
       "hint": "Think about what the AUT browser needs before it can record or run anything.",
-      "rationale": "The base URL is the address the AUT browser opens before recording or running begins — it's a prerequisite for actions like Reassign/Improve on a target element too, since those need the AUT open at that URL."
+      "rationale": "The project default initializes the starting AUT URL for new tests; individual tests can override it. Target editing also requires the relevant application state, which may need playback beyond the starting page.",
+      "optionExplanations": {
+        "A": "The base URL directs the AUT, not licensing alone.",
+        "B": "It defines the starting AUT address; individual tests may override the project default.",
+        "C": "It is the application address, not the visual editor address.",
+        "D": "A usable application starting URL is needed for the recording workflow."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-4503db72f695"
     },
     {
       "questionId": "Q2",
@@ -152,8 +160,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Not crashing is not the same as being correct.",
-      "rationale": "A recording without validations only proves the flow replays without crashing. A Validate element text (or element visible) step is needed to actually assert that the expected outcome — the confirmation message — appeared."
+      "hint": "Action replay alone does not assert the required confirmation content.",
+      "rationale": "Add a text assertion for the expected confirmation message. Successful replay alone does not establish that business outcome; target reassignment or CLI setup does not supply the missing assertion.",
+      "optionExplanations": {
+        "A": "Replay without the required outcome assertion is incomplete coverage.",
+        "B": "Text validation asserts the required confirmation content.",
+        "C": "Reassign changes the target; it does not assert the confirmation message.",
+        "D": "CLI configuration does not itself add the missing content assertion."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-5e51b357ff37"
     },
     {
       "questionId": "Q3",
@@ -180,8 +196,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Cross-browser runs need a different mechanism entirely.",
-      "rationale": "Local runs — whether from the editor or the Test List — are limited to Chrome. Running on other browsers requires the CLI or Scheduler, not a local Test List run."
+      "hint": "The question specifies local Test List playback, not an editor grid run.",
+      "rationale": "The documented local Test List batch workflow uses Chrome. The editor supports a separate single grid run, while CLI/Scheduler workflows provide cross-browser matrix execution.",
+      "optionExplanations": {
+        "A": "Local Test List playback does not select any installed browser.",
+        "B": "The documented local batch workflow runs in Chrome.",
+        "C": "Firefox/Safari grid configurations are not this local batch workflow.",
+        "D": "The local playback browser is not determined by the recording browser."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-33d99048f399"
     },
     {
       "questionId": "Q4",
@@ -208,30 +232,38 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Visible checks presence; Text checks presence AND content.",
-      "rationale": "Validate element text is like Validate element visible but additionally checks that a specific text value appears in the element, and Testim supports Regex in the Expected Value field for flexible matching."
+      "hint": "Visibility does not validate the element’s specific text.",
+      "rationale": "Text validation checks the required content of a chosen element and permits Regex matching. Visible validates existence and visibility without checking that content; not-visible and CSS checks assert different properties.",
+      "optionExplanations": {
+        "A": "Visible already checks element existence and visibility.",
+        "B": "Text validation checks the chosen element’s content, including supported Regex criteria.",
+        "C": "Absence from view is a not-visible check, not the added text assertion.",
+        "D": "A CSS-class assertion is a different validation."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-5e51b357ff37"
     }
   ],
   "quickRecap": [
     {
       "key": "Base URL",
-      "value": "Where the AUT browser starts for recording and running — a prerequisite for Reassign/Improve too."
+      "value": "Project defaults initialize new tests; individual URLs can differ. Reach the relevant AUT state for target editing."
     },
     {
       "key": "Editor Play",
-      "value": "Fastest feedback loop for the single test currently open."
+      "value": "Run the open test locally in Chrome or on a configured remote grid."
     },
     {
       "key": "Test List Play",
-      "value": "Run a selected batch of tests locally in one go (Ctrl/Cmd-click to multi-select)."
+      "value": "Selected web tests can run locally as a Chrome batch."
     },
     {
       "key": "Local run limitation",
-      "value": "Chrome only — cross-browser needs CLI or Scheduler."
+      "value": "A single editor grid run is supported; CLI/Scheduler provide cross-browser matrix workflows."
     },
     {
       "key": "Core validations",
-      "value": "Validate element visible / not visible / text — turn a recording into an actual assertion-based test."
+      "value": "Visible asserts existence and visibility; text asserts content; documented not-visible is web-only."
     }
   ],
   "topics": [
@@ -249,6 +281,43 @@
       "title": "Validation (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/index.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Index (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/recording-tests/how-to-record-a-test/index.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Editing target element properties (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/editing-your-tests/editing-target-element-properties.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Run multiple tests locally (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/run-multiple-tests-locally.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Running tests on multiple browsers (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/running-tests-on-multiple-browsers.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Validate element visible (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/validate-element-visible.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Validate element not visible (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/validate-element-not-visible.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Validate element text (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/validations/validate-element-text.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }

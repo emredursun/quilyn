@@ -1310,3 +1310,20 @@ test('mobile orchestration review distinguishes Agent matching, isolated devices
  assert.match(d.studyGuide[3].elements[0].description,/Fixed device assignment.*not a DEX\/Cloud prerequisite/);
  assert.doesNotMatch(JSON.stringify(d),/dynamic device allocation.*prerequisites|Nothing is consumed or disabled|console.*is gone|blocks every other run/);
 });
+
+test('Testim recording review scopes locator resilience and preserves reviewed question evidence',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m00_creating_first_codeless_test.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].description,/does not guarantee.*correct target/);
+ assert.match(d.studyGuide[1].elements[1].text,/Improve.*existing target.*Reassign.*different target/);
+ assert.doesNotMatch(JSON.stringify(d),/starting point of every test|run top-to-bottom|instead of failing outright|genuinely maintainable/);
+});
+
+test('Testim fundamentals review distinguishes editor grid playback, local Chrome and assertion semantics',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m01_fundamentals_creating_automated_tests.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[1].description,/default base URL initializes new tests/);
+ assert.match(d.studyGuide[1].elements[0].description,/Run on grid/);
+ assert.match(d.studyGuide[2].elements[1].description,/existence and visibility.*web-only.*not necessarily removal from the DOM/);
+ assert.doesNotMatch(JSON.stringify(d),/other browsers need the CLI\/Scheduler|only proves.*crash|Visible checks presence; Text checks presence/);
+});

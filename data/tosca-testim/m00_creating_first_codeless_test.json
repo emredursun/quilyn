@@ -4,13 +4,13 @@
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/1296/creating-your-first-codeless-test-in-tricentis-testim",
   "learningObjectives": [
     "Explain how a codeless test is created in Testim by recording actions in the AUT browser.",
-    "Describe how Testim's Smart Locators identify elements so tests survive UI changes.",
+    "Explain weighted element identification and the limits of Smart Locator resilience.",
     "Explain how a recorded test is saved and how its results are viewed after a run."
   ],
   "estTime": "9 min",
   "studyGuide": [
     {
-      "sectionTitle": "Recording: the starting point of every test",
+      "sectionTitle": "Creating a basic test by recording",
       "elements": [
         {
           "type": "concept",
@@ -20,11 +20,11 @@
         {
           "type": "concept",
           "term": "Steps",
-          "description": "Each recorded action becomes a step, shown as a box in the test procedure with an icon in its upper-left corner indicating the action type (click, enter text, scroll, etc.). Steps run top-to-bottom in the order they were recorded, and can be reordered, edited, or deleted afterward."
+          "description": "Recorded actions appear as individual steps with action-type icons. Execution follows the configured sequence; edit the test as needed rather than assuming the original recording order is permanent."
         },
         {
           "type": "note",
-          "text": "'Codeless' means no scripting is required to produce a working automated test from a recording — but every step remains editable afterward, including adding validations, which is where the later 'editing tests' skills come in."
+          "text": "The basic recording workflow needs no user-written script. Add outcome validations and edit supported step properties or sequence when the test requires them."
         }
       ],
       "bulletPoints": [
@@ -34,21 +34,21 @@
       "sectionId": "section-0ba3f85359d5"
     },
     {
-      "sectionTitle": "Smart Locators: why the test doesn't break on every UI change",
+      "sectionTitle": "Smart Locators and identification resilience",
       "elements": [
         {
           "type": "concept",
           "term": "Smart Locators",
-          "description": "When an element is selected during recording, Testim's algorithm analyzes potentially hundreds of attributes associated with that element and assigns weights to them to uniquely identify it. These weighted attributes are the element's Locators. Smart Locators also learn with each test run — if some attributes change, Testim falls back to other still-valid attributes instead of failing outright."
+          "description": "Testim identifies targets using many weighted attributes and can improve identification across runs. Other useful attributes may preserve a match after a change, but resilience does not guarantee success or the correct target in every changed UI."
         },
         {
           "type": "note",
-          "text": "This is the mechanism that lets a test survive normal UI churn (a class name changing, a button being restyled) without needing to be re-recorded every time — it's what makes the tests genuinely maintainable rather than brittle."
+          "text": "Inspect the actual target and asserted outcome after UI changes. Improve updates identification of the existing target; Reassign selects a different target and replaces its locators. Neither replaces business-result validations."
         }
       ],
       "bulletPoints": [
-        "Testim inspects hundreds of attributes per element and weights them to build a Locator.",
-        "Smart Locators adapt across runs, reducing false failures from minor UI changes."
+        "Weighted attributes help identify elements and adapt to changes.",
+        "Validate target correctness; locator resilience is not a guarantee."
       ],
       "sectionId": "section-e77fc53f4655"
     },
@@ -58,17 +58,17 @@
         {
           "type": "concept",
           "term": "Saving",
-          "description": "A recorded test is saved into the project's Test Library, where it can be organized into folders, labeled, and re-run at any time — locally, from the editor, from the CLI, or on a schedule."
+          "description": "Save the named test in the project library. Editor, CLI and scheduling provide different execution paths; available configuration and permissions still govern a run."
         },
         {
           "type": "concept",
           "term": "Viewing results",
-          "description": "After a run, Testim reports pass/fail per step and per test, and surfaces the reason a step failed (e.g. element not found, element not visible) so you can diagnose without re-watching a full manual re-run."
+          "description": "Inspect executed-step statuses and available error details, including expected and actual validation values. Failure evidence supports diagnosis but is not a guarantee that the root cause is already identified."
         }
       ],
       "bulletPoints": [
-        "Saved tests live in the Test Library and can be re-run from the editor, CLI, or a schedule.",
-        "Results show pass/fail per step, with the failure reason surfaced for quick diagnosis."
+        "Save the test and choose an appropriate execution path.",
+        "Review step statuses and error evidence to investigate a failed run."
       ],
       "sectionId": "section-0132ea34c8d3"
     }
@@ -77,19 +77,19 @@
     {
       "title": "Assuming 'codeless' means 'unchangeable'",
       "trapDescription": "Treating a recorded test as a fixed artifact that must be re-recorded from scratch whenever it needs a change.",
-      "bestPractice": "Every recorded step remains fully editable afterward — properties, target elements, validations, and step order can all be changed without re-recording the whole test."
+      "bestPractice": "Edit supported step properties and targets, add validations or change sequence as needed; a small change need not require a new whole recording."
     },
     {
-      "title": "Not trusting Smart Locators to survive minor UI changes",
-      "trapDescription": "Assuming any DOM or styling change will break a recorded test, and re-recording pre-emptively.",
-      "bestPractice": "Smart Locators weight many attributes and adapt across runs specifically so small UI changes don't require a full re-record — use Improve on the target element if a locator genuinely needs refreshing (see the 'How to edit tests' module)."
+      "title": "Treating locator resilience as guaranteed correctness",
+      "trapDescription": "Assuming every changed UI will still pass with the correct target.",
+      "bestPractice": "Check target identification and outcome assertions. Improve refreshes the existing target; Reassign selects a different one. Inspect failures rather than automatically trusting or replacing every locator."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "How does Testim create a codeless test?",
+      "scenario": "In the documented basic recording workflow, how is a codeless test created?",
       "options": [
         {
           "id": "A",
@@ -112,7 +112,15 @@
         "B"
       ],
       "hint": "Think about what 'recording' means here.",
-      "rationale": "Creating a test starts with recording the actions taken in the AUT browser; each action becomes a step in the test procedure. No manual scripting, document import, or chatbot description is required for this basic flow."
+      "rationale": "Creating a test starts with recording the actions taken in the AUT browser; each action becomes a step in the test procedure. No manual scripting, document import, or chatbot description is required for this basic flow.",
+      "optionExplanations": {
+        "A": "The basic workflow does not require users to review Selenium scripts.",
+        "B": "Recording AUT actions produces editable steps.",
+        "C": "Automatic manual-document conversion is not this recording workflow.",
+        "D": "A chatbot description is not required for basic recording."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-0ba3f85359d5"
     },
     {
       "questionId": "Q2",
@@ -125,7 +133,7 @@
         },
         {
           "id": "B",
-          "text": "To uniquely identify an element using many weighted attributes, so the test keeps finding it even after minor UI changes."
+          "text": "To identify a target using weighted attributes and help maintain identification as attributes change."
         },
         {
           "id": "C",
@@ -140,7 +148,15 @@
         "B"
       ],
       "hint": "It's about resilience to change, not speed or translation.",
-      "rationale": "Smart Locators analyze potentially hundreds of attributes per element, weight them, and adapt across runs — so if some attributes change, the element can still be found using others. This is what keeps tests from breaking on every small UI tweak."
+      "rationale": "Weighted attributes support resilient element identification. Changing attributes may still leave useful matching evidence; this does not guarantee every changed UI succeeds or that outcome assertions are unnecessary.",
+      "optionExplanations": {
+        "A": "Element analysis is central to weighted identification.",
+        "B": "Weighted attributes support target identification without guaranteeing every changed UI succeeds.",
+        "C": "Locators identify elements rather than translate programming languages.",
+        "D": "Their purpose is identification, not step documentation generation."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-e77fc53f4655"
     },
     {
       "questionId": "Q3",
@@ -168,7 +184,15 @@
         "B"
       ],
       "hint": "Each box maps 1:1 to a recorded action.",
-      "rationale": "Each box represents a step in the test procedure, with an icon in the upper-left corner indicating the type of action (click, enter text, scroll, etc.). It is not a separate test, a folder, or a user account."
+      "rationale": "Each box represents a step in the test procedure, with an icon in the upper-left corner indicating the type of action (click, enter text, scroll, etc.). It is not a separate test, a folder, or a user account.",
+      "optionExplanations": {
+        "A": "A step belongs to a test; it is not itself a separate test case.",
+        "B": "The box represents a step and its icon identifies the action type.",
+        "C": "A procedure step is not a library folder.",
+        "D": "The icon describes an action, not the recording user account."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-0ba3f85359d5"
     },
     {
       "questionId": "Q4",
@@ -196,25 +220,33 @@
         "B"
       ],
       "hint": "Diagnosis works at the step level, not just the whole-test level.",
-      "rationale": "Testim reports pass/fail per step and per test and surfaces the failure reason (e.g. element not found, element not visible), letting you diagnose without a full manual re-run."
+      "rationale": "Executed-step status and available failure details support investigation. A validation error may include expected and actual values; those details are evidence, not a guaranteed complete root-cause analysis.",
+      "optionExplanations": {
+        "A": "Available step detail goes beyond a whole-test flag.",
+        "B": "Step status and failure evidence help diagnose the run.",
+        "C": "A human manual replay video is not the documented failure-detail mechanism.",
+        "D": "Results provide evidence without requiring a manual replay for every failure."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-0132ea34c8d3"
     }
   ],
   "quickRecap": [
     {
       "key": "Recording",
-      "value": "Actions taken in the AUT browser become editable steps — no code required."
+      "value": "Recording produces editable action steps without user-written scripting."
     },
     {
       "key": "Smart Locators",
-      "value": "Hundreds of weighted attributes per element; Testim adapts across runs instead of breaking on minor changes."
+      "value": "Weighted attributes can improve identification resilience; verify the target and outcome."
     },
     {
       "key": "Saving",
-      "value": "Tests live in the project's Test Library — foldered, labeled, and re-runnable."
+      "value": "Save tests in the project library and select a supported execution path."
     },
     {
       "key": "Results",
-      "value": "Pass/fail per step, with the failure reason surfaced for fast diagnosis."
+      "value": "Inspect executed-step statuses and available error evidence; diagnose the actual cause."
     }
   ],
   "topics": [
@@ -227,6 +259,18 @@
       "title": "Recording a Web Test (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/recording-tests/how-to-record-a-test/index.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Editing target element properties (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/editing-your-tests/editing-target-element-properties.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Running tests overview (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/running-tests-overview.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }
