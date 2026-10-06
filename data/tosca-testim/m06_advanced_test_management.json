@@ -21,13 +21,13 @@
         {
           "type": "concept",
           "term": "Test status",
-          "description": "Testim's built-in test statuses are Draft (not ready to be used yet — still in progress), Active (automatically applied to tests that ran in the last 30 days), Evaluating (ready, but stability still needs to be examined), and Quarantine (unstable — generating errors, waiting to be fixed). 'Failed' and 'Archived' are NOT Testim test statuses — 'Failed' describes a run's result, not the test's lifecycle status, and there is no 'Archived' status."
+          "description": "The documented lifecycle statuses are Draft, Active, Evaluating and Quarantine; Failed is a run result. The status feature is professional-plan functionality and documents CLI 3.135.0 or later. At feature enablement, tests run within the preceding 30 days are identified as Active; this does not promise perpetual rolling automatic promotion. Evaluating failures do not fail CI/Scheduler; quarantined tests normally do not run, with an explicit CLI bypass available."
         }
       ],
       "bulletPoints": [
         "Folders = single-location; Labels = multi-tag, searchable via label:<name>.",
         "Real test statuses: Draft, Active, Evaluating, Quarantine — NOT 'Failed' or 'Archived'.",
-        "Active is auto-applied based on having run in the last 30 days; Quarantine flags unstable, error-generating tests."
+        "Feature enablement identifies recently run tests as Active; manage statuses deliberately afterward."
       ],
       "sectionId": "section-4bd9c26f3b1b"
     },
@@ -42,12 +42,12 @@
         {
           "type": "concept",
           "term": "Revisions",
-          "description": "Every time a test with changes is saved, the version before the change is automatically stored as a revision — no action is required to create one; it happens by itself on every save. After saving, a dialog optionally prompts for a change message describing the purpose of the change. The revision list (change message, user, date) lets you always look back and revert to an older revision."
+          "description": "Saving a changed test stores the previous version as a revision with author/date and an optional message. Reverting shared content can affect other instances; inspect the shared references before restoring. A save with no change is not a promise of a new revision."
         }
       ],
       "bulletPoints": [
         "Shared Steps Library: Advanced filters → filter by Groups / Actions / Validations / Wait for (including finding hidden steps to unhide).",
-        "Revisions are created automatically on every save — not manually, not on close, and not by reusing a locally saved file."
+        "Saving changed tests creates revisions; inspect shared-content impact before reverting."
       ],
       "sectionId": "section-8437a1d99baa"
     },
@@ -57,17 +57,17 @@
         {
           "type": "concept",
           "term": "Test Plans - Web",
-          "description": "Test Plans model genuine environment setup/teardown around a run — preparing the environment before tests start, and cleaning up after. A Test Plan can be integrated with a CI tool by picking the specific CI tool your team uses and executing the test plan through that tool's pipeline, rather than being limited to local-only execution or manual copying of test cases."
+          "description": "A web plan selects labels/suites, optional Before All/After All tests and run configuration. Before/after phases use parallel level 1; a failing Before All stops the main list. After All is documented to run when main-list tests fail, but that does not certify successful cleanup after every abort/infrastructure failure. CI invokes the plan through the supported CLI workflow."
         },
         {
           "type": "concept",
           "term": "Test Suites",
-          "description": "Test Suites group tests into a collection and let you control the order they run in — the two core benefits: organizing tests into collections, and running multiple tests in sequence in a defined order. (Order is only guaranteed for non-parallel runs — passing --parallel to a suite run no longer guarantees the sequence.) Test Suites do not automatically delete unused tests, and executing directly from CI tools is a separate CLI/CI-integration concern, not a Test Suite feature itself."
+          "description": "Suites collect tests and set an intended order. Parallel execution does not guarantee that order. CLI/Scheduler can run suites; suite creation alone does not provision a CI pipeline or delete unused tests."
         }
       ],
       "bulletPoints": [
-        "Test Plans: setup/teardown around a run; integrate with CI by picking a specific CI tool and running the plan through it.",
-        "Test Suites: group tests into collections + control run order — not auto-deletion, not itself a CI-execution mechanism."
+        "Plans organize setup, main tests and teardown; validate failure behavior and configuration.",
+        "Suites collect and order tests; parallel execution does not preserve guaranteed sequence."
       ],
       "sectionId": "section-1cc0d4a71636"
     },
@@ -77,17 +77,17 @@
         {
           "type": "concept",
           "term": "Locators: Auto Improve",
-          "description": "If a locator's score drops below 70%, Testim automatically attempts to improve that locator to enhance the test's stability. If the improvement succeeds, Testim replaces the degraded locator with the improved one and creates a test revision labeled 'Testim auto improve' — so the change is tracked, not silent."
+          "description": "The documentation describes an Auto Improve attempt below 70% locator score, with replacement and a revision after successful improvement. It applies automatically to writable master, can be enabled on read-only master, and does not run on other branches. Manual locator editing disables future Auto Improve for that locator. An attempt is not guaranteed repair or outcome correctness."
         },
         {
           "type": "concept",
           "term": "Smart Locator confidence and changed attributes",
-          "description": "Smart Locators weight potentially hundreds of attributes per element. When an element's attributes change during a test run, the test can still pass — Smart Locators can typically still identify the element using its other, unchanged attributes — but the confidence score for that locator may decrease. A page-change warning is shown specifically when that confidence level varies by more than 20% compared to the originally recorded test."
+          "description": "Changed attributes may reduce confidence while other weighted attributes still permit matching. A documented page-change warning is associated with a variation greater than 20% from the recorded confidence. Verify the actual target and asserted result; confidence alone does not establish correctness."
         }
       ],
       "bulletPoints": [
-        "Locator score < 70% → Testim auto-attempts an improvement, tracked as a 'Testim auto improve' revision if it succeeds.",
-        "Changed element attributes during a run: the test may still pass, but the confidence score can decrease — not an automatic fail or skip."
+        "Auto Improve depends on branch/settings and manual-edit scope; success is not guaranteed.",
+        "Changed attributes can still match; review confidence warnings and business assertions."
       ],
       "sectionId": "section-a266a6c9ffb8"
     },
@@ -97,7 +97,7 @@
         {
           "type": "concept",
           "term": "Capture Video & Bug Scenario",
-          "description": "The Testim (Chrome) Extension's Capture feature records a video of a bug scenario, generates a screenshot per step, and can publish it straight to a connected bug tracker (e.g. Jira, Trello). Before any of that is possible, the prerequisite is installing the Testim browser extension for Chrome — the capture/video functionality lives inside the extension, not the web editor itself."
+          "description": "The Chrome extension offers Capture Video & Bug Scenario with screen recording and per-step screenshots. Publishing requires a connected tracker. Bug Reporting also supports reporting a tagged test failure; not all reporting requires a new video capture."
         }
       ],
       "bulletPoints": [
@@ -111,12 +111,12 @@
     {
       "title": "Treating 'Failed' or 'Archived' as Testim test statuses",
       "trapDescription": "Assuming a test's lifecycle status can be set to 'Failed' or 'Archived' in the Test Library.",
-      "bestPractice": "The real statuses are Draft, Active, Evaluating, and Quarantine. 'Failed' describes a run's outcome, not a test's status, and there is no 'Archived' status."
+      "bestPractice": "Use the documented lifecycle choices, distinguishing Failed run results. Check status entitlement and CLI support; Quarantine normally skips execution but has an explicit bypass."
     },
     {
       "title": "Trying to manually trigger a revision",
       "trapDescription": "Looking for a button to explicitly 'create a revision' before making a change.",
-      "bestPractice": "Revisions are created automatically every time a changed test is saved — there's no manual toggle or trigger needed."
+      "bestPractice": "Save a changed test to create the revision automatically. Before reverting shared content, inspect affected instances."
     },
     {
       "title": "Assuming Test Suite order is always guaranteed",
@@ -134,7 +134,7 @@
       "questionId": "Q1",
       "type": "multi-select",
       "selectCount": 2,
-      "scenario": "Which of the following is NOT an option for test status in the Testim test library?",
+      "scenario": "Which TWO names are not among the documented Draft/Active/Evaluating/Quarantine test lifecycle choices?",
       "options": [
         {
           "id": "A",
@@ -162,7 +162,16 @@
         "E"
       ],
       "hint": "The real statuses are Draft, Active, Evaluating, and Quarantine.",
-      "rationale": "Testim's test statuses are Draft, Active, Evaluating, and Quarantine. 'Failed' is a run outcome, not a test status, and 'Archived' isn't a Testim status at all — both D and E are NOT valid options."
+      "rationale": "The documented lifecycle choices are Draft, Active, Evaluating and Quarantine. Failed describes a run outcome; Archived is not in that documented lifecycle list.",
+      "optionExplanations": {
+        "A": "Draft is a documented lifecycle choice, so do not select it.",
+        "B": "Evaluating is a documented lifecycle choice.",
+        "C": "Active is a documented lifecycle choice.",
+        "D": "Failed is a run outcome, not one of the listed lifecycle choices.",
+        "E": "Archived is not in the documented lifecycle list."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-4bd9c26f3b1b"
     },
     {
       "questionId": "Q2",
@@ -190,7 +199,15 @@
         "A"
       ],
       "hint": "It's the same Advanced filters entry point used elsewhere in the Shared Steps Library.",
-      "rationale": "The Advanced filters pane is Testim's standard mechanism for surfacing items that aren't shown by default — including hidden shared steps — so you can select one and unhide it, rather than editing raw properties, a dropdown 'Unhide' command, or re-adding from a separate hidden list."
+      "rationale": "The Advanced filters pane is Testim's standard mechanism for surfacing items that aren't shown by default — including hidden shared steps — so you can select one and unhide it, rather than editing raw properties, a dropdown 'Unhide' command, or re-adding from a separate hidden list.",
+      "optionExplanations": {
+        "A": "Show hidden items with the filter, select the item and unhide it.",
+        "B": "The documented library workflow uses the filter and unhide action.",
+        "C": "Name searching alone does not make hidden items visible in the default list.",
+        "D": "Adding another instance does not unhide the shared-library item."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-8437a1d99baa"
     },
     {
       "questionId": "Q3",
@@ -207,7 +224,7 @@
         },
         {
           "id": "C",
-          "text": "Pick a specific CI tool and execute the test plan on that tool."
+          "text": "Configure the CI pipeline to invoke the supported Testim CLI test-plan workflow."
         },
         {
           "id": "D",
@@ -217,8 +234,16 @@
       "correctOptions": [
         "C"
       ],
-      "hint": "Testim integrates natively with major CI/CD platforms — you pick the one your team uses.",
-      "rationale": "A test plan is integrated with CI by picking the specific CI tool (Jenkins, GitHub Actions, Azure DevOps, etc.) your team uses and executing it through that tool's pipeline — not a local-only run, manual copying, or 'not possible'."
+      "hint": "Selecting a CI name alone does not configure a working pipeline.",
+      "rationale": "A CI job can invoke the Testim CLI with the required plan, credentials and environment. Merely selecting a CI tool, running locally or copying cases does not configure that integration.",
+      "optionExplanations": {
+        "A": "The supported CLI can invoke plans from CI.",
+        "B": "A local run alone does not configure CI integration.",
+        "C": "A CI pipeline invokes the supported plan runner with the needed environment.",
+        "D": "Manual copying does not establish the configured plan workflow."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-1cc0d4a71636"
     },
     {
       "questionId": "Q4",
@@ -227,7 +252,7 @@
       "options": [
         {
           "id": "A",
-          "text": "Revisions are created automatically whenever changes are made to the test"
+          "text": "Save a changed test; the previous version is stored automatically."
         },
         {
           "id": "B",
@@ -246,13 +271,21 @@
         "A"
       ],
       "hint": "No manual action is needed — it happens on save.",
-      "rationale": "Every time a changed test is saved, the prior version is automatically stored as a revision — there's no manual toggle, no revision tied to closing the app, and no local-drive file involved."
+      "rationale": "Every time a changed test is saved, the prior version is automatically stored as a revision — there's no manual toggle, no revision tied to closing the app, and no local-drive file involved.",
+      "optionExplanations": {
+        "A": "Saving a changed test automatically preserves the prior version.",
+        "B": "No manual revision toggle is required for the documented save workflow.",
+        "C": "Closing without saving is not the changed-test revision trigger.",
+        "D": "A local-drive copy is not this revision mechanism."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-8437a1d99baa"
     },
     {
       "questionId": "Q5",
       "type": "multi-select",
       "selectCount": 2,
-      "scenario": "What are the benefits of using Test Suites in Testim?",
+      "scenario": "Which TWO are the collection and ordering capabilities of a Test Suite, before separately configuring its runner?",
       "options": [
         {
           "id": "A",
@@ -268,7 +301,7 @@
         },
         {
           "id": "D",
-          "text": "Executing tests directly from CI tools."
+          "text": "Automatically provisioning a working CI pipeline and its credentials."
         }
       ],
       "correctOptions": [
@@ -276,12 +309,20 @@
         "B"
       ],
       "hint": "The two core benefits are about grouping and ordering, not deletion or CI execution.",
-      "rationale": "Test Suites group tests into collections and let you control the order multiple tests run in. They don't auto-delete unused tests, and direct CI execution is a separate CLI/CI-integration concern, not a Test Suite benefit itself."
+      "rationale": "Suites group tests and define their intended order; parallel runs need separate consideration. They do not delete tests or automatically provision CI integration.",
+      "optionExplanations": {
+        "A": "Suites organize tests into collections.",
+        "B": "They define intended sequence; parallel execution can change ordering.",
+        "C": "Suites do not delete unused tests automatically.",
+        "D": "Runner configuration and credentials are not automatically provisioned by a suite."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-1cc0d4a71636"
     },
     {
       "questionId": "Q6",
       "type": "single-select",
-      "scenario": "What happens when the locator score falls below a particular threshold in Testim?",
+      "scenario": "On writable master with Auto Improve eligible and no manual locator edit, what does Testim attempt when a locator score falls below the documented 70% threshold?",
       "options": [
         {
           "id": "A",
@@ -304,7 +345,15 @@
         "B"
       ],
       "hint": "This is the Locators: Auto Improve mechanism, triggered below a specific score.",
-      "rationale": "When a locator's score drops below 70%, Testim automatically attempts to improve it, replacing the degraded locator and logging a 'Testim auto improve' revision on success — it doesn't immediately fail the test, skip the element, or delete the locator."
+      "rationale": "For eligible runs, Testim attempts improvement and records a revision after a successful replacement. Branch/settings/manual-edit restrictions matter; the attempt does not guarantee repair.",
+      "optionExplanations": {
+        "A": "Low confidence does not imply immediate failure of every eligible run.",
+        "B": "An eligible locator can undergo an improvement attempt.",
+        "C": "The feature attempts identification repair rather than automatically skipping targets.",
+        "D": "Successful improvement replaces the degraded locator, not deleting the target step."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-a266a6c9ffb8"
     },
     {
       "questionId": "Q7",
@@ -331,8 +380,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Smart Locators can usually still find the element using other attributes.",
-      "rationale": "Smart Locators weight many attributes per element, so a test can still pass when some attributes change — using the remaining unchanged attributes — but the confidence score for that locator may decrease. It doesn't automatically fail, become more stable, or skip the element outright."
+      "hint": "A change does not necessarily prevent a match; inspect actual target and outcome.",
+      "rationale": "Smart Locators weight many attributes per element, so a test can still pass when some attributes change — using the remaining unchanged attributes — but the confidence score for that locator may decrease. It doesn't automatically fail, become more stable, or skip the element outright.",
+      "optionExplanations": {
+        "A": "Changed attributes do not force an automatic failure in every case.",
+        "B": "Other attributes may still identify the element while confidence changes.",
+        "C": "A change does not guarantee increased stability.",
+        "D": "A changed target is not automatically skipped."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-a266a6c9ffb8"
     },
     {
       "questionId": "Q8",
@@ -360,7 +417,15 @@
         "C"
       ],
       "hint": "The capture/video functionality lives inside the extension, not the web editor.",
-      "rationale": "Capture Video & Bug Scenario is a feature of the Testim Chrome Extension, so installing that extension is the required first step — it isn't a setting toggle, a validation step, or a bug report template, which are separate concerns that come after the extension is in place."
+      "rationale": "Capture Video & Bug Scenario is a feature of the Testim Chrome Extension, so installing that extension is the required first step — it isn't a setting toggle, a validation step, or a bug report template, which are separate concerns that come after the extension is in place.",
+      "optionExplanations": {
+        "A": "Capture requires the extension, not just a setting.",
+        "B": "A validation step does not install video capture.",
+        "C": "The Chrome extension provides the described capture feature.",
+        "D": "A bug template does not replace the extension prerequisite."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-b8e231eead0d"
     }
   ],
   "quickRecap": [
@@ -378,11 +443,11 @@
     },
     {
       "key": "Revisions",
-      "value": "Auto-created on every save — no manual trigger."
+      "value": "Saving a changed test creates a revision; restoring shared content can affect other instances."
     },
     {
       "key": "Test Plans",
-      "value": "Model setup/teardown; integrate with CI by picking a specific tool and running through its pipeline."
+      "value": "Before/main/after phases and run configuration; invoke via a configured supported runner."
     },
     {
       "key": "Test Suites",
@@ -390,7 +455,7 @@
     },
     {
       "key": "Locators: Auto Improve",
-      "value": "Score < 70% → auto-attempted improvement, logged as a revision."
+      "value": "Eligible master runs can attempt improvement below 70%; branch/settings/manual edits restrict eligibility."
     },
     {
       "key": "Confidence score",
@@ -436,6 +501,43 @@
       "title": "Testim Extension - Capture Video & Bug Scenario (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/testim-extension/testim-extension-capture-video-bug-scenario.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Testim extension overview (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/testim-extension/testim-extension-overview.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Bug reporting (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/test-management/bug-reporting.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Index (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/results/test-results/index.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Editing target element properties (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/editing-your-tests/editing-target-element-properties.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Index (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/running-tests/the-command-line-cli/index.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Labels (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/test-management/labels.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Managing tests and folders (Tricentis docs)",
+      "url": "https://docs.tricentis.com/testim/content/test-management/test-list/managing-tests-and-folders.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }

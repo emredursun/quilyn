@@ -1369,3 +1369,13 @@ test('Testim execution review distinguishes timeout units, quota scope, graph se
  assert.match(d.practiceQuiz[7].options[3].text,/locally from the editor/);
  assert.doesNotMatch(JSON.stringify(d),/next test case.*fails to run|main mechanism for keeping sensitive|runs directly from the editor are.*excluded|every.*nothing remembered/);
 });
+
+test('Testim management review scopes Auto Improve, status initialization and changed-test revisions',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m06_advanced_test_management.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D','E'],['A'],['C'],['A'],['A','B'],['B'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[1].description,/At feature enablement.*not.*perpetual/);
+ assert.match(d.studyGuide[3].elements[0].description,/writable master.*read-only master.*other branches.*Manual locator editing/);
+ assert.match(d.studyGuide[2].elements[0].description,/failing Before All stops.*not certify.*every abort/);
+ assert.match(d.practiceQuiz[3].options[0].text,/Save a changed test/);
+ assert.doesNotMatch(JSON.stringify(d),/auto-applied based on having run|whenever changes are made to the test|automatically provision.*already configured/);
+});
