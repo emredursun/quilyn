@@ -1177,3 +1177,13 @@ test('Android preparation review scopes vendor security, host support and instal
  assert.match(d.studyGuide[3].elements[3].text,/BundleID identifies an installed iOS/);
  assert.doesNotMatch(JSON.stringify(d),/only appears the first time|safe to skip|debug keystore|two most common|ships no ARM64 Windows|grep mCurrentFocus/);
 });
+
+test('iOS preparation review scopes host support and keeps pairing, signing and hardware evidence distinct',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m04_preparing_ios.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[1].text,/Windows instructions.*vendor confirmation/);
+ assert.match(d.studyGuide[1].elements[1].text,/pairing.*not the only trigger/);
+ assert.match(d.studyGuide[2].elements[0].description,/Simulated biometric.*different/);
+ assert.match(d.studyGuide[3].elements[2].text,/\.ipa.*physical.*\.app.*Simulator/);
+ assert.doesNotMatch(JSON.stringify(d),/free Apple ID is sufficient|any iOS automation|full stop|only appears after Xcode|simulator\/app's BundleID|Tosca and TMA together/);
+});
