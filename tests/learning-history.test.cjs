@@ -1196,3 +1196,22 @@ test('mobile connection review uses documented dynamic selection without inventi
  assert.match(d.studyGuide[3].elements[3].items[1],/REST bind port equals the Appium port/);
  assert.doesNotMatch(JSON.stringify(d),/api\/devices|never even leaves Tosca|Scan tolerates|most connection failures|Every run always|live visual feed/);
 });
+
+test('mobile scan review separates driver capabilities, named set entries and execution evidence',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m06_mobile_scan.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['B'],['B'],['A'],['A','B'],['B'],['C'],['C'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[2].description,/entry to the selected group/);
+ assert.match(d.studyGuide[1].elements[3].text,/UiAutomator2.*target SDK\/API.*XCUITest.*privacy alerts/);
+ assert.match(d.practiceQuiz[7].scenario,/XCUITest iOS/);
+ assert.doesNotMatch(JSON.stringify(d),/almost always|more forgiving|same capabilities apply|current session only|not the permissions one/);
+});
+
+test('first mobile TestCase review includes capabilities exception, relative coordinates and iOS keyboard scope',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m07_first_mobile_testcase.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['B'],['B'],['A','C','D']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/Desired Capabilities setup.*exception.*Mobile websites use OpenUrl/);
+ assert.match(d.studyGuide[1].elements[1].text,/percentages as well as pixels/);
+ assert.match(d.studyGuide[2].elements[1].description,/iOS.*True.*False/);
+ assert.match(d.practiceQuiz[4].rationale,/does support native and hybrid/);
+ assert.doesNotMatch(JSON.stringify(d),/no exceptions|Mandatory first TestStep of any|near-real-time|only when no scanned|same shape as TBox/);
+});

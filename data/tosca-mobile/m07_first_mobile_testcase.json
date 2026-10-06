@@ -3,7 +3,7 @@
   "moduleTitle": "Lesson 7 - Building Your First Mobile TestCase",
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/1311/getting-started-with-mobile-test-automation-with-tricentis-tosca-mobile",
   "learningObjectives": [
-    "Build a mobile TestCase starting with the mandatory Open Mobile App TestStep.",
+    "Open a native/hybrid app after any required Desired Capabilities setup, and distinguish mobile website opening.",
     "Use the core gesture Modules — Click, Swipe, and Draw On Screen — for coordinate-based interaction.",
     "Enter text into mobile controls and control keyboard autohide behaviour.",
     "Run and observe a mobile TestCase using LiveView."
@@ -11,16 +11,16 @@
   "estTime": "25 min",
   "studyGuide": [
     {
-      "sectionTitle": "Open Mobile App comes first, always",
+      "sectionTitle": "Opening the application after capability setup",
       "elements": [
         {
           "type": "concept",
-          "term": "The mandatory first TestStep",
-          "description": "Drag and drop the Open Mobile App Module onto the TestCase — and note the hard constraint: it must be the first TestStep of the TestCase. Nothing can be steered on the device until the application has been opened through this Module."
+          "term": "Application opening and capability ordering",
+          "description": "Use Open Mobile App to begin native/hybrid application steering. Desired Capabilities setup is the documented exception: Set Desired Capabilities, and any additions, precede application opening. Mobile websites use OpenUrl."
         },
         {
           "type": "note",
-          "text": "This mirrors a recurring pattern across Tosca's Engine 3.0 family: engines that attach to an external resource require an explicit open step before anything else in the TestCase — the same shape as TBox Open Excel Workbook for the Excel Engine."
+          "text": "Do not generalize this ordering to every Engine or resource-opening Module. Check the specific application and capability workflow."
         },
         {
           "type": "concept",
@@ -34,8 +34,8 @@
         }
       ],
       "bulletPoints": [
-        "Open Mobile App = mandatory first TestStep — no exceptions.",
-        "Switch Mobile App changes context mid-TestCase when a flow legitimately spans two apps."
+        "Native/hybrid opening follows any required Desired Capabilities setup.",
+        "Switch Mobile App selects another app during the TestCase."
       ],
       "sectionId": "section-ad020d3a75a3"
     },
@@ -47,18 +47,18 @@
           "title": "Coordinate-based interaction Modules",
           "items": [
             "Click On Screen — taps a specific x/y coordinate rather than a scanned control, for spots the scan couldn't identify as a distinct element.",
-            "Swipe On Screen — a directional swipe gesture between two coordinates, used for scrolling lists, dismissing cards, or revealing hidden actions.",
+            "Swipe On Screen — supports directional swipes or SWIPE with configured start/end points.",
             "Draw On Screen — a free-form drawing/path gesture, used for things like signature capture or gesture-based unlock patterns."
           ]
         },
         {
           "type": "warning",
-          "text": "Coordinate-based gestures are a fallback, not a first choice — they're brittle across different screen sizes and resolutions. Prefer steering a scanned control whenever one exists; reach for On Screen Modules only when no addressable control is available."
+          "text": "Coordinates need validation against the actual layout. Click/Swipe support percentages as well as pixels; relative coordinates can scale with the screen but do not automatically locate a moved control. Prefer stable scanned identifiers when suitable."
         }
       ],
       "bulletPoints": [
-        "Click/Swipe/Draw On Screen = coordinate-based, for when nothing addressable exists at that spot.",
-        "Prefer scanned controls over coordinates wherever possible — coordinates don't adapt to different screen sizes."
+        "Click/Swipe can use relative percentages or pixels; Draw uses percentage points.",
+        "Coordinates do not guarantee control identity across changed layouts."
       ],
       "sectionId": "section-f721bf645124"
     },
@@ -73,12 +73,12 @@
         {
           "type": "concept",
           "term": "Set Autohide Keyboard",
-          "description": "Controls whether the on-screen keyboard automatically dismisses after a text-entry step. Leaving the keyboard open when the next TestStep expects to interact with an element it's now covering is a common source of flaky steps — this setting exists specifically to manage that."
+          "description": "Set Autohide Keyboard controls iOS onscreen keyboard auto-hide: True enables it and False disables it. Check the actual platform and resulting keyboard state; do not present this as a universal Android/iOS dismissal guarantee."
         }
       ],
       "bulletPoints": [
         "Tap the field, then Send Text Input To Focused Control — mirrors real user behaviour.",
-        "An open on-screen keyboard covering the next target element is a classic source of flakiness — manage it with Set Autohide Keyboard."
+        "Configure iOS auto-hide where appropriate and verify that the next target is accessible."
       ],
       "sectionId": "section-64ec29508d0c"
     },
@@ -88,42 +88,42 @@
         {
           "type": "concept",
           "term": "Watching execution happen",
-          "description": "With the LiveView TCP set to True, executing a mobile TestCase shows the device's screen updating in near-real-time inside Tosca — genuinely useful while a TestCase is still being built and debugged, since a failed TestStep can be visually correlated with exactly what the device was showing at that moment."
+          "description": "For local mobile execution, LiveView=True displays a screenshot preview when the TestStep changes. It is not a continuous video or proof of the exact screen at every failure instant."
         },
         {
           "type": "note",
-          "text": "LiveView adds overhead to execution. It's worth leaving on while authoring and debugging, and worth considering turning off for large batch/CI runs where nobody is watching."
+          "text": "Use preview alongside execution logs and assertions during debugging. Choose preview settings for the run’s needs rather than assuming a measured performance improvement from switching it off."
         }
       ],
       "bulletPoints": [
-        "LiveView = True while authoring/debugging, since it lets you see exactly what the device showed at the moment of a failure.",
-        "Consider disabling LiveView for unattended batch runs to reduce overhead."
+        "Live View previews local execution at TestStep changes.",
+        "Use execution logs and assertions to validate failures and outcomes."
       ],
       "sectionId": "section-c4c6ff6e3c10"
     }
   ],
   "examPitfalls": [
     {
-      "title": "Placing Open Mobile App anywhere other than first",
+      "title": "Steering before application opening or omitting capability setup",
       "trapDescription": "Adding navigation or verification TestSteps before the Open Mobile App Module.",
-      "bestPractice": "Open Mobile App must be the first TestStep of the TestCase. Nothing on the device can be steered before the application has been opened through it."
+      "bestPractice": "Place required Desired Capabilities configuration before Open Mobile App for native/hybrid apps. Mobile websites use their OpenUrl workflow."
     },
     {
       "title": "Reaching for On Screen gestures as a default",
       "trapDescription": "Using Click On Screen with hardcoded coordinates for a control that was actually captured and addressable during scanning.",
-      "bestPractice": "Coordinate-based gestures are a fallback for controls the scan couldn't address — prefer steering the scanned control whenever one exists, since coordinates don't adapt across screen sizes and resolutions."
+      "bestPractice": "Prefer useful scanned identifiers. Relative coordinates scale with screen dimensions but still require layout validation; pixel coordinates add resolution sensitivity."
     },
     {
       "title": "Not accounting for the on-screen keyboard",
       "trapDescription": "A TestStep intermittently fails to tap an element that's actually being covered by the still-open keyboard from the previous text-entry step.",
-      "bestPractice": "Manage keyboard dismissal explicitly with Set Autohide Keyboard rather than assuming it will close on its own before the next TestStep runs."
+      "bestPractice": "On iOS, configure auto-hide appropriately and verify the actual keyboard state. Use platform-appropriate handling rather than assuming a universal Module hides every keyboard."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "Which Module must be the first TestStep of a mobile TestCase?",
+      "scenario": "For a native/hybrid TestCase that does not first set Desired Capabilities, which Module opens the application before steering?",
       "options": [
         {
           "id": "A",
@@ -145,13 +145,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "The same 'open before you touch anything' pattern as the Excel Engine.",
-      "rationale": "Open Mobile App must be the first TestStep — nothing on the device can be steered until the application has been opened through it."
+      "hint": "The scenario excludes the documented capabilities-first exception.",
+      "rationale": "Open Mobile App opens native/hybrid apps. Required Desired Capabilities steps can precede it; mobile websites have an OpenUrl workflow.",
+      "optionExplanations": {
+        "A": "This is not the documented app-opening Module.",
+        "B": "This opens the native/hybrid app under the stated ordering.",
+        "C": "Mobile Scan creates Modules rather than opening the TestCase application.",
+        "D": "Application opening and capability setup constrain the order."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-ad020d3a75a3"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "When should Click On Screen be used instead of steering a scanned control directly?",
+      "scenario": "When a target has no useful scanned identifier, how should the team evaluate Click On Screen?",
       "options": [
         {
           "id": "A",
@@ -159,7 +167,7 @@
         },
         {
           "id": "B",
-          "text": "Only when no addressable control exists at that location, since coordinates don't adapt across screen sizes."
+          "text": "As a coordinate-based alternative, validating percentage or pixel positions against the target layout."
         },
         {
           "id": "C",
@@ -174,12 +182,20 @@
         "B"
       ],
       "hint": "Coordinates are a fallback, not a default choice.",
-      "rationale": "On Screen gestures are coordinate-based and brittle across different screen sizes and resolutions. They should be used only when no scanned, addressable control exists — steering the actual control is always preferred when available."
+      "rationale": "Coordinates can provide an alternative, but they identify positions rather than stable control identity. Percentages scale with the screen; they do not guarantee a moved element remains at that position.",
+      "optionExplanations": {
+        "A": "Position-based steering needs validation rather than universal use.",
+        "B": "Validate the configured position against the actual layout.",
+        "C": "This is not an iOS-only interaction.",
+        "D": "It is not limited to hybrid webviews."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-f721bf645124"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "A TestCase intermittently fails to tap a button that appears right after a text field was filled in. What is the most likely cause?",
+      "scenario": "On iOS, the keyboard visibly covers the next target after text entry. Which issue should the team address?",
       "options": [
         {
           "id": "A",
@@ -202,7 +218,15 @@
         "B"
       ],
       "hint": "Think about what's still on screen right after typing.",
-      "rationale": "An open on-screen keyboard covering the intended element is a classic source of intermittent failures right after text entry — manage dismissal explicitly with Set Autohide Keyboard rather than assuming it closes on its own."
+      "rationale": "The scenario confirms the obstruction. Check the iOS keyboard auto-hide configuration and actual dismissal rather than inferring a connection or identifier failure.",
+      "optionExplanations": {
+        "A": "The scenario confirms obstruction rather than an identifier change.",
+        "B": "The keyboard visibly covers the intended target.",
+        "C": "The supplied evidence does not establish a lost connection.",
+        "D": "Adding another open step does not address the confirmed obstruction."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-64ec29508d0c"
     },
     {
       "questionId": "Q4",
@@ -230,7 +254,15 @@
         "B"
       ],
       "hint": "It's about app context, not connection topology.",
-      "rationale": "Switch Mobile App changes the active app context mid-TestCase — for example testing a deep link or a share-sheet handoff — without a second Open Mobile App step."
+      "rationale": "Switch Mobile App changes the active app context mid-TestCase — for example testing a deep link or a share-sheet handoff — without a second Open Mobile App step.",
+      "optionExplanations": {
+        "A": "Switching apps is not a guaranteed full reset.",
+        "B": "It changes the selected application during the TestCase.",
+        "C": "It does not change the connection topology.",
+        "D": "It does not configure Live View."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-ad020d3a75a3"
     },
     {
       "questionId": "Q5",
@@ -243,7 +275,7 @@
         },
         {
           "id": "B",
-          "text": "Provides options for hybrid application testing"
+          "text": "Requires its Android AppActivity field when switching to every installed iOS app"
         },
         {
           "id": "C",
@@ -259,41 +291,51 @@
         "C",
         "D"
       ],
-      "hint": "Hybrid context switching belongs to a different part of the workflow than Open Mobile App itself.",
-      "rationale": "Open Mobile App creates the mobile device session via TMA, can install the app at the start of that session, and opens an already-installed app by BundleID (iOS) or AppPackage/AppActivity (Android). Hybrid application testing options — like switching between native and webview context — belong to the Mobile Scan and steering workflow, not to Open Mobile App itself."
+      "hint": "Distinguish supported opening methods from a wrong platform-specific field.",
+      "rationale": "The Module can create the session, install a supplied app build, or open an installed app with the platform’s identifiers. Android AppActivity is not required for installed iOS apps; Open Mobile App does support native and hybrid applications.",
+      "optionExplanations": {
+        "A": "The app-opening workflow establishes a mobile session.",
+        "B": "Android AppActivity is not required to select an installed iOS application.",
+        "C": "A configured installation path can supply a target-compatible app build.",
+        "D": "These are the platform-specific installed application identifiers."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-ad020d3a75a3"
     }
   ],
   "quickRecap": [
     {
       "key": "Open Mobile App",
-      "value": "Mandatory first TestStep of any mobile TestCase — nothing can be steered before it. Creates the TMA session, installs the app at session start if configured, and opens an already-installed app by BundleID (iOS) or AppPackage/AppActivity (Android)."
+      "value": "Open native/hybrid apps after required capability setup; websites use OpenUrl."
     },
     {
       "key": "Switch Mobile App",
-      "value": "Changes active app context mid-TestCase for flows spanning two apps."
+      "value": "Select another app by its platform identifier during the TestCase."
     },
     {
       "key": "On Screen gestures",
-      "value": "Click / Swipe / Draw On Screen — coordinate-based fallback for controls the scan couldn't address. Prefer scanned controls when available."
+      "value": "Validate coordinate gestures; percentages scale with screen dimensions but do not identify moved controls."
     },
     {
       "key": "Text entry",
-      "value": "Tap the field, then Send Text Input To Focused Control."
+      "value": "Set focus before Send Text Input To Focused Control."
     },
     {
       "key": "Keyboard management",
-      "value": "Set Autohide Keyboard prevents the open keyboard from covering the next TestStep's target."
+      "value": "Set Autohide Keyboard controls iOS auto-hide; verify the resulting keyboard state."
     },
     {
       "key": "LiveView",
-      "value": "True while authoring/debugging for real-time visual feedback; consider False for unattended batch/CI runs."
+      "value": "LiveView=True gives local TestStep-change previews, not continuous video or exact failure snapshots."
     }
   ],
   "topics": [
     {
-      "title": "Mobile Engine 3.0 (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/mobile/tbox_mobileweb.htm",
+      "title": "Mobile Modules (Tosca 2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/engines_3.0/mobile.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Tosca 2026.1 LTS"
 }
