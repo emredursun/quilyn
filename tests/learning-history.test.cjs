@@ -1120,3 +1120,12 @@ test('AE1 mobile review scopes app opening, capability exception and Agent versi
  assert.match(d.studyGuide[4].elements[1].description,/--rest-address.*--appium-port.*separately/);
  assert.doesNotMatch(JSON.stringify(d),/safe to skip|fault is on Tosca's side|no Android Emulator exists|GET.*api\/devices|BundleID.*those are for installing from an APK/);
 });
+
+test('AE1 Vision AI review requires configured recovery and preserves UIDC sizing limits',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m11_vision_ai.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[3].text,/administrator-enabled.*RetryLevel=TestStepValue.*OnDialogFailure=Recover.*TestStepValueRetries=1.*ExecutionList/);
+ assert.match(d.studyGuide[3].elements[1].description,/single anchor.*may fail.*UidcCategory/);
+ assert.match(d.studyGuide[0].elements[0].text,/blueprint was not accessible/);
+ assert.doesNotMatch(JSON.stringify(d),/nothing here will be tested|stable, self-healing Modules for any UI|TBox XEngines|self-healing does not cover/);
+});

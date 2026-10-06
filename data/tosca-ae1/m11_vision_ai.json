@@ -15,7 +15,7 @@
       "elements": [
         {
           "type": "note",
-          "text": "⚠️ This is the OPTIONAL section of the AE1 course. The Final Exam draws no questions from optional sections, so nothing here will be tested. It is worth understanding anyway — Vision AI is where Tosca's control identification is heading, and it directly addresses the weaknesses of the image-based controls covered in Lesson 8."
+          "text": "This lesson is labeled optional in the local AE1 outline. The current Academy exam blueprint was not accessible for verification, so do not infer that the topic can never appear in an exam. Check the current official course requirements. This guide explains the documented on-prem Vision AI mechanisms."
         }
       ],
       "sectionId": "section-289dc526c54c"
@@ -35,7 +35,7 @@
         },
         {
           "type": "list",
-          "title": "Vision AI Modules in the AE1 workspace (Standard modules → TBox XEngines → Vision AI)",
+          "title": "Standard modules → Engines → Vision AI",
           "items": [
             "Run VisionScript — executes a VisionScript, Tosca's scripting layer for Vision AI driven steering.",
             "Vision AI Self Healing — the self-healing counterpart for visually recognised controls."
@@ -43,7 +43,7 @@
         },
         {
           "type": "note",
-          "text": "The presence of a dedicated 'Vision AI Self Healing' Module is worth noting against Lesson 5: conventional self-healing covers DotNet, Java, Oracle, UIA, XBrowser and Salesforce, and does not extend to image-based controls. Vision AI brings its own self-healing mechanism for visually identified controls — which is exactly the gap image-based identification leaves open."
+          "text": "Vision AI recovery requires administrator-enabled cloud image-analysis history, a Recovery Scenario with RetryLevel=TestStepValue, the Vision AI Self Healing Module, OnDialogFailure=Recover and TestStepValueRetries=1. Run from an ExecutionList. Recovery is attempted for missing controls; it does not guarantee that the intended target or later assertions will succeed."
         }
       ],
       "bulletPoints": [
@@ -58,16 +58,16 @@
         {
           "type": "concept",
           "term": "Versus property-based scanning",
-          "description": "Property-based identification depends on technical attributes staying stable. Vision AI steers by visual components instead, which makes it resilient to UI changes that alter the underlying markup without changing what the user sees — a framework upgrade that renames every generated class, for example."
+          "description": "Vision AI uses visual recognition rather than relying on the target’s DOM identifiers. Changes to technical attributes may therefore leave a visual locator usable, but labels, layout, detection quality and steering support still require validation."
         },
         {
           "type": "concept",
           "term": "Versus image-based controls (Lesson 8)",
-          "description": "This is the comparison that matters most. Image-based identification matches a screenshot — it knows nothing about what the control is, only what it looked like. Vision AI recognises individual control types and adjusts its behaviour accordingly, which is smarter steering than pixel matching or screenshot comparison. Where Lesson 8's method is a last resort accepting brittleness, Vision AI aims to be a genuine identification strategy."
+          "description": "Image identifiers match a captured appearance. Vision AI detects control types and uses type-specific steering. Classification can require adjustment; neither method guarantees reliable execution after arbitrary visual changes."
         },
         {
           "type": "note",
-          "text": "Tricentis positions Vision AI as producing stable, self-healing Modules for any UI — the self-healing framing is deliberate, contrasting with image-based controls, which self-healing does not cover."
+          "text": "Evaluate Vision AI against the actual interface and supported steering behavior. The introduction documents table-steering limitations and suggests VisionScript for some cases. Marketing descriptions of stable or platform-agnostic automation are not a guarantee that every UI is supported."
         }
       ],
       "bulletPoints": [
@@ -82,16 +82,16 @@
         {
           "type": "concept",
           "term": "User Identified Controls (UIDCs)",
-          "description": "Vision AI does not always classify a control correctly on its own. When standard recognition falls short, controls can be configured manually, or you can create User Identified Controls — controls you define yourself so the AI knows how to treat them."
+          "description": "When detection is unsuitable, XScan can adjust the ControlType among detected choices, refine labels or create a User Identified Control (UIDC). In Advanced View, define the target region, control type and application category, select anchor controls, save and rescan. UIDC definitions are shared within the company."
         },
         {
           "type": "concept",
           "term": "Anchors, again",
-          "description": "UIDCs use anchor points — surrounding elements that guide the AI to locate the target correctly. The same relational idea you met in the PDF Engine lesson and in XScan's Advanced Identification appears here too: when an element is hard to pin down on its own, describe it by what sits around it."
+          "description": "UIDCs use reference controls inside or outside the target region. A single anchor preserves a fixed relative size/position and may fail when sizes vary. Prefer unique text labels and multiple appropriate anchors for variable dimensions; use UidcCategory for the defined application group."
         },
         {
           "type": "note",
-          "text": "Three lessons, one recurring principle: PDF anchors, XScan anchor identification, and Vision AI anchor points all solve the same problem — identifying something unstable by reference to something stable nearby."
+          "text": "PDF, XScan and Vision AI anchors share a reference idea but have distinct configuration and behavior. PDF-specific rules are not a substitute for UIDC anchor selection."
         }
       ],
       "bulletPoints": [
@@ -109,13 +109,13 @@
           "items": [
             "Application controls lack reliable technical identifiers.",
             "UI layouts change frequently but the visual appearance stays consistent.",
-            "You want self-healing behaviour for visually recognised controls.",
+            "You can configure and validate recovery for missing visually recognized controls, with the required cloud-history policy.",
             "Standard property-based identification has proved insufficient."
           ]
         },
         {
           "type": "note",
-          "text": "Note what this list does not say: it is not positioned as a replacement for property-based scanning where that works well. Structural identification remains the default; Vision AI is the answer when structure is unavailable or unstable."
+          "text": "These are independent selection considerations, not a universal vendor ranking. Compare identification reliability, supported controls, setup and cloud data requirements. A working structural locator does not automatically justify migration."
         },
         {
           "type": "note",
@@ -123,16 +123,16 @@
         }
       ],
       "bulletPoints": [
-        "Best fit: no reliable identifiers, or markup that churns while the UI looks the same."
+        "Candidate fit: unreliable technical identifiers or visually accessible interfaces; validate classification, steering and recovery."
       ],
       "sectionId": "section-b6407702c946"
     }
   ],
   "examPitfalls": [
     {
-      "title": "Studying this section for the Final Exam",
-      "trapDescription": "Spending exam preparation time on Vision AI because it seems important.",
-      "bestPractice": "Vision AI Theory is an optional section and the Final Exam draws no questions from optional sections. Learn it for its practical value, not for the exam."
+      "title": "Treating an old optional label as an exam guarantee",
+      "trapDescription": "Skipping a topic because this local outline labels it optional.",
+      "bestPractice": "Check the current official Academy blueprint. The local optional label is not verification that future or current exams exclude all Vision AI questions."
     },
     {
       "title": "Equating Vision AI with image-based controls",
@@ -142,12 +142,12 @@
     {
       "title": "Replacing working property-based scans with Vision AI",
       "trapDescription": "Migrating stable, well-identified Modules to Vision AI on the assumption that newer is better.",
-      "bestPractice": "Vision AI targets cases where technical identifiers are unreliable or absent, or where markup changes while appearance does not. Where property-based identification already works, there is no problem for it to solve."
+      "bestPractice": "Compare the actual identification and steering requirements before changing a working Module. Visual recognition may suit unreliable technical identifiers, but it brings detection, setup and data-policy considerations."
     },
     {
       "title": "Expecting perfect automatic classification",
       "trapDescription": "Assuming Vision AI will correctly identify every control with no manual intervention.",
-      "bestPractice": "When standard recognition fails, controls can be configured manually or defined as User Identified Controls (UIDCs), using anchor points to guide the AI to the correct target."
+      "bestPractice": "When detection is unsuitable, XScan can adjust the ControlType among detected choices, refine labels or create a User Identified Control (UIDC). In Advanced View, define the target region, control type and application category, select anchor controls, save and rescan. UIDC definitions are shared within the company."
     }
   ],
   "practiceQuiz": [
@@ -177,7 +177,15 @@
         "B"
       ],
       "hint": "One network locates things; the other reads text.",
-      "rationale": "Vision AI employs two neural networks: one for finding controls and one for OCR. Together they let it identify elements by their visual components rather than by technical attributes."
+      "rationale": "Vision AI employs two neural networks: one for finding controls and one for OCR. Together they let it identify elements by their visual components rather than by technical attributes.",
+      "optionExplanations": {
+        "A": "DOM and UI Automation are structural mechanisms; the documented visual detection/OCR parameters are different.",
+        "B": "Control detection and OCR provide the documented visual identification functions, configurable through ScanControlNetwork and ScanOcrNetwork.",
+        "C": "Checksums do not provide the documented type detection and OCR behavior.",
+        "D": "Appium and TMA manage mobile automation, not the described Vision AI recognition functions."
+      },
+      "lessonSection": "section-75054d279600",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -204,8 +212,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "One method understands what a control is; the other only knows what it looked like.",
-      "rationale": "Image-based identification matches appearance with no knowledge of the control's nature. Vision AI detects control types and adapts its steering mechanism to the classification, which is why Tricentis describes it as producing stable, self-healing Modules."
+      "hint": "Compare type-aware visual steering with matching a captured appearance.",
+      "rationale": "Vision AI detects control types and varies steering by type. This differs from matching a captured appearance; accurate classification and execution still need validation.",
+      "optionExplanations": {
+        "A": "Type-dependent steering differentiates Vision AI from matching a captured appearance.",
+        "B": "Vision AI detects types and uses type-dependent steering; unsuitable classification may need manual adjustment.",
+        "C": "This reverses the documented use of neural networks for Vision AI detection and OCR.",
+        "D": "Vision AI is not documented as a mobile-only mechanism; it is integrated with on-prem XScan for applications."
+      },
+      "lessonSection": "section-e74e2d1007a7",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
@@ -233,7 +249,15 @@
         "B"
       ],
       "hint": "There is a named mechanism for controls you define yourself.",
-      "rationale": "When standard recognition fails you can configure controls manually or create User Identified Controls (UIDCs). UIDCs use anchor points — surrounding elements that guide the AI to locate the target correctly."
+      "rationale": "XScan supports control-type and label adjustments and UIDCs using reference controls. Anchor quality, sizing and the application category affect recognition; creating a UIDC does not guarantee a correct target.",
+      "optionExplanations": {
+        "A": "XScan permits classification/label adjustment and UIDCs; recognition is not immutable.",
+        "B": "These are documented remediation mechanisms. Choose appropriate anchors and validate the resulting recognition.",
+        "C": "The Mobile Engine is not a universal remedy for a visually misclassified application control.",
+        "D": "A different screenshot resolution does not replace the documented classification or UIDC configuration workflow."
+      },
+      "lessonSection": "section-97ff4a4fd554",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
@@ -261,13 +285,21 @@
         "B"
       ],
       "hint": "Think about when structural identification stops being dependable.",
-      "rationale": "Vision AI suits applications lacking reliable technical identifiers, or where UI layouts change frequently but the appearance remains consistent. Where identifiers are already stable, property-based identification has no problem for Vision AI to solve — and PDFs and Excel have their own dedicated engines."
+      "rationale": "Among these choices, unstable technical markup with stable appearance is the clearest candidate for visual identification. Compare it with actual detection/steering support and validate the result; PDF comparison and Excel workbook operations have dedicated Modules.",
+      "optionExplanations": {
+        "A": "Stable identifiers alone do not establish a need to replace a working structural locator.",
+        "B": "Visual identification can reduce dependence on changing markup when the appearance remains suitable; reliability still needs testing.",
+        "C": "PDF file comparison is a dedicated PDF operation, not this control-identification use case.",
+        "D": "Workbook data access is an Excel operation, not this visual UI-identification use case."
+      },
+      "lessonSection": "section-b6407702c946",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
     {
       "key": "Status",
-      "value": "OPTIONAL section — not covered by the Final Exam."
+      "value": "Locally labeled optional; current Academy exam inclusion/exclusion was not verified."
     },
     {
       "key": "How it works",
@@ -275,7 +307,7 @@
     },
     {
       "key": "vs property-based",
-      "value": "Resilient to markup changes that don't alter what the user sees."
+      "value": "Reduces dependence on technical markup; visual recognition and steering still require validation."
     },
     {
       "key": "vs image-based",
@@ -287,11 +319,15 @@
     },
     {
       "key": "Anchor points",
-      "value": "Surrounding elements that guide the AI to the target — the same relational principle as PDF and XScan anchors."
+      "value": "UIDC reference controls inside/outside the region; multiple suitable anchors help variable sizing. Rules differ from PDF/XScan anchors."
     },
     {
       "key": "Best fit",
-      "value": "No reliable identifiers · frequent layout churn with stable appearance · property-based identification insufficient."
+      "value": "Unreliable technical identifiers or visually accessible interfaces; validate supported controls, setup and data policy."
+    },
+    {
+      "key": "Recovery prerequisites",
+      "value": "Admin-enabled image-analysis history; Recovery Scenario RetryLevel=TestStepValue; OnDialogFailure=Recover; TestStepValueRetries=1; ExecutionList execution."
     }
   ],
   "topics": [
@@ -302,8 +338,20 @@
     },
     {
       "title": "Scan with Vision AI (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-cloud/en-us/content/create_tests/scan_vision_ai.htm",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/vision_ai/vision_ai_scan_modules.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "UIDC anchors and categories",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/vision_ai/vision_ai_user_identified_controls.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Vision AI recovery prerequisites",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/vision_ai/vision_ai_enable_selfhealing.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS public documentation; original AE1 exam blueprint unverified",
+  "sourceReviewedOn": "2026-10-06"
 }
