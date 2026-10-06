@@ -1002,3 +1002,14 @@ test('PBA rule review avoids architecture-specific UI and first-match resolution
  assert.match(d.studyGuide[3].elements[1].description,/identifier, class or Ruleset/);
  assert.doesNotMatch(d.studyGuide[2].elements[3].text,/first matching Rule/);
 });
+
+test('PSA relationship review separates ownership, physical storage, source and cardinality',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/system-architect/m09_creating_a_data_relationship.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(inv.modules.find(m=>m.id==='SA-M09').localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.equal(d.practiceQuiz.length,19);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[9,16,17,18].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.equal(q.explanationReviewedOn,'2026-10-06');});
+ assert.match(d.studyGuide[2].elements[0].description,/not specify a universal physical table layout/);
+ assert.match(d.studyGuide[2].elements[4].html,/does not itself guarantee write access/);
+ assert.match(d.quickRecap[2].value,/local or external/);
+ assert.doesNotMatch(d.examPitfalls[3].trapDescription,/inside the Case work object/);
+ assert.doesNotMatch(d.practiceQuiz[17].rationale,/requires an external data source/);
+});
