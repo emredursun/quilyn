@@ -1013,3 +1013,13 @@ test('PSA relationship review separates ownership, physical storage, source and 
  assert.doesNotMatch(d.examPitfalls[3].trapDescription,/inside the Case work object/);
  assert.doesNotMatch(d.practiceQuiz[17].rationale,/requires an external data source/);
 });
+
+test('PSA data model review distinguishes defaults, edit modes, simulation and structural changes',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/system-architect/m08_the_data_model.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(inv.modules.find(m=>m.id==='SA-M08').localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ assert.equal(d.practiceQuiz.length,18);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[9,15,16,17].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.equal(q.explanationReviewedOn,'2026-10-06');});
+ assert.match(d.studyGuide[0].elements[4].description,/Conceptual.*Logical.*Physical/);
+ assert.match(d.studyGuide[2].elements[1].description,/Read-only\/Editable\/Savable/);
+ assert.match(d.practiceQuiz[13].scenario,/simulated/);
+ assert.doesNotMatch(JSON.stringify(d),/one for the Operator context|requires Dev Studio|A 'data class' is not a Pega term|not a\."|there is\."|--pa-ink-2|--pa-ink-3/);
+});
