@@ -951,3 +951,14 @@ test('AS2 modification and conditions distinguish generation, safe updates and r
  assert.match(docs[1].practiceQuiz[6].options[2].text,/during generation.*during execution/);
  docs.forEach(d=>assert.doesNotMatch(JSON.stringify(d),/delete the OLD TemplateInstance|holds only one link|safer, additive option|Tosca's default for 2\+ conditions/));
 });
+
+test('AS2 execution review separates specified coverage, completion and synchronization scope',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as2/m06_run_report_automated_tests.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));
+ assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A','B','D'],['A'],['A'],['C'],['B'],['B'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[0].text,/Completed is not a universal linking prerequisite/);
+ assert.match(d.practiceQuiz[3].options[2].text,/creation progress/);
+ assert.match(d.studyGuide[2].elements[0].text,/Do not assume synchronizing one list/);
+ assert.match(d.studyGuide[0].elements[0].text,/Alternatively, dropping/);
+ assert.doesNotMatch(JSON.stringify(d),/never individual TestCases|must be set to COMPLETED|updates every linked ExecutionList/);
+});
