@@ -1415,3 +1415,18 @@ test('Testim message review separates direct SMS retrieval, managed email export
  assert.match(d.studyGuide[2].elements[1].description,/does not create a fresh phone number/);
  assert.doesNotMatch(JSON.stringify(d),/not that Testim has a dedicated SMS|no separate SMS API needed|Extract Value then pulls|brand-new contact point on every run/);
 });
+
+test('Testim CLI coding review scopes database setup and explicitly documented assistant support',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m11_generating_coded_steps_cli_actions.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].description,/credentials and dependencies still need setup/);
+ assert.match(d.studyGuide[1].elements[0].description,/explicitly lists Add CLI Validation.*does not automatically install/);
+ assert.match(d.studyGuide[1].elements[1].text,/recording was unavailable.*rather than certifying every action variant/);
+});
+
+test('Testim assistant review includes explicit draft insertion, acknowledgement and Help',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m12_custom_action_steps_copilot.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[1].description,/acknowledge.*Help.*Paste code at cursor/);
+ assert.match(d.examPitfalls[0].bestPractice,/suggestions, not proof of correctness/);
+});

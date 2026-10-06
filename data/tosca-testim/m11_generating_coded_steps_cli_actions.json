@@ -3,7 +3,7 @@
   "moduleTitle": "Generating coded test steps with CLI actions in Tricentis Testim",
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/145/tricentis-testim-product-consultant/courses/generating-coded-test-steps-with-cli-actions-in-tricentis-testim",
   "learningObjectives": [
-    "Discuss how to use Copilot to generate code for a coded step using a CLI action in Testim.",
+    "Describe the documented Copilot assistance for supported coded steps, including CLI validation.",
     "Describe the difference between a CLI action and a Custom action in Testim."
   ],
   "estTime": "3 min",
@@ -14,35 +14,35 @@
         {
           "type": "concept",
           "term": "CLI actions and validations",
-          "description": "Custom Node.js scripts executed in the CLI environment (not inside the browser), initiated from inside a test the same way a standard custom action is. Because they run outside the browser sandbox, CLI actions/validations can do things a browser-side custom action cannot — like database validation and manipulation, or image and PDF validations."
+          "description": "CLI actions/validations execute Node.js in the connected CLI environment; browser custom actions execute in the browser. Node.js can use configured packages and authorized resources, but network access, credentials and dependencies still need setup."
         },
         {
           "type": "note",
-          "text": "The distinction to hold onto: a regular custom action/validation runs in the browser's JavaScript context; a CLI action/validation runs in Node.js in the CLI environment, which is why it can reach things (a database connection, the filesystem, a PDF parser) the browser sandbox can't."
+          "text": "Browser DOM access and Node.js resource access are different capabilities. Browser/API checks can also validate server-provided results; direct database-driver access is the scenario-specific CLI use case, not a ban on all browser-based backend assertions."
         }
       ],
       "bulletPoints": [
         "CLI actions/validations = custom Node.js scripts run in the CLI environment, not the browser.",
-        "Enables what browser-side custom actions can't: DB validation/manipulation, image/PDF validation."
+        "Direct database-driver checks can use a configured CLI environment; runtime alone does not guarantee connectivity."
       ],
       "sectionId": "section-1f18af1545e5"
     },
     {
-      "sectionTitle": "Using Copilot to generate a CLI action's code",
+      "sectionTitle": "Copilot assistance for supported coded steps",
       "elements": [
         {
           "type": "concept",
-          "term": "Generate applies to CLI actions too",
-          "description": "The same Testim Copilot Coding Assistant used for regular custom steps also works inside a CLI action step: create the CLI action, click 'Write code with AI', and use the Generate command with a plain-text description of what the Node.js code should do (e.g. 'query this database table and return the row count'). The generated JavaScript appears in the chat pane, ready to use as the CLI action's implementation — the tester doesn't need to hand-write the Node.js from scratch."
+          "term": "Generate a draft, then insert and test it",
+          "description": "The Coding Assistant documentation explicitly lists Add CLI Validation among supported steps. Open Write code with AI, acknowledge the notice and request code. Use Paste code at cursor or Copy code to insert it; appearing in chat does not automatically install the implementation."
         },
         {
           "type": "note",
-          "text": "This is the same Generate/Explain/Fix workflow covered for ordinary custom action steps — the only difference here is that the target step type is a CLI action, so the generated code runs in the CLI's Node.js context instead of the browser."
+          "text": "The original Academy CLI-action recording was unavailable. This local guide uses the explicitly listed CLI validation path rather than certifying every action variant. Review runtime, parameters, package bindings and returned Promises before relying on the generated draft."
         }
       ],
       "bulletPoints": [
-        "Copilot's Generate command works inside a CLI action step, not just a regular custom step.",
-        "Describe the desired Node.js logic in plain text → Copilot writes the code → it becomes the CLI action's implementation."
+        "Copilot’s documented supported list includes CLI validation.",
+        "Request a draft, insert it deliberately and validate runtime/setup and behavior."
       ],
       "sectionId": "section-9a122d86a540"
     }
@@ -51,12 +51,12 @@
     {
       "title": "Trying to validate a database value from a regular custom (browser) action",
       "trapDescription": "Writing a browser-context custom action that attempts to open a direct database connection.",
-      "bestPractice": "Database validation/manipulation requires a CLI action or validation, which runs as a Node.js script in the CLI environment — outside the browser sandbox — precisely so it can reach resources like a database."
+      "bestPractice": "For direct database-driver queries, configure a CLI step with the required package, credentials and network access. Browser/API outcome assertions are distinct supported approaches."
     },
     {
-      "title": "Assuming Copilot's Generate command only works on regular custom steps",
-      "trapDescription": "Hand-writing a CLI action's Node.js code from scratch, on the assumption that AI code generation isn't available for that step type.",
-      "bestPractice": "Copilot's Generate command works inside a CLI action step too — describe the desired logic in plain text and let Copilot produce the Node.js implementation, the same workflow used for ordinary custom steps."
+      "title": "Treating generated chat code as an installed implementation",
+      "trapDescription": "Assuming requesting code automatically applies and validates it.",
+      "bestPractice": "Use a documented supported step, insert the draft explicitly, review and test it. Configure required packages/parameters and return asynchronous completion as required."
     }
   ],
   "practiceQuiz": [
@@ -86,12 +86,20 @@
         "B"
       ],
       "hint": "It's specifically outside the browser.",
-      "rationale": "CLI actions and validations are custom Node.js scripts executed in your CLI environment, initiated from inside a test like a standard custom action — but running outside the browser, unlike regular custom actions."
+      "rationale": "CLI actions and validations are custom Node.js scripts executed in your CLI environment, initiated from inside a test like a standard custom action — but running outside the browser, unlike regular custom actions.",
+      "optionExplanations": {
+        "A": "Browser custom steps use a different runtime.",
+        "B": "CLI steps execute Node.js in the CLI environment.",
+        "C": "The runtime is not universally a managed cloud function with no local access.",
+        "D": "The step does not execute inside the AUT backend process by default."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-1f18af1545e5"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A test needs to directly query a database to confirm a record was created. Which type of step is required?",
+      "scenario": "A test must query a database through its Node.js driver in an authorized connected runtime. Which listed step fits this direct query?",
       "options": [
         {
           "id": "A",
@@ -99,7 +107,7 @@
         },
         {
           "id": "B",
-          "text": "A CLI validation, since it runs outside the browser sandbox and can reach a database connection."
+          "text": "A CLI validation with the configured database driver, credentials and network access."
         },
         {
           "id": "C",
@@ -113,21 +121,29 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "The browser sandbox can't open arbitrary database connections; the CLI environment can.",
-      "rationale": "CLI actions/validations enable advanced actions such as database validation and manipulation precisely because they run in the CLI's Node.js environment rather than inside the restricted browser sandbox."
+      "hint": "Direct driver access requires the configured runtime, not merely selecting a step type.",
+      "rationale": "The CLI runtime can use the required Node.js driver with configured access. This does not prohibit browser/API checks of server-provided results; those are different from the stated direct query.",
+      "optionExplanations": {
+        "A": "A browser step does not load the stated direct Node.js database driver.",
+        "B": "The configured CLI validation can perform the authorized driver query.",
+        "C": "Visible checks do not query the database driver.",
+        "D": "Configured CLI database checks are supported."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-1f18af1545e5"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "How can Testim Copilot help when creating a CLI action's coded step?",
+      "scenario": "How can Copilot assist a documented supported CLI validation step?",
       "options": [
         {
           "id": "A",
-          "text": "Copilot cannot generate code for CLI actions — only for regular custom steps."
+          "text": "It cannot assist CLI validation steps."
         },
         {
           "id": "B",
-          "text": "Its Generate command can produce the Node.js code for the CLI action from a plain-text description."
+          "text": "Generate a code draft from a description, then insert, review and test it in the configured CLI runtime."
         },
         {
           "id": "C",
@@ -141,8 +157,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "It's the same Generate command used for ordinary custom steps, applied to a CLI action.",
-      "rationale": "The same Coding Assistant Generate command used for regular custom steps also works inside a CLI action step — describing the desired logic in plain text produces the Node.js implementation, without needing to hand-write it or convert the step to a different type."
+      "hint": "Generated code in chat still needs deliberate insertion and validation.",
+      "rationale": "The documented supported list includes CLI validation. Generate offers a draft; insertion, package/parameter setup and behavior testing remain required.",
+      "optionExplanations": {
+        "A": "The supported list explicitly includes CLI validation.",
+        "B": "A draft is generated, then deliberately inserted and validated.",
+        "C": "Assistance does not automatically convert the execution runtime.",
+        "D": "Generate can propose code, not only explain existing code."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-9a122d86a540"
     }
   ],
   "quickRecap": [
@@ -152,11 +176,11 @@
     },
     {
       "key": "Why it exists",
-      "value": "Reaches what the browser sandbox can't — database validation/manipulation, image/PDF validation."
+      "value": "Configured Node.js packages and resource access support direct database and file checks; access is not automatic."
     },
     {
       "key": "Copilot + CLI actions",
-      "value": "The Generate command writes a CLI action's Node.js code from a plain-text description — same workflow as regular custom steps."
+      "value": "Documented CLI validation assistance produces a draft; insert, review and test it."
     }
   ],
   "topics": [
@@ -170,5 +194,7 @@
       "url": "https://docs.tricentis.com/testim/content/advanced-editing/coding-assistant.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim web documentation checked 2026-10-06"
 }
