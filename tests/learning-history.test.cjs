@@ -1167,3 +1167,13 @@ test('mobile installation review distinguishes Appium port, REST bindings and re
  assert.match(d.practiceQuiz[2].rationale,/not proof/);
  assert.doesNotMatch(JSON.stringify(d),/default REST port is 8585|Only the --rest-address|api\/devices|installer itself is identical|VM installs work unofficially/);
 });
+
+test('Android preparation review scopes vendor security, host support and installed app identifiers',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m03_preparing_android.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A','B','C'],['B'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].items[3],/Trust can need renewal/);
+ assert.match(d.studyGuide[2].elements[1].items[1],/does discuss Permission Monitoring/);
+ assert.match(d.studyGuide[2].elements[1].items[2],/verify.*application owner/);
+ assert.match(d.studyGuide[3].elements[3].text,/BundleID identifies an installed iOS/);
+ assert.doesNotMatch(JSON.stringify(d),/only appears the first time|safe to skip|debug keystore|two most common|ships no ARM64 Windows|grep mCurrentFocus/);
+});
