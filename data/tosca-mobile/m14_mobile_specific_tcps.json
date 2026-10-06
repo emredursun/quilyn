@@ -5,7 +5,7 @@
   "learningObjectives": [
     "Describe mobile-specific test configuration parameters that help optimize test execution.",
     "Separate the TCPs that establish a connection from the ones that tune how a run behaves.",
-    "Choose LiveView and reset settings deliberately for authoring versus unattended execution.",
+    "Distinguish scan preview/reset options from execution TCPs and driver-specific state handling.",
     "Explain why TCP scoping matters once the same TestCases run in more than one environment."
   ],
   "estTime": "25 min",
@@ -16,16 +16,16 @@
         {
           "type": "concept",
           "term": "Connection TCPs versus tuning TCPs",
-          "description": "The earlier courses used TCPs to answer a single question: which agent and which device. TMAServer, DeviceName, Type. Those are connection parameters, and a wrong value there means nothing runs at all. This course adds a second category: parameters that assume the connection already works and instead shape how the run behaves. A wrong value there does not stop the run. It makes it slower, less stable, or less informative, which is considerably harder to notice."
+          "description": "Documented mobile TCPs configure connection, target and execution behavior. TMAServer and DeviceName are connection/target examples; LiveView, ScreenFlow, ScrollToVisible and TapByCoordinates control other documented behavior. Type is a Mobile Scan selection, not a generic execution TCP listed in the mobile TCP table. Invalid values in either group can produce errors; failure timing is not a guaranteed classification."
         },
         {
           "type": "note",
-          "text": "That difference in failure mode is worth holding onto. Connection TCPs fail loudly and immediately. Tuning TCPs fail quietly and gradually, usually showing up as flakiness that gets blamed on the application."
+          "text": "Treat these categories as an explanatory aid, not a rule that connection mistakes always fail immediately while all other mistakes remain silent. Inspect actual effective values and failure evidence."
         }
       ],
       "bulletPoints": [
-        "Connection TCPs decide whether a run happens. Tuning TCPs decide how well it happens.",
-        "Misconfigured tuning parameters surface as flakiness, not as errors."
+        "Use documented TCP names and values for the actual connection.",
+        "Behavior parameters can also produce explicit errors."
       ],
       "sectionId": "section-dc9a3d913bf8"
     },
@@ -36,21 +36,21 @@
           "type": "list",
           "title": "The levers worth knowing",
           "items": [
-            "LiveView. A live visual feed of the device during scanning and execution. Genuinely useful while authoring, because a failed TestStep can be correlated with what the screen actually showed. It costs throughput, and nobody is watching an unattended nightly run.",
-            "Reset application. Clears application state before the run starts, so each execution begins from a known baseline rather than inheriting whatever the previous run left behind.",
-            "OSVersion. Constrains which device version a run targets, which matters as soon as the device pool holds more than one.",
-            "Device type and platform filters. Narrow which devices a dynamic selection is allowed to resolve to."
+            "LiveView=True enables execution screenshots that update when the TestStep changes; local execution only. The Mobile Scan Run Live View checkbox is a separate interactive preview setting, not the execution screenshot cadence.",
+            "Reset application is a Mobile Scan checkbox that resets user settings/permissions and restarts an already open app. It is not a universal execution TCP; session reset behavior requires the actual driver/capabilities and validation.",
+            "OSVersion is documented for iOS simulators and Android version-based selection without an exact device ID.",
+            "ScreenFlow=True saves screenshots of Input TestStepValues and requires ScreenFlowPath; TapByCoordinates=True provides a documented tap fallback for {CLICK}. Scan platform/OS/type filters are not a universal TCP filter grammar."
           ]
         },
         {
           "type": "concept",
           "term": "Reset application and test independence",
-          "description": "Skipping the reset is tempting because it makes a run start faster, and it works fine while you are executing one TestCase at a time by hand. It stops working the moment TestCases run in sequence or in parallel, because each one inherits state from whatever ran before it. The symptom is a TestCase that passes alone and fails in a suite, which is one of the most time-consuming failure patterns to diagnose."
+          "description": "Establish the application, account and relevant backend state required by each test. A driver-specific application reset may be useful, but a scan checkbox does not certify execution reset, complete backend cleanup or independence of every subsequent test."
         }
       ],
       "bulletPoints": [
-        "LiveView on while authoring, off for unattended runs.",
-        "Reset application is what keeps a TestCase from depending on the one that ran before it."
+        "Separate interactive scan preview from local execution screenshots.",
+        "Validate application and backend baselines; no universal reset TCP is established."
       ],
       "sectionId": "section-cc322b35cdeb"
     },
@@ -60,42 +60,42 @@
         {
           "type": "concept",
           "term": "The same TestCase, several environments",
-          "description": "TCPs follow Tosca's normal scoping rules, so a value set at Project level can be overridden by a Configuration and again per environment. While everything runs on one local emulator, this is invisible. It becomes the central mechanism the moment the same TestCases have to run against a local emulator during development and a shared device pool in CI, because only the configuration should differ between those two, never the TestCases."
+          "description": "TCPs are supported on multiple Tosca objects, including the project root, relevant folders, TestCases, ExecutionLists and ExecutionEntries. Child objects inherit values and lower-level values can override them. Bundled configurations support reuse; inspect effective values for each environment rather than inventing a fixed Project → Configuration → environment hierarchy."
         },
         {
           "type": "warning",
-          "text": "The anti-pattern to avoid: duplicating a TestCase so one copy points at the local emulator and another at the shared pool. Two copies drift. Keep one TestCase and let the configuration carry the difference, which is exactly what the TCP scoping hierarchy exists for."
+          "text": "For otherwise equivalent scenarios, reuse TestCases and maintain connection differences in supported configurations to reduce duplication. Different workflows or target capabilities may still require purposeful test variants."
         }
       ],
       "bulletPoints": [
-        "One TestCase, several configurations. Never several copies of the TestCase.",
-        "Scoping is invisible on a single local device and becomes essential as soon as there are two environments."
+        "Children inherit TCPs; lower-level overrides affect their descendants.",
+        "Reuse equivalent scenarios with configuration; validate purposeful variants when workflows differ."
       ],
       "sectionId": "section-ec699120c987"
     }
   ],
   "examPitfalls": [
     {
-      "title": "Leaving LiveView enabled for unattended runs",
-      "trapDescription": "Authoring with LiveView on, then shipping the same configuration into a nightly or CI run where nobody is watching the feed.",
-      "bestPractice": "LiveView earns its cost while authoring and debugging, where correlating a failure with the actual screen saves time. For unattended execution it adds overhead with no observer, so turn it off through configuration rather than editing TestCases."
+      "title": "Confusing scan preview with execution LiveView",
+      "trapDescription": "Expecting continuous interactive video from an execution TCP on every connection.",
+      "bestPractice": "Execution LiveView provides local screenshots on TestStep changes. Scan preview uses its own checkbox; choose evidence collection appropriate to the run."
     },
     {
-      "title": "Skipping Reset application and then debugging suite-only failures",
-      "trapDescription": "A TestCase that passes reliably on its own and fails when run as part of a larger ExecutionList.",
-      "bestPractice": "Without a reset, each TestCase inherits application state from whatever ran before it. Establishing a known baseline through Reset application removes an entire class of order-dependent failures."
+      "title": "Treating the scan reset checkbox as complete test isolation",
+      "trapDescription": "Assuming Reset application guarantees every execution clears all application and backend state.",
+      "bestPractice": "The checkbox applies to Mobile Scan. Validate the actual execution driver/capabilities and explicit application/account/backend prerequisites."
     },
     {
-      "title": "Duplicating TestCases per environment instead of scoping TCPs",
-      "trapDescription": "Keeping one copy of a TestCase pointed at a local emulator and another pointed at a shared device pool.",
-      "bestPractice": "Keep a single TestCase and express the environment difference through TCP scoping. Duplicated TestCases drift apart, and the drift is usually discovered through a failure that only reproduces in one environment."
+      "title": "Duplicating equivalent tests for connection differences",
+      "trapDescription": "Maintaining drifting copies only to change the target/server.",
+      "bestPractice": "Reuse supported configurations for equivalent scenarios and inspect inherited/overridden values. Separate test variants only for actual workflow differences."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "How does a misconfigured tuning TCP typically differ from a misconfigured connection TCP such as TMAServer?",
+      "scenario": "Which statement correctly describes the scope of mobile configuration parameters?",
       "options": [
         {
           "id": "A",
@@ -103,7 +103,7 @@
         },
         {
           "id": "B",
-          "text": "A connection TCP fails loudly and immediately, while a tuning TCP tends to surface later as flakiness or reduced information."
+          "text": "They configure connection/target and documented behavior; errors can occur in either category."
         },
         {
           "id": "C",
@@ -117,13 +117,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Consider which one produces an error and which one produces a slow drift toward unreliability.",
-      "rationale": "Connection parameters decide whether a session starts at all, so mistakes there are immediate and visible. Tuning parameters assume a working connection and shape run quality, so mistakes there show up as instability that often gets misattributed to the application."
+      "hint": "Category alone does not guarantee when or how a failure appears.",
+      "rationale": "Use documented TCPs for connection, targets and behavior. Their categories do not guarantee immediate versus silent failures, and TCPs are supported on several object levels and platforms.",
+      "optionExplanations": {
+        "A": "Neither category is guaranteed to stop every run immediately.",
+        "B": "Both documented connection and behavior settings can produce errors.",
+        "C": "TCPs are supported on multiple object levels.",
+        "D": "Mobile connection parameters are not Android-only."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-dc9a3d913bf8"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A TestCase passes consistently when executed on its own but fails when run inside a larger ExecutionList. Which configuration choice most likely explains it?",
+      "scenario": "Logs confirm a test fails only after a prior run because an account’s application state was not restored to its required baseline. Which response addresses the established cause?",
       "options": [
         {
           "id": "A",
@@ -131,7 +139,7 @@
         },
         {
           "id": "B",
-          "text": "Reset application is not being applied, so the TestCase inherits state from the previous run."
+          "text": "Restore and verify the required state using the actual supported setup/reset workflow."
         },
         {
           "id": "C",
@@ -145,13 +153,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "The distinguishing factor is that something ran before it.",
-      "rationale": "Without a reset, application state carries over between executions, which produces failures that only appear when TestCases run in sequence. A missing trailing slash on TMAServer would prevent the run entirely, not just in a suite."
+      "hint": "The scenario establishes state carry-over, not a URL or screenshot issue.",
+      "rationale": "Restore and verify the specific required state. The Mobile Scan reset checkbox does not establish a universal execution reset or backend cleanup guarantee.",
+      "optionExplanations": {
+        "A": "Screenshot display does not restore the confirmed account baseline.",
+        "B": "This addresses the established state carry-over using supported setup.",
+        "C": "The evidence establishes state carry-over, not this URL defect.",
+        "D": "An OS version value does not restore the confirmed account baseline."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-cc322b35cdeb"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "The same mobile TestCases need to run against a local emulator during development and a shared device pool in CI. What is the intended approach?",
+      "scenario": "Equivalent mobile scenarios need different supported connection values in development and CI. Which approach reduces unnecessary duplication?",
       "options": [
         {
           "id": "A",
@@ -173,30 +189,38 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "Only the configuration should differ between the two environments.",
-      "rationale": "TCP scoping exists so environment differences live in configuration rather than in the TestCases. Duplicating TestCases creates copies that drift apart and produce environment-specific failures."
+      "hint": "The scenarios are stated to be equivalent; inspect effective configuration values.",
+      "rationale": "Use supported configurations and TCP inheritance/overrides to reuse equivalent TestCases. This does not guarantee one workflow covers genuinely different target behavior.",
+      "optionExplanations": {
+        "A": "Equivalent scenarios need not be duplicated solely for connection values.",
+        "B": "Supported configurations and TCP overrides allow equivalent scenario reuse.",
+        "C": "Different connection values alone do not establish a need to re-scan.",
+        "D": "Image identification does not eliminate environment requirements."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-ec699120c987"
     }
   ],
   "quickRecap": [
     {
       "key": "Two categories",
-      "value": "Connection TCPs (TMAServer, DeviceName, Type) decide whether a run happens. Tuning TCPs decide how it behaves."
+      "value": "Documented parameters configure targets/connections and behavior; Type is not a generic listed execution TCP."
     },
     {
       "key": "Failure modes",
-      "value": "Connection mistakes fail loudly and immediately. Tuning mistakes surface later as flakiness."
+      "value": "Either category can fail explicitly; diagnose actual evidence."
     },
     {
       "key": "LiveView",
-      "value": "On while authoring and debugging. Off for unattended runs, where it costs throughput with nobody watching."
+      "value": "Execution LiveView: local screenshots on TestStep changes. Scan preview: separate checkbox."
     },
     {
       "key": "Reset application",
-      "value": "Establishes a known baseline. Removes order-dependent failures where a TestCase passes alone and fails in a suite."
+      "value": "Reset application is a scan option; validate actual execution state handling and backend prerequisites."
     },
     {
       "key": "Scoping",
-      "value": "One set of TestCases, several configurations. Duplicating TestCases per environment causes drift."
+      "value": "Children inherit TCPs; lower-level overrides and reusable configurations support equivalent scenarios."
     }
   ],
   "topics": [
@@ -209,6 +233,13 @@
       "title": "Configure local or remote test automation (Tricentis docs)",
       "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/configure_mobile_local_remote_tests.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Mobile TCPs (Tosca 2026.1 LTS)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/configure_mobile_tests.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS",
+  "sourceReviewedOn": "2026-10-06"
 }

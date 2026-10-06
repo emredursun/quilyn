@@ -1263,3 +1263,21 @@ test('mobile troubleshooting review requires evidence and scopes logging instead
  assert.match(d.practiceQuiz[0].scenario,/unresponsive.*boot has not been confirmed/);
  assert.doesNotMatch(JSON.stringify(d),/api\/devices|every log line.*tagged|most real-world|trailing-slash formatting problem|misleading by design|re-sign with apksigner|version mismatches last/);
 });
+
+test('mobile image review documents additional references and resolution methods without course licensing claims',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m13_image_based_test_automation.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['A','B','C'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[1].items[2],/default is 85%/);
+ assert.match(d.studyGuide[0].elements[2].text,/does not support Edit images.*MultiScaleTemplate.*Feature/);
+ assert.match(d.practiceQuiz[1].options[3].text,/leaves.*rendering.*state unchanged/);
+ assert.doesNotMatch(JSON.stringify(d),/Official prerequisites|Official course description|Built on Tosca 2024.2|All are passing builds|all break image matches/);
+});
+
+test('mobile tuning review separates scan reset and preview from execution TCPs and inherited values',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m14_mobile_specific_tcps.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[0].items[0],/TestStep changes.*local execution only/);
+ assert.match(d.studyGuide[1].elements[0].items[1],/Mobile Scan checkbox.*not a universal execution TCP/);
+ assert.match(d.studyGuide[2].elements[0].description,/Child objects inherit.*lower-level/);
+ assert.doesNotMatch(JSON.stringify(d),/fail loudly and immediately|A live visual feed|wrong value there does not stop|Removes order-dependent failures|Never several copies/);
+});
