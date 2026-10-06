@@ -1110,3 +1110,13 @@ test('AE1 image review distinguishes XScan anchors from PDF and checks identifie
  assert.match(d.studyGuide[2].elements[0].description,/not the PDF Scan/);
  assert.match(d.studyGuide[3].elements[1].text,/does not establish that every identification mode is covered/);
 });
+
+test('AE1 mobile review scopes app opening, capability exception and Agent version requirements',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m10_mobile_engine.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['A'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.practiceQuiz[0].scenario,/does not set Desired Capabilities first/);
+ assert.match(d.studyGuide[3].elements[2].description,/exception.*Set Desired Capabilities.*Mobile websites.*OpenUrl/);
+ assert.match(d.studyGuide[1].elements[2].text,/2025.4.*iOS hosting to macOS/);
+ assert.match(d.studyGuide[4].elements[1].description,/--rest-address.*--appium-port.*separately/);
+ assert.doesNotMatch(JSON.stringify(d),/safe to skip|fault is on Tosca's side|no Android Emulator exists|GET.*api\/devices|BundleID.*those are for installing from an APK/);
+});

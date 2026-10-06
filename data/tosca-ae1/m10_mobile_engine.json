@@ -6,8 +6,8 @@
     "Explain what the Tricentis Mobile Agent provides and what setup burden it removes.",
     "Distinguish Local (TMA) from Remote (TMA) connections.",
     "Prepare an Android device for test automation.",
-    "Scan a mobile application and build a TestCase, starting with the mandatory Open Mobile App TestStep.",
-    "Configure a remote TMA correctly — including the TMAServer trailing slash and the --rest-address startup flag.",
+    "Scan a mobile application and distinguish native/hybrid opening from mobile website opening, including Desired Capabilities setup.",
+    "Configure a remote TMA using documented server formats, distinguishing REST binding from the Appium port.",
     "Diagnose mobile setup failures by separating device-side problems from Tosca-side ones."
   ],
   "estTime": "40 min",
@@ -23,7 +23,7 @@
         {
           "type": "concept",
           "term": "Mobile Engine 3.0",
-          "description": "The Engine that steers mobile applications, working through the Mobile Agent. As with every Engine 3.0, once Modules exist the TestCase-building workflow is the familiar one — the mobile-specific work is all in the connection and scanning setup."
+          "description": "Mobile Engine 3.0 steers supported mobile applications through a configured connection. Modules use the familiar Tosca TestCase workflow, but application type, supported controls, capabilities and device preparation still affect execution."
         }
       ],
       "bulletPoints": [
@@ -38,21 +38,21 @@
         {
           "type": "concept",
           "term": "Local (TMA)",
-          "description": "Connects a device to the workstation running Tricentis Tosca — via USB cable, or to a simulator or emulator running on that same machine. This is the typical setup while developing tests, and what the course exercises use."
+          "description": "Local (TMA) uses a locally connected supported device or Android emulator. Select a device explicitly when required by the topology; a single local Android device does not require DeviceName. Check the requirements for the installed Agent version."
         },
         {
           "type": "concept",
           "term": "Remote (TMA)",
-          "description": "A remotely installed Tricentis Mobile Agent connects to a remote device, emulator, or simulator. This is what you use when the device farm lives elsewhere — a shared lab, a CI environment, or cloud-hosted devices."
+          "description": "Remote (TMA) reaches an Agent on another machine and its supported device, emulator or simulator. Remote TMA is distinct from connecting directly to a cloud provider’s Appium endpoint."
         },
         {
           "type": "note",
-          "text": "The choice is a configuration matter, not a different way of writing tests. The same TestCase can run against a locally attached phone or a remote one; only the connection configuration changes."
+          "text": "The authoring model stays the same, but moving a test requires validating device/app compatibility, capabilities and connection configuration. TMA 2025.4 requirements restrict iOS hosting to macOS; older Agent/Tosca guides describe broader host support. Use the installed Agent version’s requirements rather than assuming those descriptions apply unchanged."
         }
       ],
       "bulletPoints": [
-        "Local (TMA) = device/emulator on the Tosca workstation, USB or local simulator.",
-        "Remote (TMA) = remotely installed agent reaching a remote device."
+        "Local and remote describe connection topology, not separate TestCase languages.",
+        "Validate host/device support against the installed TMA version; newer and legacy guides differ."
       ],
       "sectionId": "section-786c801112c0"
     },
@@ -70,7 +70,7 @@
         },
         {
           "type": "warning",
-          "text": "USB debugging is the step most often missed. Without it the device may charge and appear in Windows, yet remain invisible to the Mobile Agent — the symptom looks like a Tosca problem but is a device configuration one."
+          "text": "If Windows recognizes a phone but automation cannot reach it, check USB debugging, authorization, data access and the device driver. Recognition alone does not prove automation readiness; missing debugging is one possible cause, not a proven most-common diagnosis."
         }
       ],
       "bulletPoints": [
@@ -93,26 +93,26 @@
         },
         {
           "type": "concept",
-          "term": "Open Mobile App must come first",
-          "description": "Drag and drop the Open Mobile App Module onto the TestCase — and note the constraint: it must be the first TestStep of the TestCase. Nothing can be steered on the device until the application has been opened through this Module."
+          "term": "Open the correct application type",
+          "description": "Use Open Mobile App for native/hybrid applications before steering them. The Standard Mobile Module reference documents an exception: Set Desired Capabilities may precede it. Mobile websites instead start with OpenUrl, Browser=ChromeAndroid or SafariiOS, and UseActiveTab left empty."
         },
         {
           "type": "note",
-          "text": "This mirrors the Excel lesson's mandatory TBox Open Excel Workbook first step. A recurring pattern across AE1: engines that attach to an external resource require an explicit open step before anything else in the TestCase."
+          "text": "Opening rules depend on the resource and setup Modules. Do not generalize an unconditional first-step rule across Excel file comparison, mobile web and native applications."
         },
         {
           "type": "list",
-          "title": "The Mobile Modules in the AE1 workspace (Standard modules → TBox XEngines → Mobile)",
+          "title": "Examples from Standard modules → Engines → Mobile (platform support varies)",
           "items": [
-            "Open Mobile App — mandatory first TestStep. Switch Mobile App moves between apps mid-test.",
+            "Open Mobile App — native/hybrid opening, after any required Desired Capabilities setup. Switch Mobile App switches applications.",
             "Set Desired Capabilities — configures the Appium capabilities for the session.",
             "Click On Screen · Swipe On Screen · Draw On Screen — coordinate-based gestures for when no control is addressable.",
             "Send Text Input To Focused Control · Set Autohide Keyboard — text entry and keyboard behaviour.",
             "ME3.0 Hardware Button Operations · ME3.0 Set Device Orientation — physical buttons and rotating the device.",
-            "Upload File to Mobile Device · Download File from Mobile Device — moving files on and off the device.",
+            "Upload File to Mobile Device · Download File from Mobile Device — Android file transfer.",
             "Get Appium Session Id · End Appium Session — session lifecycle control.",
             "Android Snackbar — steers the Android transient message component.",
-            "Biometrics: Use Android fingerprint authentication · Use iOS biometric authentication · Set iOS biometrics enrollment · Use Perfecto biometrics authentication · Handle Perfecto Image Injection."
+            "Biometrics: Use Android fingerprint authentication · Use iOS biometric authentication · Set iOS biometrics enrollment (iOS simulator). Check each Module’s supported environment."
           ]
         },
         {
@@ -121,81 +121,67 @@
         }
       ],
       "bulletPoints": [
-        "Mobile Scan covers native, hybrid AND web mobile applications.",
-        "Connection is configured through TCPs.",
-        "Open Mobile App = mandatory first TestStep."
+        "Mobile automation covers native, hybrid and web applications with different opening paths.",
+        "TCPs and Desired Capabilities configure the connection and session.",
+        "Open Mobile App opens native/hybrid apps; OpenUrl opens mobile websites."
       ],
       "sectionId": "section-f77a735c4f21"
     },
     {
-      "sectionTitle": "Real-world setup notes: running TMA on a separate machine",
+      "sectionTitle": "Remote setup and diagnostic boundaries",
       "elements": [
         {
-          "type": "warning",
-          "text": "The TMAServer TCP value MUST end with a trailing slash: http://<ip>:8585/ — not http://<ip>:8585. Without it, execution fails with the misleading message 'Could not create TMA session: Ensure that the requested device is connected.' The cause is that TMA's REST base path is /api and Tosca appends onto the TMAServer value, so a missing slash produces a broken URL and the request never leaves Tosca."
-        },
-        {
-          "type": "note",
-          "text": "What makes this trap so confusing: the Mobile Scan wizard's Add connection dialog tolerates the missing slash, so scanning works perfectly while TestCase execution fails. Seeing Scan succeed naturally leads you to rule out the connection — and look everywhere except the one value that is wrong."
+          "type": "concept",
+          "term": "Use the documented endpoint format",
+          "description": "The Tosca mobile configuration guide gives remote addresses as http://<ip_address>:<port_number>/. Keep the documented trailing slash. It does not establish that every missing-slash failure has one exact error or that the Scan wizard always tolerates it."
         },
         {
           "type": "concept",
-          "term": "Remote TMA must be started with --rest-address",
-          "description": "Launching TMA from the tray icon or Start Menu starts it for LOCAL use only. When Tosca and TMA run on different machines, start the agent from the command line with the --rest-address flag: tricentis-mobile-agent start --rest-address <IP>:<port>. On Windows the executable lives under C:\\Program Files\\Tricentis\\Mobile Agent; on macOS inside /Applications/Tricentis Mobile Agent.app."
+          "term": "REST binding is not the Appium port",
+          "description": "The TMA 2025.4 CLI binds services to localhost by default. Use --rest-address <IP>:<port> for a reachable web-server binding. --appium-port configures Appium separately; --grpc-address configures gRPC. Match the service endpoint required by Tosca rather than treating these switches as interchangeable."
         },
         {
           "type": "concept",
-          "term": "Diagnosing device-side vs Tosca-side problems",
-          "description": "TMA exposes a REST endpoint you can query directly: http://<ip>:<port>/api/devices returns JSON with each device's udid, name, connected, busy and statusReady fields. If that shows connected:true and busy:false, the device side is healthy and the fault is on Tosca's side — which saves you from chasing firewall, proxy, and network theories."
+          "term": "Diagnose one layer at a time",
+          "description": "Check Agent/device availability, the endpoint from the Tosca host, session logs, capabilities and application identifiers. A connected or idle device status alone cannot rule out firewall, routing, permissions or session-creation problems. No undocumented REST response schema is required for this lesson."
         },
         {
           "type": "steps",
-          "title": "Getting AppPackage and AppActivity for an installed Android app",
+          "title": "Specify an installed Android application",
           "items": [
-            "Open the app on the device or emulator so it is the foreground window.",
-            "Run: adb shell dumpsys window | grep mCurrentFocus (use findstr instead of grep on Windows).",
-            "The output ends with packagename/activityname — put the part before the slash in AppPackage and the part after it in AppActivity.",
-            "Leave Application, BundleID, and Application Path empty when the app is already installed; those are for installing from an APK file."
+            "Obtain the package and launch activity from the application team or a verified Android tool for that build.",
+            "Enter them in AppPackage and AppActivity. This method requires the app to be installed.",
+            "Alternatively, Application Path points to an APK that Tosca installs. BundleID identifies an iOS app; it is not an Android APK installation field."
           ]
-        },
-        {
-          "type": "note",
-          "text": "Where is adb? It ships with TMA — on Windows under C:\\Program Files\\Tricentis\\Mobile Agent\\app\\android-sdk\\platform-tools, and with Android Studio under ~/Library/Android/sdk/platform-tools on macOS. You do not need a separate Android SDK install just for adb."
         },
         {
           "type": "concept",
-          "term": "Emulators must run on the same machine as TMA",
-          "description": "Tricentis recommends Android Studio for emulators, and the emulator has to run on the machine running TMA. That constraint drives the whole topology: if Tosca Commander runs in a VM but the emulator runs on the host, then TMA belongs on the host alongside the emulator, and Tosca connects to it remotely."
+          "term": "Choose supported host hardware",
+          "description": "TMA 2025.4 documents bare-metal hosts and requires the Android emulator to run on the same machine as the Agent. It supports Android Studio for Android virtual devices and Xcode for iOS virtual devices. Confirm host architecture, OS and emulator support for your installed versions before setup."
         },
         {
           "type": "warning",
-          "text": "The Android Emulator does not exist for Windows on ARM. Google publishes no ARM64 Windows emulator package, so the SDK Manager never lists it and AVD creation fails with 'Dependant package with key emulator not found'. On an ARM Windows VM the only paths are a physical device, or running the emulator on the host machine with TMA beside it."
+          "text": "Do not diagnose every APK parsing failure as a v1-signature problem or blindly re-sign the app: changing signing identity can affect updates and behavior. Obtain a compatible test build from its owner and inspect the actual installation error."
         },
         {
-          "type": "list",
-          "title": "Device-side gotchas that look like Tosca problems",
-          "items": [
-            "Samsung Auto Blocker (One UI 6+) greys out USB debugging. Turn it off under Settings → Security and privacy → Auto Blocker.",
-            "The exercise step 'Disable permission monitoring' no longer exists in Developer options on many current Android builds — it is absent from Tricentis' own Android prerequisites too, so it is safe to skip.",
-            "Installing an APK can fail with INSTALL_PARSE_FAILED_NO_CERTIFICATES on newer Android versions when the APK carries only an old v1 signature. Re-sign it with the SDK's apksigner using a debug keystore, then install the signed copy.",
-            "TMA is documented as supported on bare-metal hardware only, not virtual machines. It may still work in a VM, but you are outside supported territory when it misbehaves."
-          ]
+          "type": "note",
+          "text": "Device vendor policies and Android settings vary. The public preparation guide documents USB debugging, phone data access and drivers, not a universal instruction to disable protections or skip every permission-related requirement."
         }
       ],
       "bulletPoints": [
-        "TMAServer needs the trailing slash — Scan tolerates its absence, execution does not.",
-        "Remote TMA: start with --rest-address, not from the tray.",
-        "GET /api/devices proves whether the device side is healthy.",
-        "No Android Emulator exists for Windows on ARM."
+        "Use the documented address format with its trailing slash.",
+        "REST, Appium and gRPC are separate service bindings.",
+        "A device status check is evidence for one layer, not proof that all connectivity is healthy.",
+        "Check the installed Agent’s host/OS requirements; place the emulator with the Agent."
       ],
       "sectionId": "section-7c84b621f387"
     }
   ],
   "examPitfalls": [
     {
-      "title": "Placing Open Mobile App anywhere other than first",
-      "trapDescription": "Adding navigation or verification TestSteps before the Open Mobile App Module.",
-      "bestPractice": "Open Mobile App must be the first TestStep of the TestCase. Nothing on the device can be steered before the application has been opened through it — the same pattern as TBox Open Excel Workbook in the Excel lesson."
+      "title": "Applying one opening rule to every mobile test",
+      "trapDescription": "Using Open Mobile App for websites or ignoring required capability setup.",
+      "bestPractice": "Use Open Mobile App for native/hybrid applications before steering them. The Standard Mobile Module reference documents an exception: Set Desired Capabilities may precede it. Mobile websites instead start with OpenUrl, Browser=ChromeAndroid or SafariiOS, and UseActiveTab left empty."
     },
     {
       "title": "Assuming Appium must be installed and configured manually",
@@ -210,7 +196,7 @@
     {
       "title": "Thinking Remote (TMA) requires different TestCases",
       "trapDescription": "Rebuilding TestCases when moving from a locally attached device to a remote device farm.",
-      "bestPractice": "Local and Remote (TMA) differ in connection configuration only. The same TestCase runs against either; only the configuration pointing at the agent and device changes."
+      "bestPractice": "Local and remote use the same authoring model. Validate capabilities, app and platform compatibility as well as connection configuration when moving a test."
     },
     {
       "title": "Assuming Mobile Scan only handles native apps",
@@ -219,25 +205,25 @@
     },
     {
       "title": "Omitting the trailing slash from the TMAServer TCP",
-      "trapDescription": "Entering http://<ip>:8585 as the TMAServer value, watching the Mobile Scan connect perfectly, then getting 'Could not create TMA session: Ensure that the requested device is connected' on every execution — and concluding the device or the network is at fault.",
-      "bestPractice": "TMAServer must end with a trailing slash: http://<ip>:8585/. Tosca appends onto that value to reach TMA's /api base path. Verify a connection value against the documented format before investigating firewall, proxy, or device theories — the Add connection dialog accepts a value that execution will reject."
+      "trapDescription": "Using an address inconsistent with the documented remote endpoint format, then assuming a successful scan proves execution connectivity.",
+      "bestPractice": "Use the documented http://<ip_address>:<port_number>/ format. Validate scan and execution configuration separately; neither a successful scan nor a generic error proves one particular root cause."
     },
     {
       "title": "Starting a remote Mobile Agent from the tray icon",
       "trapDescription": "Launching TMA normally on a second machine, seeing its console load in the browser from the Tosca machine, and assuming remote connection is fully enabled.",
-      "bestPractice": "For Tosca and TMA on different machines, start the agent with tricentis-mobile-agent start --rest-address <IP>:<port>. The console being reachable is not proof that the agent is running in remote mode."
+      "bestPractice": "The TMA 2025.4 CLI binds services to localhost by default. Use --rest-address <IP>:<port> for a reachable web-server binding. --appium-port configures Appium separately; --grpc-address configures gRPC. Match the service endpoint required by Tosca rather than treating these switches as interchangeable."
     },
     {
-      "title": "Trying to run an Android emulator inside a Windows-on-ARM VM",
-      "trapDescription": "Installing Android Studio in an ARM Windows VM and hunting for the missing 'Android Emulator' SDK package after AVD creation fails.",
-      "bestPractice": "Google ships no Android Emulator for Windows on ARM — the package genuinely does not exist for that platform. Run the emulator on the host machine with TMA installed alongside it, and connect Tosca to that agent remotely."
+      "title": "Ignoring the installed Agent’s support matrix",
+      "trapDescription": "Assuming an older Windows/iOS or emulator guide applies to every later Agent build.",
+      "bestPractice": "TMA 2025.4 documents bare-metal hosts and requires the Android emulator to run on the same machine as the Agent. It supports Android Studio for Android virtual devices and Xcode for iOS virtual devices. Confirm host architecture, OS and emulator support for your installed versions before setup. TMA 2025.4 lists iOS hosts as macOS only."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "Which Module must be the first TestStep of a mobile TestCase?",
+      "scenario": "For a native/hybrid mobile TestCase that does not set Desired Capabilities first, which Module opens the app before steering?",
       "options": [
         {
           "id": "A",
@@ -259,8 +245,16 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "The same 'open before you touch anything' pattern as the Excel lesson.",
-      "rationale": "You drag and drop the Open Mobile App Module onto the TestCase, and it must be the first TestStep. Nothing on the device can be steered until the application has been opened."
+      "hint": "Choose the native/hybrid opening Module; mobile websites use a different path.",
+      "rationale": "Open Mobile App opens native/hybrid applications. Desired Capabilities setup is the documented exception to first position. Mobile websites use OpenUrl.",
+      "optionExplanations": {
+        "A": "This is not the documented native/hybrid opening Module. Connection parameters establish the device connection.",
+        "B": "Open Mobile App is the native/hybrid opening Module in this scenario. Capability setup may precede it when needed.",
+        "C": "Mobile Scan creates Modules during authoring; it is not the runtime opening TestStep.",
+        "D": "Opening must precede app steering; the order is not unconstrained."
+      },
+      "lessonSection": "section-f77a735c4f21",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -288,12 +282,20 @@
         "B"
       ],
       "hint": "It removes toolchain setup, not device setup or test authoring.",
-      "rationale": "TMA provides simplified setup and configuration of iOS and Android devices so you do not need to install Appium or Java components or configure environment variables. Device-side steps like USB debugging, and the scanning and authoring work, still apply."
+      "rationale": "TMA provides simplified setup and configuration of iOS and Android devices so you do not need to install Appium or Java components or configure environment variables. Device-side steps like USB debugging, and the scanning and authoring work, still apply.",
+      "optionExplanations": {
+        "A": "TMA manages connectivity and setup, not automatic creation of the intended TestCases.",
+        "B": "TMA packages the Appium/Java setup so those components and environment variables do not need manual assembly.",
+        "C": "Android device preparation, including USB debugging, still applies.",
+        "D": "Scanning and authoring remain part of the mobile testing workflow."
+      },
+      "lessonSection": "section-b12cae35aef7",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "An Android phone is connected by USB and is visible in Windows, but the Mobile Agent cannot see it. What is the most likely cause?",
+      "scenario": "An Android phone is visible in Windows, but automation cannot reach it. USB debugging is confirmed disabled. Which prerequisite should be corrected?",
       "options": [
         {
           "id": "A",
@@ -316,7 +318,15 @@
         "A"
       ],
       "hint": "Windows recognising the device is not the same as the device permitting automation.",
-      "rationale": "Android preparation requires allowing access to phone data, enabling USB debugging under Settings → Developer options, and having the USB driver installed. A device can charge and be recognised by Windows while still refusing debugging access."
+      "rationale": "Android preparation requires allowing access to phone data, enabling USB debugging under Settings → Developer options, and having the USB driver installed. A device can charge and be recognised by Windows while still refusing debugging access.",
+      "optionExplanations": {
+        "A": "The scenario explicitly confirms this required Android setting is disabled; enabling and authorizing debugging addresses that prerequisite.",
+        "B": "The documented device preparation issue is debugging access, not installing a Tosca license on the phone.",
+        "C": "Android is a supported mobile platform; this is not an iOS-only tool.",
+        "D": "Physical Android devices can use local connections; Remote TMA is a topology choice."
+      },
+      "lessonSection": "section-54286989717f",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
@@ -344,7 +354,15 @@
         "B"
       ],
       "hint": "The distinction is where the agent and the device live, not what they support.",
-      "rationale": "Local (TMA) connects a device via USB, or a simulator/emulator, to the workstation running Tosca. Remote (TMA) uses a remotely installed Mobile Agent to connect to a remote device, emulator or simulator. It is a configuration difference — the TestCases themselves are unchanged."
+      "rationale": "Local and remote describe where the Agent/device connection resides. The authoring model stays the same; capabilities, app compatibility and the installed Agent support matrix must still be validated.",
+      "optionExplanations": {
+        "A": "Local/remote is not an Android-versus-iOS split. Support depends on the installed Agent/platform versions.",
+        "B": "This distinguishes a local device connection from an Agent/device on a remote host.",
+        "C": "Both connection types can support scanning and execution; those are separate workflow stages.",
+        "D": "The authoring model is shared. Validate configuration and compatibility rather than inventing a different TestCase language."
+      },
+      "lessonSection": "section-786c801112c0",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
@@ -372,7 +390,15 @@
         "C"
       ],
       "hint": "It covers the full range of what runs on a phone.",
-      "rationale": "The Mobile Scan supports scanning native, hybrid, and web applications, after the test environment has been prepared and the device, emulator or simulator has been connected."
+      "rationale": "The Mobile Scan supports scanning native, hybrid, and web applications, after the test environment has been prepared and the device, emulator or simulator has been connected.",
+      "optionExplanations": {
+        "A": "Native apps are only one supported application type.",
+        "B": "This excludes supported mobile web applications.",
+        "C": "Mobile automation covers native, hybrid and web apps, with different preparation and opening paths.",
+        "D": "Native apps are supported without a universal custom-control requirement."
+      },
+      "lessonSection": "section-f77a735c4f21",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
@@ -402,31 +428,31 @@
     },
     {
       "key": "Open Mobile App",
-      "value": "MUST be the first TestStep of the TestCase."
+      "value": "Native/hybrid opening before steering; Set Desired Capabilities is an exception. Mobile websites use OpenUrl."
     },
     {
       "key": "TMAServer TCP format",
-      "value": "http://<ip>:<port>/ — the TRAILING SLASH is required. Without it, Scan works but execution fails."
+      "value": "Use the documented remote http://<ip_address>:<port_number>/ format. Do not infer an exact error or universal scan behavior."
     },
     {
       "key": "Remote agent startup",
-      "value": "tricentis-mobile-agent start --rest-address <IP>:<port> — the tray launch is local-only."
+      "value": "--rest-address binds the web server; --appium-port configures Appium separately. Defaults bind locally."
     },
     {
       "key": "Device health check",
-      "value": "GET http://<ip>:<port>/api/devices → JSON with udid, name, connected, busy, statusReady."
+      "value": "Check devices, endpoints, logs and session setup separately; a connected/idle status cannot prove complete connectivity."
     },
     {
       "key": "AppPackage / AppActivity",
-      "value": "adb shell dumpsys window | grep mCurrentFocus → package/activity. Leave Application and Path empty for installed apps."
+      "value": "AppPackage/AppActivity identify an installed Android app; Application Path installs a build. BundleID identifies an iOS app."
     },
     {
       "key": "Emulator placement",
-      "value": "Must run on the same machine as TMA. No Android Emulator exists for Windows on ARM."
+      "value": "Android emulator and Agent share a host; use the installed version’s supported hardware and OS matrix."
     },
     {
       "key": "Android device gotchas",
-      "value": "Samsung Auto Blocker greys out USB debugging · 'Disable permission monitoring' often absent and not required · old v1-signed APKs need re-signing with apksigner."
+      "value": "Vendor policies vary. Diagnose permission/signing failures and obtain an approved compatible test build instead of assuming one bypass fixes all failures."
     }
   ],
   "topics": [
@@ -437,13 +463,25 @@
     },
     {
       "title": "Get started with mobile test automation (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2024.2/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/tbox_mobileweb_preparation.htm",
       "duration": "docs"
     },
     {
       "title": "Configure local or remote test automation (Tricentis docs)",
       "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/mobile/configure_mobile_local_remote_tests.htm",
       "duration": "docs"
+    },
+    {
+      "title": "TMA 2025.4 host requirements",
+      "url": "https://docs.tricentis.com/tma-2025.4/content/user_manual/system_requirements.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "TMA CLI service bindings",
+      "url": "https://docs.tricentis.com/tma-2025.4/content/user_manual/start_command_line.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS / TMA 2025.4; original AE1 exercises unverified",
+  "sourceReviewedOn": "2026-10-06"
 }
