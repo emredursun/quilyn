@@ -15,17 +15,17 @@
         {
           "type": "concept",
           "term": "Testim Mobile",
-          "description": "Extends Testim's AI-powered test automation — Smart Locators, visual validation, codeless authoring — specifically to mobile app testing, covering native apps, hybrid apps, and cross-platform frameworks."
+          "description": "Testim Mobile supports native, hybrid and documented cross-platform frameworks. Use a mobile project separate from web, with a separate project for each mobile OS; language/framework coverage does not certify every application or interaction."
         },
         {
           "type": "concept",
           "term": "Native app language support",
-          "description": "For Android devices, Testim supports Java or Kotlin native apps; for iOS devices, Objective-C or Swift. Recording works the same way as web — click through the app and Testim captures elements — building toward more stable tests as more application elements are found during recording."
+          "description": "The Enhanced getting-started guide lists Android Java/Kotlin and iOS Objective-C/Swift. Recording uses the AUT Mirroring Viewer for one app on one device; prefer stable text targets. Validate replay rather than assuming that finding more elements automatically improves stability."
         }
       ],
       "bulletPoints": [
-        "Testim Mobile = Testim's AI automation (Smart Locators, visual validation) applied to native/hybrid/cross-platform mobile apps.",
-        "Android: Java or Kotlin. iOS: Objective-C or Swift."
+        "Mobile projects are distinct from web and scoped to a single OS.",
+        "Native languages listed: Android Java/Kotlin, iOS Objective-C/Swift; validate the app/build/flow."
       ],
       "sectionId": "section-a55ce0a10dbe"
     },
@@ -35,25 +35,28 @@
         {
           "type": "concept",
           "term": "Enhanced mode",
-          "description": "Testim's newer recording/execution mode, designed to be more stable, faster, and more versatile than Appium-based testing. It uses a zero-knowledge approach with a unified API supporting native, hybrid, or cross-platform apps alike. The trade-off: tests recorded in Enhanced mode can only be executed on VMG (Testim's own mobile grid)."
+          "description": "Enhanced mode exposes richer hierarchy and a unified approach for supported app frameworks. It records and runs only on VMG virtual devices; vendor stability/speed claims are not guarantees for each flow."
         },
         {
           "type": "concept",
           "term": "Appium mode",
-          "description": "Guarantees compatibility with other Appium-based grids and supports local execution on your own local devices. The trade-off runs the other way: it's restricted to Appium's own capabilities, meaning some flows — especially hybrid apps or webviews — may not be fully recordable."
+          "description": "Standard Appium compatibility mode supports appropriate local physical/virtual devices and Appium grids, including VMG. Verify the driver, build and required interactions: its documented hybrid/webview recording limitations do not mean Appium universally lacks hybrid support."
         },
         {
           "type": "list",
           "title": "Choosing a mode",
           "items": [
-            "Need maximum stability/speed and are fine executing on VMG only → Enhanced mode.",
-            "Need Appium-grid compatibility or local device execution, and can accept Appium's recording limitations → Appium mode."
+            "VMG-only execution and compatible app/build → consider Enhanced mode; verify the required flow.",
+            "Local/physical/other-grid execution → use Standard Appium compatibility and configure its requirements.",
+            "Recording fixes the mode; changing execution mode requires re-recording, not a playback toggle.",
+            "VMG uses Android emulators and iOS simulators; provide compatible Android x86_64 and iOS simulator builds. Virtual runs do not validate real-device accessibility."
           ]
         }
       ],
       "bulletPoints": [
-        "Enhanced mode: more stable/faster/versatile, unified API across app types — but VMG-only execution.",
-        "Appium mode: Appium-grid compatible + local execution — but limited to what Appium itself can record (hybrid/webviews can be tricky)."
+        "Choose mode from execution/build/flow requirements rather than universal performance promises.",
+        "Enhanced requires VMG; Standard Appium supports configured local/other-grid execution.",
+        "Changing recorded mode requires re-recording. VMG virtual devices are not physical-device evidence."
       ],
       "sectionId": "section-34f832f2330f"
     }
@@ -67,7 +70,7 @@
     {
       "title": "Trying to record a hybrid app's webview flow in Appium mode and being surprised by gaps",
       "trapDescription": "Hitting recording limitations on a hybrid app/webview scenario while in Appium mode and assuming Testim itself can't handle it.",
-      "bestPractice": "Appium mode is restricted to Appium's own capabilities, which can struggle with hybrid apps or webviews. Enhanced mode's zero-knowledge, unified API is built to handle exactly this case, at the cost of VMG-only execution."
+      "bestPractice": "Check the flow against the selected mode’s documented capabilities. Enhanced is an alternative for supported hybrid/webview flows on VMG, not a universal guarantee. Switching modes requires re-recording."
     }
   ],
   "practiceQuiz": [
@@ -97,7 +100,15 @@
         "A"
       ],
       "hint": "Each platform has two supported languages.",
-      "rationale": "For Android devices, Testim supports Java or Kotlin native apps; for iOS devices, it supports Objective-C or Swift."
+      "rationale": "For Android devices, Testim supports Java or Kotlin native apps; for iOS devices, it supports Objective-C or Swift.",
+      "optionExplanations": {
+        "A": "These are the native languages listed in the Enhanced getting-started guide.",
+        "B": "The guide does not list Python/Java as that platform pair.",
+        "C": "Native support is not JavaScript-only.",
+        "D": "The guide explicitly lists native language/framework requirements."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-a55ce0a10dbe"
     },
     {
       "questionId": "Q2",
@@ -110,7 +121,7 @@
         },
         {
           "id": "B",
-          "text": "Appium mode, since it guarantees Appium-grid compatibility and supports local execution."
+          "text": "Standard Appium compatibility mode, with the required driver/device/grid setup."
         },
         {
           "id": "C",
@@ -125,7 +136,15 @@
         "B"
       ],
       "hint": "One mode is built specifically for Appium-grid and local-device compatibility.",
-      "rationale": "Appium mode guarantees compatibility with other Appium-based grids and supports local executions on local devices — exactly what this team needs, at the cost of being limited to Appium's own capabilities."
+      "rationale": "Standard Appium compatibility permits these execution targets with suitable setup; Enhanced is limited to VMG virtual devices.",
+      "optionExplanations": {
+        "A": "Enhanced is limited to VMG rather than being universally best.",
+        "B": "Standard Appium supports the requested targets with appropriate setup.",
+        "C": "Standard Appium permits configured local execution.",
+        "D": "Modes differ in compatibility and recorded metadata."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-34f832f2330f"
     },
     {
       "questionId": "Q3",
@@ -153,16 +172,24 @@
         "A"
       ],
       "hint": "It trades broad grid compatibility for stability/speed.",
-      "rationale": "Enhanced mode tests deliver more stable, faster, more versatile testing than Appium-based testing, but can be executed on VMG only — not on external Appium-based grids or arbitrary local devices."
+      "rationale": "Enhanced-recorded tests run on VMG virtual devices only. Changing to Standard Appium requires re-recording; no universal per-flow speed/stability guarantee is implied.",
+      "optionExplanations": {
+        "A": "Enhanced runs on VMG virtual devices only.",
+        "B": "Enhanced tests are executable on VMG.",
+        "C": "A paid Appium license is not the documented execution trade-off.",
+        "D": "Enhanced is a mobile app mode."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-34f832f2330f"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "Why might Appium mode struggle to fully record a hybrid app's flow?",
+      "scenario": "What limitation does Testim document for its Standard Appium compatibility recording mode?",
       "options": [
         {
           "id": "A",
-          "text": "Because Appium mode is restricted to Appium's own capabilities, which can have gaps around hybrid apps and webviews."
+          "text": "Some hybrid/webview flows may not be fully recordable; verify the required flow and mode."
         },
         {
           "id": "B",
@@ -180,8 +207,16 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "The limitation is about what Appium itself can capture, not about Testim Mobile as a whole.",
-      "rationale": "Appium mode is restricted to Appium's capabilities, meaning some flows may not be fully recordable, especially with hybrid apps or webviews — Enhanced mode's zero-knowledge, unified API is built to handle this case instead."
+      "hint": "A Testim recording limitation is not a claim that all Appium hybrid testing is impossible.",
+      "rationale": "Testim warns of mode-specific recording gaps. Enhanced supports documented frameworks on VMG, but neither app type nor framework name proves a particular flow works.",
+      "optionExplanations": {
+        "A": "The documented limitation concerns particular recorded flows.",
+        "B": "Testim Mobile supports documented hybrid frameworks.",
+        "C": "Standard Appium mode is not iOS-only.",
+        "D": "The cited limitation is recording capability, not a separate hybrid license."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-34f832f2330f"
     }
   ],
   "quickRecap": [
@@ -195,11 +230,11 @@
     },
     {
       "key": "Enhanced mode",
-      "value": "More stable/fast/versatile, unified API — but VMG-only execution."
+      "value": "VMG virtual-device execution only; switching mode needs re-recording. Performance/stability varies."
     },
     {
       "key": "Appium mode",
-      "value": "Appium-grid + local-device compatible — but limited by Appium's own recording capabilities (hybrid/webviews can be gaps)."
+      "value": "Configured local/physical/virtual or other-grid execution; verify driver/build and recording capabilities."
     }
   ],
   "topics": [
@@ -209,9 +244,16 @@
       "duration": "docs"
     },
     {
-      "title": "Testim Mobile Documentation (Tricentis docs)",
-      "url": "https://docs.tricentis.com/all/manuals/testim_mobile.htm",
+      "title": "Enhanced Mode Mobile",
+      "url": "https://docs.tricentis.com/testim/content/overview/testim-overview/enhanced-mode-mobile.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Virtual Mobile Grid",
+      "url": "https://docs.tricentis.com/testim/content/integrations/grid-management/virtual-mobile-grid.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim documentation checked 2026-10-06"
 }

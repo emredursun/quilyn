@@ -1561,3 +1561,12 @@ test('Testim project review distinguishes membership and built-in audit and prot
  assert.match(d.studyGuide[0].elements[1].description,/alone does not establish execution readiness/);
  assert.doesNotMatch(JSON.stringify(d),/course credits|course's answer key|will need to integrate another project management/);
 });
+
+for(const [file,keys,verify] of [
+ ['m29_using_rest_api.json',[['B'],['B'],['B']],d=>{assert.match(d.studyGuide[0].elements[2].description,/already has its PAK- prefix.*additionally.*does not replace/);assert.doesNotMatch(JSON.stringify(d),/instead of \(or alongside\)|is instead added/);}],
+ ['m30_best_practices_automating_logins.json',[['B'],['B'],['B']],d=>{assert.match(d.studyGuide[0].elements[2].description,/blur validation.*Replay/);assert.match(d.practiceQuiz[0].options[1].text,/bind the credential entry steps/);assert.match(d.studyGuide[1].elements[1].description,/skipped login group alone does not prove authentication/);assert.doesNotMatch(JSON.stringify(d),/guarantees? a clean/);}],
+ ['m31_automating_mobile_tests.json',[['A'],['B'],['A'],['A']],d=>{assert.match(d.studyGuide[1].elements[2].items[2],/re-recording/);assert.match(d.studyGuide[1].elements[2].items[3],/x86_64.*simulator.*real-device/);assert.match(d.studyGuide[0].elements[0].description,/separate project for each mobile OS/);assert.doesNotMatch(JSON.stringify(d),/Need maximum stability|more stable, faster, more versatile testing/);}]
+])test('Testim final-source regression: '+file,()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/'+file),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,keys[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});verify(d);
+});

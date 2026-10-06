@@ -14,23 +14,23 @@
         {
           "type": "concept",
           "term": "Grouping login steps",
-          "description": "Grouping login steps allows reuse of those steps across other tests — give the group a meaningful name so its purpose is clear to anyone browsing the project's groups later."
+          "description": "Create and save a shared login group with a meaningful name so other tests can reuse its steps; ordinary grouping alone does not establish cross-test reuse."
         },
         {
           "type": "concept",
           "term": "Parameterizing credentials",
-          "description": "To make the group generic across different accounts, add JavaScript parameters for username and password in the group's properties panel. Every time the group is used, different credentials can be supplied without duplicating the underlying steps."
+          "description": "Define username/password group parameters and replace the constants inside its entry steps with those parameter references. Caller values can differ. Parameterization alone is not secret encryption or an access-control mechanism."
         },
         {
           "type": "concept",
           "term": "Cleaning up recorded noise",
-          "description": "Steps recorded as a manual user — like pressing Tab to move between fields — often aren't relevant to the automated test and can simply be deleted, keeping the login group lean and focused on what actually matters."
+          "description": "Remove a recorded Tab/focus step only after checking its effects. It may trigger blur validation or other application behavior. Replay the entire flow and save after confirming needed behavior remains."
         }
       ],
       "bulletPoints": [
-        "Group login steps once, name it meaningfully, reuse it everywhere.",
-        "Add JS parameters for username/password so the same group serves every account.",
-        "Delete manual-user noise (like Tab presses) that doesn't matter to the automated flow."
+        "Use a shared, meaningfully named group for cross-test reuse.",
+        "Bind entry steps to parameters; protect the credential values separately.",
+        "Remove only unnecessary recorded steps, then replay and save."
       ],
       "sectionId": "section-c1166ddf7538"
     },
@@ -40,17 +40,17 @@
         {
           "type": "concept",
           "term": "Incognito mode",
-          "description": "Running in incognito mode is useful specifically while building the login process: each run starts with a clean browser — no cookies, no local storage, nothing remembered — so the test reliably exercises the actual login flow instead of skipping it because a previous session is still active."
+          "description": "A new incognito session reduces inherited browser cookies/storage when testing login. This does not clear server-side account state or guarantee isolation from SSO and other environmental authentication."
         },
         {
           "type": "concept",
           "term": "Conditional login execution",
-          "description": "Adding a condition that checks, at runtime, whether login is actually needed (e.g. an element condition on whether a login button is visible) lets the same test work whether the session starts logged in or logged out — rather than assuming one state and breaking under the other."
+          "description": "When testing a flow that allows an existing session, use a runtime condition such as login-button visibility or login-page URL. Verify the expected authenticated state afterwards; a skipped login group alone does not prove authentication. When login itself is the test objective, establish a logged-out state instead."
         }
       ],
       "bulletPoints": [
-        "Incognito mode = a clean slate for reliably testing the login flow itself.",
-        "A runtime condition (e.g. is the login button visible?) makes a test resilient to both already-logged-in and logged-out starting states."
+        "Incognito resets browser context, not every backend/session condition.",
+        "Conditional login supports flows permitting an existing session; assert the resulting identity/state."
       ],
       "sectionId": "section-78abca002ea7"
     }
@@ -59,19 +59,19 @@
     {
       "title": "Hardcoding one set of credentials into every test that needs to log in",
       "trapDescription": "Duplicating the exact same recorded login steps, with the same hardcoded username/password, across many tests.",
-      "bestPractice": "Group the login steps once, add JS parameters for username/password, and let each calling test supply its own credentials — avoiding both duplication and hardcoded values."
+      "bestPractice": "Use a shared group, define credential parameters and bind its entry steps; store credentials through appropriate secret mechanisms."
     },
     {
       "title": "Assuming a test always starts from a logged-out state",
       "trapDescription": "A login test fails intermittently because a prior run's session persisted, so the login button it expects isn't there.",
-      "bestPractice": "Use a runtime condition (e.g. checking if the login button is visible) so the test handles both already-logged-in and logged-out starting states, and/or use incognito mode to guarantee a clean starting session."
+      "bestPractice": "For a flow permitting an existing session, condition the login group and assert authenticated state. For a login-specific test, establish logged-out preconditions; incognito alone does not clear backend state."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "How can a single login group be reused across tests that each need different credentials?",
+      "scenario": "How can a shared login group be reused with different credentials?",
       "options": [
         {
           "id": "A",
@@ -79,7 +79,7 @@
         },
         {
           "id": "B",
-          "text": "By adding JavaScript parameters for username and password in the group's properties panel."
+          "text": "Define group username/password parameters and bind the credential entry steps to them."
         },
         {
           "id": "C",
@@ -94,7 +94,15 @@
         "B"
       ],
       "hint": "Parameters let one group serve many accounts.",
-      "rationale": "Adding JavaScript parameters for username and password in the group properties panel makes the group generic — each use of the group can then supply different credentials without duplicating steps."
+      "rationale": "Parameters must actually be referenced by the group’s entry steps; defining unused parameters does not replace hardcoded values.",
+      "optionExplanations": {
+        "A": "A fixed shared credential cannot supply different callers’ values.",
+        "B": "The group parameters must be referenced by its credential entry steps.",
+        "C": "Separate groups duplicate the reusable behavior.",
+        "D": "Group parameters support varying credentials."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-c1166ddf7538"
     },
     {
       "questionId": "Q2",
@@ -107,7 +115,7 @@
         },
         {
           "id": "B",
-          "text": "It guarantees a clean browser with no cookies or local storage, so the login flow is reliably exercised rather than skipped due to a remembered session."
+          "text": "A new incognito session reduces inherited browser cookies/storage, helping establish login preconditions."
         },
         {
           "id": "C",
@@ -122,12 +130,20 @@
         "B"
       ],
       "hint": "It's about starting from a known, clean state.",
-      "rationale": "Running in incognito mode starts with a clean browser every time — no cookies, no local storage — so the test doesn't accidentally skip the login flow because the browser 'remembers' a prior session."
+      "rationale": "A fresh browser context helps avoid inherited browser authentication. It does not reset server-side account state or guarantee every SSO condition.",
+      "optionExplanations": {
+        "A": "Incognito is not a universal speed optimization.",
+        "B": "A fresh browser context helps reduce inherited browser state.",
+        "C": "Incognito does not fill credentials automatically.",
+        "D": "Incognito does not disable validation."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-78abca002ea7"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "A login test sometimes fails because a previous run's session is still active and no login button appears. What is the recommended fix?",
+      "scenario": "A downstream flow permits an existing authenticated session and otherwise needs login. Which approach handles both starts?",
       "options": [
         {
           "id": "A",
@@ -135,7 +151,7 @@
         },
         {
           "id": "B",
-          "text": "Add a condition that checks at runtime whether login is actually needed (e.g. is the login button visible), so the test handles both starting states."
+          "text": "Condition the login group on whether login is needed and assert the resulting authenticated state."
         },
         {
           "id": "C",
@@ -150,29 +166,37 @@
         "B"
       ],
       "hint": "Make the test work in either starting state instead of assuming one.",
-      "rationale": "Adding a condition that determines at runtime whether the login step should execute — such as checking if the login button is visible — lets the test work whether the session starts logged in or logged out."
+      "rationale": "Conditional login handles this downstream flow; verify the resulting state. A login-specific test should instead establish logged-out preconditions.",
+      "optionExplanations": {
+        "A": "Deleting coverage does not handle session state.",
+        "B": "Condition the optional login and verify authenticated state.",
+        "C": "Ignoring failure does not establish a valid test outcome.",
+        "D": "A fixed assumption fails when a valid session is already present."
+      },
+      "explanationReviewedOn": "2026-10-06",
+      "lessonSection": "section-78abca002ea7"
     }
   ],
   "quickRecap": [
     {
       "key": "Grouped, named login steps",
-      "value": "Reusable across every test that needs to log in."
+      "value": "Shared login group for compatible callers; ordinary grouping alone is not cross-test reuse."
     },
     {
       "key": "JS parameters",
-      "value": "Username/password parameterized on the group — one group, many accounts."
+      "value": "Define parameters and reference them inside entry steps; parameterization is not encryption."
     },
     {
       "key": "Cleanup",
-      "value": "Delete manual-only noise (e.g. Tab presses) that don't matter to automation."
+      "value": "Remove only unnecessary Tab/focus actions; replay to check for lost behavior."
     },
     {
       "key": "Incognito mode",
-      "value": "Clean browser state for reliably building/testing the login flow."
+      "value": "Fresh browser context helps; backend/SSO state remains separate."
     },
     {
       "key": "Conditional login",
-      "value": "Runtime check (e.g. login button visible?) handles both logged-in and logged-out starts."
+      "value": "Condition login in compatible flows, then verify authenticated state; login-specific tests need logged-out preconditions."
     }
   ],
   "topics": [
@@ -180,6 +204,23 @@
       "title": "Best practices for handling logins (Tricentis docs)",
       "url": "https://docs.tricentis.com/testim/content/guides/best-practices-for-handling-logins.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Groups",
+      "url": "https://docs.tricentis.com/testim/content/editing-tests/groups/index.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Group Parameters",
+      "url": "https://docs.tricentis.com/testim/content/advanced-editing/parameters/parameters-for-groups.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Encrypted Credentials",
+      "url": "https://docs.tricentis.com/testim/content/administration/encrypted-credentials.htm",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-06",
+  "platformVersion": "Testim documentation checked 2026-10-06"
 }
