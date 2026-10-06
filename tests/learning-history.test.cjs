@@ -1082,3 +1082,11 @@ test('AE1 self healing review separates identification recovery from final asser
  assert.match(d.studyGuide[3].elements[1].description,/Review.*first/);
  assert.doesNotMatch(JSON.stringify(d),/A successful heal means a normal pass|when self-healing succeeds, the TestCase passes normally/);
 });
+
+test('AE1 custom control review keeps unverified on-prem installation open and scopes Cloud distribution',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m07_custom_controls.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(r.localContentReview,'partial-source-comparison');assert.equal(d.sourceReviewedOn,undefined);
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[1].elements[1].description,/does not affect on-prem customizations/);
+ assert.match(d.practiceQuiz[3].options[1].text,/robustness still needs validation/);
+ assert.doesNotMatch(JSON.stringify(d),/survives cosmetic changes|Tosca has to be restarted|same ActionModes/);
+});

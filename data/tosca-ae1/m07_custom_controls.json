@@ -21,15 +21,15 @@
         {
           "type": "concept",
           "term": "Custom controls",
-          "description": "A custom control wraps a complex UI widget so that Tosca presents it as one of its standard UI elements. Instead of the tester manipulating the widget's internal structure, the widget is exposed as the control it logically is — and can then be steered with the ordinary ActionModes like any other control. Custom controls are based on special, custom-made DLL files that refine how Tosca detects UI elements."
+          "description": "The public Tosca Cloud documentation describes custom DLLs that adapt complex widgets to standard UI elements. An extension’s actual recognition and steering capabilities depend on its implementation and the supported product/version; this description does not verify on-prem installation steps."
         },
         {
           "type": "note",
-          "text": "The key idea: a custom control does not add a new way to build TestCases. It changes what the engine recognises, so the TestCase can stay ordinary. That is precisely why it is preferable to falling back on image recognition."
+          "text": "Adapting a widget can preserve the familiar TestStep workflow. It does not guarantee support for all ActionModes, nor immunity to changes in the application."
         }
       ],
       "bulletPoints": [
-        "Custom control = a DLL that teaches Tosca to see a complex widget as a standard element.",
+        "Custom DLL adapters can refine recognition; check product and widget compatibility.",
         "It improves identification; it does not change the TestCase-building workflow."
       ],
       "sectionId": "section-951f248ed66d"
@@ -40,21 +40,21 @@
         {
           "type": "concept",
           "term": "Not something you author in Tosca Commander",
-          "description": "Custom controls are compiled DLLs, not project objects you create through the Tosca UI. Tricentis' own guidance is to contact your Tricentis representative to obtain custom controls — they are provided for known widget libraries rather than built ad hoc by the tester."
+          "description": "The available Cloud guide directs users to their Tricentis contact for custom DLLs. It does not establish that every widget already has an adapter, or that extensions can never be developed for an on-prem installation."
         },
         {
           "type": "concept",
           "term": "Making them available",
-          "description": "Once obtained, the DLL has to be put where Tosca will load it, and Tosca has to be restarted for the control to be picked up. The mechanism differs by deployment: in Tosca Cloud an administrator uploads them under Configurations → Uploads → Custom controls, and they are distributed automatically through Launcher and integrated into all test runs. For an on-prem installation — which is what this course covers — the AE1 lesson walks through the placement and activation steps directly; follow the version-specific path shown there rather than assuming a location."
+          "description": "Cloud administrators upload through Configurations → Uploads → Custom controls; Launcher distributes those files. The guide explicitly says this does not affect on-prem customizations. The original AE1 on-prem package and installation instructions were unavailable during review, so no DLL path, restart requirement or activation procedure is verified here."
         },
         {
           "type": "warning",
-          "text": "Because custom controls are DLLs loaded by Tosca, they are an installation-level change, not a project-level one. Everyone who executes the affected TestCases needs the same custom control available on their machine or agent — otherwise the TestCases will work for the person who installed it and fail for everyone else."
+          "text": "Validate the extension’s product/version compatibility and deployment on execution environments. Checking test objects into a repository is not evidence that their external dependencies are available on every agent."
         }
       ],
       "bulletPoints": [
-        "Obtain from your Tricentis contact — you do not build them in Tosca Commander.",
-        "Installation-level, not project-level: every executing machine or agent needs it."
+        "The public source describes Cloud distribution; it does not verify this course’s on-prem installation.",
+        "Obtain the applicable package and installation guidance before running the on-prem exercise."
       ],
       "sectionId": "section-8c74190a4f26"
     },
@@ -64,30 +64,30 @@
         {
           "type": "concept",
           "term": "After installation, nothing special",
-          "description": "Once a custom control is installed, you scan the application as usual. The difference is what comes back: the widget now appears as a recognised standard control in the Module rather than as a tangle of low-level elements. From there it is steered exactly like any other control — same TestSteps, same TestStepValues, same ActionModes."
+          "description": "With a compatible adapter, scan and check the recognized control and supported operations. Continue through the ordinary Module/TestStep workflow only after confirming that the adapter supports the required actions."
         },
         {
           "type": "list",
-          "title": "The escalation path for a control that won't identify",
+          "title": "An independent troubleshooting sequence",
           "items": [
-            "1. Standard identification — properties, anchors, index. Always try this first.",
-            "2. Rescan with the other engine where applicable (for Windows: UIA vs WinX, from Lesson 4).",
-            "3. Custom control — teach Tosca to recognise the widget properly. Robust, but requires obtaining and installing a DLL.",
-            "4. Image-based control (Lesson 8) — the last resort, matching on appearance rather than structure."
+            "1. Check supported technology and identification properties, anchors or index.",
+            "2. Evaluate an alternative supported engine where appropriate.",
+            "3. Investigate a compatible widget adapter with its applicable deployment instructions.",
+            "4. Evaluate image recognition when structural identification is unavailable, and validate its environmental sensitivity."
           ]
         },
         {
           "type": "note",
-          "text": "Custom controls sit above image-based controls in that order for a reason: they restore proper structural identification, so the resulting automation survives cosmetic changes like restyling or resolution differences. Image matching does not."
+          "text": "Structural adaptation can reduce reliance on appearance, but its resilience depends on the widget and adapter. The sequence above is independent guidance, not a verified Academy rule or guarantee that any cosmetic change is safe."
         },
         {
           "type": "note",
-          "text": "📄 Official Tricentis Academy exercise material for this lesson is not redistributed here — complete the exercises inside the official course, which demonstrates the exact installation steps for your Tosca version."
+          "text": "Original AE1 exercise packages and on-prem installation instructions were not available for this review. Obtain the official material and product-specific guidance before installing a DLL."
         }
       ],
       "bulletPoints": [
-        "After installation the widget appears as a standard control in the scan — automation proceeds normally.",
-        "Prefer a custom control over image-based recognition whenever one exists for the widget."
+        "Validate recognition and supported operations after deployment.",
+        "Compare supported structural and visual approaches for the actual widget; neither guarantees universal reliability."
       ],
       "sectionId": "section-7aa05d2c8f8a"
     }
@@ -96,22 +96,22 @@
     {
       "title": "Expecting to create custom controls inside Tosca Commander",
       "trapDescription": "Looking for a 'Create Custom Control' option in the Modules section.",
-      "bestPractice": "Custom controls are special, custom-made DLL files, not objects authored in the Tosca UI. Tricentis' guidance is to contact your Tricentis representative to obtain them."
+      "bestPractice": "The available Cloud source describes custom DLLs supplied through a Tricentis contact. It does not verify a Commander creation action or every on-prem extension workflow."
     },
     {
       "title": "Treating a custom control as a project-level change",
       "trapDescription": "Installing the DLL locally, checking the working TestCases into the common repository, and assuming colleagues and execution agents will be fine.",
-      "bestPractice": "Custom controls are loaded by the Tosca installation, so every machine or agent that executes the affected TestCases needs the same control installed. Otherwise the tests pass locally and fail everywhere else."
+      "bestPractice": "Confirm compatible external dependencies on execution environments. Repository check-in does not by itself deploy or validate an extension package."
     },
     {
       "title": "Reaching for image-based controls before custom controls",
       "trapDescription": "Falling back on image recognition as soon as a complex widget resists standard identification.",
-      "bestPractice": "A custom control restores real structural identification, so automation survives restyling and resolution changes. Image-based matching should be the last resort, tried after standard identification, an alternative engine, and a custom control have all been considered."
+      "bestPractice": "Evaluate supported structural adaptation before relying on appearance. Test the actual adapter against UI changes; do not promise immunity to restyling or resolution changes."
     },
     {
       "title": "Assuming a custom control changes how TestCases are built",
       "trapDescription": "Expecting special TestSteps or a different workflow for a widget backed by a custom control.",
-      "bestPractice": "A custom control only changes what the engine recognises during scanning. Once the widget appears as a standard control, it is steered with the ordinary TestSteps, TestStepValues and ActionModes."
+      "bestPractice": "The Module/TestStep workflow can remain familiar, but supported control actions depend on the adapter. Inspect and test its capabilities rather than assuming every ActionMode works."
     }
   ],
   "practiceQuiz": [
@@ -141,12 +141,20 @@
         "B"
       ],
       "hint": "The goal is to make a non-standard widget look standard to Tosca.",
-      "rationale": "Custom controls are based on special, custom-made DLL files that wrap complex UI widgets into Tosca's standard UI elements, refining how Tosca detects them. The widget can then be steered like any ordinary control."
+      "rationale": "A custom adapter can refine recognition of a complex widget. The available source describes this for Tosca Cloud; product/version and required steering operations still need validation.",
+      "optionExplanations": {
+        "A": "Video capture is not the recognition adaptation described here.",
+        "B": "A compatible adapter can expose a complex widget through standard element recognition.",
+        "C": "An adapter does not by itself establish an automatic engine replacement.",
+        "D": "Structural adaptation is not an automatic conversion to image matching."
+      },
+      "lessonSection": "section-951f248ed66d",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "A tester wants a custom control for a third-party grid widget. How do they obtain one?",
+      "scenario": "According to the public Tosca Cloud custom-control guide, where should a tester seek a custom-control package?",
       "options": [
         {
           "id": "A",
@@ -169,12 +177,20 @@
         "C"
       ],
       "hint": "They are compiled artefacts, not project objects.",
-      "rationale": "Custom controls are special, custom-made DLL files. Tricentis' documented guidance is to reach out to your Tricentis contact to obtain them; they are not authored inside Tosca Commander."
+      "rationale": "The Cloud guide directs users to their Tricentis contact for custom-control DLLs. This does not verify the on-prem course package or installation procedure.",
+      "optionExplanations": {
+        "A": "The public Cloud guide does not document this Commander creation menu.",
+        "B": "Rescanning reads available recognition behavior; it does not automatically compile an adapter.",
+        "C": "The Cloud guide explicitly directs users to their Tricentis contact for DLL packages.",
+        "D": "Exporting a Module is not the documented method of obtaining the custom DLL."
+      },
+      "lessonSection": "section-8c74190a4f26",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "TestCases using a custom control pass on the tester's machine but fail on the execution agent. What is the most likely cause?",
+      "scenario": "A test requires a custom DLL adapter, but the execution agent is missing that dependency. Which issue should the team address?",
       "options": [
         {
           "id": "A",
@@ -182,7 +198,7 @@
         },
         {
           "id": "B",
-          "text": "The custom control DLL is not installed on the agent — custom controls are an installation-level change, not part of the project."
+          "text": "Deploy the compatible adapter using its product-specific instructions; test object check-in alone does not provide the dependency."
         },
         {
           "id": "C",
@@ -197,12 +213,20 @@
         "B"
       ],
       "hint": "The DLL is loaded by Tosca, not stored in the repository.",
-      "rationale": "Because custom controls are DLLs loaded by the Tosca installation, every machine or agent executing the affected TestCases must have the same custom control available. The project alone does not carry it."
+      "rationale": "The scenario explicitly identifies the missing dependency. Verify its compatible deployment; this is not evidence that every real agent failure is caused by a missing DLL.",
+      "optionExplanations": {
+        "A": "Rescanning does not deploy the scenario’s missing external adapter.",
+        "B": "The specified missing dependency must be deployed and validated using the applicable instructions.",
+        "C": "The scenario identifies a missing DLL, not a Scratchbook-only limitation.",
+        "D": "No licensing diagnosis follows from the specified missing dependency."
+      },
+      "lessonSection": "section-8c74190a4f26",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "Why is a custom control preferable to an image-based control when both could automate the same widget?",
+      "scenario": "What is a potential benefit of a compatible structural adapter over purely image-based identification?",
       "options": [
         {
           "id": "A",
@@ -210,7 +234,7 @@
         },
         {
           "id": "B",
-          "text": "Custom controls restore proper structural identification, so the automation survives restyling and resolution changes that would break image matching."
+          "text": "It can reduce reliance on the widget’s pixel appearance, but its robustness still needs validation."
         },
         {
           "id": "C",
@@ -225,13 +249,21 @@
         "B"
       ],
       "hint": "Think about what each approach is actually matching on.",
-      "rationale": "A custom control makes the widget identifiable by structure, as a standard control. Image-based recognition matches on appearance, so it is vulnerable to cosmetic changes — which is why it belongs at the end of the escalation path, after standard identification, alternative engines and custom controls."
+      "rationale": "Structural recognition can reduce dependence on appearance. It does not guarantee that all layout, widget, styling or resolution changes are harmless.",
+      "optionExplanations": {
+        "A": "This is not the reason for a structural approach; visual identification can be evaluated for supported targets.",
+        "B": "Reducing dependence on pixel appearance is a potential benefit, subject to adapter validation.",
+        "C": "The cited source does not establish this blanket licensing distinction.",
+        "D": "No universal speed advantage is established by choosing an adapter."
+      },
+      "lessonSection": "section-7aa05d2c8f8a",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
     {
       "key": "What it is",
-      "value": "A custom-made DLL that wraps a complex UI widget into a standard Tosca UI element."
+      "value": "A product-compatible DLL adapter can expose complex widgets as standard elements; the available guide covers Cloud."
     },
     {
       "key": "What it changes",
@@ -239,19 +271,19 @@
     },
     {
       "key": "Where to get one",
-      "value": "From your Tricentis contact; they are not authored in Tosca Commander."
+      "value": "The Cloud guide directs users to their Tricentis contact; on-prem package availability is unverified."
     },
     {
       "key": "Installation scope",
-      "value": "Installation-level: every executing machine or agent needs the DLL. (Tosca Cloud: admin uploads under Configurations → Uploads → Custom controls, distributed via Launcher.)"
+      "value": "Cloud admin upload and Launcher distribution do not affect on-prem customizations. On-prem installation instructions remain unverified."
     },
     {
       "key": "After installing",
-      "value": "Rescan — the widget now appears as a recognised standard control and is steered normally."
+      "value": "Inspect recognition and supported actions after deploying the applicable compatible adapter."
     },
     {
       "key": "Escalation order",
-      "value": "Standard identification → alternative engine → custom control → image-based control (last resort)."
+      "value": "Independent guidance: check supported identification, alternative engines, adapters and then visual approaches as applicable."
     }
   ],
   "topics": [
