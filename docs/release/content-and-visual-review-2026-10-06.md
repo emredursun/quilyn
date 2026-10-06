@@ -44,3 +44,11 @@ Review of the current diff found no remaining blocker for the committed local co
 5. Actual iOS/Android, VoiceOver/TalkBack and installed-product execution. The user confirmed there is no device/service access; the physical-device matrix remains unexecuted.
 
 The two original Tricentis Academy course URLs were retried on this date and remained inaccessible to the web tool. No alternate Cloud/manual source was relabeled as proof of an unavailable Academy exercise.
+
+## Continued access and browser audit
+
+Direct browser navigation to the original AE1 course redirected to the Tricentis Support Hub SSO login. It explicitly requires Support Hub credentials; there was no authenticated Academy session. Requested user sign-in or the original lesson files, without requesting a password in chat. AE1-M07, AE1-M12 and TMOB-M00 remain partial until their original materials can be inspected.
+
+Rechecked the Pega Views v6 source in a separate browser tab: both knowledge-check introductions exist but no associated interaction controls or iframe exist in the rendered DOM; warning/error logs were empty. This records the published-page limitation precisely without certifying unavailable content.
+
+SA-M08's remaining two wrong-answer paths, mixed 2/4 final result, immediate score updates and Restart were executed in the browser. All three diagrams were measured at 390 × 844 with 347 px client width / 780 px scroll width / 760 px SVG width. This closes the remaining local scenario-path smoke checks; physical-device/AT validation remains unexecuted.

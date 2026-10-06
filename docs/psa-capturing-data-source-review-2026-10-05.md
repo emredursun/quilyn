@@ -30,3 +30,7 @@ Executed all four local simulator scenarios in the browser: correct answers reac
 Follow-up validation: `npm run manifest:content`, `npm run check` (144/144 passed), and `git diff --check` passed. Regression assertions preserve the documented App Studio read-only setting and prohibit the unsupported persistence inference. Shared token 20261005g / quilyn-v122.
 
 Physical iOS/Android and VoiceOver/TalkBack tests remain unexecuted; the user confirmed no device/service access on 2026-10-05. Source interactions that failed to render and any uninspected video content remain outside this evidence. Original module backlog remains 137; the 636 unanswered editorial-review items are unchanged by this follow-up.
+
+## Source interaction availability recheck — 2026-10-06
+
+Reopened the original Views v6 topic in the browser. Both “Check your knowledge” paragraphs are present, but their surrounding published content containers contain no interaction element or iframe; the page contains zero iframes and the browser warning/error log is empty. This is a source-page availability limitation, not evidence that Quilyn's local simulator failed. The missing source interactions cannot be inspected or submitted in this session. No source answer key is inferred from the surrounding prose.
