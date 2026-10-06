@@ -16,7 +16,7 @@
         {
           "type": "concept",
           "term": "The PDF Scan",
-          "description": "PDFs have no DOM and no accessible control tree — there is nothing to query for 'the invoice total field'. The PDF Scan solves this by letting you mark regions of the document as controls. Start it by right-clicking a Module folder and selecting Scan, or with the shortcut Ctrl+Shift+P, then choose the PDF file. The scan interface shows the document alongside the controls you are identifying."
+          "description": "The PDF Scan defines document regions for testing. Unlike HTML scanning, this workflow selects text, image or table areas in the document. Start Scan → PDF from a Module folder or use Ctrl+Shift+P, choose a file, then inspect the selected content before saving the Module."
         },
         {
           "type": "list",
@@ -34,6 +34,10 @@
             "Image control — verifies a visual element.",
             "Table control — checks tabular data, with configurable row and column headers."
           ]
+        },
+        {
+          "type": "note",
+          "text": "Use Content Preview to check text and table recognition, including spaces. Force optical recognition is an alternative when the extracted content is wrong; choose the document language for OCR. Scanning an exclusion region alone does not configure a comparison."
         }
       ],
       "bulletPoints": [
@@ -47,12 +51,12 @@
         {
           "type": "concept",
           "term": "Why anchors exist",
-          "description": "A control's absolute position on a PDF page is not stable. Add a line to an address block or let a table grow by one row and everything below it shifts. Identifying a control by fixed coordinates would break on the next document. An anchor control solves this by locating the target relative to another element instead of by absolute location."
+          "description": "A target may move when document content changes. Absolute coordinates can still be used for fixed layouts. Use an anchor when the target retains a stable position relative to a distinctive element on the same page."
         },
         {
           "type": "concept",
           "term": "How it works at runtime",
-          "description": "At execution, the PDF Engine 3.0 searches the document for the anchor — the text or image you defined — and once it has found it, calculates where the target control must be in relation to it. So the target moves with its anchor, and a shifted layout no longer breaks identification."
+          "description": "At runtime the engine finds the anchor, then calculates the target region from its recorded offset. Both may move together; if the distance between them changes, anchor identification alone does not guarantee the correct target."
         },
         {
           "type": "list",
@@ -65,7 +69,7 @@
         },
         {
           "type": "warning",
-          "text": "The uniqueness condition is the one most often violated in practice. Choosing a column header that repeats on every page, or a label that appears in several table rows, gives the Engine no way to know which occurrence to anchor to."
+          "text": "Repeated labels can make an anchor ambiguous. Inspect its uniqueness after redraw or rescan; the scan highlights ambiguous anchors in orange. Select a distinctive same-page landmark."
         }
       ],
       "bulletPoints": [
@@ -79,13 +83,13 @@
       "elements": [
         {
           "type": "concept",
-          "term": "Exact match by default",
-          "description": "By default Tosca looks for an anchor that is an exact match for the text or image you defined. That is the strictest and most predictable setting, and it is what you want whenever the anchor text is genuinely constant."
+          "term": "Type-specific defaults",
+          "description": "The dedicated Tosca 2026.1 anchor configuration page specifies 100% matching accuracy for text anchors and 99% for image anchors. The scan overview describes exact matching more generally; use the type-specific guidance when configuring the Module."
         },
         {
           "type": "concept",
           "term": "Lowering accuracy",
-          "description": "When exact matching causes identification problems — typically with scanned or image-based PDFs where character recognition is imperfect — a lower level of accuracy can be configured through the OCR settings. This is a deliberate trade: you gain tolerance to recognition noise and lose some certainty about which element was matched."
+          "description": "For a problematic anchor, select its ModuleAttribute and add the transition parameter Accuracy in the Properties pane. Use an integer from 0 to 100. This setting controls anchor matching; it is different from the comparison Module’s Accuracy [%] and from forcing OCR during scanning."
         },
         {
           "type": "note",
@@ -93,7 +97,7 @@
         }
       ],
       "bulletPoints": [
-        "Default = exact match. Lower it via OCR settings only when exact matching demonstrably fails."
+        "Text anchor default: 100%; image anchor default: 99%. Adjust the Accuracy transition parameter for a specific anchor only after investigating the mismatch."
       ],
       "sectionId": "section-3a7ad65b50ae"
     },
@@ -103,20 +107,20 @@
         {
           "type": "concept",
           "term": "PDF 1:1 Compare",
-          "description": "The PDF Engine 3.0 compares PDFs through the Module PDF 1:1 Compare, which is part of the Standard subset. It performs a visual comparison between a reference PDF and one or more target PDF files. The TestCase passes if the similarity between the files is above the accuracy you specify — so the threshold is yours to set, rather than requiring pixel-perfect identity."
+          "description": "PDF 1:1 Compare compares a reference PDF with one or more targets using a configured minimum similarity, Accuracy [%]. Page by Page Image is the default. Full Text Content ignores text position and does not support OCR text recognition; Page by Page Text compares corresponding pages. Choose the mode that matches the assertion."
         },
         {
           "type": "note",
-          "text": "Where to find it in the workspace: Standard modules → TBox XEngines → Pdf. In the AE1 base subset that folder holds a single Module, named simply '1:1 Compare' — the documentation refers to it as PDF 1:1 Compare, but in the Module tree it appears under the Pdf folder without the prefix. Do not confuse it with TBox Excel 1:1 File Compare, which is the Excel equivalent in a different folder."
+          "text": "Current location: Standard modules → Engines → Pdf → PDF 1:1 Compare. Do not infer the Module inventory or shortened names of an inaccessible older course subset from the current documentation."
         },
         {
           "type": "concept",
           "term": "Combining compare with exclusions",
-          "description": "This is where the scan's exclusion capability pays off. Real generated documents contain fields that change every run — generation timestamps, document IDs, batch numbers. Scanning those regions and excluding them from the comparison lets you compare everything that should be stable while ignoring what is legitimately variable."
+          "description": "Scan the variable region, save the Module, and use Copy Dimensions on its ModuleAttribute. In the comparison TestStep, populate the excluded area’s Dimensions and Page(s). This explicitly connects the scanned region to the exclusion; verify that the chosen region does not hide meaningful defects."
         },
         {
           "type": "note",
-          "text": "For anything the PDF Engine does not cover — checking for broken links, for instance — you work with the Standard subset instead."
+          "text": "Excluded Pages and Excluded Text provide additional targeted exclusions; text patterns can be literal or regex. For link checks, the Standard subset includes Check PDF for Broken Links and Extract Links; link extraction does not require scanning."
         },
         {
           "type": "note",
@@ -124,8 +128,8 @@
         }
       ],
       "bulletPoints": [
-        "PDF 1:1 Compare = visual comparison, reference vs one or more targets, pass if similarity ≥ your accuracy threshold.",
-        "Exclude volatile regions during the scan so the comparison stays meaningful."
+        "Select a comparison type and a minimum similarity threshold; compare the intended reference and targets.",
+        "Configure exclusion dimensions and pages explicitly; simply scanning a region does not exclude it."
       ],
       "sectionId": "section-cce87a41504a"
     }
@@ -134,7 +138,7 @@
     {
       "title": "Choosing an anchor that is not unique",
       "trapDescription": "Anchoring to a column header, page footer, or label that appears more than once in the document.",
-      "bestPractice": "An anchor must be uniquely identifiable and not part of a repetitive area. If the text appears several times, the Engine has no way to know which occurrence to measure from — pick a genuinely one-off element instead."
+      "bestPractice": "Use a distinct text or image on the same page. Repeated content can be ambiguous; check uniqueness after rescanning or redrawing."
     },
     {
       "title": "Anchoring to an element on a different page",
@@ -144,12 +148,12 @@
     {
       "title": "Lowering anchor accuracy as a default habit",
       "trapDescription": "Reducing accuracy across all anchors to avoid identification failures.",
-      "bestPractice": "Exact match is the default for good reason. Lower the accuracy through OCR settings only for the specific anchor that fails — typically on scanned PDFs — because an over-tolerant match can anchor to the wrong element and pass against the wrong region."
+      "bestPractice": "Investigate recognition and uniqueness first. Text anchors default to 100%, image anchors to 99%; lower a specific anchor’s Accuracy transition parameter only when justified, and confirm that it still locates the intended region."
     },
     {
       "title": "Comparing dynamic PDFs without excluding volatile regions",
       "trapDescription": "Running PDF 1:1 Compare against a document containing a generation timestamp and treating the resulting failure as a real defect.",
-      "bestPractice": "Scan and exclude the regions that legitimately change each run. Excluding areas from a comparison is an explicit purpose of the PDF Scan, not a workaround."
+      "bestPractice": "Scan the variable region and copy its dimensions into the comparison’s excluded area with the appropriate pages. Inspect exclusions so they cannot conceal meaningful changes."
     },
     {
       "title": "Expecting the anchor to be a table or arbitrary region",
@@ -161,7 +165,7 @@
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "Why does the PDF Engine 3.0 use anchor controls instead of identifying a control by its position on the page?",
+      "scenario": "When is anchor-based identification preferable to absolute PDF coordinates?",
       "options": [
         {
           "id": "A",
@@ -169,7 +173,7 @@
         },
         {
           "id": "B",
-          "text": "Because absolute positions shift when content above the target changes; an anchor lets the target be located relative to a stable element."
+          "text": "When the target moves but retains a stable offset from a unique same-page text or image."
         },
         {
           "id": "C",
@@ -184,7 +188,15 @@
         "B"
       ],
       "hint": "Think about what happens to a value's coordinates when a table above it gains a row.",
-      "rationale": "PDF layouts shift when content changes, so absolute coordinates are unreliable. At runtime the Engine finds the anchor first, then calculates the target's location in relation to it, so the target moves with its anchor."
+      "rationale": "An anchor supports relative positioning when the anchor and target retain their relationship. Fixed coordinates remain useful for fixed layouts; an anchor cannot compensate for an arbitrary change in the offset.",
+      "optionExplanations": {
+        "A": "PDF Scan can create document controls; inability to scan is not the reason for relative identification.",
+        "B": "A stable offset from a uniquely identifiable same-page anchor supports a target that moves with it.",
+        "C": "Anchor use addresses identification; it does not establish a universal execution speed advantage.",
+        "D": "Text controls and OCR recognition are supported; text extraction is not categorically unavailable."
+      },
+      "lessonSection": "section-47da9803d004",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -214,7 +226,15 @@
         "C"
       ],
       "hint": "Three rules: what it can be, how distinctive it must be, and where it must live.",
-      "rationale": "A valid anchor must be text or image, uniquely identifiable rather than part of a repetitive area, and on the same page as the target. There is no requirement about the direction of the anchor relative to the target — it can sit above, below, or beside it."
+      "rationale": "A valid anchor must be text or image, uniquely identifiable rather than part of a repetitive area, and on the same page as the target. There is no requirement about the direction of the anchor relative to the target — it can sit above, below, or beside it.",
+      "optionExplanations": {
+        "A": "Text and image controls are valid anchor types; tables are not.",
+        "B": "A unique anchor avoids ambiguous matching; repetitive areas cannot serve as anchors.",
+        "C": "The anchor must be on the target’s page so its relative location can be used.",
+        "D": "Being above the target is not a requirement; the relative position must instead remain stable."
+      },
+      "lessonSection": "section-47da9803d004",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
@@ -242,7 +262,15 @@
         "A"
       ],
       "hint": "One for words, one for pictures, one for structured data.",
-      "rationale": "The PDF Scan creates Text controls for textual content, Image controls for visual elements, and Table controls for tabular data with configurable row and column headers."
+      "rationale": "The PDF Scan creates Text controls for textual content, Image controls for visual elements, and Table controls for tabular data with configurable row and column headers.",
+      "optionExplanations": {
+        "A": "These are the three PDF Scan control categories.",
+        "B": "Link verification uses dedicated Modules; Link and Button are not the three scan categories.",
+        "C": "These describe document regions, not the supported scan control types.",
+        "D": "These are possible document features, not the scan’s Text, Image and Table categories."
+      },
+      "lessonSection": "section-09d9cf0479e9",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
@@ -255,7 +283,7 @@
         },
         {
           "id": "B",
-          "text": "Scan the timestamp region and exclude it from the comparison, then run PDF 1:1 Compare."
+          "text": "Scan the timestamp region, copy its dimensions into the comparison’s excluded area, set its pages, then compare."
         },
         {
           "id": "C",
@@ -270,12 +298,20 @@
         "B"
       ],
       "hint": "Excluding areas from a comparison is one of the two stated purposes of the PDF Scan.",
-      "rationale": "The PDF Scan explicitly supports marking areas to be excluded from a comparison. Excluding the volatile timestamp keeps the rest of the document under strict comparison, whereas blanket-lowering the accuracy would weaken the whole check."
+      "rationale": "Configure the excluded area’s Dimensions and Page(s) using the scan result. This removes the intended variable region while retaining checks elsewhere; merely creating a scanned control does not set the comparison exclusion.",
+      "optionExplanations": {
+        "A": "Reducing the global threshold can conceal unrelated differences rather than excluding the known variable region.",
+        "B": "Dimensions and page scope explicitly connect the scanned timestamp area to the comparison exclusion.",
+        "C": "The timestamp may remain on page one, and dropping later pages discards other checks.",
+        "D": "Targeted area, text and page exclusions allow comparison of PDFs containing dynamic content."
+      },
+      "lessonSection": "section-cce87a41504a",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "How does the PDF 1:1 Compare Module decide whether a TestCase passes?",
+      "scenario": "What determines the PDF 1:1 Compare result when using its default comparison type?",
       "options": [
         {
           "id": "A",
@@ -283,7 +319,7 @@
         },
         {
           "id": "B",
-          "text": "It performs a visual comparison and passes if the similarity is above the accuracy you specify."
+          "text": "It compares page images against the configured minimum similarity, Accuracy [%]."
         },
         {
           "id": "C",
@@ -298,7 +334,15 @@
         "B"
       ],
       "hint": "The threshold is configurable rather than absolute.",
-      "rationale": "PDF 1:1 Compare, part of the Standard subset, performs a visual comparison between a reference PDF and one or more target files. The TestCase passes when the similarity exceeds the accuracy you set."
+      "rationale": "The default mode is Page by Page Image. Accuracy [%] specifies the minimum similarity; other modes compare text, so visual comparison is not the only supported configuration.",
+      "optionExplanations": {
+        "A": "This is a configured content comparison, not a byte-level file identity requirement.",
+        "B": "Page by Page Image is the default; the configured minimum similarity determines its comparison result.",
+        "C": "Text-only modes exist, but the default mode compares images of corresponding pages.",
+        "D": "The Module supplies an automated comparison result; manual approval is not its pass criterion."
+      },
+      "lessonSection": "section-cce87a41504a",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
@@ -316,7 +360,7 @@
     },
     {
       "key": "Anchor control",
-      "value": "Locates the target relative to a stable element instead of by absolute position."
+      "value": "Relative identification works when the target retains its offset from a unique same-page text or image."
     },
     {
       "key": "Anchor rules",
@@ -324,11 +368,11 @@
     },
     {
       "key": "Anchor accuracy",
-      "value": "Exact match by default; lower it via OCR settings only when exact matching fails."
+      "value": "Text: 100%; image: 99% by default. Configure the anchor ModuleAttribute’s Accuracy transition parameter (0–100)."
     },
     {
       "key": "PDF 1:1 Compare",
-      "value": "Standard subset Module; visual comparison of a reference against one or more targets; passes if similarity ≥ specified accuracy."
+      "value": "Default: Page by Page Image; optional text modes. Accuracy [%] sets minimum similarity; exclusions require explicit TestStep configuration."
     }
   ],
   "topics": [
@@ -344,8 +388,15 @@
     },
     {
       "title": "Compare PDF files (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/pdf/one_to_one_compare.htm",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/pdf/one_to_one_compare.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "Configure PDF anchors (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/pdf/pdf_ocr.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS public documentation; original AE1 exercises unverified",
+  "sourceReviewedOn": "2026-10-06"
 }

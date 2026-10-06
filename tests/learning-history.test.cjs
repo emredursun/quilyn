@@ -1044,3 +1044,13 @@ test('AE1 Excel review separates manipulation, file comparison defaults and save
  assert.match(d.studyGuide[1].elements[1].description,/only applies with Save Path/);
  assert.doesNotMatch(JSON.stringify(d),/23 sub-lessons|TBox XEngines|every other Excel Module depends on it/);
 });
+
+test('AE1 PDF review distinguishes anchor defaults, relative offsets and explicit exclusions',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m03_pdf_engine.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['A','B','C'],['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[2].elements[0].description,/100%.*99%/);
+ assert.match(d.studyGuide[1].elements[1].description,/distance between them changes/);
+ assert.match(d.practiceQuiz[3].options[1].text,/dimensions.*pages/);
+ assert.match(d.studyGuide[3].elements[0].description,/does not support OCR/);
+ assert.doesNotMatch(JSON.stringify(d),/TBox XEngines|lower it via OCR settings|a shifted layout no longer breaks/);
+});
