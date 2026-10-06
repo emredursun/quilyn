@@ -1215,3 +1215,13 @@ test('first mobile TestCase review includes capabilities exception, relative coo
  assert.match(d.practiceQuiz[4].rationale,/does support native and hybrid/);
  assert.doesNotMatch(JSON.stringify(d),/no exceptions|Mandatory first TestStep of any|near-real-time|only when no scanned|same shape as TBox/);
 });
+
+test('advanced mobile review corrects hardware buttons, virtual biometrics and Android transfer scope',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m08_advanced_modules_troubleshooting.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[0].items[0],/ApplicationSelector.*do not include volume or power/);
+ assert.match(d.studyGuide[1].elements[0].items[0],/Android emulator.*not a universal physical/);
+ assert.match(d.studyGuide[2].elements[0].items[0],/Android.*overwritten/);
+ assert.match(d.practiceQuiz[3].options[1].text,/reservation release.*separately/);
+ assert.doesNotMatch(JSON.stringify(d),/api\/devices|almost always|very often|more forgiving|only then network|re-sign with apksigner/);
+});
