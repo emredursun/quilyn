@@ -9,10 +9,10 @@
     "Recognise which Modules require a pre-existing target directory and which create one.",
     "Avoid the common traps — notably that TBox Delete File reports success even when the file was never there.",
     "Tell apart Excel UI Engine 3.0, Excel Engine 3.0, Database Engine 3.0, HTML modules, and TBox Evaluation Tool by the action each one performs.",
-    "Locate the XML Engine's Standard Modules under TBox XEngines → XML.",
+    "Locate current XML Modules under Engines → XML and distinguish resource operations.",
     "Match Windows/Buffer/Process Operations Modules (Start Program, Name To Buffer, Partial Buffer, Clipboard) to their purpose.",
-    "Steer a dialog box or confirmation popup with TBox Dialog, without scanning it.",
-    "Read every entry of a variable-length JSON array with one dynamic TestCase, using item*, ExplicitName, and #{REPETITION}."
+    "Distinguish standard Windows dialogs, custom dialogs and JavaScript dialogs before selecting a Module.",
+    "Explain JSON object/array identification, editable TestStepValue names and independently configured repetition."
   ],
   "estTime": "50 min",
   "studyGuide": [
@@ -30,7 +30,7 @@
         },
         {
           "type": "list",
-          "title": "The eight File Operations Modules in the AE1 workspace",
+          "title": "Examples of File Operations Modules",
           "items": [
             "TBox Read/Create File",
             "TBox Append File",
@@ -44,16 +44,13 @@
         },
         {
           "type": "list",
-          "title": "The other TBox Automation Tools folders alongside them",
+          "title": "Related Standard subset groups (not an exhaustive course inventory)",
           "items": [
-            "Basic Windows Operations — TBox Clipboard, Context Menu, Dialog, Save As, Scroll Window Operation, Send Keys, Take Screenshot, Window Operation.",
-            "Buffer Operations — TBox Set Buffer, Name To Buffer, Partial Buffer, Delete Buffer.",
-            "Timing — TBox Wait, TBox Start Timer, TBox Stop Timer.",
-            "Process Operations — TBox Start Program.",
+            "Basic Windows Operations — Clipboard, Dialog and Context Menu handling.",
+            "Buffer Operations — Set Buffer, Name To Buffer, Partial Buffer and Delete Buffer; current versions also include array operations.",
+            "Process Operations — Start Program and Close Program.",
             "Expression Evaluation — TBox Evaluation Tool.",
-            "Numeric Operations — TBox Convert Decimal.",
-            "Resource Handling — TBox Delete Resource.",
-            "Selenium — Start Selenium Server, Run Selenium Scripts."
+            "Other Module groups depend on the installed subset/version; inspect the current catalogue rather than assuming a legacy course inventory."
           ]
         }
       ],
@@ -78,7 +75,7 @@
         },
         {
           "type": "note",
-          "text": "TBox Create Folder is frequently the step that makes a later file operation possible — several file Modules require the target directory to already exist at run time."
+          "text": "File Copy and Move require an existing target directory. Do not transfer that rule to every folder Module: Copy Folder can create a missing target, and Delete Folder only deletes empty folders unless Recursive is True."
         }
       ],
       "bulletPoints": [
@@ -97,7 +94,7 @@
         {
           "type": "concept",
           "term": "TBox Append File",
-          "description": "Adds text to an existing file, with optional newline and encoding settings. Note its convenient behaviour: if the file does not exist, Append creates it. That makes it safe to use for accumulating a log across a run without a separate create step."
+          "description": "Append File adds text and creates the file if absent. Optional encoding and newline settings apply; this does not guarantee that an invalid path, permissions or conflicting file lock can be ignored."
         }
       ],
       "bulletPoints": [
@@ -122,16 +119,16 @@
         {
           "type": "concept",
           "term": "TBox Delete File",
-          "description": "Removes files from a directory and supports wildcard patterns. Critical behaviour to know: it returns a positive result even if the file does not exist. That makes it ideal as an idempotent cleanup step at the start of a run — but it means a passing Delete step is not evidence the file was ever there."
+          "description": "Delete File returns a positive result when no matching file is found. This permits missing-file cleanup but does not prove prior existence or guarantee success for permission, lock or path errors."
         },
         {
           "type": "warning",
-          "text": "Because TBox Delete File passes regardless, never use it as an implicit check that a file was produced. If you need to know a file existed, verify it with TBox File Existence before deleting it."
+          "text": "A positive missing-file delete result is not an export assertion. Check existence first when required, and still investigate real filesystem errors."
         }
       ],
       "bulletPoints": [
         "Copy File and Move/Rename File both require the target directory to exist beforehand.",
-        "Delete File is idempotent — it passes whether or not the file was there."
+        "A missing file produces a positive delete result; other failures are not thereby excluded."
       ],
       "sectionId": "section-96b3f870d599"
     },
@@ -155,7 +152,7 @@
         },
         {
           "type": "note",
-          "text": "Version note: Tricentis' documentation for newer releases also lists TBox Zip File and TBox Unzip File. Those two are NOT present in the AE1 base subset's File Operations folder — do not expect them in the course workspace."
+          "text": "The current File Operations reference includes Zip File and Unzip File. The original AE1 course subset was unavailable, so its exact Module inventory cannot be certified here."
         },
         {
           "type": "note",
@@ -178,12 +175,12 @@
         {
           "type": "concept",
           "term": "Excel Engine 3.0",
-          "description": "Steers MS Excel files directly — reading and writing cell data without driving the Excel application's UI. Faster and more stable than the UI Engine when you only need the file's data."
+          "description": "Excel Engine works with workbook content without driving the visible Excel UI. Choose it for content operations; installed prerequisites still apply and it is not universally faster or more stable than UI steering."
         },
         {
           "type": "concept",
           "term": "Database Engine 3.0",
-          "description": "Queries and steers data sets held in one or more databases — the go-to Engine whenever a TestCase needs to read from or write to a database rather than a file or application."
+          "description": "Database Engine executes database operations through SQL statements. Use its compatible open/operate/close Modules or DB Expert; confirm the supported connection and driver."
         },
         {
           "type": "concept",
@@ -193,7 +190,7 @@
         {
           "type": "concept",
           "term": "TBox Evaluation Tool",
-          "description": "Compares numeric, string, and alphanumeric expressions. Found under Standard subset → TBox Automation Tools → Expression Evaluation — distinct from TBox File Compare, which compares file content rather than expressions. Each comparison is entered as an Expression TestStepValue with ActionMode Verify, for example '#{DATE[][][]}'>'#{DATE[][-1d][]}' to check today's date is later than yesterday's, or '{B[Text1]}'='{B[Text2]}' to check two buffered values are equal — one Module handles dates, buffers, and plain numeric or string comparisons alike."
+          "description": "TBox Evaluation Tool verifies expressions that resolve to TRUE or FALSE. Use ActionMode Verify, quote values intended as strings, and account for supported dynamic expressions and NCalc special-character escaping. A string representation of a date is not automatically a chronological date comparison."
         },
         {
           "type": "note",
@@ -213,11 +210,11 @@
       "elements": [
         {
           "type": "note",
-          "text": "The folder TBox XEngines → XML in the Standard subset contains Modules for the XML Engine 3.0 — no scanning required, same as the other TBox Automation Tools Modules."
+          "text": "Current location: Standard modules → Engines → XML. The four operations below are examples; the folder also includes validation, signing and XPath evaluation Modules."
         },
         {
           "type": "list",
-          "title": "The four XML Engine Standard Modules",
+          "title": "Four resource/file operations",
           "items": [
             "Open/Create XML file — create a new XML file, or load an existing file as a Resource.",
             "Create XML Resource — creates an empty XML resource, with no file needed yet.",
@@ -232,7 +229,7 @@
         }
       ],
       "bulletPoints": [
-        "TBox XEngines → XML: Open/Create XML file · Create XML Resource · Save XML file · Verify XML.",
+        "Engines → XML includes Open/Create XML file, Create XML Resource, Save XML file and Verify XML; this is not an exhaustive catalogue.",
         "Verify XML uses DotNet XPath expressions to check resource content."
       ],
       "sectionId": "section-5eed7fedf64c"
@@ -242,43 +239,28 @@
       "elements": [
         {
           "type": "concept",
-          "term": "Scanning a JSON file",
-          "description": "A JSON file is scanned like an API — Module folder → Scan → API → point the file picker at the .json file, then export it as an XML/JSON TestCase. The scan produces a Module whose ModuleAttributes mirror the file's structure, including one attribute per array entry: item#1, item#2, item#3, and so on for however many entries the sample file happened to have."
+          "term": "JSON structure and identification",
+          "description": "Current JSON Module guidance uses XScan. JSON object members are identified by name and treated as unordered pairs; array entries are positional and named item#<position>. Verify the generated structure and data types rather than assuming every export workflow is identical."
         },
         {
           "type": "concept",
-          "term": "The problem: the array's length isn't fixed",
-          "description": "A Module scanned from one sample file hard-codes exactly the entries that file had. If the real data returns 20 entries instead of 3, a TestCase built directly on item#1 / item#2 / item#3 simply never looks at the other 17. Reading 'however many entries are actually there' needs the Module and the TestCase to both stop assuming a fixed count."
+          "term": "ExplicitName enables name editing",
+          "description": "The Configuration Param ExplicitName=True permits editing the referenced XTestStepValue name. It does not itself activate wildcard matching or prove that a chosen name selects every JSON array entry."
         },
         {
           "type": "concept",
-          "term": "The wildcard attribute: item#1 → item*",
-          "description": "On the Module, delete every ModuleAttribute after the first array entry, keeping only item#1, then rename that surviving attribute's Name from item#1 to item* — turning one specific indexed entry into a wildcard that matches any entry in the array, at any index."
-        },
-        {
-          "type": "concept",
-          "term": "ExplicitName = True",
-          "description": "A Configuration Parameter added on that same wildcarded attribute. Without it, Tosca's wildcard matching behaves generically; with ExplicitName set to True, the attribute is treated as matching the literal repeating node structure of the source file, which is what makes the wildcarded Module actually bind correctly against the real (variable-length) JSON at run time."
-        },
-        {
-          "type": "concept",
-          "term": "Counting entries, then repeating over them",
-          "description": "A first TestStep drags the Module in with ActionMode Buffer on an expression like .ResultCount == someBuffer, capturing how many array entries are present in this run. That count then goes into the Repetition property of a TestStepFolder — set it to {B[someBuffer]} — which turns the folder into a loop that runs once per entry. Inside that repeating folder, the item* attribute is referenced as #{REPETITION}, a token that automatically advances to the next array index on every pass, and each field buffered inside the loop is named with the same token (e.g. firstName_{REPETITION}) so every entry's data lands in its own uniquely named buffer instead of overwriting the last one."
+          "term": "Counts and repetition are separate concerns",
+          "description": "ResultCount describes occurrences of the current node. TestStepFolder Repetition accepts a non-negative integer or dynamic expression, and {REPETITION} identifies the current pass. For variable-length JSON, validate counting and position selection against the actual Module; repetition alone does not guarantee coverage of each array element."
         },
         {
           "type": "note",
-          "text": "The result is one TestCase that reads a JSON array of any length: it buffers the count, repeats a TestStepFolder that many times, and reads a fresh set of fields on every pass — nothing about it needs to change if next week's file has 3 entries or 300."
-        },
-        {
-          "type": "note",
-          "text": "📄 This technique comes from an official Tricentis hands-on guide; the material itself is not redistributed here — the mechanism is described above so it can be recognised and applied."
+          "text": "The original Academy array exercise was unavailable. Its item* recipe and buffering syntax are not certified here. Independently test empty, single-entry and multiple-entry arrays before using a dynamic loop in a real suite."
         }
       ],
       "bulletPoints": [
-        "Scan a JSON file via Module → Scan → API, exported as an XML/JSON TestCase.",
-        "item#1 → item* turns one indexed array entry into a wildcard matching any entry.",
-        "The ExplicitName = True Configuration Parameter is what makes that wildcard bind against the real, variable-length data.",
-        "Buffer .ResultCount for the entry count → feed it into a TestStepFolder's Repetition property → reference the entry as #{REPETITION} inside the loop."
+        "Object members: name-based; array elements: position-based.",
+        "ExplicitName changes whether the TestStepValue name is editable, not whether an array is fully traversed.",
+        "Validate count, index selection and repetition independently; original course recipe remains unverified."
       ],
       "sectionId": "section-4847deead117"
     },
@@ -288,11 +270,11 @@
         {
           "type": "concept",
           "term": "TBox Dialog",
-          "description": "Steers a Windows dialog box or browser confirmation popup — an 'Are you sure?' prompt, for instance — without ever scanning it. Because it is a Standard Module rather than something produced by a scan, the same TestStep works across different webpages and applications: set Caption to identify the dialog window (wildcards allowed, e.g. 'demowebshop*'), Label to the dialog's message text, and Button to the button to click, all with ActionMode Input. This is the answer whenever a confirmation popup would otherwise force an extra scan just to handle one button."
+          "description": "TBox Dialog handles standard Microsoft Windows dialogs without scanning. Customized dialogs must be scanned first. Caption identifies the dialog window, optional Label further narrows it using message text, and Button supplies the text of the button to confirm. JavaScript dialogs have a separate HTML Module, Steer Dialog Box."
         },
         {
           "type": "warning",
-          "text": "The Button TestStepValue is case-sensitive against the button's actual caption — 'OK' has to be typed with a capital O and K exactly as it appears on the button, not 'Ok' or 'ok'. Alternatively, add the exact value to the ValueRange of the Button ModuleAttribute on the TBox Dialog Module itself, so it can be selected rather than retyped."
+          "text": "Use the actual dialog and button text in the applicable Module. Do not infer that every confirmation popup is an unscanned Windows dialog or that changing letter case is the guaranteed fix for any failed click."
         },
         {
           "type": "table",
@@ -325,7 +307,7 @@
         },
         {
           "type": "note",
-          "text": "Don't confuse the three Buffer Operations Modules: TBox Set Buffer stores a value you supply yourself, TBox Name To Buffer automatically stores the current TestCase's own name, and TBox Partial Buffer extracts or verifies only part of a larger value."
+          "text": "Set Buffer creates or verifies a supplied value. Name To Buffer captures the TestCase name during ExecutionList execution; ScratchBook does not support it. Partial Buffer extracts or verifies a selected part of a value."
         }
       ],
       "bulletPoints": [
@@ -371,27 +353,27 @@
     {
       "title": "Confusing TBox Name To Buffer with TBox Set Buffer or TBox Partial Buffer",
       "trapDescription": "Reaching for the wrong Buffer Operations Module when the goal is simply to capture the current TestCase's name, or to extract only part of a value.",
-      "bestPractice": "TBox Set Buffer stores a value you supply. TBox Name To Buffer automatically stores the current TestCase's own name. TBox Partial Buffer extracts or verifies only part of a larger value. Pick based on where the value should come from."
+      "bestPractice": "TBox Set Buffer stores a value you supply. TBox Name To Buffer automatically stores the current TestCase's own name. TBox Partial Buffer extracts or verifies only part of a larger value. Pick based on where the value should come from. Name To Buffer requires ExecutionList execution; ScratchBook is unsupported."
     },
     {
-      "title": "Typing 'Ok' or 'ok' into TBox Dialog's Button value",
-      "trapDescription": "A TestStep using TBox Dialog fails to click the button even though Caption and Label matched correctly.",
-      "bestPractice": "The Button TestStepValue is case-sensitive and must match the button's caption exactly — capital 'OK', not 'Ok'. Add the value to the Button ModuleAttribute's ValueRange to select it instead of retyping it."
+      "title": "Assuming every popup uses TBox Dialog",
+      "trapDescription": "Using an unscanned standard Windows dialog Module for a custom application or JavaScript popup.",
+      "bestPractice": "Identify the dialog technology. Standard Windows dialogs need no scan; custom dialogs require scanning, and JavaScript dialogs use their documented HTML workflow."
     },
     {
       "title": "Scanning a confirmation popup instead of using TBox Dialog",
       "trapDescription": "Launching a fresh scan every time a webpage or application shows a new 'Are you sure?' style dialog.",
-      "bestPractice": "TBox Dialog is a Standard Module that steers any dialog box by Caption, Label, and Button — no scanning required, and the same TestStep works across different webpages and applications."
+      "bestPractice": "Use TBox Dialog without scanning only for supported standard Windows dialogs. The current reference explicitly requires scanning customized dialogs."
     },
     {
-      "title": "Wildcarding a JSON array attribute without setting ExplicitName",
+      "title": "Misreading ExplicitName as a wildcard-matching switch",
       "trapDescription": "Renaming item#1 to item* on a scanned JSON Module, but the TestCase still only reads one entry or fails to bind at run time.",
-      "bestPractice": "The wildcard alone is not enough — the ModuleAttribute also needs the Configuration Parameter ExplicitName set to True for Tosca to treat it as matching the source file's actual repeating node structure."
+      "bestPractice": "ExplicitName=True enables TestStepValue name editing. Validate the actual Module’s selection logic; that parameter alone does not establish full JSON array traversal."
     },
     {
       "title": "Hard-coding item#1, item#2, item#3 … for a JSON array",
       "trapDescription": "Building a TestCase directly against a fixed set of indexed ModuleAttributes from the scanned sample file.",
-      "bestPractice": "Real data rarely has exactly as many entries as the sample used for scanning. Wildcard the attribute (item*), buffer the actual entry count (.ResultCount), and drive a repeating TestStepFolder off that count using #{REPETITION} — the TestCase then adapts to any array length."
+      "bestPractice": "Check the runtime count and index selection with empty, one-entry and many-entry arrays. Repetition can use a dynamic count, but looping alone does not guarantee that every entry is read once."
     }
   ],
   "practiceQuiz": [
@@ -421,7 +403,15 @@
         "B"
       ],
       "hint": "This behaviour is what makes it safe as a cleanup step — and dangerous as a check.",
-      "rationale": "TBox Delete File returns a positive result whether or not the file was present. That makes it idempotent and ideal for cleanup, but it means a passing Delete step is never evidence that the file existed — use TBox File Existence for that."
+      "rationale": "TBox Delete File returns a positive result whether or not the file was present. That makes it idempotent and ideal for cleanup, but it means a passing Delete step is never evidence that the file existed — use TBox File Existence for that.",
+      "optionExplanations": {
+        "A": "A missing match produces a positive delete result, not this failure.",
+        "B": "Positive missing-file deletion is documented; it does not prove the file existed.",
+        "C": "The Module executes and reports the missing file rather than this automatic skip.",
+        "D": "It does not create a missing file merely to remove it."
+      },
+      "lessonSection": "section-96b3f870d599",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -449,7 +439,15 @@
         "B"
       ],
       "hint": "Some file Modules create their destination; Copy is not one of them.",
-      "rationale": "TBox Copy File requires the target directory to already exist at run time, as does TBox Move/Rename File. TBox Create Folder is the step that prepares it."
+      "rationale": "TBox Copy File requires the target directory to already exist at run time, as does TBox Move/Rename File. TBox Create Folder is the step that prepares it.",
+      "optionExplanations": {
+        "A": "Copy File requires an existing target directory.",
+        "B": "Create Folder prepares the destination required by Copy File.",
+        "C": "Zipping is not a prerequisite for copying the report.",
+        "D": "A network share does not remove the existing-directory prerequisite."
+      },
+      "lessonSection": "section-96b3f870d599",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
@@ -477,7 +475,15 @@
         "A"
       ],
       "hint": "One of the ActionModes exists specifically for waiting on a condition.",
-      "rationale": "TBox File Existence supports the WaitOn ActionMode alongside negation (!) and wildcards (*). WaitOn makes the TestCase wait for the file to appear instead of performing a single check that may run too early."
+      "rationale": "TBox File Existence supports the WaitOn ActionMode alongside negation (!) and wildcards (*). WaitOn makes the TestCase wait for the file to appear instead of performing a single check that may run too early.",
+      "optionExplanations": {
+        "A": "WaitOn waits for the file-existence condition within the configured timeout.",
+        "B": "Deleting and creating a folder does not wait for the export file.",
+        "C": "Content comparison is not the stated asynchronous existence check.",
+        "D": "Manual repetition does not use the dedicated existence waiting operation."
+      },
+      "lessonSection": "section-0dccfe719053",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
@@ -505,7 +511,15 @@
         "C"
       ],
       "hint": "The Module's name states both directions.",
-      "rationale": "TBox Read/Create File creates files and writes text, and also verifies or buffers text content from existing files. It supports UTF-8, UTF-16 and ISO-8859-1 encodings with an optional byte order mark setting."
+      "rationale": "TBox Read/Create File creates files and writes text, and also verifies or buffers text content from existing files. It supports UTF-8, UTF-16 and ISO-8859-1 encodings with an optional byte order mark setting.",
+      "optionExplanations": {
+        "A": "Append writes text but is not the combined read/verify/buffer Module.",
+        "B": "File Compare compares two files rather than creating and buffering text.",
+        "C": "This Module supports writing, verification, buffering and waiting on file text.",
+        "D": "Existence checks the file’s presence, not its text creation and extraction."
+      },
+      "lessonSection": "section-6e7615d8303d",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
@@ -533,7 +547,15 @@
         "A"
       ],
       "hint": "One is strict, the other is configurable — and it is not the one you might expect.",
-      "rationale": "TBox Image Compare performs a pixel-accurate verification of BMP, JPG and GIF files — an exact match. PDF 1:1 Compare instead performs a visual comparison that passes when similarity is above the accuracy you specify."
+      "rationale": "TBox Image Compare performs a pixel-accurate verification of BMP, JPG and GIF files — an exact match. PDF 1:1 Compare instead performs a visual comparison that passes when similarity is above the accuracy you specify.",
+      "optionExplanations": {
+        "A": "The documented image Module is pixel-accurate; PDF comparison has configured similarity.",
+        "B": "This reverses the described comparison behavior.",
+        "C": "Pixel comparison and configurable PDF modes are not identical.",
+        "D": "Image Compare accepts BMP, JPG and GIF rather than only PDF."
+      },
+      "lessonSection": "section-0dccfe719053",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q6",
@@ -561,7 +583,15 @@
         "B"
       ],
       "hint": "The 'UI' in the name is the tell — it drives the visible application.",
-      "rationale": "Excel UI Engine 3.0 steers the MS Excel application itself, through its own interface. Excel Engine 3.0 (without 'UI') instead steers Excel files directly, without driving the application's UI."
+      "rationale": "Excel UI Engine 3.0 steers the MS Excel application itself, through its own interface. Excel Engine 3.0 (without 'UI') instead steers Excel files directly, without driving the application's UI.",
+      "optionExplanations": {
+        "A": "The non-UI engine works on workbook content rather than this interface workflow.",
+        "B": "The UI engine is intended for steering the Excel application interface.",
+        "C": "Database operations do not steer the Excel UI.",
+        "D": "HTML Modules serve browser tasks, not Excel application controls."
+      },
+      "lessonSection": "section-933aebfd4807",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q7",
@@ -589,7 +619,15 @@
         "B"
       ],
       "hint": "The one WITHOUT 'UI' in its name works on the file, not the application.",
-      "rationale": "Excel Engine 3.0 steers Excel files directly. Excel UI Engine 3.0 is the one that drives the application's own interface."
+      "rationale": "Excel Engine 3.0 steers Excel files directly. Excel UI Engine 3.0 is the one that drives the application's own interface.",
+      "optionExplanations": {
+        "A": "This is the Excel application interface workflow.",
+        "B": "This engine performs workbook-content operations without visible UI steering.",
+        "C": "Database data is a different target than the stated workbook.",
+        "D": "Expression evaluation is not workbook manipulation."
+      },
+      "lessonSection": "section-933aebfd4807",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q8",
@@ -617,7 +655,15 @@
         "C"
       ],
       "hint": "Its name says exactly what it connects to.",
-      "rationale": "Database Engine 3.0 queries and steers data sets across one or more databases."
+      "rationale": "Database Engine 3.0 queries and steers data sets across one or more databases.",
+      "optionExplanations": {
+        "A": "Workbook operations are not the database SQL connection workflow.",
+        "B": "Browser operations do not replace the database engine’s SQL operations.",
+        "C": "This engine performs database operations with the supported connection Modules.",
+        "D": "Expression verification does not establish a database connection and execute SQL."
+      },
+      "lessonSection": "section-933aebfd4807",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q9",
@@ -645,7 +691,15 @@
         "A"
       ],
       "hint": "These act on the browser session itself, not on one control inside the page.",
-      "rationale": "HTML modules cover browser/document-level actions such as Execute JavaScript, Open a URL, and Close Browser — distinct from Modules that steer individual HTML controls."
+      "rationale": "HTML modules cover browser/document-level actions such as Execute JavaScript, Open a URL, and Close Browser — distinct from Modules that steer individual HTML controls.",
+      "optionExplanations": {
+        "A": "The HTML group includes these XBrowser operations.",
+        "B": "This is Excel interface automation, not browser operations.",
+        "C": "This compares expressions rather than executing these browser actions.",
+        "D": "This operates on databases, not browser sessions."
+      },
+      "lessonSection": "section-933aebfd4807",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q10",
@@ -673,7 +727,15 @@
         "B"
       ],
       "hint": "It lives under Expression Evaluation, not under File Operations.",
-      "rationale": "TBox Evaluation Tool (Standard subset → TBox Automation Tools → Expression Evaluation) compares numeric, string, and alphanumeric expressions. TBox File Compare instead compares the content of two files."
+      "rationale": "TBox Evaluation Tool (Standard subset → TBox Automation Tools → Expression Evaluation) compares numeric, string, and alphanumeric expressions. TBox File Compare instead compares the content of two files.",
+      "optionExplanations": {
+        "A": "This compares file content rather than the stated expression.",
+        "B": "The Evaluation Tool verifies expression results as TRUE or FALSE.",
+        "C": "Partial Buffer operates on part of a value rather than the expression comparison tool.",
+        "D": "Image comparison is unrelated to numeric or string expression evaluation."
+      },
+      "lessonSection": "section-933aebfd4807",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q11",
@@ -701,7 +763,15 @@
         "C"
       ],
       "hint": "Its name states the action directly.",
-      "rationale": "Verify XML checks XML resource content using DotNet XPath expressions. Open/Create XML file creates a new file or loads an existing one as a Resource; Create XML Resource makes an empty resource; Save XML file writes the resource's changes back to the connected file."
+      "rationale": "Verify XML checks XML resource content using DotNet XPath expressions. Open/Create XML file creates a new file or loads an existing one as a Resource; Create XML Resource makes an empty resource; Save XML file writes the resource's changes back to the connected file.",
+      "optionExplanations": {
+        "A": "Save XML writes resource changes, not this XPath content assertion.",
+        "B": "Create XML Resource creates an empty resource rather than asserting its content.",
+        "C": "Verify XML applies the documented XPath content check.",
+        "D": "Open/Create loads or creates a resource/file rather than this assertion."
+      },
+      "lessonSection": "section-5eed7fedf64c",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q12",
@@ -729,12 +799,20 @@
         "A"
       ],
       "hint": "It lives under Process Operations.",
-      "rationale": "TBox Start Program (TBox Automation Tools → Process Operations) opens applications or executable files from a TestCase."
+      "rationale": "TBox Start Program (TBox Automation Tools → Process Operations) opens applications or executable files from a TestCase.",
+      "optionExplanations": {
+        "A": "Start Program launches the specified executable or application.",
+        "B": "Name To Buffer stores a TestCase name, not launching a process.",
+        "C": "Partial Buffer extracts or verifies part of a value.",
+        "D": "Clipboard handles Windows clipboard text, not process launch."
+      },
+      "lessonSection": "section-6add2f52be6d",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q13",
       "type": "single-select",
-      "scenario": "Which Module automatically buffers the name of the TestCase that is using it — without you supplying a value yourself?",
+      "scenario": "During ExecutionList execution, which Module buffers the name of the TestCase that uses it?",
       "options": [
         {
           "id": "A",
@@ -757,7 +835,15 @@
         "B"
       ],
       "hint": "One Buffer Operations Module names itself after what it captures.",
-      "rationale": "TBox Name To Buffer buffers the name of the TestCase that uses the Module. TBox Set Buffer stores a value you supply yourself, and TBox Partial Buffer extracts or verifies only part of a larger value."
+      "rationale": "TBox Name To Buffer buffers the name of the TestCase that uses the Module. TBox Set Buffer stores a value you supply yourself, and TBox Partial Buffer extracts or verifies only part of a larger value. This functionality is not supported in ScratchBook.",
+      "optionExplanations": {
+        "A": "Set Buffer stores or verifies a supplied value rather than automatically using this TestCase name.",
+        "B": "Name To Buffer provides the TestCase name in ExecutionList execution, not ScratchBook.",
+        "C": "Partial Buffer handles a portion of a value rather than this automatic name source.",
+        "D": "Delete Buffer removes values instead of capturing a name."
+      },
+      "lessonSection": "section-6add2f52be6d",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q14",
@@ -785,7 +871,15 @@
         "B"
       ],
       "hint": "'Partial' is the giveaway.",
-      "rationale": "TBox Partial Buffer verifies or buffers only part of a value. TBox Set Buffer stores a full value you supply, and TBox Name To Buffer stores the current TestCase's own name."
+      "rationale": "TBox Partial Buffer verifies or buffers only part of a value. TBox Set Buffer stores a full value you supply, and TBox Name To Buffer stores the current TestCase's own name.",
+      "optionExplanations": {
+        "A": "Set Buffer uses a supplied value, not the partial extraction operation.",
+        "B": "Partial Buffer extracts or verifies a specified part of a value.",
+        "C": "Name To Buffer captures the TestCase name rather than an arbitrary substring.",
+        "D": "Delete Buffer removes buffers instead of extracting a substring."
+      },
+      "lessonSection": "section-6add2f52be6d",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q15",
@@ -813,7 +907,15 @@
         "A"
       ],
       "hint": "It lives under Basic Windows Operations, named after what it touches.",
-      "rationale": "TBox Clipboard copies text to the Windows clipboard, or verifies/buffers text already there."
+      "rationale": "TBox Clipboard copies text to the Windows clipboard, or verifies/buffers text already there.",
+      "optionExplanations": {
+        "A": "Clipboard supports writing, verification, buffering and waiting on Windows clipboard text.",
+        "B": "Send Keys sends keyboard commands instead of directly accessing clipboard contents.",
+        "C": "Start Program launches a process, not clipboard text operations.",
+        "D": "Dialog identifies and confirms dialogs, not clipboard contents."
+      },
+      "lessonSection": "section-6add2f52be6d",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q16",
@@ -841,12 +943,20 @@
         "B"
       ],
       "hint": "Distinct from the File Operations folder alongside it.",
-      "rationale": "TBox Create Folder, Copy Folder, Delete Folder, and Folder Existence make up the Folder Operations Modules group — separate from the File Operations folder that handles individual files."
+      "rationale": "TBox Create Folder, Copy Folder, Delete Folder, and Folder Existence make up the Folder Operations Modules group — separate from the File Operations folder that handles individual files.",
+      "optionExplanations": {
+        "A": "File operations address individual files rather than these folder tasks.",
+        "B": "Folder Operations contains creation, copy, deletion and existence Modules.",
+        "C": "Buffer operations address values rather than directory operations.",
+        "D": "Windows UI operations are distinct from filesystem folder operations."
+      },
+      "lessonSection": "section-3c3b736b5d95",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q17",
       "type": "single-select",
-      "scenario": "A TestStep uses TBox Dialog to confirm a deletion popup. Caption and Label match correctly, but the click never lands. The Button value was entered as 'Ok'. What is wrong?",
+      "scenario": "A custom application dialog is not handled by an unscanned TBox Dialog step. What distinction does the current reference require?",
       "options": [
         {
           "id": "A",
@@ -854,31 +964,39 @@
         },
         {
           "id": "B",
-          "text": "The Button value is case-sensitive; it must be 'OK' with both letters capitalised, matching the button's actual caption."
+          "text": "Standard Windows dialogs can be handled without scanning, but customized dialogs must be scanned."
         },
         {
           "id": "C",
-          "text": "Caption must be left empty for Button to work."
+          "text": "Caption must always be empty for all dialogs."
         },
         {
           "id": "D",
-          "text": "TBox Dialog requires the popup to be scanned first."
+          "text": "Every popup is automatically a standard Windows dialog."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "The button's own caption decides the exact casing required.",
-      "rationale": "TBox Dialog's Button TestStepValue must match the button's caption exactly, including case — 'OK', not 'Ok'. No scan is required; Caption and Label identify the dialog window and its message text."
+      "hint": "Separate standard Windows and customized dialogs.",
+      "rationale": "The reference explicitly distinguishes unscanned standard Windows dialogs from customized dialogs that require scanning. Case changes do not replace this technology check.",
+      "optionExplanations": {
+        "A": "The Module can confirm standard dialog buttons; it is not read-only.",
+        "B": "The reference separates standard Windows dialogs from custom dialogs requiring scan.",
+        "C": "Caption identifies the window; universally omitting it is not the solution.",
+        "D": "A custom popup is not automatically a standard Windows dialog."
+      },
+      "lessonSection": "section-6add2f52be6d",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q18",
       "type": "single-select",
-      "scenario": "What makes TBox Dialog useful across many different webpages and applications, unlike a Module produced by scanning?",
+      "scenario": "What is the supported no-scan use case for TBox Dialog?",
       "options": [
         {
           "id": "A",
-          "text": "It is a Standard Module identified generically by Caption, Label, and Button — not tied to one scanned application."
+          "text": "Standard Microsoft Windows dialogs identified by Caption, optional Label and Button."
         },
         {
           "id": "B",
@@ -897,24 +1015,32 @@
         "A"
       ],
       "hint": "Nothing about it was produced by scanning a specific popup.",
-      "rationale": "TBox Dialog is a Standard Module, not a scan result, so the same TestStep — set with Caption, Label, and Button — can steer a confirmation popup on any webpage or application, avoiding a dedicated scan for every dialog."
+      "rationale": "The standard Module can handle Windows dialogs without scanning. This is not a guarantee for arbitrary application or JavaScript popups.",
+      "optionExplanations": {
+        "A": "This is the documented standard Windows dialog no-scan scope.",
+        "B": "The Module is not restricted to a particular demo webshop.",
+        "C": "The stated per-application license rule is not established by the reference.",
+        "D": "Dialog handling does not replace other engines’ resource lifecycle steps."
+      },
+      "lessonSection": "section-6add2f52be6d",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q19",
       "type": "single-select",
-      "scenario": "A Module was scanned from a JSON file with 3 array entries (item#1, item#2, item#3). The real file in production can have any number of entries. What two changes make the Module handle that?",
+      "scenario": "What does Configuration Param ExplicitName=True actually enable?",
       "options": [
         {
           "id": "A",
-          "text": "Add more indexed attributes, item#4 through item#20, to be safe."
+          "text": "Automatically traversing every JSON array entry."
         },
         {
           "id": "B",
-          "text": "Delete the extra indexed attributes, rename the remaining one from item#1 to item*, and set its Configuration Parameter ExplicitName to True."
+          "text": "Editing the name of the referenced XTestStepValue."
         },
         {
           "id": "C",
-          "text": "Rescan the JSON file every time the entry count changes."
+          "text": "Automatically rescanning the file whenever its length changes."
         },
         {
           "id": "D",
@@ -924,13 +1050,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "One change wildcards the attribute; the other makes the wildcard actually bind.",
-      "rationale": "Renaming item#1 to item* turns a single indexed entry into a wildcard matching any array entry, but that alone is not enough — the Configuration Parameter ExplicitName must also be set to True for it to bind against the source file's real repeating structure."
+      "hint": "The parameter controls name editability.",
+      "rationale": "ExplicitName=True makes the referenced TestStepValue name editable. It is not an automatic wildcard-binding or array traversal switch.",
+      "optionExplanations": {
+        "A": "Name editability does not automatically traverse JSON entries.",
+        "B": "This is the parameter’s documented function.",
+        "C": "The parameter does not automatically trigger rescanning.",
+        "D": "It does not change a JSON workflow into an XML engine workflow."
+      },
+      "lessonSection": "section-4847deead117",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q20",
       "type": "single-select",
-      "scenario": "A dynamic TestCase needs to loop once per JSON array entry and buffer each entry's fields into uniquely named buffers. Which two mechanisms make this possible?",
+      "scenario": "A TestStepFolder should repeat a validated number of times and use the current pass in buffer names. Which mechanisms fit?",
       "options": [
         {
           "id": "A",
@@ -938,7 +1072,7 @@
         },
         {
           "id": "B",
-          "text": "A TestStepFolder's Repetition property set from a buffered entry count, and the #{REPETITION} token used inside the loop to reference the current entry and name each buffer uniquely."
+          "text": "Set Repetition to the validated count or dynamic expression, and use {REPETITION} in the repeated values and buffer names."
         },
         {
           "id": "C",
@@ -953,7 +1087,15 @@
         "B"
       ],
       "hint": "One property turns a folder into a loop; one token tracks which pass it's on.",
-      "rationale": "Buffering .ResultCount gives the entry count, which is fed into a TestStepFolder's Repetition property ({B[count]}) to make it loop that many times. Inside the loop, #{REPETITION} both references the current array index and can be appended to buffer names (e.g. firstName_{REPETITION}) so each entry's data is stored separately."
+      "rationale": "Repetition accepts non-negative integers or dynamic expressions; {REPETITION} exposes the pass. JSON node selection remains a separate task to validate rather than an automatic consequence of looping.",
+      "optionExplanations": {
+        "A": "Neither expression comparison nor file comparison configures this loop and pass value.",
+        "B": "Repetition configures the loop count and its dynamic expression identifies the current pass.",
+        "C": "Buffer substring/clipboard Modules do not supply this loop mechanism.",
+        "D": "The stated requirement is a configured repeating folder rather than manual reruns."
+      },
+      "lessonSection": "section-4847deead117",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
@@ -979,7 +1121,7 @@
     },
     {
       "key": "Delete File",
-      "value": "Supports wildcards; returns a POSITIVE result even if the file doesn't exist."
+      "value": "Missing-file deletion is positive; this does not guarantee success for other filesystem errors."
     },
     {
       "key": "File Existence",
@@ -994,8 +1136,8 @@
       "value": "Pixel-accurate for BMP/JPG/GIF — exact match, unlike PDF 1:1 Compare's accuracy threshold."
     },
     {
-      "key": "Zip / Unzip File (not in AE1 subset)",
-      "value": "Documented for newer Tosca releases but absent from the AE1 base subset's File Operations folder."
+      "key": "Zip / Unzip File",
+      "value": "Current reference includes Zip/Unzip; original Academy subset inventory unverified."
     },
     {
       "key": "Excel UI Engine vs Excel Engine",
@@ -1015,23 +1157,23 @@
     },
     {
       "key": "XML Engine Standard Modules",
-      "value": "Open/Create XML file · Create XML Resource · Save XML file · Verify XML (DotNet XPath)."
+      "value": "Examples under Engines → XML: Open/Create XML file, Create XML Resource, Save XML file and Verify XML; current catalogue has additional Modules."
     },
     {
       "key": "Start Program / Name To Buffer / Partial Buffer / Clipboard",
-      "value": "Open apps or executables · buffer the TestCase's own name · buffer/verify part of a value · read/write the Windows clipboard."
+      "value": "Start Program launches executables; Name To Buffer requires ExecutionList; Partial Buffer works on substrings; Clipboard handles text."
     },
     {
       "key": "TBox Dialog",
-      "value": "Steers any dialog/confirmation popup by Caption, Label, and Button — no scanning. Button value is case-sensitive (e.g. 'OK')."
+      "value": "Standard Windows dialogs need no scan; customized dialogs do. Use the separate HTML workflow for JavaScript dialogs."
     },
     {
       "key": "TBox Evaluation Tool syntax",
-      "value": "Expression TestStepValue, ActionMode Verify — e.g. '#{DATE[][][]}'>'#{DATE[][-1d][]}' or '{B[Text1]}'='{B[Text2]}'."
+      "value": "Expression TestStepValue with Verify; quote intended strings and escape NCalc special characters. Validate intended data comparison semantics."
     },
     {
       "key": "JSON Engine: repeating arrays",
-      "value": "Wildcard item#1 → item*, set Configuration Parameter ExplicitName = True, buffer .ResultCount, drive a TestStepFolder's Repetition property from it, reference entries as #{REPETITION}."
+      "value": "JSON arrays use positional item#<position>; ExplicitName permits name editing. Validate node selection and count separately from folder Repetition."
     }
   ],
   "topics": [
@@ -1042,13 +1184,15 @@
     },
     {
       "title": "File Operations (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2024.1/en-us/content/standard_subset/automation_tools/file_operations.htm",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/automation_tools/file_operations.htm",
       "duration": "docs"
     },
     {
       "title": "Folder Operations (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-16.0/en-us/content/standard_subset/automation_tools/folder_operations.htm",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/standard_subset/automation_tools/folder_operations.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS public documentation; original AE1 exercise recipe unverified",
+  "sourceReviewedOn": "2026-10-06"
 }

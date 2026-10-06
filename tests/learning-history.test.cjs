@@ -1090,3 +1090,13 @@ test('AE1 custom control review keeps unverified on-prem installation open and s
  assert.match(d.practiceQuiz[3].options[1].text,/robustness still needs validation/);
  assert.doesNotMatch(JSON.stringify(d),/survives cosmetic changes|Tosca has to be restarted|same ActionModes/);
 });
+
+test('AE1 standard Modules review corrects name editing, dialog scope and execution restrictions',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m08_standard_modules.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['A'],['C'],['A'],['B'],['B'],['C'],['A'],['B'],['C'],['A'],['B'],['B'],['A'],['B'],['B'],['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.equal(d.practiceQuiz[18].options[1].text,'Editing the name of the referenced XTestStepValue.');
+ assert.match(d.studyGuide[8].elements[0].description,/Customized dialogs must be scanned/);
+ assert.match(d.studyGuide[8].elements[3].text,/ScratchBook does not support/);
+ assert.match(d.studyGuide[3].elements[2].description,/permission, lock or path errors/);
+ assert.doesNotMatch(JSON.stringify(d),/wildcarded Module actually bind|same TestStep.*any webpage|TBox XEngines|today's date is later than yesterday's/);
+});
