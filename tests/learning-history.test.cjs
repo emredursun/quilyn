@@ -1064,3 +1064,12 @@ test('AE1 mail review scopes protocols and cloud prerequisites instead of promis
  assert.match(d.studyGuide[2].elements[2].items[1],/does not guarantee availability/);
  assert.doesNotMatch(JSON.stringify(d),/TBox XEngines|personal mailbox.*avoids this entirely|Authentication Type off 'Direct'|whichever step ran last/);
 });
+
+test('AE1 Windows review preserves conditional engine guidance and control capabilities',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m05_winx_uia_engines.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['B'],['A'],['A'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ assert.match(d.studyGuide[0].elements[1].description,/recommends.*standard engine/);
+ assert.match(d.studyGuide[2].elements[0].description,/depend on the control and engine/);
+ assert.match(d.practiceQuiz[2].options[1].text,/evaluate.*references/);
+ assert.doesNotMatch(JSON.stringify(d),/does not prescribe one|Not prescribed by Tricentis|Unchanged — same|also reaches desktop elements and the taskbar/);
+});

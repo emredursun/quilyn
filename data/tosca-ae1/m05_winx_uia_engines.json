@@ -16,26 +16,26 @@
         {
           "type": "concept",
           "term": "Why Windows needs two options",
-          "description": "Windows desktop applications are not built on a single technology. Some are WinForms, some WPF, some are decades-old Win32 executables, some are hybrids. No single access mechanism reaches all of them cleanly, so Tosca offers two different ways into a Windows application and lets you pick the one that works for the application in front of you."
+          "description": "Windows applications use different control technologies. UIA and WinX are two available engines, alongside technology-specific engines such as DotNet. Evaluate supported controls and identification before selecting an engine for a large automation suite."
         },
         {
           "type": "concept",
           "term": "UIA Engine 3.0",
-          "description": "Based on the Microsoft UI Automation framework — a framework Microsoft developed specifically so that applications built on different technologies could be steered as uniformly as possible. When the UIA Engine steers an application, controls are addressed exclusively through that UI Automation interface in the target application. Beyond application windows, the UIA Engine 3.0 can also test Windows desktop elements and the taskbar."
+          "description": "UIA Engine 3.0 accesses controls through Microsoft UI Automation. Tricentis recommends it when the corresponding standard engine does not support the controls but their UI Automation interface permits steering; this is not a guarantee that every Windows element is supported."
         },
         {
           "type": "concept",
           "term": "WinX Engine",
-          "description": "WinX is used for Windows UI API tests — it interacts with the application through direct Windows API-level calls rather than through Microsoft's UI Automation abstraction. It is the alternative path for applications that the UIA interface does not expose well."
+          "description": "WinX steers supported PowerBuilder applications and applications using the Windows UI API. Evaluate its control support and setup requirements rather than treating it as a universal alternative for any UIA identification failure."
         },
         {
           "type": "note",
-          "text": "Note the layering difference: UIA goes through an abstraction Microsoft provides for cross-technology uniformity; WinX goes more directly at the Windows API. That is the essential distinction to remember."
+          "text": "UIA depends on the application’s UI Automation exposure. WinX documentation describes Windows UI API and PowerBuilder support. Engine choice, control exposure and supported operations all matter."
         }
       ],
       "bulletPoints": [
-        "UIA Engine 3.0 = Microsoft UI Automation framework; also reaches desktop elements and the taskbar.",
-        "WinX = Windows UI API tests, direct API-level interaction."
+        "UIA = Microsoft UI Automation; recommended when the corresponding standard engine lacks support and UIA can steer the control.",
+        "WinX supports Windows UI API and PowerBuilder controls; verify prerequisites."
       ],
       "sectionId": "section-86ae139c8842"
     },
@@ -45,21 +45,21 @@
         {
           "type": "concept",
           "term": "Where the decision happens",
-          "description": "You do not choose the engine on a TestStep or a Module property — you choose it while scanning. After selecting the desktop application you want to scan, right-click the application's tile and pick either UIA or WinX from the context menu. Whichever you choose determines the kind of Modules produced: UIA Modules for UIA tests, WinX Modules for Windows UI API tests."
+          "description": "Open XScan with Modules → Scan → Application, or Scan → Application from a Module folder. In Select Application, right-click the target application and choose UIA or WinX, then scan and save its controls. This creates technology-specific Modules."
         },
         {
           "type": "concept",
           "term": "Consequences of the choice",
-          "description": "This is the same Module-binds-the-Engine principle from the TBox theory lesson, applied to Windows. Because the engine is baked into the Modules created by the scan, switching engines later is not a setting you flip — it means rescanning the application with the other option and rebuilding the affected Modules. Worth a moment's evaluation before committing to a large scan."
+          "description": "A scanned Module contains engine-specific identification and control information. Selecting a different engine for another scan does not automatically convert existing Modules or TestSteps. Evaluate new Modules and affected test references before migrating."
         },
         {
           "type": "note",
-          "text": "Tricentis' documentation presents UIA and WinX as equivalent alternatives at scan time and does not prescribe one for specific scenarios — the right choice depends on the application's architecture and how well it exposes its controls. In practice this means: try one, and if controls are not identified reliably, rescan with the other."
+          "text": "Tricentis does give UIA selection guidance: use it for controls unsupported by their corresponding standard engine when UI Automation can steer them. For WinX, inspect Windows UI API/PowerBuilder support and scan results. Rescanning is an evaluation step, not a promise that the alternative engine will identify every control."
         }
       ],
       "bulletPoints": [
         "Scan → right-click the application tile → UIA or WinX.",
-        "The engine is bound into the resulting Modules; changing it later means rescanning."
+        "Changing scan technology requires evaluating new Modules and their test references; it is not an automatic TestStep conversion."
       ],
       "sectionId": "section-50a2c17c3011"
     },
@@ -69,11 +69,11 @@
         {
           "type": "concept",
           "term": "Nothing new above the Module",
-          "description": "Once the scan has produced Modules, everything above that level is the workflow you already know: drag a Module onto a TestCase to create a TestStep, fill in TestStepValues, choose an ActionMode of Input, Verify, Buffer or Select. Whether a UIA or WinX Engine is doing the steering underneath is invisible at that level — exactly the uniformity the TBox framework exists to provide."
+          "description": "The Module → TestStep → TestStepValue workflow remains familiar. ActionModes and properties still depend on the control and engine; do not assume every control supports Input, Verify, Buffer and Select identically. UIA table cell input uses embedded controls."
         },
         {
           "type": "note",
-          "text": "If a Windows control resists identification by both engines, that is the point at which the later lessons become relevant: Custom Controls (Lesson 6) for extending recognition properly, and Image Based Controls (Lesson 8) as the last-resort fallback."
+          "text": "Check supported controls and prerequisites before escalating to extensions or image recognition. For disappearing context menus, the documented TBox Context Menu workflow can avoid scanning them. PowerBuilder DataWindow recognition requires enabling the application before scanning."
         },
         {
           "type": "note",
@@ -81,8 +81,8 @@
         }
       ],
       "bulletPoints": [
-        "The engine choice affects identification, not how you build the TestCase.",
-        "If neither engine identifies a control well, Custom Controls and Image Based Controls are the escalation path."
+        "Familiar TestStep structure does not imply identical control capabilities.",
+        "Use the documented control-specific workflow before choosing an extension or visual fallback."
       ],
       "sectionId": "section-510335655945"
     }
@@ -91,22 +91,22 @@
     {
       "title": "Looking for an engine setting on the Module or TestStep",
       "trapDescription": "Trying to switch a Windows Module from UIA to WinX by editing a property after the scan.",
-      "bestPractice": "The choice is made during scanning — right-click the application's tile and select UIA or WinX. The engine is bound into the Modules the scan creates, so changing it means rescanning."
+      "bestPractice": "Select the engine in XScan and evaluate the resulting Modules. Changing the scan technology does not automatically convert existing test references; validate any migration."
     },
     {
       "title": "Confusing which engine uses Microsoft's UI Automation framework",
       "trapDescription": "Attributing the Microsoft UI Automation basis to WinX.",
-      "bestPractice": "UIA Engine 3.0 is the one based on the Microsoft UI Automation framework — the clue is in the name. WinX performs Windows UI API tests through direct API-level interaction."
+      "bestPractice": "UIA uses Microsoft UI Automation. WinX is documented for Windows UI API and PowerBuilder applications; keep those support descriptions separate."
     },
     {
       "title": "Assuming one engine is universally better",
       "trapDescription": "Standardising on UIA (or WinX) for every Windows application on principle.",
-      "bestPractice": "Tricentis presents them as alternatives without prescribing one; the right choice depends on how well the specific application exposes its controls. If identification is unreliable with one, rescan with the other."
+      "bestPractice": "Start from technology and control support. UIA is recommended where the corresponding standard engine lacks support but UI Automation can steer the controls; validate an alternative scan before migrating tests."
     },
     {
-      "title": "Forgetting UIA reaches beyond the application window",
-      "trapDescription": "Assuming a test cannot touch desktop-level elements or the taskbar.",
-      "bestPractice": "The UIA Engine 3.0 can test Windows desktop elements and the taskbar, not only controls inside an application window."
+      "title": "Assuming every ActionMode works on every scanned control",
+      "trapDescription": "Treating the common TestStep workflow as proof of identical Input, Verify, Buffer and Select support.",
+      "bestPractice": "Consult the control-specific steering reference. For UIA table cell entry, use the embedded TextBox, ComboBox or CheckBox control as appropriate."
     }
   ],
   "practiceQuiz": [
@@ -136,7 +136,15 @@
         "B"
       ],
       "hint": "The engine's name is an abbreviation of the framework it uses.",
-      "rationale": "UIA Engine 3.0 is built on the Microsoft UI Automation framework, which Microsoft created so applications of different technologies could be steered as uniformly as possible. Controls are addressed exclusively through that interface in the target application."
+      "rationale": "UIA accesses the target through Microsoft UI Automation. Success depends on what that interface exposes; it is not a universal Windows-control guarantee.",
+      "optionExplanations": {
+        "A": "This does not name UIA’s documented Microsoft UI Automation interface.",
+        "B": "This is the framework on which UIA Engine 3.0 is based.",
+        "C": "Java Access Bridge concerns Java accessibility, not UIA’s Microsoft interface.",
+        "D": "DOM-based browser identification is not the UIA engine’s basis."
+      },
+      "lessonSection": "section-86ae139c8842",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q2",
@@ -164,12 +172,20 @@
         "C"
       ],
       "hint": "The decision is made at the moment the Modules are created.",
-      "rationale": "After selecting the desktop application to scan, you right-click its tile and choose UIA or WinX. That choice determines whether UIA Modules or Windows UI API Modules are created, and it is bound into those Modules."
+      "rationale": "After selecting the desktop application to scan, you right-click its tile and choose UIA or WinX. That choice determines whether UIA Modules or Windows UI API Modules are created, and it is bound into those Modules.",
+      "optionExplanations": {
+        "A": "ActionMode selects a control operation, not the XScan technology.",
+        "B": "The documented choice is made for the application in XScan, not as a universal project setting.",
+        "C": "The application selection context menu exposes the scan-engine choice.",
+        "D": "The scan workflow permits explicitly selecting UIA or WinX."
+      },
+      "lessonSection": "section-50a2c17c3011",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "A team scanned an application with UIA, but several controls are identified unreliably. What is the appropriate next step?",
+      "scenario": "A team wants to evaluate WinX for supported controls that were unreliable in its UIA scan. What is an appropriate approach?",
       "options": [
         {
           "id": "A",
@@ -177,7 +193,7 @@
         },
         {
           "id": "B",
-          "text": "Rescan the application selecting WinX, since the engine is bound into the Modules the scan produces."
+          "text": "Create a WinX scan and evaluate its Modules and affected test references before migrating."
         },
         {
           "id": "C",
@@ -191,36 +207,52 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "There is no post-scan switch — the binding happened when the Modules were created.",
-      "rationale": "The engine is determined at scan time and baked into the resulting Modules, so switching means rescanning with the other option. UIA and WinX are presented as alternatives, and which works better depends on how the specific application exposes its controls."
+      "hint": "Evaluate the supported alternative and its references rather than assuming an automatic conversion.",
+      "rationale": "Creating a scan with the alternative engine permits evaluation of its control identification. The choice does not automatically convert the existing Modules or guarantee success.",
+      "optionExplanations": {
+        "A": "Editing a property is not a supported automatic conversion of the scanned identification and test references.",
+        "B": "A new scan allows control-support and reference evaluation before migration.",
+        "C": "An unreliable scan does not show that all desktop automation is impossible.",
+        "D": "Browser Modules do not automatically replace Windows application controls."
+      },
+      "lessonSection": "section-50a2c17c3011",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "Besides controls inside an application window, what else can the UIA Engine 3.0 test?",
+      "scenario": "When does Tricentis recommend considering UIA Engine 3.0?",
       "options": [
         {
           "id": "A",
-          "text": "Windows desktop elements and the taskbar."
+          "text": "When the corresponding standard engine lacks control support but UI Automation can steer those controls."
         },
         {
           "id": "B",
-          "text": "PDF documents."
+          "text": "Whenever a PDF must be compared, regardless of control technology."
         },
         {
           "id": "C",
-          "text": "Excel cell formulas."
+          "text": "For every Windows application, without checking control support."
         },
         {
           "id": "D",
-          "text": "Mail server inboxes."
+          "text": "Only when a mail server inbox must be read."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "It reaches the operating system's own shell, not just applications.",
-      "rationale": "The UIA Engine 3.0 can test Windows Desktop elements and the taskbar in addition to application controls. PDFs, Excel and mail each have their own dedicated engines."
+      "hint": "The recommendation depends on the control’s supported interface.",
+      "rationale": "The UIA engine page explicitly makes this recommendation conditional on standard-engine support and the ability to steer via UI Automation.",
+      "optionExplanations": {
+        "A": "This is the conditional recommendation stated on the UIA engine page.",
+        "B": "PDF comparison is covered by its dedicated workflow, not this UIA recommendation.",
+        "C": "Support must be checked; UIA is not prescribed for every Windows application.",
+        "D": "Mailbox access is not the UIA control-steering use case."
+      },
+      "lessonSection": "section-86ae139c8842",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q5",
@@ -248,7 +280,15 @@
         "A"
       ],
       "hint": "The choice is made on the scanned application's own tile, inside the XScan window.",
-      "rationale": "In the XScan, you right-click the thumbnail of the application/page to scan and pick 'UIA' or 'WinX' from the list that appears. This is the same scan-time decision covered earlier in the lesson — the engine is bound into the Modules the scan produces, so it has to be chosen here, not afterwards."
+      "rationale": "In the XScan, you right-click the thumbnail of the application/page to scan and pick 'UIA' or 'WinX' from the list that appears. This is the same scan-time decision covered earlier in the lesson — the engine is bound into the Modules the scan produces, so it has to be chosen here, not afterwards.",
+      "optionExplanations": {
+        "A": "XScan’s application context menu provides this explicit technology choice.",
+        "B": "This omits the application-specific context-menu choice inside XScan.",
+        "C": "A rescan does not establish automatic technology conversion of existing Modules and references.",
+        "D": "The documented starting route is Scan → Application from Modules or a Module folder."
+      },
+      "lessonSection": "section-50a2c17c3011",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q6",
@@ -275,13 +315,21 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "WinX goes directly at the same API layer its name references.",
-      "rationale": "WinX is used for Windows UI API tests — direct API-level interaction with the application. The Microsoft UI Automation framework (option C) is what UIA is based on, not WinX; web applications belong to the XBrowser Engine."
+      "hint": "WinX documentation identifies Windows UI API and PowerBuilder support.",
+      "rationale": "Windows UI API is the documented WinX application category; PowerBuilder is also supported. UIA’s basis is Microsoft UI Automation, and browser control steering uses the relevant browser engine.",
+      "optionExplanations": {
+        "A": "This is not the Windows UI API application category documented for WinX.",
+        "B": "Windows UI API applications are a documented WinX target category.",
+        "C": "Microsoft UI Automation is UIA’s basis, not WinX’s support description.",
+        "D": "Browser applications use browser-specific scanning; this is not the stated WinX target category."
+      },
+      "lessonSection": "section-86ae139c8842",
+      "explanationReviewedOn": "2026-10-06"
     },
     {
       "questionId": "Q7",
       "type": "single-select",
-      "scenario": "Which types of applications would you scan using the UIA Engine of Tosca?",
+      "scenario": "Which application interface must expose the controls for UIA steering?",
       "options": [
         {
           "id": "A",
@@ -293,7 +341,7 @@
         },
         {
           "id": "C",
-          "text": "Applications based on the Microsoft UI Automation framework."
+          "text": "The Microsoft UI Automation interface."
         },
         {
           "id": "D",
@@ -304,17 +352,25 @@
         "C"
       ],
       "hint": "The engine's name is a direct abbreviation of the framework it's built on.",
-      "rationale": "UIA Engine 3.0 is built on the Microsoft UI Automation framework. Direct Windows UI API interaction (option A) describes WinX, not UIA; web applications belong to the XBrowser Engine."
+      "rationale": "UIA steers through the Microsoft UI Automation interface in the target. The whole application need not be implemented in one particular framework; its controls must expose that interface.",
+      "optionExplanations": {
+        "A": "This describes the WinX support category rather than UIA’s required interface.",
+        "B": "This is not the UI Automation interface used to steer the controls.",
+        "C": "UIA accesses controls through the Microsoft UI Automation interface exposed by the target.",
+        "D": "A browser label alone does not establish UIA exposure; browser control testing has its own engine."
+      },
+      "lessonSection": "section-86ae139c8842",
+      "explanationReviewedOn": "2026-10-06"
     }
   ],
   "quickRecap": [
     {
       "key": "UIA Engine 3.0",
-      "value": "Based on the Microsoft UI Automation framework; controls steered exclusively via that interface; also reaches desktop elements and the taskbar."
+      "value": "Microsoft UI Automation interface; conditional on control exposure and support."
     },
     {
       "key": "WinX Engine",
-      "value": "Windows UI API tests — direct API-level interaction rather than the UI Automation abstraction."
+      "value": "Windows UI API and PowerBuilder applications; check supported controls and prerequisites."
     },
     {
       "key": "Where you choose",
@@ -322,15 +378,15 @@
     },
     {
       "key": "Binding",
-      "value": "The engine is baked into the Modules the scan creates — switching later means rescanning."
+      "value": "New scan technology does not automatically convert existing Modules and test references."
     },
     {
       "key": "Which to pick",
-      "value": "Not prescribed by Tricentis; depends on how the application exposes its controls. If one identifies poorly, rescan with the other."
+      "value": "UIA has conditional selection guidance; validate technology/control support and scan results."
     },
     {
       "key": "Above the Module",
-      "value": "Unchanged — same TestSteps, TestStepValues and ActionModes regardless of engine."
+      "value": "Familiar TestStep structure; supported ActionModes and properties remain control-specific."
     }
   ],
   "topics": [
@@ -341,8 +397,15 @@
     },
     {
       "title": "Steering UIA 3.0 Controls (Tricentis docs)",
-      "url": "https://docs.tricentis.com/tosca-2025.1/en-us/content/engines_3.0/uia/tbox_uia_engine_controls.htm",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/uia/tbox_uia_engine_controls.htm",
+      "duration": "docs"
+    },
+    {
+      "title": "WinX controls (Tricentis docs)",
+      "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/engines_3.0/winx/winx_controls.htm",
       "duration": "docs"
     }
-  ]
+  ],
+  "platformVersion": "Tosca 2026.1 LTS public documentation; original AE1 exercises unverified",
+  "sourceReviewedOn": "2026-10-06"
 }
