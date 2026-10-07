@@ -26,7 +26,7 @@
     var weak=ready.filter(function(m){var score=average(records[m.id]);return score!==null&&score<70;}).sort(function(a,b){return average(records[a.id])-average(records[b.id]);});
     var unfinished=ready.filter(function(m){return !completed.has(m.id);});
     var cards=user.tracks&&user.tracks[track.trackId]&&user.tracks[track.trackId].srs&&user.tracks[track.trackId].srs.cards||{};
-    var due=Object.keys(cards).filter(function(id){return ready.some(function(m){return m.id===id.split('::')[0];})&&cards[id].dueDate<=date;}).length;
+    var due=Object.keys(cards).filter(function(id){return ready.some(function(m){return m.id===global.QuilynProgress.moduleId(track.trackId,id.split('::')[0]);})&&cards[id].dueDate<=date;}).length;
     var actions=[],left=p.minutes,skips=p.skipped.day===date?p.skipped.ids:[], plannedModules=new Set();
     function add(id,title,url,minutes,reason){if(skips.includes(id)||left<minutes)return;actions.push({id:id,title:title,url:url,minutes:minutes,reason:reason});left-=minutes;}
     if(ready.length){

@@ -3,6 +3,7 @@
   'use strict';
   var ACTIVITY_KEY = 'quilyn_activity';
   var observed=new Map(), resetting=false;
+  function moduleId(track,id){return track==='PSA'&&/^m(0[1-9]|[1-3][0-9]|4[0-8])$/i.test(id)?'SA-M'+id.slice(1):id;}
   function sessionKey(key){return /^pq_state_|^pegaMock_/.test(key);}
   function conflict(key){return sessionKey(key)&&observed.has(key)&&localStorage.getItem(key)!==observed.get(key);}
   var record = function (v) { return v !== null && typeof v === 'object' && !Array.isArray(v); };
@@ -233,6 +234,6 @@
   // A visible-tab fallback also catches updates missed while the page was suspended.
   if(global.setInterval)global.setInterval(poll,2000);
 
-  global.QuilynProgress = { beginReset: function(){resetting=true;}, validEntry: validEntry, read: read, write: write, remove: remove, validateBundle: validateBundle,
+  global.QuilynProgress = { moduleId:moduleId, beginReset: function(){resetting=true;}, validEntry: validEntry, read: read, write: write, remove: remove, validateBundle: validateBundle,
     applyBundle: applyBundle, quizState:quizState, quizSignature:quizSignature, archive:archive, validateReferences: validateReferences, activity: activity, localDay: localDay, activityKey: ACTIVITY_KEY };
 })(window);

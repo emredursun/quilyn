@@ -32,8 +32,7 @@
     'BA-M16':'User Experience','BA-M17':'Insights','BA-M18':'DevOps','BA-M19':'DevOps'
   };
 
-  var DOMAINS = ['Case Management','Data & Integration','Application Development',
-    'Security','User Experience','Pega GenAI','DevOps','Insights'];
+  var DOMAINS = [];
 
   var DCOLORS = {
     'Case Management':'#4f7cff','Data & Integration':'#22d3ee',
@@ -211,7 +210,7 @@
         if(isMulti){var pos=currentSelected.indexOf(id);if(pos>=0){currentSelected.splice(pos,1);el.classList.remove('sel');}else{currentSelected.push(id);el.classList.add('sel');}}
         else{currentSelected=[id];optEls.forEach(function(x){x.classList.remove('sel');});el.classList.add('sel');}
         var ready=isMulti?currentSelected.length===(q.selectCount||q.correctOptions.length):currentSelected.length===1;
-        if(ready){var cw=_root.querySelector('#rv-conf-wrap');if(cw)cw.classList.add('show');}
+        var cw=_root.querySelector('#rv-conf-wrap');if(cw)cw.classList.toggle('show',ready);
       });
     });
     qn.querySelectorAll('.cbtn').forEach(function(btn){btn.addEventListener('click',function(){submitConf(btn.getAttribute('data-conf'));});});
@@ -222,7 +221,7 @@
   }
 
   function submitConf(conf) {
-    if(cardGraded || !currentSelected.length) return;
+    if(cardGraded || !currentQ || currentSelected.length!==(currentQ.type==='multi-select'?(currentQ.selectCount||currentQ.correctOptions.length):1)) return;
     cardGraded = true;
     var q=currentQ; var key=currentKey;
     var qn=r('qcontainer'); if(!qn) return;
@@ -300,7 +299,7 @@
     if(btnStart){if(stats.due===0){btnStart.textContent='✓ All caught up today!';btnStart.disabled=true;}else{btnStart.textContent='▶ Review '+Math.min(stats.due,SESSION_SIZE)+' Cards';btnStart.disabled=false;}}
     var dg=r('domain-grid');
     if(dg) dg.innerHTML=DOMAINS.map(function(dom){
-      var keys=Object.keys(cardBank).filter(function(k){return(MOD_DOMAIN[cardBank[k].moduleId]||'')===dom;});
+      var keys=Object.keys(cardBank).filter(function(k){return(MOD_DOMAIN[cardBank[k].moduleId]||'General')===dom;});
       var count=keys.filter(mastered).length;
       var pct=keys.length?Math.round(count/keys.length*100):0;
       return '<div class="drow"><div class="dmeta"><span class="dname">'+esc(dom)+'</span><span class="dpct">'+pct+'% ('+count+'/'+keys.length+')</span></div><div class="dbar"><i style="width:'+pct+'%;background:'+(DCOLORS[dom]||'#4f7cff')+'"></i></div></div>';
@@ -331,7 +330,7 @@
       '<li><div class="rv-sidebar-stat"><span>Total</span><b>'+stats.total+'</b></div></li>'+
       '<li><div class="rv-sidebar-stat"><span>Streak</span><b style="color:var(--pa-warn,#fbbf24)">'+currentStreak()+'</b></div></li>'+
       '<li style="margin-top:12px">'+
-        '<a href="javascript:void(0)" id="rv-sb-start" class="pa-shell-sidebar-item">▶ Start Session</a>'+
+        '<button type="button" id="rv-sb-start" class="pa-shell-sidebar-item">▶ Start Session</button>'+
       '</li>';
     var sbStart=_sidebarEl.querySelector('#rv-sb-start');
     if(sbStart) sbStart.addEventListener('click',function(){showSec('session');startSession();});
@@ -464,16 +463,13 @@
     showSec('loading');
 
     var activeTrackId = getTrack();
-    DOMAINS = ['Case Management','Data & Integration','Application Development','Security','User Experience','Pega GenAI','DevOps','Insights'];
+    DOMAINS = [];
     Promise.all([global.QuilynRuntime.json('data/registry.json'),global.QuilynRuntime.learning?global.QuilynRuntime.learning():Promise.resolve()]).then(function(results){return results[0];})
       .then(function(reg){
         if(request !== generation) throw new Error('CANCELLED');
         var track=reg.tracks.filter(function(t){return t.trackId===activeTrackId;})[0];
         if(!track) throw new Error(activeTrackId + ' track not found in registry.json');
         var mods=track.modules.filter(function(m){return m.ready!==false;});
-        if (activeTrackId === 'PSSA') {
-          DOMAINS = Array.from(new Set(mods.map(function(m) { return m.examDomain; }).filter(Boolean)));
-        }
         if(mods.length===0) throw new Error('EMPTY_TRACK');
         var loaded=0;
         var progEl=r('load-prog'); if(progEl) progEl.textContent='0 / '+mods.length+' modules';
@@ -482,8 +478,8 @@
             .then(function(data){
               if(request !== generation) return;
               var mid=data.moduleId||meta.id; var mname=data.moduleTitle||meta.name;
-              if (data.examDomain || meta.examDomain) MOD_DOMAIN[mid] = data.examDomain || meta.examDomain;
-              (data.practiceQuiz||[]).forEach(function(q){cardBank[mid+'::'+q.questionId]={moduleId:mid,moduleName:mname,q:q};});
+              if (data.examDomain || meta.examDomain) MOD_DOMAIN[meta.id] = data.examDomain || meta.examDomain;
+              (data.practiceQuiz||[]).forEach(function(q){cardBank[mid+'::'+q.questionId]={moduleId:meta.id,moduleName:mname,q:q};});
               loaded++;
               if(progEl) progEl.textContent=loaded+' / '+mods.length+' modules loaded';
             });
@@ -491,6 +487,7 @@
       })
       .then(function(){
         if(request !== generation) return;
+        DOMAINS=Array.from(new Set(Object.keys(cardBank).map(function(k){return MOD_DOMAIN[cardBank[k].moduleId]||'General';}))).sort();
         if(Object.keys(cardBank).length === 0) {
           showSec('empty');
           if(sidebarEl) sidebarEl.innerHTML='<li><div class="rv-sidebar-stat"><span style="color:var(--pa-muted,#939bbd)">No cards</span></div></li>';

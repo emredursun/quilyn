@@ -76,3 +76,21 @@ test('graded quiz keeps only picked options selected so native checked state sur
  const q={type:'multi-select',options:['A','B','C'].map(id=>({id})),correctOptions:['A','C']};window.gradeForTest(card,q,['A','B']);
  assert.equal(nodes[0].classes.has('selected'),true);assert.equal(nodes[1].classes.has('selected'),true);assert.equal(nodes[2].classes.has('selected'),false);assert.equal(nodes[0].classes.has('correct'),true);assert.equal(nodes[1].classes.has('wrong'),true);assert.equal(nodes[2].classes.has('correct'),true);assert.ok(nodes.every(el=>el.classes.has('disabled')));
 });
+
+test('mock check, restore and post-submit review retain only picked native controls, including unanswered cards',()=>{
+ const document={addEventListener(){},getElementById:()=>null,querySelectorAll:()=>[]},window={QuilynProgress:{write(){}}};
+ const source=fs.readFileSync('core/js/mock-view.js','utf8').replace('})(window);','global.mockForTest=function(root,picks,isChecked){_root=root;current="Exam";EXAMS={Exam:[{a:[0,2],r:"Reason"}]};answers=[picks];checked=[isChecked];externalConflict=false;examMode="practice";};global.checkForTest=checkAnswer;global.restoreForTest=restoreCardVisuals;global.reviewForTest=reviewExam;})(window);');
+ vm.runInNewContext(source,{window,document,HTMLElement:class{},customElements:{define(){}},Date,console});
+ vm.runInNewContext(fs.readFileSync('core/js/runtime.js','utf8').replace('global.QuilynRuntime = {','global.QuilynRuntime = {syncForTest:syncChoices,'),{window,document,Map});
+ for(const path of ['check','restore','review'])for(const picks of [[0,1],[2],[]]){
+  if(path==='check'&&!picks.length)continue;
+  const options=[0,1,2].map(j=>{const option=node();option.dataset={j:String(j)};option.classList.add('sel');option.input={};option.querySelector=()=>option.input;return option;});
+  const card=node();card.querySelectorAll=()=>options;card.querySelector=s=>s==='.check-btn'?node():null;options.forEach(o=>o.closest=()=>card.classes.has('reviewed')?card:null);
+  const root=node();root.querySelector=s=>s.startsWith('.q[data-i=')?card:null;
+  window.mockForTest(root,picks,path==='restore');
+  if(path==='check')window.checkForTest(0,card);else if(path==='restore')window.restoreForTest();else window.reviewForTest();
+  window.QuilynRuntime.syncForTest({querySelectorAll:()=>options});
+  assert.deepEqual(options.map(o=>o.input.checked),options.map((o,j)=>picks.includes(j)),path+' '+picks);
+  assert.ok(options.every(o=>o.input.disabled));assert.ok(options[0].classes.has('correct'));assert.ok(options[2].classes.has('correct'));
+ }
+});

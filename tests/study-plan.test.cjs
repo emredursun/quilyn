@@ -99,3 +99,12 @@ test('study workspace separates saved collection from daily planning and escapes
  const daily=s.workspace(t,p,plan,saved,[],'Estimate','',null,date);assert.ok(daily.includes('id="sp-form"'));assert.ok(daily.includes('Suggested time, not completed time'));assert.ok(daily.includes('How the estimate works'));assert.ok(!daily.includes('data-remove='));assert.equal((daily.match(/>Start activity /g)||[]).length,1);
  const empty=s.workspace(t,p,plan,[],[],'Estimate','', 'bookmarks',date);assert.ok(empty.includes('Build your revision shortlist'));assert.ok(empty.includes('href="#home"'));
 });
+
+test('PSA legacy SRS IDs count scheduled cards without migrating saved identities',()=>{
+ const {s,p}=setup(),cards={'m01::Q1':{dueDate:date},'m02::Q1':{dueDate:'2099-01-01'},'m99::Q1':{dueDate:date}};
+ const psa={trackId:'PSA',modules:[{id:'SA-M01',name:'First'},{id:'SA-M02',name:'Second'}]};
+ const state={tracks:{PSA:{srs:{cards}}}},before=JSON.stringify(cards);
+ const plan=s.recommend(psa,state,{mistakes:{}},preferences(),date);
+ assert.equal(plan.due,1);assert.equal(plan.actions[0].id,'review');assert.equal(JSON.stringify(cards),before);
+ assert.equal(p.moduleId('PSA','m48'),'SA-M48');assert.equal(p.moduleId('PSA','m49'),'m49');assert.equal(p.moduleId('PBA','m01'),'m01');
+});

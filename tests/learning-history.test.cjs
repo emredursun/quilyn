@@ -1784,3 +1784,23 @@ test('Original healing theory keeps controlled Search mutation separate from the
 test('Original healing log note distinguishes narrated ExecutionList from the shown ScratchBook',()=>{
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m06_self_healing.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-healing-source');assert.match(s.elements.at(-1).text,/narration mentions an execution list.*screen is labeled ScratchBook.*not an ExecutionList run.*verify the target/);
 });
+
+test('legacy PSA review mistakes resolve from canonical quizzes while old history stays unchanged',()=>{
+ const {j}=setup(),legacy=j.quizQuestion('PSA','m01',question,'Application Development');
+ j.record(meta('legacy','PSA','review'),[{snapshot:legacy,selected:['B'],conf:'sure'}]);
+ const before=JSON.stringify(j.read().attempts[0]);
+ assert.match(j.feedbackHTML(legacy),/#PSA\/SA-M01\/guide/);assert.equal(legacy.moduleId,'m01');
+ const canonical=j.quizQuestion('PSA','SA-M01',question,'Application Development');
+ j.record(meta('wrong-again','PSA'),[{snapshot:canonical,selected:['B'],conf:null}]);
+ assert.deepEqual(Object.keys(j.read().mistakes),[legacy.key]);assert.equal(j.read().mistakes[legacy.key].failures,2);
+ j.record(meta('correct','PSA'),[{snapshot:canonical,selected:['A'],conf:null}]);
+ assert.equal(j.read().mistakes[legacy.key].resolved,true);
+ assert.equal(JSON.stringify(j.read().attempts.find(a=>a.id==='legacy')),before);assert.equal(canonical.key,'PSA/SA-M01/Q1');
+});
+test('canonical PSA correction cannot resolve a legacy mistake from revised content',()=>{
+ const {j}=setup(),legacy=j.quizQuestion('PSA','m01',question);
+ j.record(meta('legacy','PSA'),[{snapshot:legacy,selected:['B'],conf:null}]);
+ const revised=j.quizQuestion('PSA','SA-M01',{...question,scenario:'Changed question'});
+ j.record(meta('correct-new','PSA'),[{snapshot:revised,selected:['A'],conf:null}]);
+ assert.equal(j.read().mistakes[legacy.key].resolved,false);
+});

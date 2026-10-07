@@ -58,6 +58,8 @@
   /* ── Crumbs ─────────────────────────────────────────────────────────── */
   function setCrumbs(label) {
     var el = getCrumbs(); if (!el || !label) return;
+    if(global._paCrumbObs){global._paCrumbObs.disconnect();global._paCrumbObs=null;}
+    el._paTrack=label;el._paModule=null;el.title=label;
     el.innerHTML = '<span class="pa-crumb pa-crumb--app">' + label + '</span>';
   }
 

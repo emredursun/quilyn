@@ -371,7 +371,7 @@
         card.querySelectorAll('.opt').forEach(function(o) {
           var j = parseInt(o.dataset.j);
           o.onclick = null;
-          o.classList.remove('sel');
+          o.classList.toggle('sel', answers[i].indexOf(j) >= 0);
           if (qu.a.indexOf(j) >= 0) o.classList.add('correct');
           else if (answers[i].indexOf(j) >= 0) o.classList.add('wrong');
         });
@@ -421,7 +421,7 @@
     card.querySelectorAll('.opt').forEach(function(o) {
       var j = parseInt(o.dataset.j);
       o.onclick = null;
-      o.classList.remove('sel');
+      o.classList.toggle('sel', answers[i].indexOf(j) >= 0);
       if (qu.a.indexOf(j) >= 0) o.classList.add('correct');
       else if (answers[i].indexOf(j) >= 0) o.classList.add('wrong');
     });
@@ -590,7 +590,7 @@
         card.querySelectorAll('.opt').forEach(function(o) {
           var j = parseInt(o.dataset.j);
           o.onclick = null;
-          o.classList.remove('sel');
+          o.classList.toggle('sel', answers[i].indexOf(j) >= 0);
           if (qu.a.indexOf(j) >= 0) o.classList.add('correct');
           else if (answers[i].indexOf(j) >= 0) o.classList.add('wrong');
         });

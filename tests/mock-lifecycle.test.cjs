@@ -43,3 +43,12 @@ test('shell unmounts old views before replacing their custom elements',()=>{
   assert.deepEqual(calls.slice(0,3),['unmount:mock','unmount:review','replace:<pega-mock-view></pega-mock-view>']);
   assert.equal(sidebar.textContent,'Loading…');
 });
+
+test('review and mock transitions clear stale lesson breadcrumbs and browser titles',()=>{
+ const crumbs={title:'PSA / Old lesson',_paTrack:'PSA',_paModule:'Old lesson'},content={};let disconnected=0;
+ const window={_paCrumbObs:{disconnect(){disconnected++;}}};
+ const document={readyState:'complete',title:'Old lesson — Quilyn',documentElement:{getAttribute:()=> 'light'},querySelector:()=>null,querySelectorAll:()=>[],getElementById:id=>id==='paCrumbs'?crumbs:id==='paContent'?content:null};
+ vm.runInNewContext(fs.readFileSync('core/js/app-shell.js','utf8'),{window,document});
+ window.QuilynShell.renderMode('review');assert.equal(disconnected,1);assert.equal(window._paCrumbObs,null);assert.equal(crumbs._paModule,null);assert.equal(crumbs.title,'Smart Review');assert.equal(document.title,'Smart Review — Quilyn');
+ window.QuilynShell.renderMode('mock');assert.equal(crumbs.title,'Mock Exams');assert.equal(document.title,'Mock Exams — Quilyn');
+});
