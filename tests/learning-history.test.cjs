@@ -1770,3 +1770,8 @@ test('Original image-control recipe distinguishes control capture, identifiers a
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m09_image_based_controls.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-image-ocr-source');
  assert.match(s.elements[0].description,/already selected control.*standalone.*first capture.*at least one identifying image/);assert.match(s.elements[1].items[0],/image and text.*Generic/);assert.match(s.elements[1].items[1],/\.OCRText==Demo Web Shop\*.*Verify/);assert.match(s.elements[1].items[2],/separate checks.*not an exact full-string assertion/);assert.match(s.elements[2].text,/F12.*95.*course-version.*unintended.*No installed/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['B'],['A','B','C'],['A']]);
 });
+
+test('Original healing recipe preserves target-title identity, source discrepancy and intentional failures',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m06_self_healing.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-healing-source');
+ assert.match(s.elements[0].description,/\.Exists=True.*SelfHealing=Weighted.*0\.75.*Title.*not changing its Title identifier/);assert.match(s.elements[1].text,/Module name remains.*Title parameter.*no Shopping Cart.*PDF asks for all three.*not a passing run/);assert.match(s.elements[2].text,/changed technical property should make the test fail.*Scope or disable healing/);assert.match(s.elements[3].text,/ScratchBook.*current public workflow uses an ExecutionList.*not a guarantee/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['C'],['A'],['B'],['B']]);
+});

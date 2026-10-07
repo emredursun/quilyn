@@ -1,0 +1,7 @@
+# Original AE1 Self-Healing source follow-up — 2026-10-07
+
+Read and visually inspected all four original Exercise 5 pages: fourteen instructions, three-row Exists/Verify table, new-target Title change, expected outcome and both final hints. Added independently summarized baseline/changed-target flow, distinct target identification and healing checks, intentional technical-property-change failures, and separation of the source ScratchBook example from current ExecutionList/log/apply guidance.
+
+Statically inspected relevant original solution TSU Module/TestCase objects. Module display Name remains Demo Web Shop while Title is Your store. Its two attributes are logo and Search; the PDF additionally requests Shopping Cart. The TestCase has no direct ConfigurationLinks; no inherited configuration or execution is certified. Local notes preserve this discrepancy rather than claiming the package completes all requested checks. Stored subset data is not a fresh passing run. Original files are not redistributed; stable source link and exact hashes are in the inventory.
+
+Re-read all five local keys B,C,A,B,B; unchanged. Added an assertion/identity/discrepancy regression. Regenerated content artifacts. `npm run check`: **292/292 passed**, zero failed/skipped; initial shell **298.0 KB**, 41 interactives and 222 static pages checked. `git diff --check` passed. Shell `20261007d` / `quilyn-v223` unchanged. No installed recovery or physical-device/AT test; remaining theory/solution/checklist scopes stay open. No push or deployment.
