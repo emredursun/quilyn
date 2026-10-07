@@ -1029,7 +1029,7 @@ test('AE1 introduction and framework review correct positional table syntax and 
  const docs=['m00_introduction.json','m01_tbox_engines_frameworks.json'].map(file=>{const bytes=fs.readFileSync('data/tosca-ae1/'+file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));d.practiceQuiz.forEach(q=>{assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});return d;});
  assert.deepEqual(docs[0].practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['B']]);
  assert.deepEqual(docs[1].practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['C'],['A'],['B'],['B'],['B'],['A']]);
- assert.match(docs[1].studyGuide[4].elements[0].description,/relative to the configured header/);
+ assert.match(docs[1].studyGuide.find(s=>s.sectionId===docs[1].practiceQuiz[4].lessonSection).elements[0].description,/relative to the configured header/);
  assert.match(docs[1].practiceQuiz[4].options[1].text,/unique Order ID/);
  assert.match(docs[1].practiceQuiz[7].options[0].text,/NONE on the report definition/);
  assert.doesNotMatch(JSON.stringify(docs),/\$ = by a cell|\$ notation instead targets the row|only the visuals shift|Final Exam draws no questions/);
@@ -1691,4 +1691,16 @@ test('Authenticated AE1 introduction scopes prerequisites and optional exam rule
 
 test('Original Framework overview preserves five benefits without universal cross-engine capability claims',()=>{
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json'));assert.match(d.studyGuide[0].elements[2].text,/five architecture benefits.*shared dynamic-expression.*broader ActionMode/);assert.match(d.studyGuide[1].elements.at(-1).text,/seventeen.*Microsoft UI Automation.*underlying framework/);assert.match(d.studyGuide[2].bulletPoints[1],/when.*prerequisites.*compatible/);assert.doesNotMatch(JSON.stringify(d),/mix freely|workflow is identical across technologies/);
+});
+
+
+test('Original AE1 prerequisite exercise uses the base subset as a single-user workspace template',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-workspace-setup');
+ assert.match(s.elements[0].description,/Tosca 16.0.*single-user.*AE1 Exercises.*AE1_Base_Subset\.tsu/);assert.match(s.elements[1].items[1],/Use Workspace template/);assert.match(s.elements[1].items[2],/Standard modules > TBox XEngines/);assert.match(s.elements[2].text,/one self-assessment.*not a graded test/);
+});
+
+
+test('Original TC Shell workflow checks real paths, Save and output rather than fixed task numbers',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json')),s=d.studyGuide.find(s=>s.sectionId==='section-1a3d005d9c11');
+ assert.match(s.elements.find(e=>e.type==='steps').items[0],/NodePath/);assert.match(s.elements.find(e=>e.type==='steps').items[2],/Save.*actual workspace/);assert.match(s.elements.at(-1).text,/task by name.*repository-specific/);
 });

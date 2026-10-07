@@ -22,3 +22,15 @@ The solution references Login, purchase, PDF verification, Excel output, invoice
 Caption review is not full video-visual review. Custom Controls and Grand Scenario solution players exposed no captions and remained at their terminal positions; complete solution narration/visual sequences are not certified. The framework objective checklist and original hands-on extras remain uninspected. Static subset parsing is not an import or runtime execution; stored source execution results are not fresh runtime evidence. No DLL, shop purchase, mailbox delivery or installed Tosca execution was performed.
 
 Physical iOS/Android and VoiceOver/TalkBack access remains unavailable, as confirmed by the user. No physical-device matrix row is marked passed. This packet is a local content/source follow-up, not completion of those external validation requirements. No push or deployment.
+
+## Framework prerequisite follow-up
+
+Read and rendered both original Create Workspace PDF pages, including its objective, rationale and all three instructions. Added the missing course-era single-user workspace/base-subset template preparation and Standard modules > TBox XEngines inspection to AE1-M01. The single framework checklist objective was DOM/visually inspected with Resume; its achievement box was not changed. This closes inspection of these two sources, not execution of workspace creation. Original PDF hash is retained in the inventory. The full theory visuals and optional hands-on extras remain open.
+
+Native access now reaches a running Windows 11 ARM VM with Tosca Commander, but its unrelated PLR workspace showed concurrent edits. Runtime interaction is awaiting an exclusive safe test window; no import, execution or current-workspace change is certified.
+
+## TC Shell optional source follow-up
+
+Read all eleven original TC Shell hands-on guide pages and visually inspected every rendered page. Compared interactive navigation/modification/run and scripted navigation/modification/run/Save, actual NodePath extraction, ordinary quotes, Commander closure and expected file verification. Added a short independent summary rather than distributing the original PDF/screenshots. Numeric task selections, local login and training paths remain version/example-scoped. Updated inventory source/hash; no shell commands from the exercise were executed.
+
+Follow-up validation: content artifacts regenerated; `npm run check`: **277/277 tests passed**; initial shell remains **297.8 KB**. `git diff --check` passed. No shell JavaScript/CSS changes in this follow-up; the shared token and service worker remain `20261007b` / `quilyn-v221`.
