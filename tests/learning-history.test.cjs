@@ -1727,3 +1727,9 @@ test('Original JSON recipe separates wildcard template, count, loop and entry se
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m08_standard_modules.json')),s=d.studyGuide.find(s=>s.sectionId==='section-4847deead117'),steps=s.elements.find(e=>e.type==='steps').items;
  assert.match(steps[0],/API Scan.*item\*.*ExplicitName/);assert.match(steps[1],/\.ResultCount == ratingsCount/);assert.match(steps[2],/\{B\[ratingsCount\]\}.*#\{REPETITION\}/);assert.match(s.elements.find(e=>e.type==='note').text,/does not prove successful execution/);assert.deepEqual(d.practiceQuiz.filter(q=>q.lessonSection===s.sectionId).map(q=>q.correctOptions),[['B'],['B']]);
 });
+
+
+test('Original Excel workflow scopes header subtraction and preserves dependent file and web data',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m02_excel_engine.json')),w=d.studyGuide.find(s=>s.sectionId==='section-ae1-excel-write-source'),r=d.studyGuide.find(s=>s.sectionId==='section-ae1-excel-read-source');
+ assert.match(w.elements[1].text,/RowCount.*-1.*count includes the header.*not a rule for every range/);assert.match(r.elements[0].description,/A1:Z100.*lastContentRow.*verify/);assert.match(r.elements[1].text,/same generated file.*timestamp.*web-page data.*not complete coverage/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['C'],['C'],['A'],['B']]);
+});

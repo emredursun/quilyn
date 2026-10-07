@@ -52,3 +52,9 @@ Statically inspected the supplied base subset File Operations folder: eight XMod
 Read and visually inspected all nine original guide pages, including each technical table and API Scan/Module/loop screenshot. Added an independent source-scoped summary of XML/JSON export, item* template, ExplicitName, `.ResultCount == ratingsCount`, `{B[ratingsCount]}`, `#{REPETITION}` and indexed field buffers. Preserved the distinction between source-era API Scan and current XScan guidance. Re-read the two local JSON questions/options/explanations; both B keys remain correct. The source's broad robustness statement is not treated as proof of empty-input or changed-schema execution. Original PDF/hash/lesson provenance retained outside the repository/in the inventory. No runtime execution.
 
 JSON follow-up validation: content artifacts regenerated; **281/281 tests passed** under `npm run check`; initial shell **297.8 KB**. `git diff --check` passed. Shared shell version unchanged; no push/deployment.
+
+## Excel optional source follow-up
+
+Read and visually inspected all seventeen pages of the original Read/Write guide, including both scenarios and all technical tables/Module screenshots. Added independently summarized web-to-file and file-to-web flows. Distinguished header-inclusive row counts, the source provisional range, timestamp/file and page-data dependencies, indexed buffers and explicit save/close behavior. Preserved current Module terminology separately from source-era Close/Save=True. Removed an unsupported guarantee of later failures after omitted cleanup. All five existing keys remain B,C,C,A,B. No runtime execution; original PDFs are not redistributed. Source/hash recorded in the inventory.
+
+Excel follow-up validation: content artifacts regenerated; **282/282 tests passed** under `npm run check`; initial shell **297.8 KB**; `git diff --check` passed. No push or deployment.
