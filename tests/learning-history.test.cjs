@@ -1775,3 +1775,12 @@ test('Original healing recipe preserves target-title identity, source discrepanc
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m06_self_healing.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-healing-source');
  assert.match(s.elements[0].description,/\.Exists=True.*SelfHealing=Weighted.*0\.75.*Title.*not changing its Title identifier/);assert.match(s.elements[1].text,/Module name remains.*Title parameter.*no Shopping Cart.*PDF asks for all three.*not a passing run/);assert.match(s.elements[2].text,/changed technical property should make the test fail.*Scope or disable healing/);assert.match(s.elements[3].text,/ScratchBook.*current public workflow uses an ExecutionList.*not a guarantee/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['C'],['A'],['B'],['B']]);
 });
+
+test('Original healing theory keeps controlled Search mutation separate from the new-shop exercise',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m06_self_healing.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-healing-source'),e=s.elements.find(e=>e.term==='Theory demonstration: Search becomes Find');
+ assert.match(e.description,/Search control.*Find.*failed ordinary lookup.*Weighted.*0\.75.*different from the PDF.*chosen control.*does not certify a current run/);
+});
+
+test('Original healing log note distinguishes narrated ExecutionList from the shown ScratchBook',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m06_self_healing.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-healing-source');assert.match(s.elements.at(-1).text,/narration mentions an execution list.*screen is labeled ScratchBook.*not an ExecutionList run.*verify the target/);
+});
