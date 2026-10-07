@@ -56,3 +56,13 @@ test('external change still locks a quiz after archive failure, including stale 
  assert.equal(h.notices.length,1);assert.equal(reset.disabled,true);assert.equal(card.check.disabled,true);assert.equal(card.options[1].getAttribute('aria-disabled'),'true');assert.ok(card.options[1].classes.has('disabled'));
  card.options[1].handlers.click();card.check.handlers.click();reset.handlers.click();assert.ok(card.options[0].classes.has('selected'));assert.ok(!card.options[1].classes.has('selected'));assert.ok(!card.el.classes.has('answered'));assert.equal(h.renders,1);assert.deepEqual(h.writes,[]);
 });
+
+test('quiz letter shortcuts respect browser commands, composition and editable focus',()=>{
+ const handlers={},clicks=[],document={activeElement:{tagName:'DIV'},querySelectorAll:()=>[]},window={};
+ const source=fs.readFileSync('core/js/quiz-engine.js','utf8').replace('})(window);',`window.quizKeys={handle:_kbHandler,prime:function(root){_kbContainer=root;_kbActiveIdx=0;}};})(window);`);
+ vm.runInNewContext(source,{window,document});window.quizKeys.prime({isConnected:true,getClientRects:()=>[{}],querySelectorAll:()=>[{click(){clicks.push('answer');}}],querySelector:()=>({click(){clicks.push('hint');}})});
+ function key(extra){let prevented=false;window.quizKeys.handle({key:'a',preventDefault(){prevented=true;},...extra});return prevented;}
+ for(const flag of ['ctrlKey','metaKey','altKey','isComposing','defaultPrevented']){assert.equal(key({[flag]:true}),false,flag);assert.deepEqual(clicks,[]);}
+ document.activeElement.isContentEditable=true;assert.equal(key({}),false);assert.deepEqual(clicks,[]);
+ document.activeElement.isContentEditable=false;assert.equal(key({}),true);assert.deepEqual(clicks,['answer']);
+});

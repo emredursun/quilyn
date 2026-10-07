@@ -39,10 +39,11 @@
   var _kbActiveIdx = null; // index of question currently targeted by keyboard
 
   function _kbHandler(e) {
-    /* Ignore if focus is on an input/textarea */
+    /* Keep browser shortcuts, composition and text editing independent of quiz keys. */
+    if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey || e.isComposing) return;
     var tag = document.activeElement && document.activeElement.tagName;
     if (Array.from(document.querySelectorAll('[aria-modal="true"]')).some(function(el) { return el.getClientRects().length; }) || !_kbContainer || !_kbContainer.isConnected || !_kbContainer.getClientRects().length) return;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || document.activeElement && document.activeElement.isContentEditable) return;
 
     var key = e.key.toUpperCase();
     var letterMap = { A: 0, B: 1, C: 2, D: 3, '1': 0, '2': 1, '3': 2, '4': 3 };
