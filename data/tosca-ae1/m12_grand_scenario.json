@@ -3,10 +3,10 @@
   "moduleTitle": "Grand Scenario - Demo Web Shop",
   "moduleUrl": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
   "learningObjectives": [
-    "Structure an end-to-end scenario using the Precondition / Process / Post condition pattern.",
-    "Extract shared steps into a TestStepLibrary as a reusable TestStep block.",
-    "Buffer a value produced at runtime and consume it in a later TestStep.",
-    "Combine web automation with the PDF Engine in a single business flow."
+    "Extend the provided purchase ExecutionList with invoice verification, Excel output, file movement and email delivery.",
+    "Scan invoice text and verify the company, current order number and exercise total.",
+    "Create and save an Excel workbook using named worksheet/range references.",
+    "Distinguish the original course mail example from current provider authentication requirements."
   ],
   "estTime": "40 min",
   "studyGuide": [
@@ -16,11 +16,11 @@
         {
           "type": "concept",
           "term": "From isolated lessons to one business process",
-          "description": "This local worked scenario combines login, book ordering, invoice download and logout to illustrate cross-technology test design. The original Academy base subset and exact exercise sequence have not been inspected, so the labels and steps below are an independent teaching example, not a certified reproduction."
+          "description": "The original AE1 Grand Scenario extends a Demo Web Shop fiction-book order into PDF verification, Excel output, file operations and email delivery. It first runs the supplied Fiction book E2E test ExecutionList, which produces the invoice and logs out, then adds four TestCases for the remaining work. The course was developed with Tosca 16.0."
         },
         {
           "type": "note",
-          "text": "Use available scanned Modules or scan the application yourself. The claimed original Grand Scenario subset folders and supplied Module inventory have not been verified; compare your workspace with the official exercise before following its exact instructions."
+          "text": "The exercise starts in AE1 Exercises → Execution → ExecutionLists and uses the existing purchase flow. Its PDF does not specify every checkout click or login-library implementation. The exact imported subset contents still need to be checked in your own training workspace."
         }
       ],
       "bulletPoints": [
@@ -29,39 +29,40 @@
       "sectionId": "section-e8012ab7b787"
     },
     {
-      "sectionTitle": "Precondition / Process / Post condition",
+      "sectionTitle": "Four extensions to the purchase flow",
       "elements": [
         {
           "type": "concept",
-          "term": "Why the scenario is split into three",
-          "description": "In this local example, Precondition establishes the starting session, Process exercises ordering and Post condition verifies logout and closes the browser. These names are a design choice, not a Tosca-required folder structure. Session cleanup does not delete orders or restore all business data."
+          "term": "Business operations and cleanup",
+          "description": "Add invoice verification, Excel output, invoice movement and email delivery to the existing purchase ExecutionList. Within the Excel TestCase, the source uses Precondition, Process and Postcondition folders for opening/preparing, writing and saving/closing the workbook. These are training organization choices, not mandatory names for every Tosca test."
         },
         {
           "type": "list",
-          "title": "The three TestCases",
+          "title": "The four new TestCases",
           "items": [
-            "Precondition — 'Login to web shop': gets a logged-in session, then verifies the login succeeded.",
-            "Process — 'Order fiction book and pay on delivery': the business flow being tested.",
-            "Post condition — 'Logout from the web shop': logs out, verifies the logout, and closes the browser instance."
+            "Verify order invoice pdf — scan the downloaded invoice and check its values.",
+            "Copy data to Excel — create a workbook/worksheet/range, write headings and order data, save and close.",
+            "Move the pdf file — move/rename the downloaded invoice to the agreed destination.",
+            "Send the files in email — attach both the invoice and workbook, then run the four added TestCases through the purchase ExecutionList."
           ]
         },
         {
           "type": "note",
-          "text": "Arrange cleanup to run on relevant failure paths as well as success. Three sequential TestCases do not themselves guarantee that logout or close executes after an earlier failure. Closing a browser releases the session; it does not undo the order."
+          "text": "Arrange cleanup on relevant failure paths. Sequential TestCases do not themselves guarantee that workbook closure or session cleanup executes after an earlier failure. Cleanup does not undo the order. Validate output files before dependent steps use them."
         }
       ],
       "bulletPoints": [
-        "Precondition = get to the starting state. Process = what is under test. Post condition = clean up and verify the cleanup."
+        "Purchase ExecutionList → PDF assertions → Excel output → file movement → email with two attachments."
       ],
       "sectionId": "section-11b40fd72a30"
     },
     {
-      "sectionTitle": "Reuse: the TestStepLibrary",
+      "sectionTitle": "Independent extension: reuse and maintenance",
       "elements": [
         {
           "type": "concept",
           "term": "The 'Login to web shop' reusable block",
-          "description": "Logging in is needed by the Precondition and would be needed by any other scenario against the same shop. Rather than duplicating those steps, the scenario keeps a TestStepLibrary containing a reusable TestStep block named 'Login to web shop', made up of three steps: Open demo web shop, Click on log in link, and Provide log in details."
+          "description": "Shared login steps can be placed in a Reusable TestStepBlock inside a TestStepLibrary. This is independent design guidance, not a login-block implementation prescribed by the Grand Scenario PDF. The original exercise starts from an existing purchase ExecutionList."
         },
         {
           "type": "concept",
@@ -70,73 +71,56 @@
         },
         {
           "type": "note",
-          "text": "This example keeps successful-login verification with the caller. That is a design choice: reusable blocks may also contain verification TestSteps when those assertions are genuinely shared."
+          "text": "Shared assertions may belong in a reusable block; caller-specific assertions may remain with the caller. The PDF does not establish a three-step login library or its exact contents."
         }
       ],
       "bulletPoints": [
-        "TestStepLibrary → reusable TestStep block 'Login to web shop' (open · click log in · provide details).",
-        "Caller-specific verification can remain outside the block; shared assertions can also be reused."
+        "Reusable TestStepBlocks are an independent maintenance technique; the original exercise does not define a specific login library.",
+        "Keep links and independent copies distinct when updating shared steps."
       ],
       "sectionId": "section-020f54a551cc"
     },
     {
-      "sectionTitle": "The Process TestCase, step by step",
+      "sectionTitle": "Copy the order data to Excel",
       "elements": [
         {
           "type": "concept",
-          "term": "Three TestStep folders",
-          "description": "This independent flow groups ordering into three folders for readability. A folder label helps locate a phase but does not prove the root cause of a failure or verify the original Academy sequence."
+          "term": "Workbook, worksheet and range are separate references",
+          "description": "The exercise creates Order_Details at C:\\Tosca_Projects\\Order_Details.xlsx using TBox Open Excel Workbook with Create New=True. It creates the Order_Details worksheet, then defines OrderDataRange from A1 to D5. The path and range are training values, not universal defaults."
         },
         {
           "type": "steps",
-          "title": "Navigation to product",
+          "title": "Prepare, write, then save",
           "items": [
-            "Navigate to books section",
-            "Click on show details for fiction",
-            "Add fiction book to cart",
-            "Navigate to shopping cart"
+            "Precondition: open/create the named workbook, create its worksheet and define the named range.",
+            "Process: use TBox Excel Range Manipulation to select Data Table and $header. Input Company, OrderNumber and OrderTotal in $1, $2 and $3 respectively.",
+            "Process: select the first data row ($1), then Input Demowebshop, {B[orderNumber]} and 41.00 under the matching headings.",
+            "Postcondition: use TBox Close Excel Workbook with Workbook Name=Order_Details, Path=C:\\Tosca_Projects and Save=True. Confirm the expected workbook exists before attaching it."
           ]
         },
         {
-          "type": "steps",
-          "title": "Check out process",
-          "items": [
-            "Accept terms of service and proceed to checkout",
-            "Add billing address",
-            "Update shipping address",
-            "Select shipping method",
-            "Select payment method",
-            "Confirm payment information",
-            "Confirm payment method"
-          ]
-        },
-        {
-          "type": "steps",
-          "title": "Verification of order creation",
-          "items": [
-            "Verify order and buffer order no",
-            "Navigate to order details page",
-            "Download PDF Invoice"
-          ]
+          "type": "note",
+          "text": "The source writes specified company/total values and the buffered order number; it does not demonstrate an automatic generic PDF-to-Excel converter. 41.00 is the exercise expectation, not a fixed total for every shop order."
         }
       ],
       "bulletPoints": [
-        "Grouping TestSteps into folders turns a 14-step flow into three readable phases."
+        "Keep Workbook Name, Worksheet Name and Range Name distinct.",
+        "Select $header for headings and the data row for values; persist the workbook before the next step."
       ],
       "sectionId": "section-3987ff4534da"
     },
     {
-      "sectionTitle": "The two techniques that make it work",
+      "sectionTitle": "Verify the generated invoice",
       "elements": [
         {
           "type": "concept",
-          "term": "Buffering the order number",
-          "description": "Capture the current order identifier with ActionMode Buffer, or use XBuffer within a verified message to extract its dynamic part. Later steps read {B[OrderID]}. Do not assume the identifier differs on every run; use the value actually produced by the application."
+          "term": "Scan and verify the order fields",
+          "description": "After running the purchase ExecutionList, open its order_orderNumber.pdf output. Under the course’s Grand Scenario Modules folder, create PDF Modules and use PDF Scan to scan Order number, Company from Billing Information and Order total as Text. Save the Module as Order Invoice. In the invoice-verification TestCase, Input the Target PDF path and Verify Company=Demowebshop, Order number={B[orderNumber]} and Order total=41.00."
         },
         {
           "type": "concept",
           "term": "Crossing into the PDF Engine",
-          "description": "Downloading the invoice is a browser/file operation, not automatic PDF verification. Verify the file is available, then use PDF Modules for the chosen checks. Content extraction and reference comparison are distinct operations. Configure explicit page/area exclusions only for allowed differences; verify the captured order identifier separately rather than hiding an important mismatch."
+          "description": "Downloading the invoice is not automatic PDF verification. The original exercise uses scanned text assertions; it does not prescribe a reference-file comparison or exclusion area. As an independent extension, use appropriate PDF Modules for selected comparison checks and verify the dynamic identifier separately rather than excluding an important mismatch."
         },
         {
           "type": "note",
@@ -144,21 +128,62 @@
         },
         {
           "type": "note",
-          "text": "Complete the official Academy capstone using its supplied materials. This local example does not verify the original subset, figures, exact checkout order or PDF assertions."
+          "text": "The PDF specifies {B[orderNumber]}; keep the buffer name consistent with the provided purchase flow. Use the actual generated value, not a hard-coded order number. The precise capture implementation in the imported base TestCase is not shown in the exercise PDF."
         }
       ],
       "bulletPoints": [
-        "Capture and consume the actual runtime identifier; do not rely on a previous run’s value.",
-        "Downloading a PDF does not verify it; add explicit document assertions and justified comparison exclusions."
+        "Target PDF uses Input; the three invoice fields use Verify.",
+        "The exercise total is 41.00; account for your actual test data rather than treating that amount as a universal product rule."
       ],
       "sectionId": "section-9980732dd488"
+    },
+    {
+      "sectionTitle": "Move the invoice file",
+      "sectionId": "section-ae1-grand-file",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Use the final path consistently",
+          "description": "The original exercise adds TBox Move/Rename File. Existing Path points to the actual downloaded invoice; New Path is C:\\Tosca_Projects\\Invoice.pdf. Both use Input. Later attachment steps must use this new path, not the original download name."
+        },
+        {
+          "type": "note",
+          "text": "Prepare the destination and check the operation’s result. Moving a file is not invoice-content verification and does not save the Excel workbook."
+        }
+      ],
+      "bulletPoints": [
+        "Move/rename after validating the invoice, before sending the attachment."
+      ]
+    },
+    {
+      "sectionTitle": "Send the invoice and workbook",
+      "sectionId": "section-ae1-grand-mail",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "One mail operation, two attachments",
+          "description": "The source uses Connect to Exchange Server and Send Mail with the same MailConnection name, then attaches C:\\Tosca_Projects\\Invoice.pdf and C:\\Tosca_Projects\\Order_Details.xlsx. It directs the test message to the tester’s own address and adds the four new TestCases to the purchase ExecutionList."
+        },
+        {
+          "type": "warning",
+          "text": "The Tosca 16.0 PDF contains a historical Direct-authentication EWS example with a username/password. Do not assume it works with today’s Microsoft accounts: Exchange Online removed Basic authentication for EWS, and current Outlook.com settings require OAuth2. Confirm supported Tosca/provider authentication and EWS availability before running the mail step; switching to a personal mailbox is not a general fix for an unsupported authentication method."
+        },
+        {
+          "type": "note",
+          "text": "The source’s final IMAP hint incorrectly describes sending and uses an SMTP hostname. SMTP sends mail; IMAP accesses incoming mail. Current Outlook.com documentation lists smtp-mail.outlook.com:587 with STARTTLS for SMTP, and outlook.office365.com:993 with SSL/TLS for IMAP, with OAuth2. These Outlook.com settings must not be applied indiscriminately to Exchange Online tenants or other providers."
+        }
+      ],
+      "bulletPoints": [
+        "The mail step needs both output files at their final paths.",
+        "A successful file move or workbook write does not prove an email was sent; check the mail operation/result independently."
+      ]
     }
   ],
   "examPitfalls": [
     {
-      "title": "Putting login steps inside the Process TestCase",
-      "trapDescription": "Building one long TestCase that logs in, orders, and logs out, because it mirrors what a user does.",
-      "bestPractice": "Separate setup, the business behavior and cleanup when that improves clarity. A single TestCase can also be valid; shared steps can be extracted without mandating three TestCases. Ensure the execution strategy handles failure cleanup."
+      "title": "Stopping at the shopping flow",
+      "trapDescription": "Finishing after the invoice download and logout.",
+      "bestPractice": "The original capstone adds four TestCases for PDF verification, Excel output, file movement and mail delivery. The provided shopping flow is the starting point."
     },
     {
       "title": "Hard-coding the order number",
@@ -166,9 +191,9 @@
       "bestPractice": "Capture the current generated identifier and reference that value later. Buffering avoids assuming a known prior identifier; it does not establish that IDs differ on every execution."
     },
     {
-      "title": "Forgetting to close the browser instance in the Post condition",
-      "trapDescription": "Logging out and considering the cleanup complete.",
-      "bestPractice": "This example logs out, verifies logout and closes the browser. Ensure cleanup also runs on relevant failures; browser cleanup does not delete orders or restore business data."
+      "title": "Using the old download path as an attachment",
+      "trapDescription": "Moving the invoice but still attaching its original filename, or attaching an unsaved workbook.",
+      "bestPractice": "Use the moved Invoice.pdf path and the saved Order_Details.xlsx output. Validate both files before sending."
     },
     {
       "title": "Duplicating the login steps instead of reusing the library block",
@@ -179,49 +204,54 @@
       "title": "Treating the PDF invoice as out of scope",
       "trapDescription": "Ending the verification at the order confirmation page because the invoice is 'just a document'.",
       "bestPractice": "Downloading the invoice is a browser/file operation, not automatic PDF verification. Verify the file is available, then use PDF Modules for the chosen checks. Content extraction and reference comparison are distinct operations. Configure explicit page/area exclusions only for allowed differences; verify the captured order identifier separately rather than hiding an important mismatch."
+    },
+    {
+      "title": "Copying historical mail settings unchanged",
+      "trapDescription": "Assuming Direct/password-based EWS works for every Microsoft account or using IMAP as a sending protocol.",
+      "bestPractice": "Check current provider/product support and authentication. SMTP sends; IMAP receives/accesses mail. The source’s outdated or incorrect hints are not current configuration instructions."
     }
   ],
   "practiceQuiz": [
     {
       "questionId": "Q1",
       "type": "single-select",
-      "scenario": "How does this local worked example separate setup, ordering and cleanup?",
+      "scenario": "Which four tasks does the original AE1 capstone add after its provided purchase flow?",
       "options": [
         {
           "id": "A",
-          "text": "As a single TestCase covering the whole flow."
+          "text": "Only login, order and logout."
         },
         {
           "id": "B",
-          "text": "Into Precondition, Process, and Post condition."
+          "text": "Invoice verification, Excel output, invoice movement and email delivery."
         },
         {
           "id": "C",
-          "text": "By engine — one TestCase per technology."
+          "text": "One new TestCase for each browser page, without file or mail operations."
         },
         {
           "id": "D",
-          "text": "Into Smoke, Regression, and One-time tests."
+          "text": "Smoke, Regression, One-time and Performance suites."
         }
       ],
       "correctOptions": [
         "B"
       ],
-      "hint": "Setup, the thing under test, and cleanup.",
-      "rationale": "The scenario separates Precondition (log in), Process (order the book and pay on delivery), and Post condition (log out, verify, close the browser). This keeps setup and cleanup distinct from the behaviour actually being tested.",
+      "hint": "Follow the invoice from download through delivery.",
+      "rationale": "The source extends the provided purchase ExecutionList with four TestCases: verify the invoice, write the order data to Excel, move the PDF and email both outputs.",
       "optionExplanations": {
-        "A": "A single TestCase can be valid, but this example chooses separate setup, ordering and cleanup.",
-        "B": "These three phases describe the local worked example, not a mandatory Tosca or verified Academy structure.",
-        "C": "The example groups business phases rather than splitting solely by engine.",
-        "D": "These are test-suite categories, not the example’s setup/process/cleanup phases."
+        "A": "The shopping flow is the starting point, not the complete capstone.",
+        "B": "These are the four additional TestCases specified in the original exercise.",
+        "C": "The exercise combines document, spreadsheet, file and mail operations rather than only browser pages.",
+        "D": "These suite categories are not the original four extensions."
       },
       "lessonSection": "section-11b40fd72a30",
-      "explanationReviewedOn": "2026-10-06"
+      "explanationReviewedOn": "2026-10-07"
     },
     {
       "questionId": "Q2",
       "type": "single-select",
-      "scenario": "The step 'Verify order and buffer order no' captures the order number into a buffer. Why is this necessary?",
+      "scenario": "Why does the invoice-verification step use {B[orderNumber]} rather than an order number copied from a previous run?",
       "options": [
         {
           "id": "A",
@@ -252,12 +282,12 @@
         "D": "Capturing an order identifier is distinct from configuring PDF anchor identification."
       },
       "lessonSection": "section-9980732dd488",
-      "explanationReviewedOn": "2026-10-06"
+      "explanationReviewedOn": "2026-10-07"
     },
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "In this local example, where are the shared login actions placed for central maintenance?",
+      "scenario": "If you independently extract shared login actions, which structure centrally maintains their linked references?",
       "options": [
         {
           "id": "A",
@@ -265,7 +295,7 @@
         },
         {
           "id": "B",
-          "text": "In a TestStepLibrary as a reusable TestStep block named 'Login to web shop', so there is a single point of maintenance."
+          "text": "In a TestStepLibrary as a Reusable TestStepBlock, so linked callers share centrally maintained steps."
         },
         {
           "id": "C",
@@ -279,7 +309,7 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "The same centralised-maintenance argument behind Classes and Libraries.",
+      "hint": "The library retains the shared step definition; callers reference it.",
       "rationale": "The example uses a Reusable TestStepBlock in a TestStepLibrary. Changes affect linked references; resolved copies are independent and require their own updates.",
       "optionExplanations": {
         "A": "Independent copies require separate maintenance and do not provide linked reuse.",
@@ -288,12 +318,12 @@
         "D": "Modules describe automation interfaces; the TestStepLibrary reuses sequences of TestSteps."
       },
       "lessonSection": "section-020f54a551cc",
-      "explanationReviewedOn": "2026-10-06"
+      "explanationReviewedOn": "2026-10-07"
     },
     {
       "questionId": "Q4",
       "type": "single-select",
-      "scenario": "After downloading a PDF invoice in this worked example, which approach verifies the document instead of merely proving a download?",
+      "scenario": "Which approach verifies a downloaded invoice rather than merely proving that a download completed?",
       "options": [
         {
           "id": "A",
@@ -301,7 +331,7 @@
         },
         {
           "id": "B",
-          "text": "Use PDF Modules for explicit content or comparison checks, configure only justified exclusions, and verify the runtime order identifier separately."
+          "text": "Use scanned PDF text Modules to check the company, current order number and expected total."
         },
         {
           "id": "C",
@@ -316,91 +346,92 @@
         "B"
       ],
       "hint": "Download completion and invoice correctness are different assertions.",
-      "rationale": "Downloading the invoice is a browser/file operation, not automatic PDF verification. Verify the file is available, then use PDF Modules for the chosen checks. Content extraction and reference comparison are distinct operations. Configure explicit page/area exclusions only for allowed differences; verify the captured order identifier separately rather than hiding an important mismatch.",
+      "rationale": "The original exercise scans three text fields and uses Verify for the company, buffered order number and expected total. Input identifies the Target PDF. A completed download alone establishes none of those content assertions.",
       "optionExplanations": {
         "A": "Excel file comparison is not PDF invoice verification.",
-        "B": "Add explicit PDF assertions after the download. Allowed exclusions must not hide the dynamic identifier check.",
+        "B": "The scanned fields are explicitly checked against the expected company, runtime identifier and total.",
         "C": "A downloaded PDF need not arrive through email; Mail Modules are not a PDF-content verifier.",
         "D": "A browser download alone does not establish document content correctness."
       },
       "lessonSection": "section-9980732dd488",
-      "explanationReviewedOn": "2026-10-06"
+      "explanationReviewedOn": "2026-10-07"
     },
     {
       "questionId": "Q5",
       "type": "single-select",
-      "scenario": "Which three session-cleanup actions are chosen in this local worked example?",
+      "scenario": "Which files does the original capstone attach to its mail message?",
       "options": [
         {
           "id": "A",
-          "text": "Log out from web shop, verify successful logout, close the demo web shop browser instance."
+          "text": "The moved Invoice.pdf and saved Order_Details.xlsx."
         },
         {
           "id": "B",
-          "text": "Log out and nothing further — the browser closes automatically."
+          "text": "Only the original downloaded PDF; no workbook is created."
         },
         {
           "id": "C",
-          "text": "Delete the order, log out, clear the cart."
+          "text": "The custom-control DLLs from Lesson 06."
         },
         {
           "id": "D",
-          "text": "Verify the invoice, log out, archive the PDF."
+          "text": "Only a screenshot of the order confirmation."
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Cleanup includes verifying that the cleanup itself worked.",
-      "rationale": "The example chooses logout, logout verification and browser closure. This is not complete business-data rollback or a guarantee that cleanup executes after failures.",
+      "hint": "The source combines the document output and spreadsheet output.",
+      "rationale": "The mail step uses the moved invoice and saved workbook paths as two attachments. Both outputs must exist; this does not by itself verify delivery.",
       "optionExplanations": {
-        "A": "These are the session-cleanup actions selected by the local example. They do not restore all business data.",
-        "B": "This example explicitly closes the browser; logout does not guarantee automatic browser closure.",
-        "C": "Order deletion/cart cleanup are different business-data operations not chosen here.",
-        "D": "Invoice checks and archiving are not the example’s logout/close sequence."
+        "A": "These are the two output files named in the source mail step.",
+        "B": "The exercise creates and attaches the workbook as well as the moved PDF.",
+        "C": "Custom-control DLLs belong to a different lesson, not the capstone mail outputs.",
+        "D": "An order screenshot is not the prescribed invoice/workbook pair."
       },
-      "lessonSection": "section-11b40fd72a30",
-      "explanationReviewedOn": "2026-10-06"
+      "lessonSection": "section-ae1-grand-mail",
+      "explanationReviewedOn": "2026-10-07"
     }
   ],
   "quickRecap": [
     {
-      "key": "Purpose",
-      "value": "Independent local purchase-flow example; original Academy subset/sequence unverified."
+      "key": "Original scope",
+      "value": "Run the provided purchase flow, then add PDF verification, Excel output, file movement and mail delivery."
     },
     {
-      "key": "Structure",
-      "value": "Precondition (login) → Process (order fiction book, pay on delivery) → Post condition (logout)."
+      "key": "Invoice assertions",
+      "value": "Input Target PDF; Verify Demowebshop, {B[orderNumber]} and the exercise total 41.00."
     },
     {
-      "key": "Reuse",
-      "value": "Linked Reusable TestStepBlock references share updates; resolved copies do not. Caller/shared assertions are design choices."
+      "key": "Excel references",
+      "value": "Workbook/worksheet Order_Details; range OrderDataRange=A1:D5; $header for headings, $1 for the first data row."
     },
     {
-      "key": "Process phases",
-      "value": "Navigation to product → Check out process → Verification of order creation."
+      "key": "Output lifecycle",
+      "value": "Save/close Order_Details.xlsx; move the invoice to Invoice.pdf; attach both final files."
     },
     {
-      "key": "Buffering",
-      "value": "'Verify order and buffer order no' captures the runtime order number for the later navigation step."
+      "key": "Authentication",
+      "value": "The historical Direct EWS example is not current Microsoft-account setup guidance. Check compatible modern authentication and provider support."
     },
     {
-      "key": "Cross-engine moment",
-      "value": "Download is not PDF verification; add content/comparison assertions and validate the dynamic order identifier."
+      "key": "Mail protocols",
+      "value": "SMTP sends mail; IMAP accesses incoming mail. Do not copy the source’s incorrect IMAP-sending hint."
     },
     {
-      "key": "Post condition",
-      "value": "Logout · verify logout · close browser; ensure failure-path cleanup and separate business-data rollback as needed."
-    },
-    {
-      "key": "Modules supplied",
-      "value": "Original supplied Module inventory not inspected; compare your workspace with official Academy materials."
+      "key": "Independent reuse guidance",
+      "value": "Linked Reusable TestStepBlock references share updates; resolved copies do not. Exact imported login-library contents were not inspected."
     }
   ],
   "topics": [
     {
       "title": "Grand Scenario - Demo Web Shop",
       "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1",
+      "duration": "exercise"
+    },
+    {
+      "title": "Original Grand Scenario exercise",
+      "url": "https://academy.tricentis.com/learn/learning-plans/78/tricentis-tosca-on-prem-product-consultant/courses/564/tricentis-tosca-deep-dive-automating-beyond-web-applications-ae1/lessons/2523/exercise-grand-scenario",
       "duration": "exercise"
     },
     {
@@ -412,6 +443,18 @@
       "title": "Capture and reuse dynamic values",
       "url": "https://docs.tricentis.com/tosca-2026.1/en-us/content/tbox/action_modes.htm",
       "duration": "docs"
+    },
+    {
+      "title": "Exchange Online authentication changes",
+      "url": "https://learn.microsoft.com/en-us/exchange/clients-and-mobile-in-exchange-online/deprecation-of-basic-authentication-exchange-online",
+      "duration": "docs"
+    },
+    {
+      "title": "Current Outlook.com protocol settings",
+      "url": "https://support.microsoft.com/en-us/outlook/pop-imap-and-smtp-settings-for-outlook-com",
+      "duration": "docs"
     }
-  ]
+  ],
+  "sourceReviewedOn": "2026-10-07",
+  "platformVersion": "Tosca 16.0 (Academy)"
 }

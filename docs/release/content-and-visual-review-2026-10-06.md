@@ -1,5 +1,7 @@
 # Content and visual review — 2026-10-06
 
+Historical snapshot. The two remaining local comparisons were closed on 2026-10-07; see [the follow-up review](content-review-closure-2026-10-07.md) for the current 185/185 state, test results and remaining external-validation limits.
+
 ## Verified state
 
 The original source-review inventory has 185 modules: 183 source-compared, zero pending, two partial. All 185 recorded content hashes match current files. This describes the independent local technical comparison documented in each inventory entry; it does not certify every original Academy recording, screenshot, challenge or official quiz key.

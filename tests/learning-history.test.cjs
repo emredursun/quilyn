@@ -1083,10 +1083,10 @@ test('AE1 self healing review separates identification recovery from final asser
  assert.doesNotMatch(JSON.stringify(d),/A successful heal means a normal pass|when self-healing succeeds, the TestCase passes normally/);
 });
 
-test('AE1 custom control review keeps unverified on-prem installation open and scopes Cloud distribution',()=>{
- const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m07_custom_controls.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(r.localContentReview,'partial-source-comparison');assert.equal(d.sourceReviewedOn,undefined);
+test('AE1 custom control review scopes verified on-prem exercise and separate Cloud distribution',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m07_custom_controls.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(r.localContentReview,'source-compared');assert.equal(d.sourceReviewedOn,'2026-10-07');
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.studyGuide[1].elements[1].description,/does not affect on-prem customizations/);
+ assert.match(d.studyGuide[1].elements[3].text,/does not affect on-prem customizations/);
  assert.match(d.practiceQuiz[3].options[1].text,/robustness still needs validation/);
  assert.doesNotMatch(JSON.stringify(d),/survives cosmetic changes|Tosca has to be restarted|same ActionModes/);
 });
@@ -1130,8 +1130,8 @@ test('AE1 Vision AI review requires configured recovery and preserves UIDC sizin
  assert.doesNotMatch(JSON.stringify(d),/nothing here will be tested|stable, self-healing Modules for any UI|TBox XEngines|self-healing does not cover/);
 });
 
-test('AE1 capstone review separates verified mechanisms from unverified Academy sequence',()=>{
- const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m12_grand_scenario.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(r.localContentReview,'partial-source-comparison');assert.equal(d.sourceReviewedOn,undefined);
+test('AE1 capstone review includes source-prescribed output operations and scopes independent design guidance',()=>{
+ const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m12_grand_scenario.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(r.localContentReview,'source-compared');assert.equal(d.sourceReviewedOn,'2026-10-07');
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['B'],['B'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[2].elements[1].description,/resolved reference.*independent copy/);
  assert.match(d.studyGuide[4].elements[1].description,/not automatic PDF verification.*identifier separately/);
@@ -1640,7 +1640,7 @@ test('PBA Scrum tools review scopes studio integration and distinguishes readine
 
 test('Final partial-content review retains scoped engine and adapter guidance',()=>{
  const inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),read=id=>JSON.parse(fs.readFileSync(inv.modules.find(m=>m.id===id).file)),mobile=read('TMOB-M00'),custom=read('AE1-M07');
- assert.equal(inv.modules.filter(m=>m.localContentReview==='pending').length,0);assert.deepEqual(inv.modules.filter(m=>m.localContentReview==='partial-source-comparison').map(m=>m.id),['AE1-M07','AE1-M12']);
+ assert.equal(inv.modules.filter(m=>m.localContentReview==='pending').length,0);assert.deepEqual(inv.modules.filter(m=>m.localContentReview==='partial-source-comparison').map(m=>m.id),[]);
  assert.match(mobile.quickRecap[0].value,/Mobile Web Engine 3.0/);assert.match(mobile.quickRecap[2].value,/applicable scanning\/steering path/);assert.match(custom.quickRecap[1].value,/subject to supported actions/);assert.doesNotMatch(custom.studyGuide[2].elements[0].term,/nothing special/);
 });
 test('Data-model and relationship interactives update score immediately and diagrams retain impact scope',()=>{
@@ -1659,4 +1659,21 @@ test('Mobile introduction distinguishes authenticated five-topic syllabus from i
  assert.equal(outline.filter(s=>/^Academy Topic/.test(s)).length,5);assert.match(outline[5],/Independent extensions/);assert.match(d.studyGuide[0].elements[0].description,/45-minute.*Tosca 2024.2/);
  assert.match(d.studyGuide[2].elements[2].title,/Academy training prerequisite/);assert.match(d.studyGuide[2].elements[3].items[0],/valid license for Tosca Mobile/);assert.match(d.quickRecap.at(-1).value,/2024.2.*2026.1.*2025.4/);
  assert.equal(r.localContentReview,'source-compared');assert.equal(r.sourceObservation.status,'observed');assert.match(r.localReview.limitations,/not fully watched/);assert.equal(r.localReview.contentSha256,require('node:crypto').createHash('sha256').update(fs.readFileSync(r.file)).digest('hex'));assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['B']]);
+});
+
+test('Original AE1 custom-control exercise retains deployment, rescan and steering facts without universal installation claims',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m07_custom_controls.json')),s=d.studyGuide[1],steps=d.studyGuide[2].elements.find(e=>e.type==='steps').items;
+ assert.match(s.elements[0].description,/FancyComboBox\.dll and HtmlTable\.dll/);assert.ok(s.elements[1].description.includes('C:\\Program Files (x86)\\TRICENTIS\\Tosca Testsuite\\TBox'));assert.match(s.elements[1].description,/closes Tosca.*reopens Commander.*not a universal path/);
+ assert.ok(steps.some(s=>/66744/.test(s)));assert.ok(steps.some(s=>/57445/.test(s)));assert.ok(steps.some(s=>/Planned.*Input/.test(s)));assert.ok(steps.some(s=>/ScratchBook/.test(s)));assert.match(d.practiceQuiz[1].options[2].text,/Close Tosca.*reopen Commander.*rescan/);assert.match(d.examPitfalls[2].bestPractice,/Vision AI.*avoid customization/);assert.doesNotMatch(JSON.stringify(d),/instructions remain unverified|package availability is unverified|instructions were unavailable/);
+});
+
+test('Original Grand Scenario includes PDF fields, Excel row selection, saved attachments and modern mail caveats',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m12_grand_scenario.json')),text=JSON.stringify(d),s=d.studyGuide;
+ assert.equal(s[1].elements[1].items.length,4);assert.match(s[4].elements[0].description,/Company=Demowebshop.*\{B\[orderNumber\]\}.*41\.00/);assert.match(s[3].elements[0].description,/OrderDataRange from A1 to D5/);assert.match(s[3].elements[1].items[1],/\$header.*Company.*OrderNumber.*OrderTotal/);assert.match(s[3].elements[1].items[3],/Save=True/);
+ assert.match(d.practiceQuiz[4].options[0].text,/Invoice\.pdf.*Order_Details\.xlsx/);assert.match(s.at(-1).elements[1].text,/removed Basic authentication for EWS.*OAuth2/);assert.match(s.at(-1).elements[2].text,/SMTP sends mail; IMAP accesses incoming mail/);assert.doesNotMatch(text,/14-step flow|complete the official.*unverified|exact exercise sequence have not been inspected/);
+});
+
+test('Completed original source-review inventory retains a current reviewed hash for every local module',()=>{
+ const inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),crypto=require('node:crypto');
+ inv.modules.forEach(m=>{assert.equal(m.localReview.contentSha256,crypto.createHash('sha256').update(fs.readFileSync(m.file)).digest('hex'),m.id+' requires review after a content change');});
 });
