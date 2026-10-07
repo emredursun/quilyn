@@ -1733,3 +1733,9 @@ test('Original Excel workflow scopes header subtraction and preserves dependent 
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m02_excel_engine.json')),w=d.studyGuide.find(s=>s.sectionId==='section-ae1-excel-write-source'),r=d.studyGuide.find(s=>s.sectionId==='section-ae1-excel-read-source');
  assert.match(w.elements[1].text,/RowCount.*-1.*count includes the header.*not a rule for every range/);assert.match(r.elements[0].description,/A1:Z100.*lastContentRow.*verify/);assert.match(r.elements[1].text,/same generated file.*timestamp.*web-page data.*not complete coverage/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['C'],['C'],['A'],['B']]);
 });
+
+
+test('Original Dialog/Evaluation guide retains supported scope and resolves Input/Verify contradiction',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m08_standard_modules.json')),e=d.studyGuide.find(s=>s.sectionId==='section-933aebfd4807'),w=d.studyGuide.find(s=>s.sectionId==='section-6add2f52be6d');
+ assert.match(e.elements.at(-1).text,/table says Input.*screenshot.*Verify.*false assertion.*expected failure/);assert.match(w.elements.at(-2).description,/temporary shop address.*selected address identity.*not a deletion assertion/);assert.match(w.elements.at(-1).text,/customized dialogs.*need scanning/);assert.deepEqual(d.practiceQuiz.filter(q=>['Q10','Q17','Q18'].includes(q.questionId)).map(q=>q.correctOptions),[['B'],['B'],['A']]);
+});

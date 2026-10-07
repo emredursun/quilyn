@@ -58,3 +58,9 @@ JSON follow-up validation: content artifacts regenerated; **281/281 tests passed
 Read and visually inspected all seventeen pages of the original Read/Write guide, including both scenarios and all technical tables/Module screenshots. Added independently summarized web-to-file and file-to-web flows. Distinguished header-inclusive row counts, the source provisional range, timestamp/file and page-data dependencies, indexed buffers and explicit save/close behavior. Preserved current Module terminology separately from source-era Close/Save=True. Removed an unsupported guarantee of later failures after omitted cleanup. All five existing keys remain B,C,C,A,B. No runtime execution; original PDFs are not redistributed. Source/hash recorded in the inventory.
 
 Excel follow-up validation: content artifacts regenerated; **282/282 tests passed** under `npm run check`; initial shell **297.8 KB**; `git diff --check` passed. No push or deployment.
+
+## Dialog/Evaluation optional source follow-up
+
+Read and visually inspected all eight original PDF pages. Compared the temporary-address confirmation example and the three intended expression outcomes against current primary Module bodies. The source Evaluation table says Input, while its screenshot and current reference specify Verify; local notes explicitly resolve that discrepancy. Preserved standard/custom/JavaScript dialog distinctions rather than copying the source's universal no-scan claim. Clarified expected negative assertion versus overall passing result and actual date-type handling. Three relevant question keys B/B/A retained. No address removed or credentials requested; no installed execution. Source/hash retained in the inventory.
+
+Dialog follow-up validation: content artifacts regenerated; **283/283 tests passed** under `npm run check`; initial shell **297.8 KB**; `git diff --check` passed. No push or deployment.
