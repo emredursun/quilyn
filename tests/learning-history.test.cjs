@@ -1702,5 +1702,11 @@ test('Original AE1 prerequisite exercise uses the base subset as a single-user w
 
 test('Original TC Shell workflow checks real paths, Save and output rather than fixed task numbers',()=>{
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json')),s=d.studyGuide.find(s=>s.sectionId==='section-1a3d005d9c11');
- assert.match(s.elements.find(e=>e.type==='steps').items[0],/NodePath/);assert.match(s.elements.find(e=>e.type==='steps').items[2],/Save.*actual workspace/);assert.match(s.elements.at(-1).text,/task by name.*repository-specific/);
+ assert.match(s.elements.find(e=>e.type==='steps').items[0],/NodePath/);assert.match(s.elements.find(e=>e.type==='steps').items[2],/Save.*actual workspace/);assert.match(s.elements.find(e=>e.type==='note'&&/2023 hands-on/.test(e.text)).text,/task by name.*repository-specific/);
+});
+
+
+test('Original REST report exercise keeps ASKUSER separate from TC Shell NONE and verifies the artifact',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json')),s=d.studyGuide.find(s=>s.sectionId==='section-1a3d005d9c11');
+ assert.match(s.elements.find(e=>e.term==='Printing reports through TC Shell').description,/TC Shell.*NONE/);assert.match(s.elements.find(e=>e.term==='Original optional REST report exercise').description,/WorkspaceBasePath.*UniqueId.*ASKUSER.*PrintReport.*outputFilepath/);assert.match(s.elements.at(-1).text,/HTTP 200.*does not certify report contents/);
 });

@@ -34,3 +34,9 @@ Native access now reaches a running Windows 11 ARM VM with Tosca Commander, but 
 Read all eleven original TC Shell hands-on guide pages and visually inspected every rendered page. Compared interactive navigation/modification/run and scripted navigation/modification/run/Save, actual NodePath extraction, ordinary quotes, Commander closure and expected file verification. Added a short independent summary rather than distributing the original PDF/screenshots. Numeric task selections, local login and training paths remain version/example-scoped. Updated inventory source/hash; no shell commands from the exercise were executed.
 
 Follow-up validation: content artifacts regenerated; `npm run check`: **277/277 tests passed**; initial shell remains **297.8 KB**. `git diff --check` passed. No shell JavaScript/CSS changes in this follow-up; the shared token and service worker remain `20261007b` / `quilyn-v221`.
+
+## REST report source follow-up
+
+Read and visually inspected every page of the seven-page original REST reporting guide. Added an independent summary of matching product/server versions, REST service/workspace configuration, recorded ExecutionList UniqueId, report task/output parameters and result-file verification. The source's ASKUSER instruction is scoped to that REST example; [the current versioned TC Shell guide](https://docs.tricentis.com/tosca-2026.1/en-us/content/reporting/print_report.htm) prescribes NONE for its own workflow. No API service settings changed and no request/credentials were submitted. The original PDF remains outside the repository; its hash/source lesson are recorded in the inventory.
+
+REST follow-up validation: regenerated content artifacts; **278/278 tests passed** under `npm run check`; initial shell **297.8 KB**. All 185 inventory hashes match current content. `git diff --check` passed. No push or deployment.
