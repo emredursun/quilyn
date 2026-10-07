@@ -72,3 +72,11 @@ Read and visually inspected all nine pages of the original Getting Started guide
 All seven original optional hands-on PDF guides have now been read and visually inspected. This closes that PDF inspection queue; individual theory recordings/SCORM and installed execution remain separate open scopes. No shop login or Vision AI/cloud configuration was executed. Physical-device/AT tests remain unavailable.
 
 Vision AI guide validation: regenerated content artifacts; **284/284 tests passed** under `npm run check`; initial shell **297.8 KB**. `git diff --check` passed. No push or deployment.
+
+## Vision AI theory, handout and objective follow-up
+
+Read complete English subtitle texts for all six original theory recordings: Introduction, Use Cases, Workflow, Overcome customizations, UIDC and VisionScript. Added an independent summary of three UI problem areas, four candidate use cases, mockup-to-remote .NET/web preparation, DIV-table recognition, UIDC rescan and window-caption context. Original universal stability/technology claims remain qualified rather than copied as guarantees. Caption hashes/source lessons recorded in the inventory. Caption inspection does not certify full video visuals or installed execution.
+
+Read and visually inspected both original Vision AI handout pages, every row and all scan/UIDC/script screenshots, including its Tosca 16.0 disclaimer. Added missing account/connected-Agent readiness. Read all seven HTML objectives and inspected all seven SCORM checklist targets, including top/bottom rendered views, using Resume. No achievement boxes changed. Added independently phrased local learning objectives. Original PDF/subtitles/screenshots remain outside the repository.
+
+Validation: regenerated content artifacts; **286/286 tests passed** under `npm run check`; initial shell **297.8 KB**, 41 interactive exercises and 222 static pages checked. No installed Vision AI execution, cloud change or physical-device/AT certification. No push/deployment. Remaining full media-visual and installed-runtime scopes are retained in the inventory.

@@ -1745,3 +1745,13 @@ test('Original Vision AI examples preserve table selectors, password handling an
  assert.match(t.elements[0].description,/row \$2 \/ cell \$1.*2\.1.*row \$1 \/ cell \$2.*Value 1/);assert.match(t.elements[1].text,/content preview.*does not demonstrate a fresh execution/);assert.match(v.elements[0].description,/Window.*caption.*Password data type.*signed-in state/);assert.match(v.elements[1].text,/does not overcome every.*not evidence of installed execution/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['B'],['B']]);assert.match(d.studyGuide[0].elements[0].text,/course-specific declaration.*not a current certification blueprint/);
  const f=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json'));assert.doesNotMatch(JSON.stringify(f),/original hands-on REST guide was not obtained/);
 });
+
+test('Original Vision AI theory separates mockup preparation from application behavior validation',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m11_vision_ai.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-vision-theory-source');
+ assert.match(s.elements[0].description,/fragility, technical know-how and late automation.*remote\/Citrix.*not evidence/);assert.match(s.elements[1].description,/PDF mockup.*remote .NET and web.*not validation of implemented business behavior/);assert.match(s.elements[2].description,/not initially recognized.*two anchors.*rescan.*not a rule/);assert.match(s.elements[3].text,/spaces and periods.*all six.*full video visuals.*not been verified/);
+});
+
+test('Original Vision AI handout distinguishes installation from connected account readiness',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m11_vision_ai.json')),notes=d.studyGuide.flatMap(s=>s.elements).filter(e=>e.type==='note').map(e=>e.text).join(' ');
+ assert.match(notes,/Tosca 16.0 handout.*account.*Agent must be running with Connected status.*installed alone does not prove/);assert.match(notes,/seven-item learning checklist.*self-assessment, not runtime evidence.*without checking achievement boxes/);assert.ok(d.learningObjectives.some(o=>/connected-Agent prerequisites/.test(o)));
+});
