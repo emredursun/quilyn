@@ -46,3 +46,9 @@ REST follow-up validation: regenerated content artifacts; **278/278 tests passed
 Read and visually inspected all eleven original Table Steering guide pages, including all seven exercise stages and parameter/value screenshots. Corrected # semantics to distinguish an unconstrained physical position from an occurrence among constrained matches, in agreement with the current primary table examples. Added header misconfiguration, removed-header behavior and duplicate-product selection as source-scoped examples, without certifying current shop results. All eight existing question keys remain unchanged.
 
 Statically inspected the supplied base subset File Operations folder: eight XModules, with no Zip/Unzip in that folder. Replaced AE1-M08's obsolete unavailable-subset statement; no broad installed-version or runtime certification. Source/PDF hashes are recorded in the inventory. Regenerated content artifacts. `npm run check`: **280/280 tests passed**, initial shell **297.8 KB**. No push or deployment.
+
+## JSON repetitive-node source follow-up
+
+Read and visually inspected all nine original guide pages, including each technical table and API Scan/Module/loop screenshot. Added an independent source-scoped summary of XML/JSON export, item* template, ExplicitName, `.ResultCount == ratingsCount`, `{B[ratingsCount]}`, `#{REPETITION}` and indexed field buffers. Preserved the distinction between source-era API Scan and current XScan guidance. Re-read the two local JSON questions/options/explanations; both B keys remain correct. The source's broad robustness statement is not treated as proof of empty-input or changed-schema execution. Original PDF/hash/lesson provenance retained outside the repository/in the inventory. No runtime execution.
+
+JSON follow-up validation: content artifacts regenerated; **281/281 tests passed** under `npm run check`; initial shell **297.8 KB**. `git diff --check` passed. Shared shell version unchanged; no push/deployment.

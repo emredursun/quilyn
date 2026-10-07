@@ -1721,3 +1721,9 @@ test('Original AE1 file-operation inventory is scoped to the supplied folder',()
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m08_standard_modules.json')),e=d.studyGuide.flatMap(s=>s.elements||[]).find(e=>/eight Modules/.test(e.text||''));
  assert.match(e.text,/Zip\/Unzip are not in that folder.*static package inventory/);assert.doesNotMatch(JSON.stringify(d),/original AE1 course subset was unavailable/);
 });
+
+
+test('Original JSON recipe separates wildcard template, count, loop and entry selection',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m08_standard_modules.json')),s=d.studyGuide.find(s=>s.sectionId==='section-4847deead117'),steps=s.elements.find(e=>e.type==='steps').items;
+ assert.match(steps[0],/API Scan.*item\*.*ExplicitName/);assert.match(steps[1],/\.ResultCount == ratingsCount/);assert.match(steps[2],/\{B\[ratingsCount\]\}.*#\{REPETITION\}/);assert.match(s.elements.find(e=>e.type==='note').text,/does not prove successful execution/);assert.deepEqual(d.practiceQuiz.filter(q=>q.lessonSection===s.sectionId).map(q=>q.correctOptions),[['B'],['B']]);
+});
