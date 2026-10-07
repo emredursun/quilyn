@@ -1710,3 +1710,14 @@ test('Original REST report exercise keeps ASKUSER separate from TC Shell NONE an
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json')),s=d.studyGuide.find(s=>s.sectionId==='section-1a3d005d9c11');
  assert.match(s.elements.find(e=>e.term==='Printing reports through TC Shell').description,/TC Shell.*NONE/);assert.match(s.elements.find(e=>e.term==='Original optional REST report exercise').description,/WorkspaceBasePath.*UniqueId.*ASKUSER.*PrintReport.*outputFilepath/);assert.match(s.elements.at(-1).text,/HTTP 200.*does not certify report contents/);
 });
+
+
+test('Original table guide distinguishes physical positions from constrained matching occurrences',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json')),s=d.studyGuide.find(s=>s.sectionId==='section-7b082db8f7d7');
+ assert.match(s.elements[0].description,/without cell constraints.*absolute.*With cell constraints.*second matching row/);assert.match(s.elements.at(-1).description,/HeaderRow to 2.*Removing HeaderRow.*#2.*not the second physical/);assert.doesNotMatch(JSON.stringify(s),/original hands-on guide was not accessed/);
+});
+
+test('Original AE1 file-operation inventory is scoped to the supplied folder',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m08_standard_modules.json')),e=d.studyGuide.flatMap(s=>s.elements||[]).find(e=>/eight Modules/.test(e.text||''));
+ assert.match(e.text,/Zip\/Unzip are not in that folder.*static package inventory/);assert.doesNotMatch(JSON.stringify(d),/original AE1 course subset was unavailable/);
+});
