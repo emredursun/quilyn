@@ -1033,7 +1033,7 @@ test('AE1 introduction and framework review correct positional table syntax and 
  assert.match(docs[1].practiceQuiz[4].options[1].text,/unique Order ID/);
  assert.match(docs[1].practiceQuiz[7].options[0].text,/NONE on the report definition/);
  assert.doesNotMatch(JSON.stringify(docs),/\$ = by a cell|\$ notation instead targets the row|only the visuals shift|Final Exam draws no questions/);
- assert.match(docs[0].studyGuide[0].elements[2].text,/unavailable during review/);
+ assert.match(docs[0].studyGuide[0].elements[2].text,/developed with Tosca 16.0/);
 });
 
 test('AE1 Excel review separates manipulation, file comparison defaults and save operations',()=>{
@@ -1087,7 +1087,7 @@ test('AE1 custom control review scopes verified on-prem exercise and separate Cl
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m07_custom_controls.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(r.localContentReview,'source-compared');assert.equal(d.sourceReviewedOn,'2026-10-07');
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[1].elements[3].text,/does not affect on-prem customizations/);
- assert.match(d.practiceQuiz[3].options[1].text,/robustness still needs validation/);
+ assert.match(d.practiceQuiz[3].options[1].text,/Recompile.*other control types/);
  assert.doesNotMatch(JSON.stringify(d),/survives cosmetic changes|Tosca has to be restarted|same ActionModes/);
 });
 
@@ -1670,10 +1670,25 @@ test('Original AE1 custom-control exercise retains deployment, rescan and steeri
 test('Original Grand Scenario includes PDF fields, Excel row selection, saved attachments and modern mail caveats',()=>{
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m12_grand_scenario.json')),text=JSON.stringify(d),s=d.studyGuide;
  assert.equal(s[1].elements[1].items.length,4);assert.match(s[4].elements[0].description,/Company=Demowebshop.*\{B\[orderNumber\]\}.*41\.00/);assert.match(s[3].elements[0].description,/OrderDataRange from A1 to D5/);assert.match(s[3].elements[1].items[1],/\$header.*Company.*OrderNumber.*OrderTotal/);assert.match(s[3].elements[1].items[3],/Save=True/);
- assert.match(d.practiceQuiz[4].options[0].text,/Invoice\.pdf.*Order_Details\.xlsx/);assert.match(s.at(-1).elements[1].text,/removed Basic authentication for EWS.*OAuth2/);assert.match(s.at(-1).elements[2].text,/SMTP sends mail; IMAP accesses incoming mail/);assert.doesNotMatch(text,/14-step flow|complete the official.*unverified|exact exercise sequence have not been inspected/);
+ assert.match(d.practiceQuiz[4].options[0].text,/Invoice\.pdf.*Order_Details\.xlsx/);assert.match(s[6].elements[1].text,/removed Basic authentication for EWS.*OAuth2/);assert.match(s[6].elements[2].text,/SMTP sends mail; IMAP accesses incoming mail/);assert.doesNotMatch(text,/14-step flow|complete the official.*unverified|exact exercise sequence have not been inspected/);
 });
 
 test('Completed original source-review inventory retains a current reviewed hash for every local module',()=>{
  const inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),crypto=require('node:crypto');
  inv.modules.forEach(m=>{assert.equal(m.localReview.contentSha256,crypto.createHash('sha256').update(fs.readFileSync(m.file)).digest('hex'),m.id+' requires review after a content change');});
+});
+
+test('Original AE1 theory warns about control interference and recompilation while subset order keeps logout last',()=>{
+ const c=JSON.parse(fs.readFileSync('data/tosca-ae1/m07_custom_controls.json')),g=JSON.parse(fs.readFileSync('data/tosca-ae1/m12_grand_scenario.json'));
+ assert.match(c.studyGuide[0].elements[1].description,/C#.*special execution tasks/);assert.match(c.studyGuide[1].elements.at(-1).text,/interfere.*not automatically upgraded.*recompilation/);assert.deepEqual(c.practiceQuiz[3].correctOptions,['B']);assert.match(c.practiceQuiz[3].optionExplanations.A,/not automatically upgraded/);
+ const order=g.studyGuide[1].elements.find(e=>e.type==='steps').items;assert.equal(order.length,7);assert.equal(order.at(-1),'Logout from the web shop');assert.ok(order.indexOf('Send the files in email')<order.indexOf('Logout from the web shop'));
+ assert.match(g.studyGuide[2].elements[0].description,/three|Open demo web shop.*Click on log in link.*Provide log in details/);assert.match(g.studyGuide[4].elements[3].text,/\{XB\[orderNumber\]\}.*\{B\[orderNumber\]\}/);assert.match(g.studyGuide.at(-1).elements[0].description,/fourteen.*four navigation.*seven checkout.*three order/);
+});
+
+test('Authenticated AE1 introduction scopes prerequisites and optional exam rules to the original course',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m00_introduction.json'));assert.equal(d.platformVersion,'Tosca 16.0 (Academy)');assert.match(d.studyGuide[2].elements[0].items[0],/AS1 and AS2/);assert.match(d.studyGuide[3].elements[0].description,/base and solution.*without importing or executing/);assert.match(d.studyGuide[4].elements[0].description,/Final Exam excludes those optional sections.*not a general rule/);assert.match(d.studyGuide[4].elements[1].text,/does not unlock the Academy exam/);assert.doesNotMatch(JSON.stringify(d),/course access.*unavailable|no original AE1 subset was obtained|recording version was not independently verified/);
+});
+
+test('Original Framework overview preserves five benefits without universal cross-engine capability claims',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json'));assert.match(d.studyGuide[0].elements[2].text,/five architecture benefits.*shared dynamic-expression.*broader ActionMode/);assert.match(d.studyGuide[1].elements.at(-1).text,/seventeen.*Microsoft UI Automation.*underlying framework/);assert.match(d.studyGuide[2].bulletPoints[1],/when.*prerequisites.*compatible/);assert.doesNotMatch(JSON.stringify(d),/mix freely|workflow is identical across technologies/);
 });

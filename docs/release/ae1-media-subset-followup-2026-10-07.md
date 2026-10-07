@@ -1,0 +1,24 @@
+# AE1 original media and subset follow-up — 2026-10-07
+
+## Evidence inspected
+
+- AE1-M00: authenticated original Welcome, Course Overview and course description, including eighteen objectives, Tosca 16.0, AS1/AS2 prerequisites, optional sections and course-specific Final Exam access rules. Quilyn practice does not unlock Academy certification.
+- AE1-M01: complete original English theory captions (12.078–131.936 seconds of the 138-second recording) and all seventeen visible interactive Engine information cards across three pages. Preserved five framework benefits as source claims, distinguished Excel file automation from Excel UI steering, and removed universal identical-action and compatibility claims. The original UIA card conflates Microsoft's underlying framework with Tosca's integration; local wording preserves that distinction.
+- AE1-M07: complete original English theory captions (12.166–142.633 seconds of the 143-second recording) and all three SCORM self-assessment items. Added C# customization/task scope, interference with other control types and recompilation after Tosca upgrades or applicable SUT changes. Achievement checkboxes were not selected.
+- AE1-M12: original downloaded solution-package ZIP, SHA256 `c33e5f8034a2e4a002e1bee71ab00299e0e5e1cf0ade3a5b10f8ffa4bc186abd`. Statically parsed its two gzip JSON TSUs: 3,067 base entities and 1,598 solution entities. Inspected Grand Scenario object trees, actual reusable-login link, fourteen purchase steps, Module inventory, XBuffer capture and seven ordered solution ExecutionList references.
+
+Source lesson links, reviewed file hashes and explicit limitations are retained in [the inventory](../source-review-inventory-2026-10-02.json). Original training downloads and transcripts remain outside the repository. Signed URLs, training credentials and imported execution-log values are not published.
+
+## Corrected Grand Scenario order
+
+The solution references Login, purchase, PDF verification, Excel output, invoice movement, email delivery, then Logout. Its purchase flow has four navigation, seven checkout and three verification/download steps. Login's shared block has three actions; the login assertion is outside that block. `{XB[orderNumber]}` captures the identifier before subsequent `{B[orderNumber]}` use. These facts now have original subset evidence; the earlier PDF-only review could not certify them.
+
+## Validation
+
+`npm run manifest:content` regenerated manifests, library index and four public reading pages. `npm run check`: **275/275 tests passed**. Three added source regressions cover upgrade/interference, subset execution order, introductory prerequisites/optional rules and framework capability scope. The existing original exercise regression now addresses the mail section explicitly after the new purchase-inventory section. All 185 reviewed content hashes remain current. Shared shell token `20261007b`; service worker `quilyn-v221`.
+
+## Open limitations
+
+Caption review is not full video-visual review. Custom Controls and Grand Scenario solution players exposed no captions and remained at their terminal positions; complete solution narration/visual sequences are not certified. The framework objective checklist and original hands-on extras remain uninspected. Static subset parsing is not an import or runtime execution; stored source execution results are not fresh runtime evidence. No DLL, shop purchase, mailbox delivery or installed Tosca execution was performed.
+
+Physical iOS/Android and VoiceOver/TalkBack access remains unavailable, as confirmed by the user. No physical-device matrix row is marked passed. This packet is a local content/source follow-up, not completion of those external validation requirements. No push or deployment.

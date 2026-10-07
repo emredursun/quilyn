@@ -16,11 +16,11 @@
         {
           "type": "concept",
           "term": "From isolated lessons to one business process",
-          "description": "The original AE1 Grand Scenario extends a Demo Web Shop fiction-book order into PDF verification, Excel output, file operations and email delivery. It first runs the supplied Fiction book E2E test ExecutionList, which produces the invoice and logs out, then adds four TestCases for the remaining work. The course was developed with Tosca 16.0."
+          "description": "The original AE1 Grand Scenario extends a Demo Web Shop fiction-book order into PDF verification, Excel output, file operations and email delivery. The initial base ExecutionList can generate the invoice and log out. In the supplied solution, the complete seven-entry ExecutionList runs login, ordering, PDF checks, Excel output, file movement, mail and finally logout. The course was developed with Tosca 16.0."
         },
         {
           "type": "note",
-          "text": "The exercise starts in AE1 Exercises → Execution → ExecutionLists and uses the existing purchase flow. Its PDF does not specify every checkout click or login-library implementation. The exact imported subset contents still need to be checked in your own training workspace."
+          "text": "The original downloadable package contains both base and solution subsets. Their Grand Scenario folder contains Precondition, Library, Process and Post condition. If an imported subset is not immediately visible, the Academy notes suggest searching under Section. Importing or reading a subset does not execute its tests."
         }
       ],
       "bulletPoints": [
@@ -49,6 +49,19 @@
         {
           "type": "note",
           "text": "Arrange cleanup on relevant failure paths. Sequential TestCases do not themselves guarantee that workbook closure or session cleanup executes after an earlier failure. Cleanup does not undo the order. Validate output files before dependent steps use them."
+        },
+        {
+          "type": "steps",
+          "title": "Original solution ExecutionList order",
+          "items": [
+            "Login to web shop",
+            "Order fiction book and pay on delivery",
+            "Verify order invoice pdf",
+            "Copy data to Excel",
+            "Move the pdf file",
+            "Send the files in email",
+            "Logout from the web shop"
+          ]
         }
       ],
       "bulletPoints": [
@@ -57,12 +70,12 @@
       "sectionId": "section-11b40fd72a30"
     },
     {
-      "sectionTitle": "Independent extension: reuse and maintenance",
+      "sectionTitle": "Supplied login reuse and maintenance",
       "elements": [
         {
           "type": "concept",
           "term": "The 'Login to web shop' reusable block",
-          "description": "Shared login steps can be placed in a Reusable TestStepBlock inside a TestStepLibrary. This is independent design guidance, not a login-block implementation prescribed by the Grand Scenario PDF. The original exercise starts from an existing purchase ExecutionList."
+          "description": "Both supplied subsets contain a TestStepLibrary named Library and its Reusable TestStepBlock Login to web shop. The block contains Open demo web shop, Click on log in link and Provide log in details. The Login to web shop TestCase references this block and then separately verifies successful login."
         },
         {
           "type": "concept",
@@ -71,11 +84,11 @@
         },
         {
           "type": "note",
-          "text": "Shared assertions may belong in a reusable block; caller-specific assertions may remain with the caller. The PDF does not establish a three-step login library or its exact contents."
+          "text": "The supplied login TestCase keeps its success assertion outside the shared block. Other designs may share assertions when appropriate. The observed source structure is a course implementation choice, not a mandatory three-step rule for all reusable blocks."
         }
       ],
       "bulletPoints": [
-        "Reusable TestStepBlocks are an independent maintenance technique; the original exercise does not define a specific login library.",
+        "The supplied library shares three login actions; the caller separately verifies successful login.",
         "Keep links and independent copies distinct when updating shared steps."
       ],
       "sectionId": "section-020f54a551cc"
@@ -128,7 +141,7 @@
         },
         {
           "type": "note",
-          "text": "The PDF specifies {B[orderNumber]}; keep the buffer name consistent with the provided purchase flow. Use the actual generated value, not a hard-coded order number. The precise capture implementation in the imported base TestCase is not shown in the exercise PDF."
+          "text": "The supplied order TestCase verifies the confirmation line with Order number: {XB[orderNumber]}. This captures the dynamic identifier while verifying the message; subsequent invoice and Excel steps read {B[orderNumber]}. Keep the same buffer name throughout the flow rather than copying an identifier from a previous run."
         }
       ],
       "bulletPoints": [
@@ -176,6 +189,36 @@
       "bulletPoints": [
         "The mail step needs both output files at their final paths.",
         "A successful file move or workbook write does not prove an email was sent; check the mail operation/result independently."
+      ]
+    },
+    {
+      "sectionTitle": "Original purchase flow and Module inventory",
+      "sectionId": "section-ae1-grand-subset",
+      "elements": [
+        {
+          "type": "concept",
+          "term": "Three purchase phases in both subsets",
+          "description": "The supplied ordering TestCase has fourteen TestSteps: four navigation steps, seven checkout steps and three order-verification/download steps. The final solution includes four additional output TestCases before logout. These names and grouping are observed training data, not universal Tosca defaults."
+        },
+        {
+          "type": "list",
+          "title": "Supplied web and PDF Modules",
+          "items": [
+            "Navigation elements: Top menu and Logged in screen.",
+            "Login: Login page.",
+            "Products: Product choice tabs, Add to cart and Books product selection_Old.",
+            "Checkout: Shopping cart, Billing address, Shipping address, Shipping method, Payment method, Payment information – COD and Check, Confirm payment, Order confirmation page and Download PDF Invoice.",
+            "Solution-only PDF Modules: Order Invoice."
+          ]
+        },
+        {
+          "type": "note",
+          "text": "Static subset inspection confirms the objects and links, not successful execution against the current shop. Stored source execution logs are not a fresh test run. Revalidate current application controls and test data in a supported installed environment."
+        }
+      ],
+      "bulletPoints": [
+        "The solution orders all seven TestCases and keeps logout last.",
+        "Original subset structure and buffer capture are now inspected; current shop execution remains a separate validation."
       ]
     }
   ],
@@ -287,7 +330,7 @@
     {
       "questionId": "Q3",
       "type": "single-select",
-      "scenario": "If you independently extract shared login actions, which structure centrally maintains their linked references?",
+      "scenario": "In the supplied AE1 subsets, where are the shared login actions stored for linked reuse?",
       "options": [
         {
           "id": "A",
@@ -309,7 +352,7 @@
       "correctOptions": [
         "B"
       ],
-      "hint": "The library retains the shared step definition; callers reference it.",
+      "hint": "The login TestCase references the shared three-action block, then verifies success.",
       "rationale": "The example uses a Reusable TestStepBlock in a TestStepLibrary. Changes affect linked references; resolved copies are independent and require their own updates.",
       "optionExplanations": {
         "A": "Independent copies require separate maintenance and do not provide linked reuse.",
@@ -419,8 +462,12 @@
       "value": "SMTP sends mail; IMAP accesses incoming mail. Do not copy the source’s incorrect IMAP-sending hint."
     },
     {
-      "key": "Independent reuse guidance",
-      "value": "Linked Reusable TestStepBlock references share updates; resolved copies do not. Exact imported login-library contents were not inspected."
+      "key": "Supplied reuse",
+      "value": "Library contains the linked Login to web shop block with three actions; the caller separately verifies success. Resolved copies no longer share updates."
+    },
+    {
+      "key": "Final ExecutionList",
+      "value": "Login → order → PDF checks → Excel output → move invoice → send attachments → logout."
     }
   ],
   "topics": [
