@@ -1,0 +1,7 @@
+# Original AE1 image/OCR source follow-up — 2026-10-07
+
+Read and visually inspected all three original Exercise 8 PDF pages: objective, eleven instructions, full logo/text capture, Generic type, Screen Module rename and `.OCRText==Demo Web Shop*` Verify table. Added an independently summarized OCR exercise separately from existing XScan IMAGE identification. Explained control-region capture versus identifying image, location versus OCR assertion and trailing wildcard versus exact full-string verification.
+
+Read complete English theory captions (12.633–173.166 seconds of the 186-second clip). Inspected selected paused source frames around 67,97,117,127 and157 seconds: reticle, control-type chooser, surrounding identifying rectangle, separate control/identifier panes, Accuracy 95 and subsequent adjustment to75. Source F12 and default95 are version-scoped; accuracy weakening is not proof of a correct match. The original PDFs/video/screenshots are not redistributed. Stable source links and hashes are recorded in the inventory.
+
+Re-read all five local question keys B,B,B,ABC,A; unchanged. Added regression for workflow/assertion distinctions and version/runtime limits. Regenerated content artifacts. `npm run check`: **291/291 passed**, zero failed/skipped. Initial shell **298.0 KB**, 41 interactives and 222 static pages checked. `git diff --check` passed. Shell `20261007d` / `quilyn-v223` unchanged. No installed OCR/capture execution, real-device/AT validation, push or deployment. Full remaining video visuals, solution and checklist scopes remain open.

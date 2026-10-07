@@ -1765,3 +1765,8 @@ test('Original UIA calculator recipe separates wildcard identity from an explici
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m05_winx_uia_engines.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-uia-calculator-source');
  assert.match(s.elements[0].description,/Technical Id Name.*Display is 0.*Display is \*.*renaming.*alone is not/);assert.match(s.elements[1].items[2],/One, Plus, One and Equals.*Value X.*Input/);assert.match(s.elements[1].items[3],/\.Name==Display is 2.*Verify.*wildcard.*assertion/);assert.match(s.elements[1].items[4],/WorkState Completed.*does not demonstrate/);assert.match(s.elements[2].text,/UI language.*initial state.*not a fresh test result/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['C'],['B'],['A'],['A'],['B'],['C']]);
 });
+
+test('Original image-control recipe distinguishes control capture, identifiers and OCR assertion',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m09_image_based_controls.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-image-ocr-source');
+ assert.match(s.elements[0].description,/already selected control.*standalone.*first capture.*at least one identifying image/);assert.match(s.elements[1].items[0],/image and text.*Generic/);assert.match(s.elements[1].items[1],/\.OCRText==Demo Web Shop\*.*Verify/);assert.match(s.elements[1].items[2],/separate checks.*not an exact full-string assertion/);assert.match(s.elements[2].text,/F12.*95.*course-version.*unintended.*No installed/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['B'],['A','B','C'],['A']]);
+});
