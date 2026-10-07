@@ -1755,3 +1755,8 @@ test('Original Vision AI handout distinguishes installation from connected accou
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m11_vision_ai.json')),notes=d.studyGuide.flatMap(s=>s.elements).filter(e=>e.type==='note').map(e=>e.text).join(' ');
  assert.match(notes,/Tosca 16.0 handout.*account.*Agent must be running with Connected status.*installed alone does not prove/);assert.match(notes,/seven-item learning checklist.*self-assessment, not runtime evidence.*without checking achievement boxes/);assert.ok(d.learningObjectives.some(o=>/connected-Agent prerequisites/.test(o)));
 });
+
+test('Standard Module recap agrees with the inspected base folder without claiming installed availability',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m08_standard_modules.json')),r=d.quickRecap.find(r=>r.key==='Zip / Unzip File');
+ assert.match(r.value,/neither appears among the eight Modules.*does not certify installed-version availability/);assert.doesNotMatch(r.value,/inventory unverified/);
+});
