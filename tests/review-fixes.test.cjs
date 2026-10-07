@@ -66,3 +66,13 @@ test('quiz letter shortcuts respect browser commands, composition and editable f
  document.activeElement.isContentEditable=true;assert.equal(key({}),false);assert.deepEqual(clicks,[]);
  document.activeElement.isContentEditable=false;assert.equal(key({}),true);assert.deepEqual(clicks,['answer']);
 });
+
+test('graded quiz keeps only picked options selected so native checked state survives grading',()=>{
+ const window={addEventListener(){},removeEventListener(){}},nodes=['A','B','C'].map(id=>{const el=node();el.setAttribute('data-id',id);el.querySelector=()=>null;return el;});nodes[2].classList.add('selected');
+ const verdict=node(),rationale=node(),check=node(),card=node();card.querySelectorAll=()=>nodes;card.querySelector=s=>s==='.verdict'?verdict:s==='.rationale'?rationale:check;
+ const source=fs.readFileSync('core/js/quiz-engine.js','utf8').replace('    /* Build each question card */','    global.gradeForTest=applyGradedState;\n    /* Build each question card */');
+ vm.runInNewContext(source,{window,document:{addEventListener(){},createElement:()=>node()},localStorage:{getItem:()=>null}});
+ window.QuilynProgress={quizState:()=>({version:2,answers:{}})};window.PegaQuiz.render(node(),[],null,null,true,{});
+ const q={type:'multi-select',options:['A','B','C'].map(id=>({id})),correctOptions:['A','C']};window.gradeForTest(card,q,['A','B']);
+ assert.equal(nodes[0].classes.has('selected'),true);assert.equal(nodes[1].classes.has('selected'),true);assert.equal(nodes[2].classes.has('selected'),false);assert.equal(nodes[0].classes.has('correct'),true);assert.equal(nodes[1].classes.has('wrong'),true);assert.equal(nodes[2].classes.has('correct'),true);assert.ok(nodes.every(el=>el.classes.has('disabled')));
+});

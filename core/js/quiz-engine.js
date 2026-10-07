@@ -185,11 +185,11 @@
       var isCorrect = setsEqual(selected, q.correctOptions);
 
       optEls.forEach(function (el) {
-        el.classList.remove("selected");
         el.classList.add("disabled");
         var id = el.getAttribute("data-id");
         var inAnswer = q.correctOptions.indexOf(id) >= 0;
         var picked = selected.indexOf(id) >= 0;
+        el.classList.toggle("selected", picked);
         var badge = el.querySelector(".key");
         if (inAnswer) {
           el.classList.add("correct");
