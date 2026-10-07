@@ -64,3 +64,11 @@ Excel follow-up validation: content artifacts regenerated; **282/282 tests passe
 Read and visually inspected all eight original PDF pages. Compared the temporary-address confirmation example and the three intended expression outcomes against current primary Module bodies. The source Evaluation table says Input, while its screenshot and current reference specify Verify; local notes explicitly resolve that discrepancy. Preserved standard/custom/JavaScript dialog distinctions rather than copying the source's universal no-scan claim. Clarified expected negative assertion versus overall passing result and actual date-type handling. Three relevant question keys B/B/A retained. No address removed or credentials requested; no installed execution. Source/hash retained in the inventory.
 
 Dialog follow-up validation: content artifacts regenerated; **283/283 tests passed** under `npm run check`; initial shell **297.8 KB**; `git diff --check` passed. No push or deployment.
+
+## Vision AI optional guide follow-up
+
+Read and visually inspected all nine pages of the original Getting Started guide, including DIV-table scan/cell selectors and both VisionScript tables/screenshots. Added independent source-scoped summaries of visual table recognition and window/script/password handling, preserving validation requirements rather than copying universal success claims. Compared current XScan and Run VisionScript manual bodies. Original course optional/exam declaration is now distinguished from current certification requirements. Re-read four local question keys B/B/B/B; unchanged. Removed a stale AE1-M01 pitfall claiming the already-inspected REST guide was unavailable. PDF hash and source provenance are recorded in the inventory; no original PDF/screenshots redistributed.
+
+All seven original optional hands-on PDF guides have now been read and visually inspected. This closes that PDF inspection queue; individual theory recordings/SCORM and installed execution remain separate open scopes. No shop login or Vision AI/cloud configuration was executed. Physical-device/AT tests remain unavailable.
+
+Vision AI guide validation: regenerated content artifacts; **284/284 tests passed** under `npm run check`; initial shell **297.8 KB**. `git diff --check` passed. No push or deployment.

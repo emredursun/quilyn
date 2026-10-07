@@ -1126,7 +1126,7 @@ test('AE1 Vision AI review requires configured recovery and preserves UIDC sizin
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[1].elements[3].text,/administrator-enabled.*RetryLevel=TestStepValue.*OnDialogFailure=Recover.*TestStepValueRetries=1.*ExecutionList/);
  assert.match(d.studyGuide[3].elements[1].description,/single anchor.*may fail.*UidcCategory/);
- assert.match(d.studyGuide[0].elements[0].text,/blueprint was not accessible/);
+ assert.match(d.studyGuide[0].elements[0].text,/not a current certification blueprint/);
  assert.doesNotMatch(JSON.stringify(d),/nothing here will be tested|stable, self-healing Modules for any UI|TBox XEngines|self-healing does not cover/);
 });
 
@@ -1738,4 +1738,10 @@ test('Original Excel workflow scopes header subtraction and preserves dependent 
 test('Original Dialog/Evaluation guide retains supported scope and resolves Input/Verify contradiction',()=>{
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m08_standard_modules.json')),e=d.studyGuide.find(s=>s.sectionId==='section-933aebfd4807'),w=d.studyGuide.find(s=>s.sectionId==='section-6add2f52be6d');
  assert.match(e.elements.at(-1).text,/table says Input.*screenshot.*Verify.*false assertion.*expected failure/);assert.match(w.elements.at(-2).description,/temporary shop address.*selected address identity.*not a deletion assertion/);assert.match(w.elements.at(-1).text,/customized dialogs.*need scanning/);assert.deepEqual(d.practiceQuiz.filter(q=>['Q10','Q17','Q18'].includes(q.questionId)).map(q=>q.correctOptions),[['B'],['B'],['A']]);
+});
+
+test('Original Vision AI examples preserve table selectors, password handling and execution limits',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m11_vision_ai.json')),t=d.studyGuide.find(s=>s.sectionId==='section-ae1-vision-table-source'),v=d.studyGuide.find(s=>s.sectionId==='section-ae1-vision-script-source');
+ assert.match(t.elements[0].description,/row \$2 \/ cell \$1.*2\.1.*row \$1 \/ cell \$2.*Value 1/);assert.match(t.elements[1].text,/content preview.*does not demonstrate a fresh execution/);assert.match(v.elements[0].description,/Window.*caption.*Password data type.*signed-in state/);assert.match(v.elements[1].text,/does not overcome every.*not evidence of installed execution/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['B'],['B']]);assert.match(d.studyGuide[0].elements[0].text,/course-specific declaration.*not a current certification blueprint/);
+ const f=JSON.parse(fs.readFileSync('data/tosca-ae1/m01_tbox_engines_frameworks.json'));assert.doesNotMatch(JSON.stringify(f),/original hands-on REST guide was not obtained/);
 });
