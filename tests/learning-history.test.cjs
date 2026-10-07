@@ -1760,3 +1760,8 @@ test('Standard Module recap agrees with the inspected base folder without claimi
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m08_standard_modules.json')),r=d.quickRecap.find(r=>r.key==='Zip / Unzip File');
  assert.match(r.value,/neither appears among the eight Modules.*does not certify installed-version availability/);assert.doesNotMatch(r.value,/inventory unverified/);
 });
+
+test('Original UIA calculator recipe separates wildcard identity from an explicit result assertion',()=>{
+ const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m05_winx_uia_engines.json')),s=d.studyGuide.find(s=>s.sectionId==='section-ae1-uia-calculator-source');
+ assert.match(s.elements[0].description,/Technical Id Name.*Display is 0.*Display is \*.*renaming.*alone is not/);assert.match(s.elements[1].items[2],/One, Plus, One and Equals.*Value X.*Input/);assert.match(s.elements[1].items[3],/\.Name==Display is 2.*Verify.*wildcard.*assertion/);assert.match(s.elements[1].items[4],/WorkState Completed.*does not demonstrate/);assert.match(s.elements[2].text,/UI language.*initial state.*not a fresh test result/);assert.deepEqual(d.practiceQuiz.map(q=>q.correctOptions),[['B'],['C'],['B'],['A'],['A'],['B'],['C']]);
+});
