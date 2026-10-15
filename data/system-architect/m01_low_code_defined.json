@@ -265,7 +265,7 @@
           "type": "interactive",
           "title": "Studio & Integration Decision Simulator",
           "height": 460,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}\nbody{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}\n.label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.scenario{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:14px}\n.opt{display:block;width:100%;text-align:left;margin:6px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}\n.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}\n.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}\n.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;color:var(--soft);border-left:3px solid var(--line);padding-left:10px}\n.fb.ok{border-color:var(--ok);color:var(--ink)}\n.fb.bad{border-color:var(--bad);color:var(--ink)}\n.progress{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:12px}\n.btn{margin-top:12px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}\n.btn:hover{border-color:var(--brand);color:var(--ink)}\n.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}\n.btn.primary:hover{opacity:.88}\n.score-big{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}\n.score-msg{font-size:13px;color:var(--soft);text-align:center}\n</style></head><body>\n<div class=\"progress\" id=\"prog\">Scenario 1 of 4</div>\n<div class=\"card\" id=\"qcard\"></div>\n<div id=\"nav\"></div>\n\n<script>\n(function(){\n  var root=document.documentElement;\n  function apply(t){root.setAttribute('data-theme',t);}\n  apply('__THEME__');\n  window.addEventListener('message',function(e){\n    if(e.data&&e.data.type==='pa-theme') apply(e.data.theme);\n  });\n})();\n</script>\n\n<script>\nvar scenarios = [\n  {\n    label: \"Studio Selection\",\n    scenario: \"A Business Analyst needs to add a new text field to a customer-facing form. The field has no advanced validation and will be visible in App Studio. Where should the BA work?\",\n    opts: [\n      \"App Studio — App Studio handles standard field configuration and generates the underlying Property automatically\",\n      \"Dev Studio — all field additions require Dev Studio to create the Property rule directly\",\n      \"Admin Studio — Admin Studio manages all form configurations at runtime\",\n      \"Prediction Studio — Prediction Studio controls which fields appear in forms\"\n    ],\n    correct: 0,\n    fbs: [\n      \"✓ Correct. App Studio is designed for exactly this — adding standard fields without coding. It creates the underlying Property rule behind the scenes.\",\n      \"✗ Incorrect. Dev Studio is needed only when the capability is unavailable in App Studio. Standard field addition is fully supported in App Studio — using Dev Studio here bypasses the 'work in the right environment for the skill' best practice.\",\n      \"✗ Incorrect. Admin Studio is for runtime system administration (monitoring, user management, system config) — it has no form design capability.\",\n      \"✗ Incorrect. Prediction Studio is the machine-learning environment for adaptive and predictive models — it has no role in form field configuration.\"\n    ]\n  },\n  {\n    label: \"Advanced SLA\",\n    scenario: \"An SA must configure an SLA with a timer excluding non-business days and a custom escalation that reassigns the task to a backup team after 4 hours. App Studio's SLA panel only shows basic goal/deadline fields. Where should the SA configure the advanced options?\",\n    opts: [\n      \"Dev Studio — advanced SLA options (initialization, business-day calendars, multi-action escalations) are only accessible in Dev Studio\",\n      \"App Studio — scroll down in the SLA panel; the advanced options are hidden below the fold\",\n      \"Admin Studio — SLA scheduling is a runtime system configuration managed in Admin Studio\",\n      \"Create a separate Wait Step with a Timer — this achieves the same result as an advanced SLA without needing Dev Studio\"\n    ],\n    correct: 0,\n    fbs: [\n      \"✓ Correct. When App Studio's UI doesn't expose the needed capability, the SA moves to Dev Studio. Advanced SLA options — initialization behavior, business-day calendars, and multi-action escalation chains — live in the SLA rule in Dev Studio.\",\n      \"✗ Incorrect. If App Studio's SLA panel doesn't show the option, it's not hidden — it genuinely isn't available in App Studio. The feature requires Dev Studio.\",\n      \"✗ Incorrect. Admin Studio handles runtime administration (users, logs, system settings), not application rule configuration like SLAs.\",\n      \"✗ Incorrect. A Wait Step with a Timer handles pause-and-continue logic, not business-day SLA intervals with escalation actions. These are different mechanisms with different purposes.\"\n    ]\n  },\n  {\n    label: \"Integration Choice\",\n    scenario: \"A CSR is live on the phone with a customer. They need to update the customer's address in a 30-year-old mainframe that exposes no REST API, no web service, and no database connector — only a green-screen terminal. Which integration approach fits?\",\n    opts: [\n      \"Attended RPA — a robot drives the mainframe UI in real time alongside the CSR, completing the update while the customer is still on the call\",\n      \"Unattended RPA — queue the request for a batch job tonight when the mainframe is less busy\",\n      \"Standard API connector — all modern mainframes expose at least a SOAP endpoint; use that\",\n      \"Manual re-entry — have the CSR switch screens and type the address directly into the mainframe terminal\"\n    ],\n    correct: 0,\n    fbs: [\n      \"✓ Correct. No API + active CSR call = Attended RPA. The robot drives the legacy UI in real time so the customer's address is updated before they hang up.\",\n      \"✗ Incorrect. Unattended RPA is for background batch processing with no human waiting. A live customer on the phone cannot wait until tonight's batch run.\",\n      \"✗ Incorrect. The scenario explicitly states no REST API, no web service — asserting the mainframe 'must have SOAP' contradicts the given constraints.\",\n      \"✗ Incorrect. Manual re-entry is the pre-Pega workaround. While technically possible, it is error-prone, slow, and exactly what RPA exists to replace.\"\n    ]\n  },\n  {\n    label: \"Rule Scope Extension\",\n    scenario: \"An approval process rule was built for the Property Insurance Case Type. The same rule must now apply to Auto Insurance and Travel Insurance — all three share the same Pega application. How do you extend the rule's scope for reuse?\",\n    opts: [\n      \"In Dev Studio, extend the rule's scope from the Case Type level to the application level for reuse by Case Types in the configured application hierarchy\",\n      \"In App Studio, copy-paste the rule into each Case Type's configuration — App Studio supports cross-Case-Type rule sharing via copy\",\n      \"Create three separate rules (one per Case Type) — Pega does not support single-rule reuse across multiple Case Types in the same application\",\n      \"In Admin Studio, set the rule's visibility flag to 'All Case Types' in the runtime rule management screen\"\n    ],\n    correct: 0,\n    fbs: [\n      \"✓ Correct. Dev Studio exposes the full rule hierarchy, including the ability to change a rule's Applies-To class from a specific Case Type to a higher-level class (application or division), enabling reuse across Case Types.\",\n      \"✗ Incorrect. App Studio does not expose scope/Applies-To controls. Copying creates maintenance debt — three copies of the same rule that must all be updated when the approval logic changes.\",\n      \"✗ Incorrect. Pega explicitly supports rule inheritance across Case Types. Extending scope is the documented best practice for exactly this scenario.\",\n      \"✗ Incorrect. Admin Studio manages runtime system configuration (users, logs, system resources) — it is not the Rule-authoring workspace for this task.\"\n    ]\n  }\n];\n\nvar cur = 0, score = 0;\n\nfunction render() {\n  var s = scenarios[cur];\n  document.getElementById('prog').textContent = 'Scenario ' + (cur+1) + ' of ' + scenarios.length + ' — Score: ' + score + '/' + scenarios.length;\n  var html = '<div class=\"label\">' + s.label + '</div>';\n  html += '<div class=\"scenario\">' + s.scenario + '</div>';\n  s.opts.forEach(function(o, i) {\n    html += '<button class=\"opt\" onclick=\"answer(' + i + ')\">' + o + '</button>';\n  });\n  document.getElementById('qcard').innerHTML = html;\n  document.getElementById('nav').innerHTML = '';\n}\n\nfunction answer(idx) {\n  var s = scenarios[cur];\n  var btns = document.querySelectorAll('.opt');\n  btns.forEach(function(b){ b.disabled = true; });\n  var correct = idx === s.correct;\n  if (correct) score++;\n  s.opts.forEach(function(o, i) {\n    var cls = i === s.correct ? 'opt ok' : (i === idx && !correct ? 'opt bad' : 'opt');\n    btns[i].className = cls;\n  });\n  var fb = document.createElement('div');\n  fb.className = 'fb ' + (correct ? 'ok' : 'bad');\n  fb.textContent = s.fbs[idx];\n  document.getElementById('qcard').appendChild(fb);\n  var nav = document.getElementById('nav');\n  if (cur < scenarios.length - 1) {\n    nav.innerHTML = '<button class=\"btn primary\" onclick=\"next()\">Next scenario →</button>';\n  } else {\n    showResult();\n  }\n}\n\nfunction next() {\n  cur++;\n  render();\n}\n\nfunction showResult() {\n  var pct = Math.round(score / scenarios.length * 100);\n  var msg = pct === 100 ? 'Perfect — you know your studios and integration patterns.' :\n            pct >= 75 ? 'Strong. Review the scenarios you missed before the exam.' :\n            'Re-read the Studio selection rules and integration decision tree, then retry.';\n  document.getElementById('qcard').innerHTML = '<div class=\"score-big\">' + score + ' / ' + scenarios.length + ' (' + pct + '%)</div><div class=\"score-msg\">' + msg + '</div>';\n  document.getElementById('nav').innerHTML = '<button class=\"btn\" onclick=\"restart()\">Restart</button>';\n}\n\nfunction restart() { cur = 0; score = 0; render(); }\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}\nbody{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}\n.label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.scenario{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:14px}\n.opt{display:block;width:100%;text-align:left;margin:6px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}\n.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}\n.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}\n.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;color:var(--soft);border-left:3px solid var(--line);padding-left:10px}\n.fb.ok{border-color:var(--ok);color:var(--ink)}\n.fb.bad{border-color:var(--bad);color:var(--ink)}\n.progress{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:12px}\n.btn{margin-top:12px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}\n.btn:hover{border-color:var(--brand);color:var(--ink)}\n.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}\n.btn.primary:hover{opacity:.88}\n.score-big{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}\n.score-msg{font-size:13px;color:var(--soft);text-align:center}\n</style></head><body>\n<div class=\"progress\" id=\"prog\">Scenario 1 of 4</div>\n<div class=\"card\" id=\"qcard\"></div>\n<div id=\"nav\"></div>\n\n<script>\n(function(){\n  var root=document.documentElement;\n  function apply(t){root.setAttribute('data-theme',t);}\n  apply('__THEME__');\n  window.addEventListener('message',function(e){\n    if(e.data&&e.data.type==='pa-theme') apply(e.data.theme);\n  });\n})();\n</script>\n\n<script>\n/* quilyn-topic-balance-v1 */\nvar scenarios = [\n  {\n    \"label\": \"Studio Selection\",\n    \"scenario\": \"A Business Analyst needs to add a new text field to a customer-facing form. The field has no advanced validation and will be visible in App Studio. Where should the BA work?\",\n    \"opts\": [\n      \"Admin Studio\",\n      \"Dev Studio\",\n      \"App Studio\",\n      \"Prediction Studio\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. Admin Studio is for runtime system administration (monitoring, user management, system config) — it has no form design capability.\",\n      \"✗ Incorrect. Dev Studio is needed only when the capability is unavailable in App Studio. Standard field addition is fully supported in App Studio — using Dev Studio here bypasses the 'work in the right environment for the skill' best practice.\",\n      \"✓ Correct. App Studio is designed for exactly this — adding standard fields without coding. It creates the underlying Property rule behind the scenes.\",\n      \"✗ Incorrect. Prediction Studio is the machine-learning environment for adaptive and predictive models — it has no role in form field configuration.\"\n    ]\n  },\n  {\n    \"label\": \"Advanced SLA\",\n    \"scenario\": \"An SA must configure an SLA with a timer excluding non-business days and a custom escalation that reassigns the task to a backup team after 4 hours. App Studio's SLA panel only shows basic goal/deadline fields. Where should the SA configure the advanced options?\",\n    \"opts\": [\n      \"A separate Wait Step with a Timer\",\n      \"Dev Studio\",\n      \"App Studio\",\n      \"Admin Studio\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"✗ Incorrect. A Wait Step with a Timer handles pause-and-continue logic, not business-day SLA intervals with escalation actions. These are different mechanisms with different purposes.\",\n      \"✓ Correct. When App Studio's UI doesn't expose the needed capability, the SA moves to Dev Studio. Advanced SLA options — initialization behavior, business-day calendars, and multi-action escalation chains — live in the SLA rule in Dev Studio.\",\n      \"✗ Incorrect. If App Studio's SLA panel doesn't show the option, it's not hidden — it genuinely isn't available in App Studio. The feature requires Dev Studio.\",\n      \"✗ Incorrect. Admin Studio handles runtime administration (users, logs, system settings), not application rule configuration like SLAs.\"\n    ]\n  },\n  {\n    \"label\": \"Integration Choice\",\n    \"scenario\": \"A CSR is live on the phone with a customer. They need to update the customer's address in a 30-year-old mainframe that exposes no REST API, no web service, and no database connector — only a green-screen terminal. Which integration approach fits?\",\n    \"opts\": [\n      \"Manual terminal re-entry by the CSR\",\n      \"Unattended RPA queued for tonight\",\n      \"A standard API connector\",\n      \"Attended RPA\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"✗ Incorrect. Manual re-entry is the pre-Pega workaround. While technically possible, it is error-prone, slow, and exactly what RPA exists to replace.\",\n      \"✗ Incorrect. Unattended RPA is for background batch processing with no human waiting. A live customer on the phone cannot wait until tonight's batch run.\",\n      \"✗ Incorrect. The scenario explicitly states no REST API, no web service — asserting the mainframe 'must have SOAP' contradicts the given constraints.\",\n      \"✓ Correct. No API + active CSR call = Attended RPA. The robot drives the legacy UI in real time so the customer's address is updated before they hang up.\"\n    ]\n  },\n  {\n    \"label\": \"Rule Scope Extension\",\n    \"scenario\": \"An approval process rule was built for the Property Insurance Case Type. The same rule must now apply to Auto Insurance and Travel Insurance — all three share the same Pega application. How do you extend the rule's scope for reuse?\",\n    \"opts\": [\n      \"Extend the Rule scope in Dev Studio to the shared application level\",\n      \"Set an 'All Case Types' visibility flag in Admin Studio\",\n      \"Copy the Rule into each Case Type using App Studio\",\n      \"Create a separate Rule for each Case Type\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. Dev Studio exposes the full rule hierarchy, including the ability to change a rule's Applies-To class from a specific Case Type to a higher-level class (application or division), enabling reuse across Case Types.\",\n      \"✗ Incorrect. Admin Studio manages runtime system configuration (users, logs, system resources) — it is not the Rule-authoring workspace for this task.\",\n      \"✗ Incorrect. App Studio does not expose scope/Applies-To controls. Copying creates maintenance debt — three copies of the same rule that must all be updated when the approval logic changes.\",\n      \"✗ Incorrect. Pega explicitly supports rule inheritance across Case Types. Extending scope is the documented best practice for exactly this scenario.\"\n    ]\n  }\n];\n\nvar cur = 0, score = 0;\n\nfunction render() {\n  var s = scenarios[cur];\n  document.getElementById('prog').textContent = 'Scenario ' + (cur+1) + ' of ' + scenarios.length + ' — Score: ' + score + '/' + scenarios.length;\n  var html = '<div class=\"label\">' + s.label + '</div>';\n  html += '<div class=\"scenario\">' + s.scenario + '</div>';\n  s.opts.forEach(function(o, i) {\n    html += '<button class=\"opt\" onclick=\"answer(' + i + ')\">' + o + '</button>';\n  });\n  document.getElementById('qcard').innerHTML = html;\n  document.getElementById('nav').innerHTML = '';\n}\n\nfunction answer(idx) {\n  var s = scenarios[cur];\n  var btns = document.querySelectorAll('.opt');\n  btns.forEach(function(b){ b.disabled = true; });\n  var correct = idx === s.correct;\n  if (correct) score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+scenarios.length+' — Score: '+score+'/'+scenarios.length;\n  s.opts.forEach(function(o, i) {\n    var cls = i === s.correct ? 'opt ok' : (i === idx && !correct ? 'opt bad' : 'opt');\n    btns[i].className = cls;\n  });\n  var fb = document.createElement('div');\n  fb.className = 'fb ' + (correct ? 'ok' : 'bad');\n  fb.textContent = s.fbs[idx];\n  document.getElementById('qcard').appendChild(fb);\n  var nav = document.getElementById('nav');\n  if (cur < scenarios.length - 1) {\n    nav.innerHTML = '<button class=\"btn primary\" onclick=\"next()\">Next scenario →</button>';\n  } else {\n    showResult();\n  }\n}\n\nfunction next() {\n  cur++;\n  render();\n}\n\nfunction showResult() {\n  var pct = Math.round(score / scenarios.length * 100);\n  var msg = pct === 100 ? 'Perfect — you know your studios and integration patterns.' :\n            pct >= 75 ? 'Strong. Review the scenarios you missed before the exam.' :\n            'Re-read the Studio selection rules and integration decision tree, then retry.';\n  document.getElementById('qcard').innerHTML = '<div class=\"score-big\">' + score + ' / ' + scenarios.length + ' (' + pct + '%)</div><div class=\"score-msg\">' + msg + '</div>';\n  document.getElementById('nav').innerHTML = '<button class=\"btn\" onclick=\"restart()\">Restart</button>';\n}\n\nfunction restart() { cur = 0; score = 0; render(); }\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-ac1cd615694b"
@@ -330,20 +330,20 @@
       "scenario": "A data scientist must build, train, and monitor adaptive machine-learning models that power Pega's Next-Best-Action recommendations. Which Pega Studio is designed for this?",
       "options": [
         {
-          "id": "A",
-          "text": "Prediction Studio — the dedicated analytics environment for building adaptive, predictive, and text ML models"
+          "id": "C",
+          "text": "App Studio — Autopilot's model-management tab generates and deploys adaptive models from natural-language descriptions"
         },
         {
           "id": "B",
           "text": "Dev Studio — predictive models are a Rule type in the Ruleset layer and must be authored directly in the Rules layer via Dev Studio"
         },
         {
-          "id": "C",
-          "text": "App Studio — Autopilot's model-management tab generates and deploys adaptive models from natural-language descriptions"
-        },
-        {
           "id": "D",
           "text": "Admin Studio — the System Management console includes a Model Performance dashboard for training and monitoring ML models"
+        },
+        {
+          "id": "A",
+          "text": "Prediction Studio — the dedicated analytics environment for building adaptive, predictive, and text ML models"
         }
       ],
       "correctOptions": [
@@ -366,20 +366,20 @@
       "scenario": "An SA must configure a standard sequential approval process — a capability fully supported in App Studio. Per best practice, where should the SA work, and why?",
       "options": [
         {
-          "id": "A",
-          "text": "App Studio — its behind-the-scenes configuration reduces potential errors for this supported process"
+          "id": "D",
+          "text": "Admin Studio — all Case process configurations must pass through admin review before they become active"
         },
         {
           "id": "B",
           "text": "Dev Studio — building Case processes in Dev Studio ensures the rules land in the correct Ruleset layer and are portable across applications"
         },
         {
-          "id": "C",
-          "text": "Dev Studio — App Studio creates read-only 'shadow' rules that cannot be extended, so SAs must go to Dev Studio to create editable versions"
+          "id": "A",
+          "text": "App Studio — its behind-the-scenes configuration reduces potential errors for this supported process"
         },
         {
-          "id": "D",
-          "text": "Admin Studio — all Case process configurations must pass through admin review before they become active"
+          "id": "C",
+          "text": "Dev Studio — App Studio creates read-only 'shadow' rules that cannot be extended, so SAs must go to Dev Studio to create editable versions"
         }
       ],
       "correctOptions": [
@@ -422,7 +422,7 @@
         "A",
         "B"
       ],
-      "hint": "Constellation pairs with Constellation; Traditional pairs with Theme Cosmos.",
+      "hint": "Compare the architecture names with the terminology used for their UI components.",
       "rationale": "Constellation = Constellation Ruleset (View-based components); Traditional = Theme Cosmos Ruleset (Section-based). C is wrong because Theme Cosmos belongs to Traditional UI, not Constellation — Constellation has its own dedicated Ruleset. D is wrong because it inverts the pairing; Constellation is the modern architecture and its Ruleset is the Constellation Ruleset, not Theme Cosmos.",
       "selectCount": 2,
       "optionExplanations": {
@@ -476,20 +476,20 @@
       "scenario": "A CSR must update a customer's address in a legacy system that exposes no API. The customer is on the phone and needs the update completed immediately. Which integration approach is correct?",
       "options": [
         {
-          "id": "A",
-          "text": "A standard API connector — connects directly to the legacy system in real time without any manual interaction"
+          "id": "D",
+          "text": "A manual re-entry process — the CSR swaps windows and types the update directly into the legacy system"
         },
         {
           "id": "B",
           "text": "Attended RPA — drives the legacy system's UI in real time alongside the CSR while the customer is on the call"
         },
         {
-          "id": "C",
-          "text": "Unattended RPA queued for off-peak processing — runs the update in the background when system load is low"
+          "id": "A",
+          "text": "A standard API connector — connects directly to the legacy system in real time without any manual interaction"
         },
         {
-          "id": "D",
-          "text": "A manual re-entry process — the CSR swaps windows and types the update directly into the legacy system"
+          "id": "C",
+          "text": "Unattended RPA queued for off-peak processing — runs the update in the background when system load is low"
         }
       ],
       "correctOptions": [
@@ -516,16 +516,16 @@
           "text": "Case Types — the primary authoring area for Case Life Cycles, Stages, Steps, and Data Models"
         },
         {
-          "id": "B",
-          "text": "Channels — where Persona-to-interface mappings are defined for web, mobile, and messaging"
+          "id": "D",
+          "text": "Robot Manager — the control-tower dashboard for scheduling, monitoring, and managing RPA robots"
         },
         {
           "id": "C",
           "text": "Library (Reuse Library) — exposes reusable Case Types, data and logic"
         },
         {
-          "id": "D",
-          "text": "Robot Manager — the control-tower dashboard for scheduling, monitoring, and managing RPA robots"
+          "id": "B",
+          "text": "Channels — where Persona-to-interface mappings are defined for web, mobile, and messaging"
         }
       ],
       "correctOptions": [
@@ -551,10 +551,6 @@
       "scenario": "A production environment has latency spikes. An IT administrator needs to inspect thread pools, scheduled agents, and active requestors to diagnose the issue. Which Pega Studio provides these system-administration tools?",
       "options": [
         {
-          "id": "A",
-          "text": "Admin Studio — designed specifically for monitoring system health, managing scheduled jobs, and debugging runtime resources"
-        },
-        {
           "id": "B",
           "text": "Dev Studio — all Pega rules including runtime agents are authored in Dev Studio, making it the correct place for runtime diagnostics"
         },
@@ -565,6 +561,10 @@
         {
           "id": "D",
           "text": "Prediction Studio — monitors real-time performance of all Pega microservices and platform components"
+        },
+        {
+          "id": "A",
+          "text": "Admin Studio — designed specifically for monitoring system health, managing scheduled jobs, and debugging runtime resources"
         }
       ],
       "correctOptions": [
@@ -587,20 +587,20 @@
       "scenario": "A bank's IT governance board demands that all application changes go through their Java developer team. A Pega champion responds: 'Low-code lets our process analysts own most of the model without writing code.' The board pushes back: 'That's just a marketing claim — real enterprise apps require hand-coded logic.' Which statement best counters their concern with an accurate description of how Pega low-code actually works?",
       "options": [
         {
-          "id": "A",
-          "text": "Low-code uses visual, declarative techniques to author rules — the platform generates the underlying execution artifacts, so most configuration requires zero Java"
-        },
-        {
-          "id": "B",
-          "text": "Low-code is a marketing term; all Pega rules ultimately require a developer to write Java in Dev Studio to take effect"
-        },
-        {
           "id": "C",
           "text": "Low-code generates code once at build time, which is then locked and cannot be extended or customized afterward"
         },
         {
           "id": "D",
           "text": "Low-code is limited to simple departmental workflows; enterprise-grade complexity (multi-stage approvals, SLAs, integrations) still requires traditional coding"
+        },
+        {
+          "id": "A",
+          "text": "Low-code uses visual, declarative techniques to author rules — the platform generates the underlying execution artifacts, so most configuration requires zero Java"
+        },
+        {
+          "id": "B",
+          "text": "Low-code is a marketing term; all Pega rules ultimately require a developer to write Java in Dev Studio to take effect"
         }
       ],
       "correctOptions": [
@@ -623,6 +623,10 @@
       "scenario": "An SA opens Dev Studio to diagnose a routing issue. The rule list shows: 'CaseType1', 'Stage2', 'Process3', 'Field4'. The SA cannot tell which rules belong to which business function. The BA who built the app says: 'Pega accepted those names, so they must be fine.' What principle does the SA invoke to explain the real problem?",
       "options": [
         {
+          "id": "D",
+          "text": "Pega validation rejects non-descriptive names at save time, which is why these rules must have caused a silent corruption"
+        },
+        {
           "id": "A",
           "text": "Pega creates related Rules from App Studio configuration — descriptive business names make those Rules easier to identify and maintain in Dev Studio"
         },
@@ -633,10 +637,6 @@
         {
           "id": "C",
           "text": "Generic names disable the Pega localization engine, so the application cannot render field labels in non-English languages"
-        },
-        {
-          "id": "D",
-          "text": "Pega validation rejects non-descriptive names at save time, which is why these rules must have caused a silent corruption"
         }
       ],
       "correctOptions": [
@@ -659,20 +659,20 @@
       "scenario": "A stakeholder asks how business analysts and System Architects divide work during Pega low-code development. Which TWO statements accurately describe co-development?",
       "options": [
         {
-          "id": "A",
-          "text": "A Business Analyst can configure Views and Case Life Cycles in App Studio while a System Architect adds complex logic and extends rules in Dev Studio"
-        },
-        {
-          "id": "B",
-          "text": "Match the workspace to the task: both groups use App Studio for supported work, with Dev Studio for advanced configuration"
-        },
-        {
           "id": "C",
           "text": "Only System Architects are permitted to interact with the application at any stage; BAs review outputs but cannot author directly"
         },
         {
+          "id": "A",
+          "text": "A Business Analyst can configure Views and Case Life Cycles in App Studio while a System Architect adds complex logic and extends rules in Dev Studio"
+        },
+        {
           "id": "D",
           "text": "Domain experts must complete Java training before contributing to Pega development"
+        },
+        {
+          "id": "B",
+          "text": "Match the workspace to the task: both groups use App Studio for supported work, with Dev Studio for advanced configuration"
         }
       ],
       "correctOptions": [
@@ -701,22 +701,22 @@
           "text": "Use Dev Studio to extend the Process scope to the consumer division for the consuming applications"
         },
         {
+          "id": "D",
+          "text": "In Admin Studio, schedule a batch job that replicates the rule across all Case Types at a defined interval"
+        },
+        {
           "id": "B",
           "text": "In App Studio, copy the rule into each Case Type manually — App Studio's Copy Rule wizard propagates the rule across the organization automatically"
         },
         {
           "id": "C",
           "text": "In Prediction Studio, train a model to replicate the approval logic across Case Types by learning from the existing rule"
-        },
-        {
-          "id": "D",
-          "text": "In Admin Studio, schedule a batch job that replicates the rule across all Case Types at a defined interval"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Scope extension across application layers requires the advanced studio.",
+      "hint": "Consider the intended reuse scope and each workspace's configuration capabilities.",
       "rationale": "Dev Studio supports extending the Process scope for reuse across the division. Availability to a consumer depends on its application/class configuration; copying alone does not create a shared implementation.",
       "optionExplanations": {
         "A": "Extending the Process scope supports reuse across the consumer division.",
@@ -733,20 +733,20 @@
       "scenario": "During a sprint review, a stakeholder spots that the 'Submit Claim' button label is incorrect and wants it captured immediately while screen-sharing the running app, linked to the exact View being reviewed. A second stakeholder asks to also track the item in the project backlog. The BA is in App Studio. Which single tool handles both in-context capture AND backlog tracking — and what does it NOT do?",
       "options": [
         {
-          "id": "A",
-          "text": "Pega Agile Workbench (opened from the App Studio header) — captures in-context feedback linked to the specific View AND feeds the project backlog; it does NOT train predictive models"
-        },
-        {
-          "id": "B",
-          "text": "Pega Blueprint — AI-generates a Case structure from a text prompt AND tracks backlog items; it does NOT require the application to be running first"
+          "id": "D",
+          "text": "Dev Studio's Application Explorer — provides in-context markup for running screens AND version-controls feedback items alongside Rule definitions"
         },
         {
           "id": "C",
           "text": "Prediction Studio — captures run-time feedback AND manages the product backlog; it is accessible directly from the App Studio header"
         },
         {
-          "id": "D",
-          "text": "Dev Studio's Application Explorer — provides in-context markup for running screens AND version-controls feedback items alongside Rule definitions"
+          "id": "A",
+          "text": "Pega Agile Workbench (opened from the App Studio header) — captures in-context feedback linked to the specific View AND feeds the project backlog; it does NOT train predictive models"
+        },
+        {
+          "id": "B",
+          "text": "Pega Blueprint — AI-generates a Case structure from a text prompt AND tracks backlog items; it does NOT require the application to be running first"
         }
       ],
       "correctOptions": [
@@ -769,20 +769,20 @@
       "scenario": "A CRM system and Pega both support a well-known REST API standard. Customer address updates must be reflected immediately in both systems. Which integration approach is most appropriate?",
       "options": [
         {
-          "id": "A",
-          "text": "A standard API connector — enables real-time data exchange when both systems support a common protocol"
-        },
-        {
           "id": "B",
           "text": "Attended RPA — drives the CRM's UI in real time to capture and push the address update without requiring an API"
+        },
+        {
+          "id": "D",
+          "text": "A manual data re-entry workflow — routes the update request to a back-office team for manual input into the CRM"
         },
         {
           "id": "C",
           "text": "Unattended RPA — queues the address update for off-peak processing to minimize load during business hours"
         },
         {
-          "id": "D",
-          "text": "A manual data re-entry workflow — routes the update request to a back-office team for manual input into the CRM"
+          "id": "A",
+          "text": "A standard API connector — enables real-time data exchange when both systems support a common protocol"
         }
       ],
       "correctOptions": [
@@ -809,16 +809,16 @@
           "text": "Unattended RPA — queues robotic automation jobs and runs them in the background during off-peak hours without a human operator"
         },
         {
-          "id": "B",
-          "text": "Attended RPA — assigns a robot to assist each CSR in real time, preventing the off-peak batching the bank needs"
+          "id": "D",
+          "text": "A manual data re-entry process — assigns a data-entry team to process updates overnight"
         },
         {
           "id": "C",
           "text": "A standard API connector — provides real-time, API-driven exchange for high-volume processing"
         },
         {
-          "id": "D",
-          "text": "A manual data re-entry process — assigns a data-entry team to process updates overnight"
+          "id": "B",
+          "text": "Attended RPA — assigns a robot to assist each CSR in real time, preventing the off-peak batching the bank needs"
         }
       ],
       "correctOptions": [
@@ -841,26 +841,26 @@
       "scenario": "An operations team runs dozens of RPA robots across multiple business units. They need a single interface to schedule robot jobs, monitor run status, and view performance analytics. Which Pega capability provides this control tower?",
       "options": [
         {
-          "id": "A",
-          "text": "Pega Robot Manager — a dedicated product for scheduling, monitoring, and measuring performance analytics across all RPA robots"
-        },
-        {
-          "id": "B",
-          "text": "Admin Studio's Agent Schedule manager — provides a built-in RPA scheduler and dashboard for all robot types inside Admin Studio"
-        },
-        {
           "id": "C",
           "text": "App Studio's Library section — stores and manages RPA robot configurations alongside reusable application assets"
         },
         {
+          "id": "A",
+          "text": "Pega Robot Manager — a dedicated product for scheduling, monitoring, and measuring performance analytics across all RPA robots"
+        },
+        {
           "id": "D",
           "text": "The Application Profile in Dev Studio — contains a Robot Performance Dashboard that tracks completion rates and error counts per robot"
+        },
+        {
+          "id": "B",
+          "text": "Admin Studio's Agent Schedule manager — provides a built-in RPA scheduler and dashboard for all robot types inside Admin Studio"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "The name tells you its purpose — it manages robots.",
+      "hint": "Distinguish application authoring from operating a fleet of automations.",
       "rationale": "Pega Robot Manager is the dedicated control tower for RPA: scheduling, run-status monitoring, and performance analytics across all robots. Admin Studio manages system agents, not RPA robots; App Studio's Library stores reusable app assets, not robot configurations.",
       "optionExplanations": {
         "A": "Robot Manager matches the requested oversight of robot operations.",
@@ -916,8 +916,8 @@
       "scenario": "An SA needs delayed SLA initialization, intervals that exclude non-business days, and an escalation that reassigns work. Which studio exposes these advanced Rule settings?",
       "options": [
         {
-          "id": "A",
-          "text": "Dev Studio — configure initialization, business-day intervals and additional escalation actions on the SLA Rule"
+          "id": "D",
+          "text": "Prediction Studio — SLA timing is predicted and optimized by an adaptive model configured in Prediction Studio"
         },
         {
           "id": "B",
@@ -928,8 +928,8 @@
           "text": "Admin Studio — SLA schedules and escalation policies are managed through the System Scheduling console in Admin Studio"
         },
         {
-          "id": "D",
-          "text": "Prediction Studio — SLA timing is predicted and optimized by an adaptive model configured in Prediction Studio"
+          "id": "A",
+          "text": "Dev Studio — configure initialization, business-day intervals and additional escalation actions on the SLA Rule"
         }
       ],
       "correctOptions": [
@@ -952,20 +952,20 @@
       "scenario": "A bank used Attended RPA to integrate with a legacy address system. Now the legacy system is replaced with a modern REST API. An SA swaps the RPA for an API connector. Why does this change require minimal impact on the Case design?",
       "options": [
         {
-          "id": "A",
-          "text": "Because Pega separates data and integration details from application functionality, replacing the integration can minimize changes to the Case design"
-        },
-        {
           "id": "B",
           "text": "Because the RPA robot and the API connector share the same authentication profile, making them interchangeable without any code change"
         },
         {
-          "id": "C",
-          "text": "Because the Case logic is duplicated in both the RPA configuration and the API connector, so changing one automatically updates the other"
-        },
-        {
           "id": "D",
           "text": "Because all integration types in Pega compile down to the same underlying Java class, making them structurally identical at runtime"
+        },
+        {
+          "id": "A",
+          "text": "Because Pega separates data and integration details from application functionality, replacing the integration can minimize changes to the Case design"
+        },
+        {
+          "id": "C",
+          "text": "Because the Case logic is duplicated in both the RPA configuration and the API connector, so changing one automatically updates the other"
         }
       ],
       "correctOptions": [
@@ -988,12 +988,12 @@
       "scenario": "A BA wants to identify the current application’s UI architecture and review a high-level view of its application layers without leaving App Studio. Which element is appropriate?",
       "options": [
         {
-          "id": "A",
-          "text": "The Application Layers Widget on the App Studio overview"
-        },
-        {
           "id": "B",
           "text": "The Case Type Explorer in Dev Studio — it lists all Case Types and their inheritance hierarchy, from which you can infer the Ruleset structure"
+        },
+        {
+          "id": "A",
+          "text": "The Application Layers Widget on the App Studio overview"
         },
         {
           "id": "C",
@@ -1007,7 +1007,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Use the overview widget that describes the application structure, rather than a generated proposal or team comments.",
+      "hint": "Compare each tool's purpose with the information the BA wants to inspect.",
       "rationale": "The widget provides a high-level layer overview and identifies the application type. For the application definition’s built-on details, the topic also gives a Dev Studio route.",
       "optionExplanations": {
         "A": "The widget summarizes application layers and identifies the architecture.",
@@ -1024,16 +1024,16 @@
       "scenario": "A CIO asks an SA to explain two genuine business benefits of Pega's low-code approach. Which TWO are accurate?",
       "options": [
         {
-          "id": "A",
-          "text": "It provides a common visual language that enables business analysts and developers to collaborate directly in the same environment"
-        },
-        {
           "id": "B",
           "text": "It enables one application model to serve web, mobile, and chatbot channels without maintaining separate codebases"
         },
         {
           "id": "C",
           "text": "It eliminates the need for QA testing, since the model-driven approach guarantees defect-free output"
+        },
+        {
+          "id": "A",
+          "text": "It provides a common visual language that enables business analysts and developers to collaborate directly in the same environment"
         },
         {
           "id": "D",
@@ -1044,7 +1044,7 @@
         "A",
         "B"
       ],
-      "hint": "One about collaboration, one about multi-channel delivery — two real module-stated benefits.",
+      "hint": "Separate supported business benefits from claims that remove delivery responsibilities.",
       "rationale": "A shared visual model helps business and technical contributors collaborate and supports multiple channels. The application still requires testing, security review, and quality assurance.",
       "selectCount": 2,
       "optionExplanations": {
@@ -1081,7 +1081,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Default at login, switch any time via the upper-left menu — no logout required.",
+      "hint": "Distinguish the configured starting workspace from the workspaces a user is authorized to access.",
       "rationale": "Login opens the user's designated default studio; the upper-left studio-switcher lets you move to any accessible studio in the same session — no logout, no export required.",
       "optionExplanations": {
         "A": "Studio switching uses the user's available studios without requiring logout.",
@@ -1098,26 +1098,26 @@
       "scenario": "A senior BA asks an SA to explain the difference between 'Layers' and 'Rulesets' in Pega's modular design. Which statement best captures the distinction?",
       "options": [
         {
-          "id": "A",
-          "text": "Layers organize the application into reusable architectural tiers (each built on lower tiers); Rulesets are versioned bundles of Rules that can be shared and reused across applications"
-        },
-        {
-          "id": "B",
-          "text": "Layers and Rulesets are interchangeable terms — both refer to versioned containers of Rules organized for reuse"
-        },
-        {
           "id": "C",
           "text": "A Ruleset can only contain a single Rule; multiple Rulesets must be assembled into a Layer for packaging"
         },
         {
           "id": "D",
           "text": "Layers exist only in Prediction Studio and have no presence in application design"
+        },
+        {
+          "id": "B",
+          "text": "Layers and Rulesets are interchangeable terms — both refer to versioned containers of Rules organized for reuse"
+        },
+        {
+          "id": "A",
+          "text": "Layers organize the application into reusable architectural tiers (each built on lower tiers); Rulesets are versioned bundles of Rules that can be shared and reused across applications"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "One concept is the architectural stack of tiers; the other is a versioned, deployable bundle of rules.",
+      "hint": "Compare architectural organization with how related Rules are packaged for reuse.",
       "rationale": "Layers are architectural tiers (each inheriting from those below); Rulesets are versioned bundles of Rules within Layers that can be shared across applications. They are related but distinct — not interchangeable terms.",
       "optionExplanations": {
         "A": "Architectural tiers and versioned rule bundles serve related but different purposes.",

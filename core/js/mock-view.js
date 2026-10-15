@@ -70,7 +70,7 @@
     if (!current || examFinished || externalConflict) return;
     try {
       var value = {
-        name: current, answers: answers, checked: checked, remaining: remaining, durationMinutes:TIME_MIN
+        name: current, optionOrderVersion: 1, answers: answers, checked: checked, remaining: remaining, durationMinutes:TIME_MIN
       };
       if(attemptId)Object.assign(value,{mode:examMode,attemptId:attemptId,startedAt:startedAt,deadline:simulationEnd,signature:bankVersion,flags:flags,index:examNav?examNav.config.index:0,view:examNav?examNav.config.view:'list'});
       global.QuilynProgress.write(stateKey(), value);
@@ -201,11 +201,17 @@
   function startExam(name) {
     closeActions();
     var saved = loadState(name);
-    if(saved && saved.signature && global.QuilynJournal && saved.signature!==global.QuilynJournal.bankSignature(getTrack(),name,EXAMS[name])){
-      if(!global.QuilynProgress.archive(stateKey(name),saved))return;
+    if (saved && global.QuilynJournal) saved = global.QuilynJournal.migrateMockState(saved, EXAMS[name], global.QuilynJournal ? function(rows) {
+      return global.QuilynJournal.bankSignature(getTrack(),name,rows);
+    } : null);
+    if(saved && (saved.requiresContentReview || saved.signature && global.QuilynJournal && saved.signature!==global.QuilynJournal.bankSignature(getTrack(),name,EXAMS[name]))){
+      var recovery=Object.assign({},saved);delete recovery.requiresContentReview;
+      if(!global.QuilynProgress.archive(stateKey(name),recovery))return;
       if(!global.QuilynJournal.abandon(saved.attemptId))return;
       clearState(name);saved=null;
+      renderHome();
       q('bankDisclosure').textContent='This exam content changed. Older saved answers were archived in your backup; start a fresh attempt.';
+      return;
     }
     /* Only offer resume if the saved state matches the current question count */
     if (saved && saved.answers && saved.answers.length === EXAMS[name].length &&

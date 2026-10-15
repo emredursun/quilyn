@@ -45,6 +45,30 @@
     result.key=q.sourceModuleId&&q.sourceQuestionId?track+'/'+q.sourceModuleId+'/'+q.sourceQuestionId:track+'/mock/'+result.signature;
     return feedbackFields(result,q);
   }
+  // Numeric mock answers predate the one-time content rewrite. Map a copy so
+  // backups and stored originals remain intact until the resumed attempt saves.
+  function migrateMockState(saved, questions, bankSignature) {
+    if (!saved || saved.optionOrderVersion === 1 || saved.answers.length !== questions.length) return saved;
+    // An editorial correction can change answer meaning. Preserve the original
+    // attempt through recovery rather than reinterpret its checked answers.
+    if (questions.some(function(q) { return q.answerReviewVersion === 1; })) return Object.assign({},saved,{requiresContentReview:true});
+    var oldQuestions = questions.map(function(q) {
+      var order = q.previousOrder || q.o.map(function(_,i) { return i; });
+      var options = [];
+      order.forEach(function(old,i) { options[old] = q.o[i]; });
+      return Object.assign({},q,{o:options,a:q.a.map(function(i) { return order[i]; }).sort(function(a,b) { return a-b; })});
+    });
+    // An unrelated bank revision must keep using the existing recovery path.
+    if (saved.signature && (!bankSignature || saved.signature !== bankSignature(oldQuestions))) return saved;
+    if (saved.answers.some(function(row,i) { return row.some(function(a) { return a < 0 || a >= questions[i].o.length; }); })) return saved;
+    var next = Object.assign({},saved,{optionOrderVersion:1,answers:saved.answers.map(function(row,i) {
+      var order=questions[i].previousOrder;
+      return row.map(function(a) { return order ? order.indexOf(a) : a; });
+    })});
+    if (bankSignature) next.signature=bankSignature(questions);
+    return next;
+  }
+
   function bankSignature(track,name,questions){return JSON.stringify(questions.map(function(q,i){var s=mockQuestion(track,name,q,i);return [s.key,s.signature];}));}
   function questionKey(key){var parts=key.split('/');if(parts.length===3)parts[1]=global.QuilynProgress.moduleId(parts[0],parts[1]);return parts.join('/');}
   function record(meta,rows){
@@ -79,7 +103,7 @@
   function contentVersion(a){return JSON.stringify(a.rows.map(function(r){return [r.slot||r.snapshot.key,r.snapshot.signature];}).sort(function(a,b){return a[0].localeCompare(b[0]);}));}
   function score(a){return a.rows.filter(function(r){return equal(r.selected,r.snapshot.correct);}).length;}
   function feedbackHTML(s){
-    var detail=s.optionExplanations?'<details class="jl-feedback"><summary>Why each option fits or fails</summary><ul>'+s.options.map(function(o){return '<li><strong>'+esc(o.id)+' · '+(s.correct.includes(o.id)?'Correct':'Incorrect')+'</strong><p>'+esc(s.optionExplanations[o.id])+'</p></li>';}).join('')+'</ul>'+(s.explanationReviewedOn?'<p class="jl-meta">Explanation reviewed '+esc(s.explanationReviewedOn)+'</p>':'')+'</details>':'';
+    var detail=s.optionExplanations?'<details class="jl-feedback"><summary>Why each option fits or fails</summary><ul>'+s.options.map(function(o,i){return '<li><strong>'+esc(String.fromCharCode(65+i))+' · '+esc(o.text)+' · '+(s.correct.includes(o.id)?'Correct':'Incorrect')+'</strong><p>'+esc(s.optionExplanations[o.id])+'</p></li>';}).join('')+'</ul>'+(s.explanationReviewedOn?'<p class="jl-meta">Explanation reviewed '+esc(s.explanationReviewedOn)+'</p>':'')+'</details>':'';
     var lesson=s.moduleId?'<a class="jl-lesson-link" href="#'+encodeURIComponent(s.track)+'/'+encodeURIComponent(global.QuilynProgress.moduleId(s.track,s.moduleId))+'/guide'+(s.lessonSection?'/'+encodeURIComponent(s.lessonSection):'')+'">'+(s.lessonSection?'Review related lesson section':'Open lesson')+'</a>':'';
     return detail+lesson;
   }
@@ -123,5 +147,5 @@
     function changed(){if(config.disabled)return;draw();config.save(config);(config.view==='single'?nav:cards[config.index]).scrollIntoView({block:'start'});}
     draw();return {refresh:draw,disable:function(){config.disabled=true;draw();},config:config};
   }
-  global.QuilynJournal={id:id,abandon:abandon,valid:valid,record:record,read:read,quizQuestion:quizQuestion,mockQuestion:mockQuestion,bankSignature:bankSignature,feedbackHTML:feedbackHTML,validFeedback:validFeedback,mount:mount,examControls:examControls};
+  global.QuilynJournal={migrateMockState:migrateMockState,id:id,abandon:abandon,valid:valid,record:record,read:read,quizQuestion:quizQuestion,mockQuestion:mockQuestion,bankSignature:bankSignature,feedbackHTML:feedbackHTML,validFeedback:validFeedback,mount:mount,examControls:examControls};
 })(window);

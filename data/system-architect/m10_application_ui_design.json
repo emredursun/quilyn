@@ -142,7 +142,7 @@
           "type": "interactive",
           "title": "UI Design: Spot the Flaw",
           "height": 460,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Field Group vs View\", \"scenario\": \"An SA creates a new 'Shipping Details' Form View and adds Address, City, State, and ZIP code to it. They then configure the same group of fields again on two other Form Views for Billing and Returns. When Address format changes (adding a Suite field), they must update all three Views manually. What design flaw caused this maintenance burden?\", \"opts\": [\"The SA should have used a single reusable 'Address' View (Partial or Form) and referenced it from all three contexts — changing the Address View once would propagate to all three\", \"The SA should have used field groups within each View to organize the fields — field groups enable reuse across Views\", \"The issue is with Data Model design — the Address fields should be in a separate data object with a relationship so each View automatically gets updates\", \"The SA should have used Sections (Traditional UI) instead of Views — Sections support cross-View reuse unlike Constellation Views\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Views are designed for reuse. A single Address View referenced from Shipping, Billing, and Returns means one update propagates everywhere.\", \"✗ Incorrect. Field groups organize fields within a single View but are specific to that View — they do not enable reuse across different Views.\", \"✗ Incorrect. While a separate Address data object improves data reuse, it does not automatically update Views. The UI View still needs to be referenced consistently.\", \"✗ Incorrect. Sections are Traditional UI architecture (Theme Cosmos). In Constellation, Views provide the same cross-Case-Type reuse capability.\"]}, {\"label\": \"Supported control choices\", \"scenario\": \"A Picklist has only three choices. An SA selects radio-button presentation instead of a dropdown. Does this contradict model-driven UI?\", \"opts\": [\"No. Picklist metadata supports several controls; choose a supported presentation that fits the task.\", \"Yes. Every Picklist must always use a dropdown.\", \"Yes. Supported presentation choices remove all server validation.\", \"No. The field type can be ignored and any control is always supported.\"], \"correct\": 0, \"fbs\": [\"Correct. The model constrains supported choices while allowing configuration.\", \"A Picklist can also use search or radio presentation.\", \"A control choice does not remove server validation.\", \"Supported choices still depend on the field type and context.\"]}, {\"label\": \"Promoted Action Limit\", \"scenario\": \"A Case Type has 5 frequent Actions that users access regularly: 'Change Address', 'Add Note', 'Escalate', 'Request Callback', and 'Update Priority'. An SA tries to configure all 5 as promoted Actions (accessible from the Case header). Is this possible?\", \"opts\": [\"No — only ONE promoted Action is allowed per Case Type; the other frequent Actions should be accessible via the Actions menu, optional Actions, or Stages\", \"Yes — up to 5 promoted Actions can be configured per Case Type; the limit is 5 to prevent header clutter\", \"Yes — there is no limit on promoted Actions per Case Type; add as many as needed for user convenience\", \"No — promoted Actions are only for optional Actions; required Steps cannot be promoted regardless of frequency\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Exactly one promoted Action per Case Type is the Pega design constraint. Additional frequent Actions belong in the standard Actions menu or as Stage/Case-wide optional Actions.\", \"✗ Incorrect. The limit is ONE, not five. Configuring more than one is not supported by the platform.\", \"✗ Incorrect. There IS a limit — one per Case Type. Unlimited promoted Actions would clutter the Case header and defeat the purpose of 'promoted' (the single most important action).\", \"✗ Incorrect. The one-per-Case-Type limit applies to the configuration itself — the restriction is not about Action type (optional vs. required).\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Field Group vs View\",\n    \"scenario\": \"An SA creates a new 'Shipping Details' Form View and adds Address, City, State, and ZIP code to it. They then configure the same group of fields again on two other Form Views for Billing and Returns. When Address format changes (adding a Suite field), they must update all three Views manually. What design flaw caused this maintenance burden?\",\n    \"opts\": [\n      \"The SA should have used a single reusable 'Address' View (Partial or Form) and referenced it from all three contexts — changing the Address View once would propagate to all three\",\n      \"The SA should have used Sections (Traditional UI) instead of Views — Sections support cross-View reuse unlike Constellation Views\",\n      \"The SA should have used field groups within each View to organize the fields — field groups enable reuse across Views\",\n      \"The issue is with Data Model design — the Address fields should be in a separate data object with a relationship so each View automatically gets updates\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. Views are designed for reuse. A single Address View referenced from Shipping, Billing, and Returns means one update propagates everywhere.\",\n      \"✗ Incorrect. Sections are Traditional UI architecture (Theme Cosmos). In Constellation, Views provide the same cross-Case-Type reuse capability.\",\n      \"✗ Incorrect. Field groups organize fields within a single View but are specific to that View — they do not enable reuse across different Views.\",\n      \"✗ Incorrect. While a separate Address data object improves data reuse, it does not automatically update Views. The UI View still needs to be referenced consistently.\"\n    ]\n  },\n  {\n    \"label\": \"Supported control choices\",\n    \"scenario\": \"A Picklist has only three choices. An SA selects radio-button presentation instead of a dropdown. Does this contradict model-driven UI?\",\n    \"opts\": [\n      \"No. The field type can be ignored and any control is always supported.\",\n      \"Yes. Supported presentation choices remove all server validation.\",\n      \"Yes. Every Picklist must always use a dropdown.\",\n      \"No. Picklist metadata supports several controls; choose a supported presentation that fits the task.\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"Supported choices still depend on the field type and context.\",\n      \"A control choice does not remove server validation.\",\n      \"A Picklist can also use search or radio presentation.\",\n      \"Correct. The model constrains supported choices while allowing configuration.\"\n    ]\n  },\n  {\n    \"label\": \"Promoted Action Limit\",\n    \"scenario\": \"A Case Type has 5 frequent Actions that users access regularly: 'Change Address', 'Add Note', 'Escalate', 'Request Callback', and 'Update Priority'. An SA tries to configure all 5 as promoted Actions (accessible from the Case header). Is this possible?\",\n    \"opts\": [\n      \"No — promoted Actions are only for optional Actions; required Steps cannot be promoted regardless of frequency\",\n      \"No — only ONE promoted Action is allowed per Case Type; the other frequent Actions should be accessible via the Actions menu, optional Actions, or Stages\",\n      \"Yes — there is no limit on promoted Actions per Case Type; add as many as needed for user convenience\",\n      \"Yes — up to 5 promoted Actions can be configured per Case Type; the limit is 5 to prevent header clutter\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"✗ Incorrect. The one-per-Case-Type limit applies to the configuration itself — the restriction is not about Action type (optional vs. required).\",\n      \"✓ Correct. Exactly one promoted Action per Case Type is the Pega design constraint. Additional frequent Actions belong in the standard Actions menu or as Stage/Case-wide optional Actions.\",\n      \"✗ Incorrect. There IS a limit — one per Case Type. Unlimited promoted Actions would clutter the Case header and defeat the purpose of 'promoted' (the single most important action).\",\n      \"✗ Incorrect. The limit is ONE, not five. Configuring more than one is not supported by the platform.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-dfe0e0dc406b"
@@ -213,6 +213,10 @@
       "scenario": "A sales application must let customers use a self-service interface while employees use a work Portal. Where does an SA configure these application interfaces?",
       "options": [
         {
+          "id": "D",
+          "text": "Data Pages — each data source defines a separate application interface"
+        },
+        {
           "id": "A",
           "text": "Channels — configure the interfaces through which different users interact with the application"
         },
@@ -223,10 +227,6 @@
         {
           "id": "C",
           "text": "Case Life Cycle Stages — each Stage is a separate user interface channel"
-        },
-        {
-          "id": "D",
-          "text": "Data Pages — each data source defines a separate application interface"
         }
       ],
       "correctOptions": [
@@ -249,20 +249,20 @@
       "scenario": "An SA needs to add a custom navigation tab labeled 'My Tasks' to the portal so all users see it immediately upon login. Where is this configuration made?",
       "options": [
         {
-          "id": "A",
-          "text": "Portal configuration — add a landing page to Main navigation and configure the default landing page"
-        },
-        {
           "id": "B",
           "text": "Theme — change navigation colors and fonts to create a new menu item"
+        },
+        {
+          "id": "D",
+          "text": "A Data Page — change the data source to add a Portal menu item"
         },
         {
           "id": "C",
           "text": "Form View — add a field to a task form to create global Portal navigation"
         },
         {
-          "id": "D",
-          "text": "A Data Page — change the data source to add a Portal menu item"
+          "id": "A",
+          "text": "Portal configuration — add a landing page to Main navigation and configure the default landing page"
         }
       ],
       "correctOptions": [
@@ -285,20 +285,20 @@
       "scenario": "A customer opens the same Constellation Lost Card form on a phone and a desktop browser. What normally adapts the form layout to the smaller screen?",
       "options": [
         {
-          "id": "A",
-          "text": "Responsive View templates — the prescribed layout adjusts to the available screen width"
-        },
-        {
           "id": "B",
           "text": "A mobile-only Stage — duplicate the workflow Stage for every phone size"
         },
         {
-          "id": "C",
-          "text": "A new Case Type — duplicate the Case Type for every device breakpoint"
-        },
-        {
           "id": "D",
           "text": "A Data Page — the data source changes the screen dimensions"
+        },
+        {
+          "id": "A",
+          "text": "Responsive View templates — the prescribed layout adjusts to the available screen width"
+        },
+        {
+          "id": "C",
+          "text": "A new Case Type — duplicate the Case Type for every device breakpoint"
         }
       ],
       "correctOptions": [
@@ -321,20 +321,20 @@
       "scenario": "A BA asks: 'What is the fundamental purpose of a View in Pega?' Which answer is correct?",
       "options": [
         {
-          "id": "A",
-          "text": "A View defines the visual layout and the fields presented to a user within a UI screen or form"
-        },
-        {
-          "id": "B",
-          "text": "A View stores the business logic (validation, assignments) triggered when a user interacts with a field"
+          "id": "D",
+          "text": "A View caches the data displayed on a form so the screen loads without re-querying the data source"
         },
         {
           "id": "C",
           "text": "A View is a Pega security artifact that controls which fields a user role can read or modify"
         },
         {
-          "id": "D",
-          "text": "A View caches the data displayed on a form so the screen loads without re-querying the data source"
+          "id": "B",
+          "text": "A View stores the business logic (validation, assignments) triggered when a user interacts with a field"
+        },
+        {
+          "id": "A",
+          "text": "A View defines the visual layout and the fields presented to a user within a UI screen or form"
         }
       ],
       "correctOptions": [
@@ -357,16 +357,16 @@
       "scenario": "A Constellation form has a two-column grid. The grid contains: a single-line text field, a currency field, a rich text editor for comments, and a date picker. The designer asks: 'Which control breaks out of the two-column constraint and spans the full width?' Which is correct and why?",
       "options": [
         {
-          "id": "A",
-          "text": "The Rich Text Editor spans both columns because it requires more vertical/horizontal space and is in the 'wider input' category that Constellation treats as full-width"
+          "id": "C",
+          "text": "The Date picker spans both columns because it renders a calendar overlay that requires full-width positioning to display without clipping"
         },
         {
           "id": "B",
           "text": "The Currency field spans both columns because monetary values need wider formatting to display correctly in all locales"
         },
         {
-          "id": "C",
-          "text": "The Date picker spans both columns because it renders a calendar overlay that requires full-width positioning to display without clipping"
+          "id": "A",
+          "text": "The Rich Text Editor spans both columns because it requires more vertical/horizontal space and is in the 'wider input' category that Constellation treats as full-width"
         },
         {
           "id": "D",
@@ -397,16 +397,16 @@
           "text": "The Full Page View — the Case framework containing read-only information and configured panels"
         },
         {
-          "id": "B",
-          "text": "The task Form View — the editable form for completing an Assignment"
+          "id": "D",
+          "text": "The Portal landing page — a list or dashboard rather than the opened Case"
         },
         {
           "id": "C",
           "text": "The Confirmation View — feedback after submitting an Assignment"
         },
         {
-          "id": "D",
-          "text": "The Portal landing page — a list or dashboard rather than the opened Case"
+          "id": "B",
+          "text": "The task Form View — the editable form for completing an Assignment"
         }
       ],
       "correctOptions": [
@@ -465,20 +465,20 @@
       "scenario": "An SA marks a field Required: Always in a Constellation form. A user leaves it empty while interacting with the form. Which behavior helps the user correct the missing value?",
       "options": [
         {
-          "id": "A",
-          "text": "Client-side validation shows an inline required-field error associated with the field"
-        },
-        {
           "id": "B",
           "text": "A Channel replaces the Case workflow with another workflow"
         },
         {
-          "id": "C",
-          "text": "The Data Page automatically invents a valid value for the missing field"
+          "id": "A",
+          "text": "Client-side validation shows an inline required-field error associated with the field"
         },
         {
           "id": "D",
           "text": "A Field Group bypasses all validation for its contained fields"
+        },
+        {
+          "id": "C",
+          "text": "The Data Page automatically invents a valid value for the missing field"
         }
       ],
       "correctOptions": [
@@ -501,20 +501,20 @@
       "scenario": "An SA opens a Case Type's Data Model in App Studio. She notices that 'Label' and 'Description' have a star/badge marking them as Primary. A junior BA asks: 'What does Primary mean here, and what happens automatically because of that designation?' What is the correct explanation?",
       "options": [
         {
-          "id": "A",
-          "text": "Primary Fields are automatically included on the Create, Edit, and Details Views without any manual View configuration — marking a field Primary ensures it appears on standard Views without explicit placement"
+          "id": "C",
+          "text": "Primary Fields are displayed in the sidebar summary panel only — they appear as a quick-view list of key Case attributes without being on any editable form"
         },
         {
           "id": "B",
           "text": "Primary Fields are mandatory (required) fields — marking a field Primary adds a required validation that prevents the Case from advancing if the field is empty"
         },
         {
-          "id": "C",
-          "text": "Primary Fields are displayed in the sidebar summary panel only — they appear as a quick-view list of key Case attributes without being on any editable form"
-        },
-        {
           "id": "D",
           "text": "Primary Fields are indexed in the Pega database for faster search — the designation improves query performance for Cases with many field properties"
+        },
+        {
+          "id": "A",
+          "text": "Primary Fields are automatically included on the Create, Edit, and Details Views without any manual View configuration — marking a field Primary ensures it appears on standard Views without explicit placement"
         }
       ],
       "correctOptions": [
@@ -573,20 +573,20 @@
       "scenario": "During a design review an SA explains that Views should only define layout and field presentation, not business logic. A developer disagrees, saying the Submit button's action flow should be embedded in the View itself. Who is correct and why?",
       "options": [
         {
-          "id": "A",
-          "text": "Keep presentation in Views and configure workflow processing with the appropriate Automations and Rules"
-        },
-        {
-          "id": "B",
-          "text": "The developer — embedding action flows in the View collocates the trigger and the logic, reducing configuration steps"
-        },
-        {
           "id": "C",
           "text": "Both — Pega allows business logic to be defined either in the View or in a separate Automation depending on complexity"
         },
         {
           "id": "D",
           "text": "Neither — business logic in Pega must always be defined in the Case Life Cycle Stage, not in Views or Automations"
+        },
+        {
+          "id": "A",
+          "text": "Keep presentation in Views and configure workflow processing with the appropriate Automations and Rules"
+        },
+        {
+          "id": "B",
+          "text": "The developer — embedding action flows in the View collocates the trigger and the logic, reducing configuration steps"
         }
       ],
       "correctOptions": [
@@ -609,6 +609,10 @@
       "scenario": "An SA edits a Full Page View in App Studio and sees placeholder text. How should she inspect the UI with actual Case data?",
       "options": [
         {
+          "id": "D",
+          "text": "Change the theme to retrieve the last saved Case"
+        },
+        {
           "id": "A",
           "text": "Run a Case instance and inspect the rendered interface"
         },
@@ -619,10 +623,6 @@
         {
           "id": "C",
           "text": "Toggle read-only mode to create live Case data"
-        },
-        {
-          "id": "D",
-          "text": "Change the theme to retrieve the last saved Case"
         }
       ],
       "correctOptions": [
@@ -649,16 +649,16 @@
           "text": "A Form View for the Step, used to collect task data"
         },
         {
+          "id": "D",
+          "text": "A Portal landing page unrelated to the Step"
+        },
+        {
           "id": "B",
           "text": "A read-only Partial View as the Step’s standalone editing form"
         },
         {
           "id": "C",
           "text": "A List View that automatically completes every Assignment"
-        },
-        {
-          "id": "D",
-          "text": "A Portal landing page unrelated to the Step"
         }
       ],
       "correctOptions": [
@@ -681,20 +681,20 @@
       "scenario": "In a Constellation form, an upload field should be shown only when Attach supporting documents is selected. Which configuration fits?",
       "options": [
         {
-          "id": "A",
-          "text": "A Visibility condition on the upload field, based on the checkbox value"
-        },
-        {
-          "id": "B",
-          "text": "A Channel that reroutes each checkbox click to another application"
-        },
-        {
           "id": "C",
           "text": "A submit Action that adds the upload field only after the form has closed"
         },
         {
           "id": "D",
           "text": "A Data Page that defines the complete form layout"
+        },
+        {
+          "id": "B",
+          "text": "A Channel that reroutes each checkbox click to another application"
+        },
+        {
+          "id": "A",
+          "text": "A Visibility condition on the upload field, based on the checkbox value"
         }
       ],
       "correctOptions": [
@@ -717,16 +717,16 @@
       "scenario": "Shipping, Billing and Returns need the same address presentation in a Constellation application. Why embed a reusable Address View instead of copying the fields three times?",
       "options": [
         {
+          "id": "C",
+          "text": "Views cannot be reused across Case Types in the application"
+        },
+        {
           "id": "A",
           "text": "A shared View definition reduces duplicated presentation configuration and centralizes maintenance"
         },
         {
           "id": "B",
           "text": "Each embedding creates an unrelated permanent copy, so reuse has no maintenance benefit"
-        },
-        {
-          "id": "C",
-          "text": "Views cannot be reused across Case Types in the application"
         },
         {
           "id": "D",
@@ -753,16 +753,16 @@
       "scenario": "A designer asks how a Constellation form adapts to different screen sizes without creating a View for every breakpoint. What should the SA describe?",
       "options": [
         {
-          "id": "A",
-          "text": "Constellation’s responsive templates and prescribed UI patterns"
-        },
-        {
           "id": "B",
           "text": "A manual Channel-to-pixel-width mapping for every screen resolution"
         },
         {
           "id": "C",
           "text": "A Data Page that decides browser viewport dimensions"
+        },
+        {
+          "id": "A",
+          "text": "Constellation’s responsive templates and prescribed UI patterns"
         },
         {
           "id": "D",
@@ -797,12 +797,12 @@
           "text": "Embed every product permanently in the View definition regardless of category"
         },
         {
-          "id": "C",
-          "text": "Use a Channel to convert every character typed into a separate workflow Stage"
-        },
-        {
           "id": "D",
           "text": "Change the Case’s Ruleset version whenever the category changes"
+        },
+        {
+          "id": "C",
+          "text": "Use a Channel to convert every character typed into a separate workflow Stage"
         }
       ],
       "correctOptions": [
@@ -825,20 +825,20 @@
       "scenario": "An SA's mentor reviews UI work and notes: 'You've placed assignment-advancing business logic inside a View. What should you do instead?' What is the correct approach?",
       "options": [
         {
-          "id": "A",
-          "text": "Keep presentation in Views and configure workflow processing with the appropriate Automations and Rules"
-        },
-        {
-          "id": "B",
-          "text": "Keep it in the View but add a comment explaining why it is there, so future developers know it is intentional"
-        },
-        {
           "id": "C",
           "text": "Move it into the Data Page — Data Pages are the correct container for any logic that fires when a user submits a form"
         },
         {
           "id": "D",
           "text": "Duplicate it into both the View and an Automation so the logic runs regardless of which path the user takes"
+        },
+        {
+          "id": "B",
+          "text": "Keep it in the View but add a comment explaining why it is there, so future developers know it is intentional"
+        },
+        {
+          "id": "A",
+          "text": "Keep presentation in Views and configure workflow processing with the appropriate Automations and Rules"
         }
       ],
       "correctOptions": [
@@ -861,20 +861,20 @@
       "scenario": "Which TWO statements distinguish the overall Constellation Case interface from the View for a user task?",
       "options": [
         {
-          "id": "A",
-          "text": "The Full Page View provides the overall interface for an individual Case"
+          "id": "D",
+          "text": "A read-only Partial View is the editable top-level form generated for every Step"
         },
         {
           "id": "B",
           "text": "Configuring a Step View from Workflow creates a Form View for that task"
         },
         {
-          "id": "C",
-          "text": "The Full Page View and task Form View have identical roles and configuration"
+          "id": "A",
+          "text": "The Full Page View provides the overall interface for an individual Case"
         },
         {
-          "id": "D",
-          "text": "A read-only Partial View is the editable top-level form generated for every Step"
+          "id": "C",
+          "text": "The Full Page View and task Form View have identical roles and configuration"
         }
       ],
       "correctOptions": [
@@ -902,16 +902,16 @@
           "text": "Constellation selects the appropriate UI control automatically based on the field's data type"
         },
         {
+          "id": "D",
+          "text": "Model-driven UI applies only to List Views and has no effect on Form Views"
+        },
+        {
           "id": "B",
           "text": "A Date field automatically renders as a date-picker control without manual configuration"
         },
         {
           "id": "C",
           "text": "Developers must manually assign a UI control to every field regardless of field type"
-        },
-        {
-          "id": "D",
-          "text": "Model-driven UI applies only to List Views and has no effect on Form Views"
         }
       ],
       "correctOptions": [
@@ -935,20 +935,20 @@
       "scenario": "A business analyst asks how Form Views differ from List Views in a Pega Constellation application. Which TWO statements are correct?",
       "options": [
         {
-          "id": "A",
-          "text": "Form Views allow users to enter and edit field data for a single record"
+          "id": "C",
+          "text": "Form Views display multiple records side-by-side for comparison"
         },
         {
           "id": "B",
           "text": "List Views display multiple records in a tabular or grid format"
         },
         {
-          "id": "C",
-          "text": "Form Views display multiple records side-by-side for comparison"
-        },
-        {
           "id": "D",
           "text": "List Views support full inline editing by default in Constellation"
+        },
+        {
+          "id": "A",
+          "text": "Form Views allow users to enter and edit field data for a single record"
         }
       ],
       "correctOptions": [
@@ -972,20 +972,20 @@
       "scenario": "An SA is configuring Primary Fields on a Vehicle data object. Which TWO statements correctly describe how Primary Fields behave in Pega App Studio?",
       "options": [
         {
-          "id": "A",
-          "text": "Primary Fields identify important descriptive fields on the data object"
-        },
-        {
           "id": "B",
           "text": "Designated Primary Fields automatically populate standard Views such as Create, Edit and Details"
+        },
+        {
+          "id": "D",
+          "text": "Making a field Primary moves its stored value from the data object onto the Case Type"
         },
         {
           "id": "C",
           "text": "Primary Fields are required in every custom View regardless of task context"
         },
         {
-          "id": "D",
-          "text": "Making a field Primary moves its stored value from the data object onto the Case Type"
+          "id": "A",
+          "text": "Primary Fields identify important descriptive fields on the data object"
         }
       ],
       "correctOptions": [
@@ -1009,16 +1009,16 @@
       "scenario": "A Constellation developer defines a Picklist field. Which TWO statements describe the relationship between the model and the control?",
       "options": [
         {
+          "id": "C",
+          "text": "Every field requires a manually coded UI component"
+        },
+        {
           "id": "A",
           "text": "The field type determines the supported presentation choices"
         },
         {
           "id": "B",
           "text": "A Picklist can use dropdown, search or radio-button presentation as appropriate"
-        },
-        {
-          "id": "C",
-          "text": "Every field requires a manually coded UI component"
         },
         {
           "id": "D",

@@ -109,7 +109,7 @@ test('reviewed PBA questions have complete feedback and real lesson targets',()=
  }
  assert.equal(count,293);
  const d=JSON.parse(fs.readFileSync('data/business-architect/m03_pega_center_out_architecture.json'));
- assert.match(d.practiceQuiz[13].options[0].text,/evaluate/);
+ assert.match(d.practiceQuiz[13].options.find(o=>o.id==='A').text,/evaluate/);
  assert.match(d.studyGuide[5].elements[0].description,/evaluation/);
  assert.ok(!JSON.stringify(d).includes('automatically brings all consuming applications into compliance'));
 });
@@ -124,17 +124,17 @@ test('PSA foundation feedback resolves to real sections and preserves the review
 });
 test('PSA draft, naming and access questions avoid the reviewed misleading claims',()=>{
  const d=JSON.parse(fs.readFileSync('data/system-architect/m02_defining_customer_microjourney.json'));
- const draft=d.practiceQuiz.find(q=>q.questionId==='m02_q20');assert.doesNotMatch(draft.options[0].text,/without.*live application/);assert.match(draft.options[1].text,/before.*production/);assert.match(draft.rationale,/not a deployment isolation/);
+ const draft=d.practiceQuiz.find(q=>q.questionId==='m02_q20');assert.doesNotMatch(draft.options.find(o=>o.id==='A').text,/without.*live application/);assert.match(draft.options.find(o=>o.id==='B').text,/before.*production/);assert.match(draft.rationale,/not a deployment isolation/);
  const naming=d.practiceQuiz.find(q=>q.questionId==='m02_q12');assert.match(naming.scenario,/Process = 'Review documents'/);assert.match(naming.rationale,/verb\+noun/);
- const users=JSON.parse(fs.readFileSync('data/system-architect/m03_inviting_users_to_application.json'));assert.match(users.practiceQuiz[15].options[0].text,/individual user.*People tab/);assert.doesNotMatch(users.practiceQuiz[15].options[1].text,/includes.*Persona/);
+ const users=JSON.parse(fs.readFileSync('data/system-architect/m03_inviting_users_to_application.json'));assert.match(users.practiceQuiz[15].options.find(o=>o.id==='A').text,/individual user.*People tab/);assert.doesNotMatch(users.practiceQuiz[15].options.find(o=>o.id==='B').text,/includes.*Persona/);
 });
 
 test('PSA Center-out, GenAI and Blueprint feedback has complete, real lesson targets',()=>{
  const registry=JSON.parse(fs.readFileSync('data/registry.json'));let count=0;
  for(const m of registry.tracks.find(t=>t.trackId==='PSA').modules.slice(3,6)){const d=JSON.parse(fs.readFileSync(m.file)),ids=new Set(d.studyGuide.map(s=>s.sectionId));for(const q of d.practiceQuiz){count++;assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,['SA-M04','SA-M05','SA-M06'].includes(m.id)?'2026-10-05':'2026-10-02');}}
  assert.equal(count,49);
- const center=JSON.parse(fs.readFileSync(registry.tracks.find(t=>t.trackId==='PSA').modules[3].file));assert.match(center.practiceQuiz[7].options[1].text,/testing remains necessary/);assert.match(center.practiceQuiz[13].options[0].text,/validate/);
- const genai=JSON.parse(fs.readFileSync(registry.tracks.find(t=>t.trackId==='PSA').modules[4].file));assert.match(genai.practiceQuiz[14].options[0].text,/individual features/);assert.doesNotMatch(genai.practiceQuiz[14].rationale,/cannot access any/);
+ const center=JSON.parse(fs.readFileSync(registry.tracks.find(t=>t.trackId==='PSA').modules[3].file));assert.match(center.practiceQuiz[7].options.find(o=>o.id==='B').text,/testing remains necessary/);assert.match(center.practiceQuiz[13].options.find(o=>o.id==='A').text,/validate/);
+ const genai=JSON.parse(fs.readFileSync(registry.tracks.find(t=>t.trackId==='PSA').modules[4].file));assert.match(genai.practiceQuiz[14].options.find(o=>o.id==='A').text,/individual features/);assert.doesNotMatch(genai.practiceQuiz[14].rationale,/cannot access any/);
 });
 
 test('PSA data feedback has real targets and distinguishes ownership, cardinality and caching',()=>{
@@ -143,8 +143,8 @@ test('PSA data feedback has real targets and distinguishes ownership, cardinalit
  assert.equal(count,54);
  const rel=JSON.parse(fs.readFileSync('data/system-architect/m09_creating_a_data_relationship.json'));
  assert.match(rel.practiceQuiz[1].scenario,/delivery address/);assert.doesNotMatch(rel.practiceQuiz[1].scenario,/CVV/);
- assert.match(rel.practiceQuiz[8].rationale,/not a security boundary/);assert.doesNotMatch(rel.practiceQuiz[8].options[0].text,/cannot be accessed/);
- assert.doesNotMatch(rel.practiceQuiz[4].rationale,/retrieves a single record, not/);assert.match(rel.practiceQuiz[18].options[1].text,/List of records/);
+ assert.match(rel.practiceQuiz[8].rationale,/not a security boundary/);assert.doesNotMatch(rel.practiceQuiz[8].options.find(o=>o.id==='A').text,/cannot be accessed/);
+ assert.doesNotMatch(rel.practiceQuiz[4].rationale,/retrieves a single record, not/);assert.match(rel.practiceQuiz[18].options.find(o=>o.id==='B').text,/List of records/);
  const data=JSON.parse(fs.readFileSync('data/system-architect/m08_the_data_model.json'));assert.match(data.practiceQuiz[5].scenario,/configured to a system of record/);assert.match(data.practiceQuiz[16].rationale,/refresh and invalidation/);
 });
 
@@ -156,10 +156,10 @@ test('PSA UI, guidance and routing review has complete feedback and current sour
   for(const q of d.practiceQuiz){count++;assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.deepEqual(q.correctOptions,q.type==='multi-select'?['A','B']:['A']);}
  }assert.equal(count,55);
  const ui=JSON.parse(fs.readFileSync(modules[0].file)),guidance=JSON.parse(fs.readFileSync(modules[1].file)),routing=JSON.parse(fs.readFileSync(modules[2].file));
- assert.match(ui.practiceQuiz[18].options[1].text,/Form View/);assert.doesNotMatch(JSON.stringify(ui),/Full Page views.*assigned directly|DEPTH LIMIT|Cosmos React/);
+ assert.match(ui.practiceQuiz[18].options.find(o=>o.id==='B').text,/Form View/);assert.doesNotMatch(JSON.stringify(ui),/Full Page views.*assigned directly|DEPTH LIMIT|Cosmos React/);
  assert.match(ui.studyGuide.find(s=>s.sectionTitle==='Model-driven UI Controls').elements[0].description,/supported/);
- assert.match(guidance.practiceQuiz[16].options[0].text,/New, Open, Pending and Resolved/);assert.match(guidance.practiceQuiz[15].options[1].text,/configured/);
- assert.match(routing.practiceQuiz[10].options[0].text,/preceding task/);assert.match(routing.practiceQuiz[5].options[0].text,/Roles/);assert.doesNotMatch(JSON.stringify(routing),/would create 25 separate|creates 30 separate/);
+ assert.match(guidance.practiceQuiz[16].options.find(o=>o.id==='A').text,/New, Open, Pending and Resolved/);assert.match(guidance.practiceQuiz[15].options.find(o=>o.id==='B').text,/configured/);
+ assert.match(routing.practiceQuiz[10].options.find(o=>o.id==='A').text,/preceding task/);assert.match(routing.practiceQuiz[5].options.find(o=>o.id==='A').text,/Roles/);assert.doesNotMatch(JSON.stringify(routing),/would create 25 separate|creates 30 separate/);
 });
 
 test('approval review keeps answer identities, complete feedback and evidence for the local content',()=>{
@@ -170,8 +170,8 @@ test('approval review keeps answer identities, complete feedback and evidence fo
   d.practiceQuiz.forEach((q,i)=>{count++;assert.equal(q.questionId,'m'+(13+index)+'_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,index===0&&i>=12||index===1&&[7,12,13].includes(i)?['A','B']:['A']);assert.ok(sections.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,'2026-10-02');});
  });assert.equal(count,29);
  const approval=JSON.parse(fs.readFileSync(modules[0].file)),cascade=JSON.parse(fs.readFileSync(modules[1].file));
- assert.match(approval.practiceQuiz[0].options[0].text,/shared Work Queue/);assert.match(approval.practiceQuiz[7].options[0].text,/Resolved-Rejected/);
- assert.match(approval.practiceQuiz[4].options[0].text,/Reject flow/);assert.doesNotMatch(JSON.stringify(approval.studyGuide),/auto-approve|Three approval actions|default is to return/);
+ assert.match(approval.practiceQuiz[0].options.find(o=>o.id==='A').text,/shared Work Queue/);assert.match(approval.practiceQuiz[7].options.find(o=>o.id==='A').text,/Resolved-Rejected/);
+ assert.match(approval.practiceQuiz[4].options.find(o=>o.id==='A').text,/Reject flow/);assert.doesNotMatch(JSON.stringify(approval.studyGuide),/auto-approve|Three approval actions|default is to return/);
  assert.match(cascade.practiceQuiz[11].scenario,/reporting-structure/);assert.match(cascade.practiceQuiz[13].optionExplanations.B,/not assume arbitrary middle tiers/);
  assert.match(cascade.studyGuide[2].elements[0].description,/Data Page, Activity or Data Transform/);
  assert.doesNotMatch(JSON.stringify(cascade),/authority matrix traverses|can be configured in App Studio|not an\./);
@@ -190,7 +190,7 @@ test('SLA feedback separates configured actions and Case inheritance from task u
  const crypto=require('node:crypto'),file='data/system-architect/m15_completing_work_on_time.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M15');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
  assert.equal(d.practiceQuiz.length,15);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m15_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[1].scenario,/no resolution action/);assert.match(d.practiceQuiz[9].scenario,/no resolution action/);assert.match(d.practiceQuiz[11].options[0].text,/passed deadline interval 3 days, one event/);
+ assert.match(d.practiceQuiz[1].scenario,/no resolution action/);assert.match(d.practiceQuiz[9].scenario,/no resolution action/);assert.match(d.practiceQuiz[11].options.find(o=>o.id==='A').text,/passed deadline interval 3 days, one event/);
  assert.match(d.studyGuide[1].elements[1].description,/existing Assignment’s own SLA/);assert.match(d.practiceQuiz[14].scenario,/milestones/);
  assert.doesNotMatch(JSON.stringify(d),/not at data or\.|Urgency only goes up, never down|goal, additional interval|changing an SLA's Urgency increment affects/);
 });
@@ -208,7 +208,7 @@ test('team editorial review preserves keys and replaces unsupported management c
  const crypto=require('node:crypto'),file='data/system-architect/m18_creating_managing_teams_users.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M18');
  assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m18_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[5,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[9].options[0].text,/Authorized managers on the Work Group tab/);assert.match(d.practiceQuiz[11].scenario,/Roles restriction configured/);assert.match(d.practiceQuiz[13].options[1].text,/not required to belong/);
+ assert.match(d.practiceQuiz[9].options.find(o=>o.id==='A').text,/Authorized managers on the Work Group tab/);assert.match(d.practiceQuiz[11].scenario,/Roles restriction configured/);assert.match(d.practiceQuiz[13].options.find(o=>o.id==='B').text,/not required to belong/);
  assert.doesNotMatch(JSON.stringify(d),/scoped per Case Type|operator belongs to one Work Group|Deputy WGM field|requires a manager to manually act/);
 });
 
@@ -216,7 +216,7 @@ test('parallel development editorial review separates integration from release a
  const crypto=require('node:crypto'),file='data/system-architect/m19_team_application_development.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M19');
  assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.platformVersion,"Pega Platform '25");
  assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m19_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[4,10,12].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[11].options[0].text,/integration, before release/);assert.match(d.studyGuide[1].elements[4].caption,/deployment guarantee/);assert.match(d.examPitfalls[5].bestPractice,/Approval is a separate/);
+ assert.match(d.practiceQuiz[11].options.find(o=>o.id==='A').text,/integration, before release/);assert.match(d.studyGuide[1].elements[4].caption,/deployment guarantee/);assert.match(d.examPitfalls[5].bestPractice,/Approval is a separate/);
  assert.doesNotMatch(JSON.stringify(d),/PREREQUISITE: Lock|unlocked Ruleset cannot be branched|all must pass|all delivery-phase roles who join after/);
 });
 
@@ -224,7 +224,7 @@ test('Pulse editorial review keeps notification preferences explicit and avoids 
  const crypto=require('node:crypto'),file='data/system-architect/m20_collaboration_with_users.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M20');
  assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m20_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[3,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[9].scenario,/chosen Pulse email/);assert.match(d.practiceQuiz[9].options[0].text,/email notification/);assert.match(d.practiceQuiz[11].options[0].text,/dialog listing Cases/);assert.match(d.practiceQuiz[13].options[1].text,/comment/);
+ assert.match(d.practiceQuiz[9].scenario,/chosen Pulse email/);assert.match(d.practiceQuiz[9].options.find(o=>o.id==='A').text,/email notification/);assert.match(d.practiceQuiz[11].options.find(o=>o.id==='A').text,/dialog listing Cases/);assert.match(d.practiceQuiz[13].options.find(o=>o.id==='B').text,/comment/);
  assert.doesNotMatch(JSON.stringify(d),/permanent case history data|persist as long as the case exists|not external email by default|original CSR loses access/);
 });
 
@@ -232,7 +232,7 @@ test('reuse editorial review aligns principles and avoids integration guarantees
  const crypto=require('node:crypto'),file='data/system-architect/m21_modular_architecture_enterprise_reuse.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M21');
  assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.platformVersion,"Pega Platform '25");
  assert.equal(d.practiceQuiz.length,16);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m21_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[0,5].includes(i)?['A','B','C']:[10,15].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[1].elements[5].caption,/Interoperable, Updateable, Configurable, Modular and Governed/);assert.match(d.practiceQuiz[1].hint,/not the complete rule-resolution/);assert.match(d.practiceQuiz[15].options[1].text,/governed compatibility/);
+ assert.match(d.studyGuide[1].elements[5].caption,/Interoperable, Updateable, Configurable, Modular and Governed/);assert.match(d.practiceQuiz[1].hint,/not the complete rule-resolution/);assert.match(d.practiceQuiz[15].options.find(o=>o.id==='B').text,/governed compatibility/);
  assert.doesNotMatch(JSON.stringify(d),/first matching rule wins|Single, Maximize, Manage, Build|Division → Region → Channel → Product|thresholds directly in App Studio/);
 });
 
@@ -240,7 +240,7 @@ test('Rule creation review corrects version increments and prefix inheritance',(
  const crypto=require('node:crypto'),file='data/system-architect/m22_creating_a_rule.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M22');
  assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  assert.equal(d.practiceQuiz.length,22);d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m22_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,i===2?['C']:[4,18,19,20,21].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[3].elements[4].description,/timestamp normalized to GMT/);assert.match(d.studyGuide[2].elements[3].caption,/patch increment/);assert.match(d.practiceQuiz[18].options[0].text,/Application Layer/);assert.match(d.practiceQuiz[18].options[1].text,/directly from @baseclass/);
+ assert.match(d.studyGuide[3].elements[4].description,/timestamp normalized to GMT/);assert.match(d.studyGuide[2].elements[3].caption,/patch increment/);assert.match(d.practiceQuiz[18].options.find(o=>o.id==='A').text,/Application Layer/);assert.match(d.practiceQuiz[18].options.find(o=>o.id==='B').text,/directly from @baseclass/);
  assert.doesNotMatch(JSON.stringify(d),/inherits from Work because|Only the major version number matters|checking in the earlier version|Promoted via Guardrails/);
 });
 
@@ -256,7 +256,7 @@ test('Automation review scopes system actions and corrects ambiguous stage and u
  const crypto=require('node:crypto'),file='data/system-architect/m24_automation_shapes_case_life_cycle.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M24');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'20 min');
  assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===4?['A','B','C']:[11,12].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[0].scenario,/generation.*supported/);assert.match(d.practiceQuiz[8].scenario,/Run Data Transform/);assert.doesNotMatch(d.practiceQuiz[9].scenario,/not only the current/);assert.match(d.practiceQuiz[11].options[3].text,/previously visited.*next Stage/);assert.match(d.studyGuide[0].elements[0].description,/Questionnaire/);
+ assert.match(d.practiceQuiz[0].scenario,/generation.*supported/);assert.match(d.practiceQuiz[8].scenario,/Run Data Transform/);assert.doesNotMatch(d.practiceQuiz[9].scenario,/not only the current/);assert.match(d.practiceQuiz[11].options.find(o=>o.id==='D').text,/previously visited.*next Stage/);assert.match(d.studyGuide[0].elements[0].description,/Questionnaire/);
  assert.doesNotMatch(JSON.stringify(d),/all run automatically, no Assignment|SYSTEM-EXECUTED, NO ASSIGNMENT|CREATE CASE — creates child Cases|always cascades to child Cases automatically.*Correct/);
 });
 
@@ -264,7 +264,7 @@ test('Process-modeling review corrects swapped colors and distinguishes End from
  const crypto=require('node:crypto'),file='data/system-architect/m25_automating_workflow_decisions.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M25');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.platformVersion,"Pega Platform '25");
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=11?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[12].options[0].text,/green rectangle.*Subprocess.*blue rectangle/);assert.match(d.practiceQuiz[8].rationale,/not inherently the whole Case/);assert.match(d.practiceQuiz[13].rationale,/not a promise/);
+ assert.match(d.practiceQuiz[12].options.find(o=>o.id==='A').text,/green rectangle.*Subprocess.*blue rectangle/);assert.match(d.practiceQuiz[8].rationale,/not inherently the whole Case/);assert.match(d.practiceQuiz[13].rationale,/not a promise/);
  assert.doesNotMatch(JSON.stringify(d),/blue for Assignment steps|green for Subprocess steps|original flow does NOT resume|Utility Action \(reusable|End shape resolves the Case|exactly one green Start/);
 });
 
@@ -272,7 +272,7 @@ test('calculation review corrects category diagram and explains ordered conditio
  const crypto=require('node:crypto'),file='data/system-architect/m26_calculating_fields_decision_tables.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M26');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'25 min');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=11?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[1].elements[3].description,/first row.*otherwise/);assert.match(d.practiceQuiz[13].options[0].text,/aggregate choices/);assert.match(d.practiceQuiz[3].scenario,/including its quantity/);assert.match(d.practiceQuiz[4].scenario,/comparable numeric monetary/);
+ assert.match(d.studyGuide[1].elements[3].description,/first row.*otherwise/);assert.match(d.practiceQuiz[13].options.find(o=>o.id==='A').text,/aggregate choices/);assert.match(d.practiceQuiz[3].scenario,/including its quantity/);assert.match(d.practiceQuiz[4].scenario,/comparable numeric monetary/);
  assert.doesNotMatch(JSON.stringify(d),/Default Value \(once at creation\)|Sum, Count, Average|Expressions are supported only.*Double|tables can return any data type|built-in operations like @Sum/);assert.ok(d.topics.some(t=>t.url.includes('calculated-values/v6')));
 });
 
@@ -280,7 +280,7 @@ test('Decision Rule review allows multi-column tables and scopes conflict and de
  const crypto=require('node:crypto'),file='data/system-architect/m27_decision_tables_and_trees.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M27');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[0].elements[0].description,/different columns may test different fields/);assert.match(d.practiceQuiz[0].scenario,/already has authorized/);assert.match(d.practiceQuiz[3].rationale,/not a requirement/);assert.match(d.practiceQuiz[13].options[0].text,/unreachable.*earlier broader/);
+ assert.match(d.studyGuide[0].elements[0].description,/different columns may test different fields/);assert.match(d.practiceQuiz[0].scenario,/already has authorized/);assert.match(d.practiceQuiz[3].rationale,/not a requirement/);assert.match(d.practiceQuiz[13].options.find(o=>o.id==='A').text,/unreachable.*earlier broader/);
  assert.doesNotMatch(JSON.stringify(d),/Different properties → Decision tree.*rule|table's columnar structure cannot handle|all rows always execute|Test tab on a Decision Rule|Both can return any data type/);
 });
 
@@ -288,7 +288,7 @@ test('conditional-execution review avoids universal OR bans and extra required R
  const crypto=require('node:crypto'),file='data/system-architect/m28_skipping_process_or_stage.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M28');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.topics[0].duration,'5 min');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[9].scenario,/combined.*same way.*single-valued/);assert.match(d.practiceQuiz[12].options[1].text,/not require a second separately/);assert.match(d.practiceQuiz[1].rationale,/start condition/);
+ assert.match(d.practiceQuiz[9].scenario,/combined.*same way.*single-valued/);assert.match(d.practiceQuiz[12].options.find(o=>o.id==='B').text,/not require a second separately/);assert.match(d.practiceQuiz[1].rationale,/start condition/);
  assert.doesNotMatch(JSON.stringify(d),/Cannot express OR logic|condition \(When Rule\) is composed of exactly|Stage skip and Process skip are entirely independent|can reference any Case property/);
 });
 
@@ -304,7 +304,7 @@ test('duplicate-search review preserves inclusive threshold and user resolution 
  const crypto=require('node:crypto'),file='data/system-architect/m30_identifying_duplicate_cases.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M30');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.sourceReviewedOn,'2026-10-04');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[2].scenario,/All basic conditions pass/);assert.match(d.practiceQuiz[8].options[0].text,/depends.*20 or lower/);assert.match(d.practiceQuiz[2].optionExplanations.A,/threshold of 70 accepts 70/);assert.match(d.studyGuide[0].elements[4].description,/requires customized behavior/);assert.equal(d.topics[0].url,'https://academy.pega.com/topic/duplicate-search/v7/in/96211/67036');
+ assert.match(d.practiceQuiz[2].scenario,/All basic conditions pass/);assert.match(d.practiceQuiz[8].options.find(o=>o.id==='A').text,/depends.*20 or lower/);assert.match(d.practiceQuiz[2].optionExplanations.A,/threshold of 70 accepts 70/);assert.match(d.studyGuide[0].elements[4].description,/requires customized behavior/);assert.equal(d.topics[0].url,'https://academy.pega.com/topic/duplicate-search/v7/in/96211/67036');
  assert.doesNotMatch(JSON.stringify(d),/ranked list|runs automatically at case creation|all match exactly|cannot be saved without at least one|higher total score = higher likelihood/);
 });
 
@@ -312,7 +312,7 @@ test('child-Case review separates resolution dependency from every-Step blocking
  const crypto=require('node:crypto'),file='data/system-architect/m31_creating_a_child_case.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M31');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.topics[0].duration,'10 min');
  assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[1,11,12].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[0].elements[1].text,/not mean every intermediate parent Step is blocked/);assert.match(d.practiceQuiz[8].scenario,/configured to create a child/);assert.match(d.practiceQuiz[10].options[2].text,/copy propagation/);assert.match(d.practiceQuiz[12].optionExplanations.D,/does not establish write-back/);
+ assert.match(d.studyGuide[0].elements[1].text,/not mean every intermediate parent Step is blocked/);assert.match(d.practiceQuiz[8].scenario,/configured to create a child/);assert.match(d.practiceQuiz[10].options.find(o=>o.id==='C').text,/copy propagation/);assert.match(d.practiceQuiz[12].optionExplanations.D,/does not establish write-back/);
  assert.doesNotMatch(JSON.stringify(d),/Parent waits for ALL children.*advancing|parent case waits for all children.*advances|passes a pointer to the parent's data page|B and C are available in App Studio/);
 });
 
@@ -320,7 +320,7 @@ test('Wait review supports custom statuses and resolves prefix semantics without
  const crypto=require('node:crypto'),file='data/system-architect/m32_pausing_resuming_case_processing.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M32');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[8,12,13].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[2].options[0].text,/custom target status.*Resolved-prefixed/);assert.match(d.studyGuide[1].elements[0].description,/any or all.*already exist/);assert.match(d.practiceQuiz[4].options[3].text,/72 minutes/);assert.match(d.practiceQuiz[13].scenario,/48-hour/);
+ assert.match(d.practiceQuiz[2].options.find(o=>o.id==='A').text,/custom target status.*Resolved-prefixed/);assert.match(d.studyGuide[1].elements[0].description,/any or all.*already exist/);assert.match(d.practiceQuiz[4].options.find(o=>o.id==='D').text,/72 minutes/);assert.match(d.practiceQuiz[13].scenario,/48-hour/);
  assert.doesNotMatch(JSON.stringify(d),/No custom status values allowed|exactly 2\).*Trigger|To be resolved.*child still open|5 business days|only two statuses that trigger/);
 });
 
@@ -336,7 +336,7 @@ test('data-validation review corrects Stage entry timing and removes the ambiguo
  const crypto=require('node:crypto'),file='data/system-architect/m34_validating_data_business_logic.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M34');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===11?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[2].options[0].text,/Before.*Settlement/);assert.match(d.practiceQuiz[13].options[1].text,/block entry/);assert.match(d.practiceQuiz[6].options[0].text,/error prevents entry/);assert.match(d.studyGuide[1].elements[3].description,/different validation conditions at each use/);assert.match(d.practiceQuiz[9].optionExplanations.A,/passes.*comparison/);
+ assert.match(d.practiceQuiz[2].options.find(o=>o.id==='A').text,/Before.*Settlement/);assert.match(d.practiceQuiz[13].options.find(o=>o.id==='B').text,/block entry/);assert.match(d.practiceQuiz[6].options.find(o=>o.id==='A').text,/error prevents entry/);assert.match(d.studyGuide[1].elements[3].description,/different validation conditions at each use/);assert.match(d.practiceQuiz[9].optionExplanations.A,/passes.*comparison/);
  assert.doesNotMatch(JSON.stringify(d),/prevent the Case from exiting|Nothing automatically|both are needed|automatically repeat.*Correct|custom Java/);
 });
 
@@ -344,7 +344,7 @@ test('Dev Studio validation review corrects qualifier diagrams and invocation-de
  const crypto=require('node:crypto'),file='data/system-architect/m35_validating_data_dev_studio.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M35');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===7?['A','C']:i===11?['D']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[6].rationale,/Stage-specific sets/);assert.match(d.practiceQuiz[3].options[0].text,/can also call Edit Validate/);assert.match(d.practiceQuiz[5].scenario,/proposes to apply/);assert.match(d.practiceQuiz[12].options[1].text,/containing Rule runs on submission/);
+ assert.match(d.practiceQuiz[6].rationale,/Stage-specific sets/);assert.match(d.practiceQuiz[3].options.find(o=>o.id==='A').text,/can also call Edit Validate/);assert.match(d.practiceQuiz[5].scenario,/proposes to apply/);assert.match(d.practiceQuiz[12].options.find(o=>o.id==='B').text,/containing Rule runs on submission/);
  assert.doesNotMatch(JSON.stringify(d),/four: Stages, Role, Skill|4 types: Stages, Role|fire on every change|executes every time|custom Java bypasses|client-side in the browser.*no server round-trip/);
 });
 
@@ -352,7 +352,7 @@ test('data-manipulation review restores calculation support and scopes the clipb
  const crypto=require('node:crypto'),file='data/system-architect/m36_application_data_manipulation.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M36');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'15 min');assert.ok(d.topics.every(t=>t.duration==='5 min'));
  assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===1?['C']:i===8?['A','C']:i>=11?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[0].elements[1].description,/calculate values/);assert.match(d.practiceQuiz[0].scenario,/attached to the next form Step itself/);assert.match(d.practiceQuiz[7].scenario,/illustrated.*Clipboard Page/);assert.match(d.practiceQuiz[1].options[2].text,/Either a following/);
+ assert.match(d.studyGuide[0].elements[1].description,/calculate values/);assert.match(d.practiceQuiz[0].scenario,/attached to the next form Step itself/);assert.match(d.practiceQuiz[7].scenario,/illustrated.*Clipboard Page/);assert.match(d.practiceQuiz[1].options.find(o=>o.id==='C').text,/Either a following/);
  assert.doesNotMatch(JSON.stringify(d),/Does NOT validate or calculate|must register any Data Page|Without this step.*fails at runtime|guardrail violation.*regenerates it on save/);
 });
 
@@ -360,7 +360,7 @@ test('Dev Studio transform review distinguishes class superclassing from Case hi
  const crypto=require('node:crypto'),file='data/system-architect/m37_application_data_manipulation_dev_studio.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M37');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
  assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===8?['A','B']:i===11?['A','C']:i===12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[1].elements[4].description,/class inheritance, not.*Case instances/);assert.match(d.practiceQuiz[3].scenario,/explicitly invoked.*no other definitions/);assert.match(d.practiceQuiz[11].options[0].text,/not two same-named superclass/);assert.match(d.practiceQuiz[7].scenario,/Clipboard Page/);
+ assert.match(d.studyGuide[1].elements[4].description,/class inheritance, not.*Case instances/);assert.match(d.practiceQuiz[3].scenario,/explicitly invoked.*no other definitions/);assert.match(d.practiceQuiz[11].options.find(o=>o.id==='A').text,/not two same-named superclass/);assert.match(d.practiceQuiz[7].scenario,/Clipboard Page/);
  assert.doesNotMatch(JSON.stringify(d),/Any Data Page.*must be added|runtime cannot resolve the page|Data initialization page does not support expression|auto-enabled.*pySetFieldDefaults transform/);
 });
 
@@ -368,7 +368,7 @@ test('sourced-data review corrects mapping structures, copied-value limits and o
  const crypto=require('node:crypto'),file='data/system-architect/m38_accessing_sourced_data_case.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M38');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'75 min · 6 topics');
  assert.equal(d.practiceQuiz.length,13);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=10?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[2].elements[1].description,/Report definition with List structure, Lookup with Page/);assert.match(d.studyGuide[4].elements[1].description,/Changed parameters overwrite.*removing.*clipboard/);assert.match(d.practiceQuiz[8].options[0].text,/Only SED/);assert.match(d.practiceQuiz[12].scenario,/optional but recommended/);assert.match(d.practiceQuiz[10].rationale,/Thread.*Node/);
+ assert.match(d.studyGuide[2].elements[1].description,/Report definition with List structure, Lookup with Page/);assert.match(d.studyGuide[4].elements[1].description,/Changed parameters overwrite.*removing.*clipboard/);assert.match(d.practiceQuiz[8].options.find(o=>o.id==='A').text,/Only SED/);assert.match(d.practiceQuiz[12].scenario,/optional but recommended/);assert.match(d.practiceQuiz[10].rationale,/Thread.*Node/);
  assert.doesNotMatch(JSON.stringify(d),/other 5 source types map automatically|Reference = always current|Saved with the Case permanently|DataPageName\[index\]|Report definition \(page structure\)|Lookup \(list structure\)/);
 });
 
@@ -392,7 +392,7 @@ test('application access review restores production scale and permits intermedia
  const crypto=require('node:crypto'),file='data/system-architect/m41_managing_application_access.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M41');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');
  assert.equal(d.practiceQuiz.length,15);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[1].elements[3].description,/5 Production.*4 Staging.*3 Quality assurance.*2 Development.*1 Sandbox/);assert.match(d.studyGuide[1].elements[2].bulletPoints[0],/other than.*0\/5/);assert.match(d.practiceQuiz[6].rationale,/five to Production/);assert.match(d.practiceQuiz[8].rationale,/one application.*different role sets/);assert.match(d.practiceQuiz[1].scenario,/no applicable Access Deny/);assert.match(d.practiceQuiz[14].options[0].text,/Access Groups/);
+ assert.match(d.studyGuide[1].elements[3].description,/5 Production.*4 Staging.*3 Quality assurance.*2 Development.*1 Sandbox/);assert.match(d.studyGuide[1].elements[2].bulletPoints[0],/other than.*0\/5/);assert.match(d.practiceQuiz[6].rationale,/five to Production/);assert.match(d.practiceQuiz[8].rationale,/one application.*different role sets/);assert.match(d.practiceQuiz[1].scenario,/no applicable Access Deny/);assert.match(d.practiceQuiz[14].options.find(o=>o.id==='A').text,/Access Groups/);
  assert.doesNotMatch(JSON.stringify(d),/1 = Production|1=Production|5 = Sandbox|5=Sandbox|ARO records.*they do not deny|Access Role Objects|ALWAYS overrides ARO|Lower = More Restrictive/);
 });
 
@@ -408,7 +408,7 @@ test('Portal-content review separates theme sharing from inheritance and correct
  const crypto=require('node:crypto'),file='data/system-architect/m43_configuring_portal_content.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M43');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'40 min · 5 topics');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===6?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[4].elements[1].description,/themes do not support inheritance/);assert.match(d.practiceQuiz[13].options[0].text,/higher Ruleset/);assert.match(d.studyGuide[1].elements[3].svg,/Portal = a web Channel/);assert.match(d.studyGuide[3].elements[4].svg,/App announcement/);assert.match(d.practiceQuiz[7].hint,/configured Widgets.*data.*empty/);assert.match(d.practiceQuiz[4].hint,/copied dashboard.*source visibility/);
+ assert.match(d.studyGuide[4].elements[1].description,/themes do not support inheritance/);assert.match(d.practiceQuiz[13].options.find(o=>o.id==='A').text,/higher Ruleset/);assert.match(d.studyGuide[1].elements[3].svg,/Portal = a web Channel/);assert.match(d.studyGuide[3].elements[4].svg,/App announcement/);assert.match(d.practiceQuiz[7].hint,/configured Widgets.*data.*empty/);assert.match(d.practiceQuiz[4].hint,/copied dashboard.*source visibility/);
  assert.doesNotMatch(JSON.stringify(d),/Amazon Connect|App analytics|all Portals inherit|all pages and portals|auto-generates platform-specific tokens|brand-new themes default to Private/);
 });
 
@@ -424,7 +424,7 @@ test('PegaUnit review separates coverage privileges, Rule eligibility and Rule v
  const crypto=require('node:crypto'),file='data/system-architect/m45_devops_pega_platform.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M45');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'40 min · 3 topics');
  assert.equal(d.practiceQuiz.length,15);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[2].elements[2].items[1],/SysAdm4 or User4/);assert.equal(d.practiceQuiz[10].options[0].text,'pzStartOrStopMasterAppRuleCoverage');assert.match(d.practiceQuiz[1].scenario,/eligible.*no Branch/);assert.match(d.practiceQuiz[13].options[1].text,/does not prove every internal path/);assert.match(d.studyGuide[0].elements[4].description,/Decision result/);assert.ok(review.localReview.sources.includes('https://academy.pega.com/topic/unit-tests/v5'));
+ assert.match(d.studyGuide[2].elements[2].items[1],/SysAdm4 or User4/);assert.equal(d.practiceQuiz[10].options.find(o=>o.id==='A').text,'pzStartOrStopMasterAppRuleCoverage');assert.match(d.practiceQuiz[1].scenario,/eligible.*no Branch/);assert.match(d.practiceQuiz[13].options.find(o=>o.id==='B').text,/does not prove every internal path/);assert.match(d.studyGuide[0].elements[4].description,/Decision result/);assert.ok(review.localReview.sources.includes('https://academy.pega.com/topic/unit-tests/v5'));
  assert.doesNotMatch(JSON.stringify(d),/No real data source called|requires the SysAdm4 role.*Lower roles|Only latest app-level report shown|aggregates results across all users/);
 });
 
@@ -432,7 +432,7 @@ test('Tracer review replaces archived source and distinguishes server debug sett
  const crypto=require('node:crypto'),file='data/system-architect/m46_debugging_application_errors.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M46');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.moduleUrl,'https://academy.pega.com/module/debugging-application-errors/v8');assert.equal(d.topics.length,3);
  assert.equal(d.practiceQuiz.length,15);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[0].elements[5].description,/request ID/);assert.match(d.studyGuide[2].elements[2].description,/unavailable in the App Studio shell/);assert.match(d.studyGuide[2].elements[4].svg,/dynamic system setting, not URL parameter/);assert.match(d.practiceQuiz[11].rationale,/Break Conditions.*errors/);assert.match(d.practiceQuiz[13].scenario,/non-Constellation, non-Service/);assert.match(d.practiceQuiz[14].options[1].text,/UI Inspector/);
+ assert.match(d.studyGuide[0].elements[5].description,/request ID/);assert.match(d.studyGuide[2].elements[2].description,/unavailable in the App Studio shell/);assert.match(d.studyGuide[2].elements[4].svg,/dynamic system setting, not URL parameter/);assert.match(d.practiceQuiz[11].rationale,/Break Conditions.*errors/);assert.match(d.practiceQuiz[13].scenario,/non-Constellation, non-Service/);assert.match(d.practiceQuiz[14].options.find(o=>o.id==='B').text,/UI Inspector/);
  assert.doesNotMatch(JSON.stringify(d),/only the most recently opened|opening a new one closes|logs every Rule execution event|NEVER run in production|Inspect \/ clipboard icon/);
 });
 
@@ -440,7 +440,7 @@ test('Insights review uses property optimization and relevant records instead of
  const crypto=require('node:crypto'),file='data/system-architect/m47_exploring_application_data_insights.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M47');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.estTime,'25 min · 3 topics');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===11?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.practiceQuiz[9].scenario,/Show\/hide columns/);assert.match(d.practiceQuiz[9].options[0].text,/parent classes.*specific Class/);assert.match(d.practiceQuiz[13].options[1].text,/relevant record/);assert.match(d.studyGuide[1].elements[0].description,/excludes adding them directly to a View/);assert.match(d.studyGuide[1].elements[2].description,/not configured through.*Portal authoring/);
+ assert.match(d.practiceQuiz[9].scenario,/Show\/hide columns/);assert.match(d.practiceQuiz[9].options.find(o=>o.id==='A').text,/parent classes.*specific Class/);assert.match(d.practiceQuiz[13].options.find(o=>o.id==='B').text,/relevant record/);assert.match(d.studyGuide[1].elements[0].description,/excludes adding them directly to a View/);assert.match(d.studyGuide[1].elements[2].description,/not configured through.*Portal authoring/);
  assert.doesNotMatch(JSON.stringify(d),/typically a.*permissions issue|CAUSE: insufficient user permissions|Not a report definition bug|all widgets update|Token expiry controls how long/);
 });
 
@@ -448,7 +448,7 @@ test('localization review distinguishes packaged Paragraph translation from Data
  const crypto=require('node:crypto'),file='data/system-architect/m48_localizing_application_content.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId)),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M48');
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.moduleUrl,'https://academy.pega.com/module/localizing-application-content/v7');
  assert.equal(d.practiceQuiz.length,14);d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===6?['A','B','C']:i>=12?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));});
- assert.match(d.studyGuide[1].elements[2].description,/included in the ZIP.*paragraph\/base/);assert.match(d.studyGuide[1].elements[3].description,/rebuild and import/);assert.match(d.studyGuide[1].elements[4].svg,/Radio\/drop-down in tables/);assert.match(d.practiceQuiz[4].rationale,/fresh login/);assert.match(d.practiceQuiz[13].options[1].text,/Manually prepare/);assert.match(d.studyGuide[0].elements[7].description,/not fully localized/);
+ assert.match(d.studyGuide[1].elements[2].description,/included in the ZIP.*paragraph\/base/);assert.match(d.studyGuide[1].elements[3].description,/rebuild and import/);assert.match(d.studyGuide[1].elements[4].svg,/Radio\/drop-down in tables/);assert.match(d.practiceQuiz[4].rationale,/fresh login/);assert.match(d.practiceQuiz[13].options.find(o=>o.id==='B').text,/Manually prepare/);assert.match(d.studyGuide[0].elements[7].description,/not fully localized/);
  assert.doesNotMatch(JSON.stringify(d),/NOT automatically extracted|Cannot be localized at all|manual translation outside the standard package|✗ Data Page controls|ensures dropdown options are locale-aware/);
 });
 
@@ -462,7 +462,7 @@ test('low-code review separates configured studio default from recommended autho
 test('BA low-code review scopes co-development and integration replacement while preserving historical question IDs',()=>{
  const crypto=require('node:crypto'),file='data/business-architect/m02_low_code_defined.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M02'),q=Object.fromEntries(d.practiceQuiz.map(q=>[q.questionId,q]));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,21);assert.equal(q.Q4,undefined);assert.deepEqual(q.Q1.correctOptions,['C']);assert.deepEqual(q.Q5.correctOptions,['B']);assert.deepEqual(q.Q10.correctOptions,['A','B']);
- assert.match(q.Q10.options[1].text,/technical members also use App Studio/);assert.match(q.Q12.optionExplanations.D,/UI Ruleset/);assert.match(q.Q18.rationale,/configuration and testing/);assert.match(d.studyGuide[3].elements[3].description,/except the base Pega Platform layer/);assert.match(q.Q17.rationale,/distinct from.*office opening hours/);
+ assert.match(q.Q10.options.find(o=>o.id==='B').text,/technical members also use App Studio/);assert.match(q.Q12.optionExplanations.D,/UI Ruleset/);assert.match(q.Q18.rationale,/configuration and testing/);assert.match(d.studyGuide[3].elements[3].description,/except the base Pega Platform layer/);assert.match(q.Q17.rationale,/distinct from.*office opening hours/);
 });
 
 test('Case Life Cycle review separates Process draft mode from designer data placeholders and permits explicit Stage returns',()=>{
@@ -476,7 +476,7 @@ test('user-management review separates business Personas from identity and avoid
  const crypto=require('node:crypto'),file='data/system-architect/m03_inviting_users_to_application.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M03'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(review.localContentReview,'source-compared');assert.equal(d.practiceQuiz.length,17);assert.equal(d.estTime,'10 min · 1 topic');assert.equal(d.topics[0].duration,'5 min');
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,14,15,16].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.practiceQuiz[7].options[1].text,/default permissions and a Work Queue/);assert.match(d.practiceQuiz[14].optionExplanations.D,/Multiple Personas can share/);assert.match(d.studyGuide[2].elements[3].html,/People, enter Dana/);assert.match(d.studyGuide[2].elements[1].description,/not every role has a Persona/);
+ assert.match(d.practiceQuiz[7].options.find(o=>o.id==='B').text,/default permissions and a Work Queue/);assert.match(d.practiceQuiz[14].optionExplanations.D,/Multiple Personas can share/);assert.match(d.studyGuide[2].elements[3].html,/People, enter Dana/);assert.match(d.studyGuide[2].elements[1].description,/not every role has a Persona/);
  assert.doesNotMatch(JSON.stringify(d),/Inviting sends credentials|automatically updates the Access Group|Persona assignment IS access assignment|Work is routed to Personas|Assigned 1\+ Personas/);
 });
 
@@ -499,7 +499,7 @@ test('Blueprint review distinguishes branch placement from missing assets and co
  const crypto=require('node:crypto'),file='data/system-architect/m06_accelerating_app_building_blueprint.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='SA-M06'),ids=new Set(d.studyGuide.map(s=>s.sectionId)),h=d.studyGuide[1].elements[3].html,a=h.indexOf('var S=')+6,sc=JSON.parse(h.slice(a,h.indexOf(',cur=0,score=0;',a)));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.estTime,'65 min · 4 topics');assert.deepEqual(d.topics.map(t=>t.duration),['5 min','35 min','15 min','5 min']);assert.equal(d.practiceQuiz.length,17);
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,12,15,16].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(sc[1].opts[0],/does not mean.*excluded/);assert.match(sc[1].fbs[0],/placement, not exclusion/);assert.doesNotMatch(JSON.stringify(sc),/\\\\u[0-9a-f]{4}/i);assert.match(d.studyGuide[2].elements[5].description,/without its own new class/);assert.match(d.studyGuide[3].elements[0].description,/add it to a View/);assert.match(d.practiceQuiz[12].options[0].text,/saving.*as a template/);
+ assert.match(sc[1].opts[sc[1].correct],/does not mean.*excluded/);assert.match(sc[1].fbs[sc[1].correct],/placement, not exclusion/);assert.doesNotMatch(JSON.stringify(sc),/\\\\u[0-9a-f]{4}/i);assert.match(d.studyGuide[2].elements[5].description,/without its own new class/);assert.match(d.studyGuide[3].elements[0].description,/add it to a View/);assert.match(d.practiceQuiz[12].options.find(o=>o.id==='A').text,/saving.*as a template/);
  assert.doesNotMatch(JSON.stringify(d),/Not generated: Access Roles|Anyone with the URL can collaborate|no special role needed|Access Roles are the ONE asset|no Pega account of any kind|functional application in minutes|Pega is not responsible/);
 });
 
@@ -507,7 +507,7 @@ test('BA Blueprint review retains answers and covers SaaS access and wizard impo
  const crypto=require('node:crypto'),file='data/business-architect/m07_accelerating_app_building_blueprint.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M07'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.estTime,'65 min · 4 topics');assert.equal(d.practiceQuiz.length,13);
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[7,11].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.equal(q.explanationReviewedOn,'2026-10-05');});
- assert.match(d.studyGuide[2].elements[5].description,/without its own class/);assert.match(d.studyGuide[3].elements[0].description,/Picklist and add it to a View/);assert.match(d.practiceQuiz[11].options[0].text,/saving it as a template/);assert.match(d.practiceQuiz[4].rationale,/does not imply they were not created/);
+ assert.match(d.studyGuide[2].elements[5].description,/without its own class/);assert.match(d.studyGuide[3].elements[0].description,/Picklist and add it to a View/);assert.match(d.practiceQuiz[11].options.find(o=>o.id==='A').text,/saving it as a template/);assert.match(d.practiceQuiz[4].rationale,/does not imply they were not created/);
  assert.doesNotMatch(JSON.stringify(d),/no Pega instance or login is required to collaborate|functional application in minutes|LSA performs the import|The LSA imports the Blueprint file/);
 });
 
@@ -516,8 +516,8 @@ test('Capturing and presenting data review follows the Fields, Calculated values
  assert.equal(review.localContentReview,'source-compared');assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.sourceReviewedOn,'2026-10-05');assert.equal(d.estTime,'45 min · 3 topics');
  assert.deepEqual(d.topics.map(t=>t.url),['https://academy.pega.com/topic/fields/v7','https://academy.pega.com/topic/calculated-values/v6','https://academy.pega.com/topic/views/v6']);assert.deepEqual(d.topics.map(t=>t.duration),['15 min','20 min','5 min']);
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'m07_q'+String(i+1).padStart(2,'0'));assert.deepEqual(q.correctOptions,[7,14,15,16].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.ok(Object.values(q.optionExplanations).every(s=>s.length>25));assert.equal(q.explanationReviewedOn,'2026-10-05');});
- assert.match(d.practiceQuiz[10].options[0].text,/not a form/);assert.match(d.practiceQuiz[15].options[1].text,/^Date only/);assert.match(d.studyGuide[1].elements[4].description,/relevant record/);assert.match(d.studyGuide[0].elements[3].items[4],/leading zeros/);
- assert.equal(sc.length,4);assert.match(sc[3].fbs[0],/mix read-only/);assert.doesNotMatch(JSON.stringify(sc),/Autocomplete field type|always read-only|read-only by default/);
+ assert.match(d.practiceQuiz[10].options.find(o=>o.id==='A').text,/not a form/);assert.match(d.practiceQuiz[15].options.find(o=>o.id==='B').text,/^Date only/);assert.match(d.studyGuide[1].elements[4].description,/relevant record/);assert.match(d.studyGuide[0].elements[3].items[4],/leading zeros/);
+ assert.equal(sc.length,4);assert.match(sc[3].fbs[sc[3].correct],/mix read-only/);assert.doesNotMatch(JSON.stringify(sc),/Autocomplete field type|always read-only|read-only by default/);
  assert.match(d.studyGuide[1].elements[0].description,/App Studio.*read-only/);assert.match(d.studyGuide[1].elements[1].description,/does not establish whether the value is persisted/);assert.match(d.quickRecap[2].value,/App Studio.*read-only/);assert.doesNotMatch(JSON.stringify(d),/Whether users may override a result is a separate View design decision/);
  assert.doesNotMatch(JSON.stringify(d),/Rich Text|Editable by default|Calculated fields are always read-only|Text for everything' is always wrong|List Views are read-only by default|locale-aware/);
 });
@@ -526,7 +526,7 @@ test('BA Center-out review keeps stable answer keys and scopes architectural gua
  const crypto=require('node:crypto'),file='data/business-architect/m03_pega_center_out_architecture.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='BA-M03'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.sourceReviewedOn,'2026-10-05');assert.equal(d.practiceQuiz.length,16);assert.equal(d.studyGuide.length,6);
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,i===14?['A','B','C']:[4,7,11].includes(i)?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.practiceQuiz[14].hint,/Three options/);assert.match(d.practiceQuiz[6].options[0].text,/Case Lifecycles/);assert.match(d.studyGuide[4].elements[1].description,/select and configure/);assert.match(d.studyGuide[5].elements[7].description,/Accessibility Inspector is not supported/);
+ assert.match(d.practiceQuiz[14].hint,/Three options/);assert.match(d.practiceQuiz[6].options.find(o=>o.id==='A').text,/Case Lifecycles/);assert.match(d.studyGuide[4].elements[1].description,/select and configure/);assert.match(d.studyGuide[5].elements[7].description,/Accessibility Inspector is not supported/);
  assert.doesNotMatch(JSON.stringify(d),/Four real principles|instantly reaches|logic never has to be rebuilt|neither can break/);
 });
 
@@ -541,7 +541,7 @@ test('TDS retrieval review uses resource aliases and the TDS expression command'
  const crypto=require('node:crypto'),file='data/tosca-tds2/m04_retrieving_and_updating_records.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS2-M04'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.equal(d.practiceQuiz[0].options[1].text,'{TDS[customer.Email]}');assert.match(d.practiceQuiz[0].options[3].text,/^\{TD\[/);assert.match(d.practiceQuiz[3].rationale,/alias name.*customer, not the source type/);assert.match(d.studyGuide[4].elements[1].description,/One move targets one known item/);
+ assert.equal(d.practiceQuiz[0].options.find(o=>o.id==='B').text,'{TDS[customer.Email]}');assert.match(d.practiceQuiz[0].options.find(o=>o.id==='D').text,/^\{TD\[/);assert.match(d.practiceQuiz[3].rationale,/alias name.*customer, not the source type/);assert.match(d.studyGuide[4].elements[1].description,/One move targets one known item/);
  assert.doesNotMatch(JSON.stringify(d.studyGuide),/\{TD\[|always works together with a search|200 OK response, confirming/);
 });
 
@@ -549,7 +549,7 @@ test('TDS creation review separates alias identity, item selection and execution
  const crypto=require('node:crypto'),file='data/tosca-tds2/m03_create_and_register_records.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS2-M03'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,3);
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.match(d.practiceQuiz[0].scenario,/Find & provide item/);assert.match(d.practiceQuiz[1].options[1].text,/criteria.*distinct aliases/);assert.match(d.practiceQuiz[2].rationale,/does not guarantee success or uniqueness/);assert.match(d.studyGuide[2].elements[1].text,/ReadOnly does not acquire/);assert.doesNotMatch(JSON.stringify(d),/Test Data - Create & provide new record|only unlocks automatically|exactly the sender\/recipient example/);
+ assert.match(d.practiceQuiz[0].scenario,/Find & provide item/);assert.match(d.practiceQuiz[1].options.find(o=>o.id==='B').text,/criteria.*distinct aliases/);assert.match(d.practiceQuiz[2].rationale,/does not guarantee success or uniqueness/);assert.match(d.studyGuide[2].elements[1].text,/ReadOnly does not acquire/);assert.doesNotMatch(JSON.stringify(d),/Test Data - Create & provide new record|only unlocks automatically|exactly the sender\/recipient example/);
 });
 
 test('TDS repository review uses installed contracts and distinguishes save/export and configuration/data deletion',()=>{
@@ -564,7 +564,7 @@ test('TDS preparation review corrects invalid naming answer and separates type r
  const crypto=require('node:crypto'),file='data/tosca-tds2/m02_preparing_your_project.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS2-M02'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[i===2?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.equal(d.practiceQuiz[2].options[2].text,'CustomerDetails');assert.match(d.practiceQuiz[2].optionExplanations.B,/square brackets are forbidden/);assert.match(d.studyGuide[3].elements[2].description,/override an inherited/);assert.match(d.studyGuide[3].elements[0].description,/Standard.tsu/);
+ assert.equal(d.practiceQuiz[2].options.find(o=>o.id==='C').text,'CustomerDetails');assert.match(d.practiceQuiz[2].optionExplanations.B,/square brackets are forbidden/);assert.match(d.studyGuide[3].elements[2].description,/override an inherited/);assert.match(d.studyGuide[3].elements[0].description,/Standard.tsu/);
  assert.doesNotMatch(JSON.stringify(d),/single entry point to every TDS feature|In Memory is the only type that doesn't need|repository\/type name/);
 });
 
@@ -575,7 +575,7 @@ test('TDS introductions scope reuse and require explicit application-state updat
   assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.studyGuide.length,3);assert.equal(d.practiceQuiz.length,3);
   d.practiceQuiz.forEach((q,j)=>{assert.equal(q.questionId,'Q'+(j+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
   assert.doesNotMatch(JSON.stringify(d),/can generally only be used once|automatically updates each record|TDM Studio handles|can't be tested independently|Every change is reflected back/);
-  if(i===0){assert.equal(d.practiceQuiz[1].options[1].text,'Expert Module ReadOnly');assert.match(d.studyGuide[1].elements[1].description,/not inherently single-use/);}
+  if(i===0){assert.equal(d.practiceQuiz[1].options.find(o=>o.id==='B').text,'Expert Module ReadOnly');assert.match(d.studyGuide[1].elements[1].description,/not inherently single-use/);}
   else{assert.match(d.practiceQuiz[2].scenario,/next TDS Update step/);assert.match(d.studyGuide[1].elements[1].description,/does not automatically synchronize/);assert.match(d.studyGuide[2].elements[1].text,/rather than automatic TDS lifecycle rules/);}
  });
 });
@@ -609,14 +609,14 @@ test('TDS1 introduction requires recalculation and avoids guaranteed test comple
  const crypto=require('node:crypto'),file='data/tosca-tds1/m00_introduction.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M00'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,3);
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.match(d.practiceQuiz[2].options[1].text,/recalculate.*restart Tosca/);assert.match(d.studyGuide[0].elements[0].text,/not a transcript/);assert.doesNotMatch(JSON.stringify(d),/only fails for one reason|roll up automatically|10 lessons, using the DemoWebShop/);
+ assert.match(d.practiceQuiz[2].options.find(o=>o.id==='B').text,/recalculate.*restart Tosca/);assert.match(d.studyGuide[0].elements[0].text,/not a transcript/);assert.doesNotMatch(JSON.stringify(d),/only fails for one reason|roll up automatically|10 lessons, using the DemoWebShop/);
 });
 
 test('TDS1 Requirements review separates class inputs, risk weight and executed coverage',()=>{
  const crypto=require('node:crypto'),file='data/tosca-tds1/m01_requirements.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M01'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[i===2?'A':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.match(d.studyGuide[1].elements[0].description,/Do not confuse direct weights/);assert.match(d.studyGuide[3].bulletPoints[0],/both passed and failed/);assert.match(d.practiceQuiz[2].rationale,/values can coincide/);assert.match(d.practiceQuiz[3].options[1].text,/restart/);assert.equal(d.practiceQuiz[1].options[1].text,'2^3 × 2^2 = 32');
+ assert.match(d.studyGuide[1].elements[0].description,/Do not confuse direct weights/);assert.match(d.studyGuide[3].bulletPoints[0],/both passed and failed/);assert.match(d.practiceQuiz[2].rationale,/values can coincide/);assert.match(d.practiceQuiz[3].options.find(o=>o.id==='B').text,/restart/);assert.equal(d.practiceQuiz[1].options.find(o=>o.id==='B').text,'2^3 × 2^2 = 32');
  assert.doesNotMatch(JSON.stringify(d),/always sums to 100% per level|10.2 and earlier|base adjustable|press F6/);
 });
 
@@ -624,7 +624,7 @@ test('TDS1 Attributes review scopes the example layout and tests documented nest
  const crypto=require('node:crypto'),file='data/tosca-tds1/m02_attributes.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M02'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[i%2?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.match(d.studyGuide[2].elements[0].description,/Independent Quilyn/);assert.match(d.practiceQuiz[0].options[1].text,/parent Attribute grouping/);assert.match(d.studyGuide[4].elements[1].items[1],/characters are removed/);assert.doesNotMatch(JSON.stringify(d),/AttrType is calculated automatically|starting every TestSheet|Not user-editable/);
+ assert.match(d.studyGuide[2].elements[0].description,/Independent Quilyn/);assert.match(d.practiceQuiz[0].options.find(o=>o.id==='B').text,/parent Attribute grouping/);assert.match(d.studyGuide[4].elements[1].items[1],/characters are removed/);assert.doesNotMatch(JSON.stringify(d),/AttrType is calculated automatically|starting every TestSheet|Not user-editable/);
 });
 
 test('TDS1 Instances review requires assertions and retains boundary regression relevance',()=>{
@@ -646,14 +646,14 @@ test('TDS1 specification review does not infer mutation scope from filters and c
  const crypto=require('node:crypto'),file='data/tosca-tds1/m05_testcase_specifications.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M05'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.match(d.studyGuide[2].elements[2].text,/do not establish.*bulk-fill/);assert.match(d.practiceQuiz[3].options[1].text,/Empty TestStepValues.*uniquely matching/);assert.doesNotMatch(JSON.stringify(d),/corrupting the existing structure|only the matching columns are visible\/editable|never higher/);
+ assert.match(d.studyGuide[2].elements[2].text,/do not establish.*bulk-fill/);assert.match(d.practiceQuiz[3].options.find(o=>o.id==='B').text,/Empty TestStepValues.*uniquely matching/);assert.doesNotMatch(JSON.stringify(d),/corrupting the existing structure|only the matching columns are visible\/editable|never higher/);
 });
 
 test('TDS1 Class review warns about bidirectional edits and uses documented Relevance column',()=>{
  const crypto=require('node:crypto'),file='data/tosca-tds1/m06_classes.json',bytes=fs.readFileSync(file),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id==='TDS1-M06'),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,4);
  d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.match(d.studyGuide[0].elements[1].description,/editing an unresolved reference changes/);assert.match(d.practiceQuiz[1].scenario,/no child elements/);assert.match(d.practiceQuiz[2].rationale,/Other consumers may still reference/);assert.match(d.practiceQuiz[3].options[1].text,/Relevance checkbox/);assert.doesNotMatch(JSON.stringify(d),/auto-generates Instance combinations|Relevant column\/F11|4 creation methods exist/);
+ assert.match(d.studyGuide[0].elements[1].description,/editing an unresolved reference changes/);assert.match(d.practiceQuiz[1].scenario,/no child elements/);assert.match(d.practiceQuiz[2].rationale,/Other consumers may still reference/);assert.match(d.practiceQuiz[3].options.find(o=>o.id==='B').text,/Relevance checkbox/);assert.doesNotMatch(JSON.stringify(d),/auto-generates Instance combinations|Relevant column\/F11|4 creation methods exist/);
 });
 
 test('TDS1 Requirement links require explicit substitute replacement and distinguish execution entry scope',()=>{
@@ -668,7 +668,7 @@ test('TDS1 added Attribute example scopes Linear Expansion counts and checks sta
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-tds1/m08_integration_of_new_attributes.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.match(d.practiceQuiz[0].rationale,/does not establish coverage of other values/);assert.match(d.practiceQuiz[1].scenario,/unconstrained Linear Expansion/);assert.match(d.practiceQuiz[2].options[1].text,/refresh outdated/);assert.match(d.studyGuide[1].elements[0].description,/Propagate Instance\(s\)/);
+ assert.match(d.practiceQuiz[0].rationale,/does not establish coverage of other values/);assert.match(d.practiceQuiz[1].scenario,/unconstrained Linear Expansion/);assert.match(d.practiceQuiz[2].options.find(o=>o.id==='B').text,/refresh outdated/);assert.match(d.studyGuide[1].elements[0].description,/Propagate Instance\(s\)/);
  assert.doesNotMatch(JSON.stringify(d),/existing 9 TestSheet-level|Instances are NOT automatically|don't inherit existing TestCase-Substitute links automatically/);
 });
 
@@ -676,7 +676,7 @@ test('TDS1 maintenance review preserves boundary coverage and removes unsupporte
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-tds1/m09_best_practices.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[i===2?'A':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.match(d.studyGuide[0].elements[0].description,/editing the reference also changes the Class/);assert.match(d.practiceQuiz[1].options[1].text,/Create Element Structure from Clipboard/);assert.match(d.examPitfalls[3].bestPractice,/Retain boundary coverage/);assert.match(d.studyGuide[1].elements[2].text,/does not automatically execute Gherkin/);
+ assert.match(d.studyGuide[0].elements[0].description,/editing the reference also changes the Class/);assert.match(d.practiceQuiz[1].options.find(o=>o.id==='B').text,/Create Element Structure from Clipboard/);assert.match(d.examPitfalls[3].bestPractice,/Retain boundary coverage/);assert.match(d.studyGuide[1].elements[2].text,/does not automatically execute Gherkin/);
  assert.doesNotMatch(JSON.stringify(d),/Tricentis recommends using Classes only|Usually one-time tests|Notepad uses Tab indentation|backbone of every TestSheet/);
 });
 
@@ -684,7 +684,7 @@ test('TDS1 automatic generation review uses documented targets and distinguishes
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-tds1/m10_automatic_generation_of_instances.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.equal(d.practiceQuiz[0].options[1].text,'TestSheets, TestCase-Design Classes and Attributes.');assert.match(d.studyGuide[0].elements[1].description,/1000 combinations/);assert.match(d.studyGuide[3].elements[1].description,/Uncombined Instances appear in bold/);assert.equal(d.practiceQuiz[3].options[1].text,'BusinessRelevant = Result.');
+ assert.equal(d.practiceQuiz[0].options.find(o=>o.id==='B').text,'TestSheets, TestCase-Design Classes and Attributes.');assert.match(d.studyGuide[0].elements[1].description,/1000 combinations/);assert.match(d.studyGuide[3].elements[1].description,/Uncombined Instances appear in bold/);assert.equal(d.practiceQuiz[3].options.find(o=>o.id==='B').text,'BusinessRelevant = Result.');
  assert.doesNotMatch(JSON.stringify(d),/requires an empty Instance Folder first|excluded from combinatorics entirely|instantly combines every/);
 });
 
@@ -692,7 +692,7 @@ test('TDS1 capstone review scopes Guest assumptions and equal single-Attribute c
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-tds1/m11_scenarios.json'),d=JSON.parse(bytes),inventory=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),review=inventory.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[i===2?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
- assert.match(d.studyGuide[1].elements[0].description,/exercise assumptions/);assert.match(d.studyGuide[1].elements[3].description,/100, 95, 90 and 85/);assert.match(d.studyGuide[1].elements[4].description,/All Combinations also produces five/);assert.match(d.practiceQuiz[3].optionExplanations.D,/Position property/);assert.match(d.practiceQuiz[2].options[2].text,/Planned design coverage/);
+ assert.match(d.studyGuide[1].elements[0].description,/exercise assumptions/);assert.match(d.studyGuide[1].elements[3].description,/100, 95, 90 and 85/);assert.match(d.studyGuide[1].elements[4].description,/All Combinations also produces five/);assert.match(d.practiceQuiz[3].optionExplanations.D,/Position property/);assert.match(d.practiceQuiz[2].options.find(o=>o.id==='C').text,/Planned design coverage/);
  assert.doesNotMatch(JSON.stringify(d),/Tricentis default recommendation|official course closes with three|effectively every order|All Combinations would be unnecessary/);
  const added=JSON.parse(fs.readFileSync('data/tosca-tds1/m08_integration_of_new_attributes.json'));assert.match(added.studyGuide[1].elements[2].text,/right-click the top-level Instance/);
 });
@@ -705,8 +705,8 @@ test('API foundations review scopes launch, HTTP semantics, service generation a
   assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(d.practiceQuiz.length,5);
   d.practiceQuiz.forEach((q,i)=>{assert.equal(q.questionId,'Q'+(i+1));assert.deepEqual(q.correctOptions,[keys[n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
   assert.doesNotMatch(JSON.stringify(d),/ApiScanStandalone\.exe|valid for 24 hours|SOAP uses only POST|500 = server down\/unreachable|16 syllabus sections|two very mundane causes|a physical API/);
-  if(n===0){assert.match(d.practiceQuiz[0].options[1].text,/ApiScan\.exe/);assert.match(d.studyGuide[2].elements[1].description,/does not establish/);assert.match(d.practiceQuiz[3].options[2].text,/explicit assertions/);}
-  else if(n===1){assert.match(d.studyGuide[1].elements[2].text,/SOAP-response pattern to GET/);assert.match(d.practiceQuiz[2].options[1].text,/create or replace/);assert.match(d.studyGuide[3].elements[1].description,/not universal REST requirements/);}
+  if(n===0){assert.match(d.practiceQuiz[0].options.find(o=>o.id==='B').text,/ApiScan\.exe/);assert.match(d.studyGuide[2].elements[1].description,/does not establish/);assert.match(d.practiceQuiz[3].options.find(o=>o.id==='C').text,/explicit assertions/);}
+  else if(n===1){assert.match(d.studyGuide[1].elements[2].text,/SOAP-response pattern to GET/);assert.match(d.practiceQuiz[2].options.find(o=>o.id==='B').text,/create or replace/);assert.match(d.studyGuide[3].elements[1].description,/not universal REST requirements/);}
   else{assert.match(d.practiceQuiz[0].scenario,/not a simple message file/);assert.match(d.practiceQuiz[1].scenario,/contract defines POST/);assert.match(d.practiceQuiz[2].rationale,/no HTTP response/);assert.match(d.studyGuide[1].elements[3].rows[3][1],/unexpected server condition/);}
  });
 });
@@ -718,8 +718,8 @@ test('API project and result review preserves payload scope, explicit recovery a
   assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
   d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[[['B','B','B','B'],['B','C','B','A']][n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
   assert.doesNotMatch(JSON.stringify(d),/There is no Undo in the API Scan|closing the whole API Scan window.*also saves|Save as workspace template|new entries appear last|Method tab specifically/);
-  if(!n){assert.match(d.studyGuide[0].elements[2].text,/not a complete message backup/);assert.match(d.quickRecap[2].value,/replaces existing payload/);assert.match(d.practiceQuiz[2].options[1].text,/actual exported test-step order/);assert.match(d.practiceQuiz[3].options[1].text,/context menu/);}
-  else{assert.match(d.studyGuide[0].elements[1].items[1],/Add Files is disabled/);assert.match(d.practiceQuiz[1].options[2].text,/Add Files > Attachment/);assert.match(d.studyGuide[1].elements[0].items[2],/200 alone does not prove persistence/);assert.match(d.practiceQuiz[2].rationale,/every observed value/);}
+  if(!n){assert.match(d.studyGuide[0].elements[2].text,/not a complete message backup/);assert.match(d.quickRecap[2].value,/replaces existing payload/);assert.match(d.practiceQuiz[2].options.find(o=>o.id==='B').text,/actual exported test-step order/);assert.match(d.practiceQuiz[3].options.find(o=>o.id==='B').text,/context menu/);}
+  else{assert.match(d.studyGuide[0].elements[1].items[1],/Add Files is disabled/);assert.match(d.practiceQuiz[1].options.find(o=>o.id==='C').text,/Add Files > Attachment/);assert.match(d.studyGuide[1].elements[0].items[2],/200 alone does not prove persistence/);assert.match(d.practiceQuiz[2].rationale,/every observed value/);}
  });
 });
 
@@ -730,8 +730,8 @@ test('API export and Module review separates destinations, request buffer defaul
   assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
   d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[!n&&i===2?'C':'B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
   assert.doesNotMatch(JSON.stringify(d),/Buffer only applies to Response|fully independent once|verbatim from the course|Shift\+click does NOT work|named.*ApiScan_Import/);
-  if(!n){assert.match(d.practiceQuiz[3].options[1].text,/without creating a new/);assert.match(d.studyGuide[1].elements[1].text,/multiple folders/);}
-  else{assert.match(d.practiceQuiz[3].options[1].text,/Insert.*buffer reference/);assert.match(d.studyGuide[3].elements[1].text,/automatically applied to corresponding messages/);assert.match(d.practiceQuiz[4].options[1].text,/validate/);assert.match(d.studyGuide[4].elements[0].text,/not proof of server behavior/);}
+  if(!n){assert.match(d.practiceQuiz[3].options.find(o=>o.id==='B').text,/without creating a new/);assert.match(d.studyGuide[1].elements[1].text,/multiple folders/);}
+  else{assert.match(d.practiceQuiz[3].options.find(o=>o.id==='B').text,/Insert.*buffer reference/);assert.match(d.studyGuide[3].elements[1].text,/automatically applied to corresponding messages/);assert.match(d.practiceQuiz[4].options.find(o=>o.id==='B').text,/validate/);assert.match(d.studyGuide[4].elements[0].text,/not proof of server behavior/);}
  });
 });
 
@@ -742,8 +742,8 @@ test('API TestCase review supports whole-case defaults, preserves clipboard omis
   assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
   d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[[['B','B','B','A'],['B','C','B','C','B']][n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
   assert.doesNotMatch(JSON.stringify(d),/verbatim from the course|ValueRange column on the corresponding TestCase|TestCase itself is.*unsupported/);
-  if(!n){assert.match(d.practiceQuiz[1].options[1].text,/whole API TestCase/);assert.match(d.studyGuide[1].elements[1].text,/retain their existing values/);}
-  else{assert.match(d.practiceQuiz[0].options[1].text,/Ctrl\+Shift\+J/);assert.match(d.studyGuide[0].elements[1].text,/Do not create a separate TCP on every TestStepValue/);assert.match(d.studyGuide[0].elements[3].text,/empty ActionMode/);}
+  if(!n){assert.match(d.practiceQuiz[1].options.find(o=>o.id==='B').text,/whole API TestCase/);assert.match(d.studyGuide[1].elements[1].text,/retain their existing values/);}
+  else{assert.match(d.practiceQuiz[0].options.find(o=>o.id==='B').text,/Ctrl\+Shift\+J/);assert.match(d.studyGuide[0].elements[1].text,/Do not create a separate TCP on every TestStepValue/);assert.match(d.studyGuide[0].elements[3].text,/empty ActionMode/);}
  });
 });
 
@@ -754,9 +754,9 @@ test('SOAP review scopes HTTP bindings, authentication, month coverage and prede
   assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
   d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[[['A','B','A','A'],['A','B','A','A'],['A','A','A']][n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
   assert.doesNotMatch(JSON.stringify(d),/SOAP is a stateless protocol|SOAP = POST-only|SOAP remains extremely widespread|never changes the payload's content/);
-  if(!n){assert.match(d.studyGuide[0].elements[0].text,/GET with SOAP-response/);assert.match(d.practiceQuiz[3].options[0].text,/security contract/);}
-  else if(n===1){assert.match(d.practiceQuiz[1].rationale,/omits the first hour/);assert.match(d.studyGuide[2].elements[1].text,/subsecond events/);assert.match(d.practiceQuiz[0].options[0].text,/Insert/);}
-  else{assert.match(d.practiceQuiz[0].options[0].text,/requires an endpoint/);assert.match(d.studyGuide[1].elements[1].text,/SOAPAction header is universally required/);assert.match(d.studyGuide[1].elements[2].text,/whitespace-sensitive/);}
+  if(!n){assert.match(d.studyGuide[0].elements[0].text,/GET with SOAP-response/);assert.match(d.practiceQuiz[3].options.find(o=>o.id==='A').text,/security contract/);}
+  else if(n===1){assert.match(d.practiceQuiz[1].rationale,/omits the first hour/);assert.match(d.studyGuide[2].elements[1].text,/subsecond events/);assert.match(d.practiceQuiz[0].options.find(o=>o.id==='A').text,/Insert/);}
+  else{assert.match(d.practiceQuiz[0].options.find(o=>o.id==='A').text,/requires an endpoint/);assert.match(d.studyGuide[1].elements[1].text,/SOAPAction header is universally required/);assert.match(d.studyGuide[1].elements[2].text,/whitespace-sensitive/);}
  });
 });
 
@@ -767,7 +767,7 @@ test('XML review separates transport, resource persistence and existing element 
   assert.equal(review.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
   d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[[['B','A','A'],['B','B','B','A']][n][i]]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
   assert.doesNotMatch(JSON.stringify(d),/Response view is always completely blank|original file on disk is never overwritten|All 12 lessons.*now covered/);
-  if(!n){assert.match(d.practiceQuiz[0].options[1].text,/transport must be configured/);assert.equal(d.practiceQuiz[1].options[0].text,'Input');}
+  if(!n){assert.match(d.practiceQuiz[0].options.find(o=>o.id==='B').text,/transport must be configured/);assert.equal(d.practiceQuiz[1].options.find(o=>o.id==='A').text,'Input');}
   else{assert.match(d.practiceQuiz[1].scenario,/remains connected/);assert.match(d.studyGuide[0].elements[0].text,/Input can modify existing XML/);assert.match(d.studyGuide[1].elements[1].text,/reload that file/);assert.match(d.studyGuide[1].elements[0].text,/duplicate IDs/);}
  });
 });
@@ -778,7 +778,7 @@ test('AS1 prerequisites use model-specific licensing and current resources witho
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D'],['A'],['B'],['C'],['A','B','C'],['D'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),['A','B','C','D']);});
  assert.match(d.studyGuide[1].elements[0].text,/8 GB RAM \(16 GB recommended\)/);
  assert.match(d.practiceQuiz[1].scenario,/online node-locked.*2023.2 or later/);
- assert.match(d.practiceQuiz[3].options[2].text,/source, availability, validity and connectivity/);
+ assert.match(d.practiceQuiz[3].options.find(o=>o.id==='C').text,/source, availability, validity and connectivity/);
  assert.match(d.studyGuide[0].elements[0].text,/no named hypervisor.*certified/);
  const diagrams=d.studyGuide[0].elements.filter(e=>e.type==='diagram');assert.equal(diagrams.length,2);
  diagrams.forEach(e=>assert.doesNotMatch(e.svg,/Help → License|1–2 business days|Parallels/));
@@ -793,7 +793,7 @@ test('AS1 workspace review distinguishes local workspaces, admin revocation and 
  assert.match(d.studyGuide[1].elements[2].text,/revoke checkouts.*rejecting/);
  assert.match(d.studyGuide[2].elements[0].text,/does not keep the two copies synchronized/);
  assert.match(d.practiceQuiz[8].scenario,/ordinary Tester B.*without administrative recovery/);
- assert.match(d.practiceQuiz[9].options[3].text,/local\/repository state/);
+ assert.match(d.practiceQuiz[9].options.find(o=>o.id==='D').text,/local\/repository state/);
  assert.match(d.studyGuide[3].elements[1].text,/not a universal built-in Tosca enforcement/);
  assert.doesNotMatch(JSON.stringify(d),/Only a check-in by the holder|force-override are not supported|Contains 9 sections|Save disables undo\/redo|shared Google Doc/);
  assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.type==='diagram').length,3);
@@ -804,11 +804,11 @@ test('AS1 Modules review corrects control attributes, anchor fallback and same-t
  assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D'],['A','B','C'],['A'],['D'],['A'],['B'],['C'],['D'],['B','C','F','G','H'],['A'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.equal(d.practiceQuiz.reduce((n,q)=>n+q.options.length,0),53);
- assert.match(d.practiceQuiz[2].options[0].text,/ModuleAttribute/);
- assert.match(d.practiceQuiz[6].options[2].text,/stable unique property combination.*parent/);
+ assert.match(d.practiceQuiz[2].options.find(o=>o.id==='A').text,/ModuleAttribute/);
+ assert.match(d.practiceQuiz[6].options.find(o=>o.id==='C').text,/stable unique property combination.*parent/);
  assert.match(d.studyGuide[5].elements[2].text,/Auto is the default.*then Coordinate/);
  assert.match(d.studyGuide[6].elements[0].text,/same type.*radio buttons, buttons and links/);
- assert.match(d.practiceQuiz[11].options[2].text,/Convert to ControlGroup/);
+ assert.match(d.practiceQuiz[11].options.find(o=>o.id==='C').text,/Convert to ControlGroup/);
  assert.match(d.studyGuide[6].elements[1].text,/does not automatically execute every/);
  assert.doesNotMatch(JSON.stringify(d),/Tosca never auto-fills|Always prefer Shortest Path|Breaks only if the anchor|Attributes describe the Module itself|Ctrl\+Click multi-select → Create ControlGroup/);
  assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.type==='diagram').length,5);
@@ -820,8 +820,8 @@ test('AS1 TestCases review disambiguates dates and distinguishes progress, waits
  const keys=[['A','B','C'],['D'],['C'],['D'],['C'],['D'],['C'],['D'],['A'],['E'],['B'],['A','B'],['A','B'],['C'],['B'],['D'],['A'],['B'],['A']];
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,keys[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());assert.equal(q.source,undefined);});
  assert.equal(d.practiceQuiz.reduce((n,q)=>n+q.options.length,0),75);
- assert.match(d.practiceQuiz[4].scenario,/including its day/);assert.match(d.practiceQuiz[4].options[2].text,/ddMMMyyyy/);
- assert.equal(d.practiceQuiz[18].options[2].text,'{DATE[][-4M][MM]}');
+ assert.match(d.practiceQuiz[4].scenario,/including its day/);assert.match(d.practiceQuiz[4].options.find(o=>o.id==='C').text,/ddMMMyyyy/);
+ assert.equal(d.practiceQuiz[18].options.find(o=>o.id==='C').text,'{DATE[][-4M][MM]}');
  assert.match(d.studyGuide[15].elements[3].text,/w means workdays, not weeks/);
  assert.match(d.studyGuide[12].elements[0].text,/Secret and RawString/);
  assert.match(d.studyGuide[8].elements[0].text,/bounded by Synchronization Timeout/);
@@ -850,7 +850,7 @@ test('AS1 parameter guidance uses scope rather than job role and preserves overr
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['C'],['D'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[0].elements[0].text,/CP is outside square brackets.*overridden/);
  assert.match(d.studyGuide[2].elements[1].text,/include URL data/);
- assert.match(d.practiceQuiz[0].options[0].text,/replace literal uses/);
+ assert.match(d.practiceQuiz[0].options.find(o=>o.id==='A').text,/replace literal uses/);
  assert.match(d.practiceQuiz[5].scenario,/uniqueness check/);
  assert.doesNotMatch(JSON.stringify(d),/CP in square brackets|exact tip given in Exercise|for non-technical business users managing.*not technical/i);
  assert.equal(d.studyGuide.flatMap(s=>s.elements).filter(e=>e.svg).length,2);
@@ -860,11 +860,11 @@ test('AS1 execution guidance separates default references, latest summary and re
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as1/m06_executionlists.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));
  assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['C'],['D'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.practiceQuiz[0].options[0].text,/Once by default/);
+ assert.match(d.practiceQuiz[0].options.find(o=>o.id==='A').text,/Once by default/);
  assert.match(d.studyGuide[0].elements[1].text,/MultipleReferencesToIdenticalTestCaseAllowed/);
  assert.match(d.studyGuide[0].elements[2].text,/ActualLog.*overwritten.*TestCaseLog/);
  assert.match(d.studyGuide[1].elements[1].text,/context menu or F6/);
- assert.match(d.practiceQuiz[3].options[3].text,/ActualLog is only the latest summary/);
+ assert.match(d.practiceQuiz[3].options.find(o=>o.id==='D').text,/ActualLog is only the latest summary/);
  assert.doesNotMatch(JSON.stringify(d),/all historic results permanently|UNLIMITED reuse|not F6|four-section structure|confirmed.*exam/i);
 });
 
@@ -877,8 +877,8 @@ test('AS1 requirements separates risk class scales from weights and links from c
  assert.match(d.studyGuide[2].elements[0].text,/COMPLETED is not required/);
  assert.match(d.studyGuide[2].elements[2].text,/defaults to Off/);
  assert.match(d.studyGuide[2].elements[3].text,/Neither means always use the newest run/);
- assert.match(d.practiceQuiz[5].options[1].text,/ddMMMyyyy/);
- assert.match(d.practiceQuiz[6].options[2].text,/RequirementSet/);
+ assert.match(d.practiceQuiz[5].options.find(o=>o.id==='B').text,/ddMMMyyyy/);
+ assert.match(d.practiceQuiz[6].options.find(o=>o.id==='C').text,/RequirementSet/);
  assert.doesNotMatch(JSON.stringify(d),/confirmed AS1 exam|verbatim official|not manually entered|Integer 1–10|CP in square brackets|var\(--pa-ink-[23]\)/i);
 });
 
@@ -891,8 +891,8 @@ test('AS1 advanced guidance distinguishes ownership, retry scope, counts and shi
  assert.match(d.studyGuide[9].elements[2].text,/General|general/);
  assert.match(d.studyGuide[9].elements[2].text,/Table ResultCount.*excludes configured headers/);
  assert.match(d.studyGuide[12].elements[1].text,/skip items/);
- assert.match(d.practiceQuiz[4].options[3].text,/current first data row/);
- assert.match(d.practiceQuiz[6].options[1].text,/additional stable properties/);
+ assert.match(d.practiceQuiz[4].options.find(o=>o.id==='D').text,/current first data row/);
+ assert.match(d.practiceQuiz[6].options.find(o=>o.id==='B').text,/additional stable properties/);
  assert.doesNotMatch(JSON.stringify(d),/confirmed Knowledge Check|verbatim official|RowCount==RowNum|\$\{Repetition\}|var\(--pa-ink-[23]\)/i);
 });
 
@@ -904,8 +904,8 @@ test('AS1 reference review corrects expression, shortcut and repair advice witho
  assert.match(d.studyGuide[2].elements[0].text,/w means workdays/);
  assert.match(d.studyGuide[3].elements[0].text,/RowCount->RowNum/);
  assert.match(d.studyGuide[4].elements[0].text,/Module references and TCP dependencies remain/);
- assert.match(d.practiceQuiz[14].options[2].text,/locally editable/);
- assert.match(d.practiceQuiz[17].options[1].text,/one or several/);
+ assert.match(d.practiceQuiz[14].options.find(o=>o.id==='C').text,/locally editable/);
+ assert.match(d.practiceQuiz[17].options.find(o=>o.id==='B').text,/one or several/);
  assert.match(d.studyGuide[5].elements[0].rows[1][0],/Ctrl\+X/);
  assert.doesNotMatch(JSON.stringify(d),/runtime-only|NO IF|ONLY before saving|RowCount==RowNum|w=weeks|var\(--pa-ink-[23]\)/i);
  const b=fs.readFileSync('data/tosca-as1/m10_original_guides.json'),guide=JSON.parse(b);
@@ -919,7 +919,7 @@ test('AS2 foundations separate official policy, instance Character and negative-
  const files=['data/tosca-as2/m00_introduction.json','data/tosca-as2/m01_testsheet_creation.json'];
  const docs=files.map((file,n)=>{const bytes=fs.readFileSync(file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,(n?[['A'],['B'],['D'],['C'],['A'],['B'],['D'],['B']]:[['D'],['C'],['D'],['C'],['D']])[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});return d;});
  assert.match(docs[0].studyGuide[1].elements[0].text,/read-only.*restarting/);
- assert.match(docs[0].practiceQuiz[2].options[3].text,/current official course account/);
+ assert.match(docs[0].practiceQuiz[2].options.find(o=>o.id==='D').text,/current official course account/);
  assert.doesNotMatch(JSON.stringify(docs[0].quickRecap),/60%|2-week|Badge \+ points/);
  assert.match(docs[1].studyGuide[2].elements[0].description,/neither that name nor the leftmost/);
  assert.match(docs[1].practiceQuiz[2].scenario,/every other assertion succeeds/);
@@ -933,9 +933,9 @@ test('AS2 template review covers broader validation and explicit regeneration wi
  const docs=['m02_templates.json','m03_how_to_use_templates.json'].map((file,n)=>{const bytes=fs.readFileSync('data/tosca-as2/'+file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,(n?[['C'],['D'],['B'],['A'],['A','B','D'],['A'],['B']]:[['B'],['B'],['C'],['C'],['A'],['D'],['D']])[i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});return d;});
  assert.match(docs[0].studyGuide[0].elements[2].description,/need reinstantiation/);
  assert.match(docs[0].studyGuide[1].elements[0].text,/not a universal conversion prerequisite/);
- assert.match(docs[0].practiceQuiz[3].options[2].text,/information is lost/);
+ assert.match(docs[0].practiceQuiz[3].options.find(o=>o.id==='C').text,/information is lost/);
  assert.match(docs[1].studyGuide[1].elements[0].text,/empty.*uniquely match/);
- assert.match(docs[1].practiceQuiz[1].options[3].text,/conditions.*TCPs and InstanceName/);
+ assert.match(docs[1].practiceQuiz[1].options.find(o=>o.id==='D').text,/conditions.*TCPs and InstanceName/);
  assert.match(docs[1].studyGuide[2].elements[0].text,/Completed is not listed/);
  docs.forEach(d=>assert.doesNotMatch(JSON.stringify(d),/ONLY checks that the links exist|only validates that XL references exist|exactly ONE Template|Undo ONLY before|BEFORE the project is saved/i));
 });
@@ -948,7 +948,7 @@ test('AS2 modification and conditions distinguish generation, safe updates and r
  assert.match(docs[0].studyGuide[2].elements[0].text,/not a guaranteed additive merge/);
  assert.match(docs[1].practiceQuiz[1].scenario,/controlled, non-null/);
  assert.match(docs[1].practiceQuiz[2].scenario,/explicit logical operator/);
- assert.match(docs[1].practiceQuiz[6].options[2].text,/during generation.*during execution/);
+ assert.match(docs[1].practiceQuiz[6].options.find(o=>o.id==='C').text,/during generation.*during execution/);
  docs.forEach(d=>assert.doesNotMatch(JSON.stringify(d),/delete the OLD TemplateInstance|holds only one link|safer, additive option|Tosca's default for 2\+ conditions/));
 });
 
@@ -957,7 +957,7 @@ test('AS2 execution review separates specified coverage, completion and synchron
  assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A','B','D'],['A'],['A'],['C'],['B'],['B'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[2].elements[0].text,/Completed is not a universal linking prerequisite/);
- assert.match(d.practiceQuiz[3].options[2].text,/creation progress/);
+ assert.match(d.practiceQuiz[3].options.find(o=>o.id==='C').text,/creation progress/);
  assert.match(d.studyGuide[2].elements[0].text,/Do not assume synchronizing one list/);
  assert.match(d.studyGuide[0].elements[0].text,/Alternatively, dropping/);
  assert.doesNotMatch(JSON.stringify(d),/never individual TestCases|must be set to COMPLETED|updates every linked ExecutionList/);
@@ -970,7 +970,7 @@ test('AS2 recap distinguishes generated negative paths, Character and bounded st
  assert.match(d.studyGuide[4].elements[0].text,/including Straight Through/);
  assert.match(d.studyGuide[4].elements[0].text,/rather than jumping folders at runtime/);
  assert.match(d.practiceQuiz[8].scenario,/independent negative-test specification/);
- assert.match(d.practiceQuiz[9].options[0].text,/rescan only when needed/);
+ assert.match(d.practiceQuiz[9].options.find(o=>o.id==='A').text,/rescan only when needed/);
  assert.doesNotMatch(JSON.stringify(d),/discount must verify as a negative number|must be typed manually, not drag-and-dropped|usually indicates an unstable module/);
 });
 
@@ -979,8 +979,8 @@ test('AS2 independent capstone qualifies catalogue assumptions and does not inve
  const docs=['m09_grand_scenario.json','m10_original_guides.json'].map(file=>{const bytes=fs.readFileSync('data/tosca-as2/'+file),d=JSON.parse(bytes);assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));return d;});
  const d=docs[0],ids=new Set(d.studyGuide.map(s=>s.sectionId));d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D'],['B'],['B'],['B'],['D'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.practiceQuiz[0].scenario,/hypothetical price table/);
- assert.match(d.practiceQuiz[1].options[1].text,/Verify the expected rejection/);
- assert.match(d.practiceQuiz[5].options[0].text,/actual Module inventory/);
+ assert.match(d.practiceQuiz[1].options.find(o=>o.id==='B').text,/Verify the expected rejection/);
+ assert.match(d.practiceQuiz[5].options.find(o=>o.id==='A').text,/actual Module inventory/);
  assert.match(docs[1].studyGuide[0].elements[0].text,/no embedded PDF viewer/);
  assert.doesNotMatch(JSON.stringify(docs[1].learningObjectives),/Click either|Download either/);
 });
@@ -989,8 +989,8 @@ test('AS2 API review scopes message patterns, TCPs and composed source values',(
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-as2/m08_create_api_testcases.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['D'],['C'],['C'],['A'],['B'],['A'],['A'],['B'],['C'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.practiceQuiz[1].scenario,/synchronous/);
- assert.match(d.practiceQuiz[4].options[0].text,/scoped.*inheritance or overrides/);
- assert.match(d.practiceQuiz[7].options[0].text,/retaining intentional composition/);
+ assert.match(d.practiceQuiz[4].options.find(o=>o.id==='A').text,/scoped.*inheritance or overrides/);
+ assert.match(d.practiceQuiz[7].options.find(o=>o.id==='A').text,/retaining intentional composition/);
  assert.doesNotMatch(JSON.stringify(d),/every Message.*PAIR|reusable, project-wide|No partial credit|SKU isn't visible on the UI/);
 });
 
@@ -1030,8 +1030,8 @@ test('AE1 introduction and framework review correct positional table syntax and 
  assert.deepEqual(docs[0].practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['B']]);
  assert.deepEqual(docs[1].practiceQuiz.map(q=>q.correctOptions),[['B'],['B'],['C'],['A'],['B'],['B'],['B'],['A']]);
  assert.match(docs[1].studyGuide.find(s=>s.sectionId===docs[1].practiceQuiz[4].lessonSection).elements[0].description,/relative to the configured header/);
- assert.match(docs[1].practiceQuiz[4].options[1].text,/unique Order ID/);
- assert.match(docs[1].practiceQuiz[7].options[0].text,/NONE on the report definition/);
+ assert.match(docs[1].practiceQuiz[4].options.find(o=>o.id==='B').text,/unique Order ID/);
+ assert.match(docs[1].practiceQuiz[7].options.find(o=>o.id==='A').text,/NONE on the report definition/);
  assert.doesNotMatch(JSON.stringify(docs),/\$ = by a cell|\$ notation instead targets the row|only the visuals shift|Final Exam draws no questions/);
  assert.match(docs[0].studyGuide[0].elements[2].text,/developed with Tosca 16.0/);
 });
@@ -1050,7 +1050,7 @@ test('AE1 PDF review distinguishes anchor defaults, relative offsets and explici
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['A','B','C'],['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[2].elements[0].description,/100%.*99%/);
  assert.match(d.studyGuide[1].elements[1].description,/distance between them changes/);
- assert.match(d.practiceQuiz[3].options[1].text,/dimensions.*pages/);
+ assert.match(d.practiceQuiz[3].options.find(o=>o.id==='B').text,/dimensions.*pages/);
  assert.match(d.studyGuide[3].elements[0].description,/does not support OCR/);
  assert.doesNotMatch(JSON.stringify(d),/TBox XEngines|lower it via OCR settings|a shifted layout no longer breaks/);
 });
@@ -1058,7 +1058,7 @@ test('AE1 PDF review distinguishes anchor defaults, relative offsets and explici
 test('AE1 mail review scopes protocols and cloud prerequisites instead of promising account bypasses',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m04_mail_engine.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.equal(d.practiceQuiz[1].options[1].text,'POP3 or IMAP');
+ assert.equal(d.practiceQuiz[1].options.find(o=>o.id==='B').text,'POP3 or IMAP');
  assert.match(d.studyGuide[1].elements[1].description,/token-acquisition failure/);
  assert.match(d.studyGuide[1].elements[2].description,/Client Secret.*Graph/);
  assert.match(d.studyGuide[2].elements[2].items[1],/does not guarantee availability/);
@@ -1070,7 +1070,7 @@ test('AE1 Windows review preserves conditional engine guidance and control capab
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['B'],['A'],['A'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[0].elements[1].description,/recommends.*standard engine/);
  assert.match(d.studyGuide[2].elements[0].description,/depend on the control and engine/);
- assert.match(d.practiceQuiz[2].options[1].text,/evaluate.*references/);
+ assert.match(d.practiceQuiz[2].options.find(o=>o.id==='B').text,/evaluate.*references/);
  assert.doesNotMatch(JSON.stringify(d),/does not prescribe one|Not prescribed by Tricentis|Unchanged — same|also reaches desktop elements and the taskbar/);
 });
 
@@ -1087,14 +1087,14 @@ test('AE1 custom control review scopes verified on-prem exercise and separate Cl
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m07_custom_controls.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));assert.equal(r.localContentReview,'source-compared');assert.equal(d.sourceReviewedOn,'2026-10-07');
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['C'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[1].elements[3].text,/does not affect on-prem customizations/);
- assert.match(d.practiceQuiz[3].options[1].text,/Recompile.*other control types/);
+ assert.match(d.practiceQuiz[3].options.find(o=>o.id==='B').text,/Recompile.*other control types/);
  assert.doesNotMatch(JSON.stringify(d),/survives cosmetic changes|Tosca has to be restarted|same ActionModes/);
 });
 
 test('AE1 standard Modules review corrects name editing, dialog scope and execution restrictions',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-ae1/m08_standard_modules.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['A'],['C'],['A'],['B'],['B'],['C'],['A'],['B'],['C'],['A'],['B'],['B'],['A'],['B'],['B'],['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.equal(d.practiceQuiz[18].options[1].text,'Editing the name of the referenced XTestStepValue.');
+ assert.equal(d.practiceQuiz[18].options.find(o=>o.id==='B').text,'Editing the name of the referenced XTestStepValue.');
  assert.match(d.studyGuide[8].elements[0].description,/Customized dialogs must be scanned/);
  assert.match(d.studyGuide[8].elements[3].text,/ScratchBook does not support/);
  assert.match(d.studyGuide[3].elements[2].description,/permission, lock or path errors/);
@@ -1154,7 +1154,7 @@ test('mobile introduction reviews distinguish Agent support, web engine and unre
  const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json'));
  ['data/tosca-mobile/m00_introduction.json','data/tosca-mobile/m01_mobile_engine_and_tma.json'].forEach((f,n)=>{const bytes=fs.readFileSync(f),d=JSON.parse(bytes),r=inv.modules.find(m=>m.id===d.moduleId),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(r.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));d.practiceQuiz.forEach(q=>{assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  if(!n){assert.equal(r.localContentReview,'source-compared');assert.equal(d.sourceReviewedOn,'2026-10-06');assert.match(d.practiceQuiz[1].scenario,/TMA 2025.4 support matrix/);assert.match(d.practiceQuiz[2].rationale,/do not quantify/);}
- else{assert.equal(r.localContentReview,'source-compared');assert.match(d.studyGuide[1].elements[1].description,/Mobile Web Engine 3.0/);assert.match(d.practiceQuiz[5].options[2].text,/every Tosca author.*manually install/);assert.deepEqual(d.practiceQuiz[5].correctOptions,['C']);assert.match(d.practiceQuiz[3].rationale,/does not prove an engine defect/);}
+ else{assert.equal(r.localContentReview,'source-compared');assert.match(d.studyGuide[1].elements[1].description,/Mobile Web Engine 3.0/);assert.match(d.practiceQuiz[5].options.find(o=>o.id==='C').text,/every Tosca author.*manually install/);assert.deepEqual(d.practiceQuiz[5].correctOptions,['C']);assert.match(d.practiceQuiz[3].rationale,/does not prove an engine defect/);}
  assert.doesNotMatch(JSON.stringify(d),/large majority|most real-world.*problems hide|Eliminates configuration challenges|Tosca Commander itself runs there/);
  });
 });
@@ -1222,14 +1222,14 @@ test('advanced mobile review corrects hardware buttons, virtual biometrics and A
  assert.match(d.studyGuide[0].elements[0].items[0],/ApplicationSelector.*do not include volume or power/);
  assert.match(d.studyGuide[1].elements[0].items[0],/Android emulator.*not a universal physical/);
  assert.match(d.studyGuide[2].elements[0].items[0],/Android.*overwritten/);
- assert.match(d.practiceQuiz[3].options[1].text,/reservation release.*separately/);
+ assert.match(d.practiceQuiz[3].options.find(o=>o.id==='B').text,/reservation release.*separately/);
  assert.doesNotMatch(JSON.stringify(d),/api\/devices|almost always|very often|more forgiving|only then network|re-sign with apksigner/);
 });
 
 test('AVD review separates profile names, runtime ports and session-readiness evidence',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m09_avd_setup_tma_integration.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.practiceQuiz[1].options[1].text,/console port.*adb port.*5555/);
+ assert.match(d.practiceQuiz[1].options.find(o=>o.id==='B').text,/console port.*adb port.*5555/);
  assert.match(d.studyGuide[2].elements[2].description,/displayed full emulator name.*Do not interchange/);
  assert.match(d.studyGuide[1].elements[2].text,/Do not assume.*translation/);
  assert.doesNotMatch(JSON.stringify(d),/Official course description|surprising share|runs, technically, through translation|isolates whether the problem is|in that order/);
@@ -1247,7 +1247,7 @@ test('mobile app-type review distinguishes opening and engine paths from shared 
 test('dynamic selection review separates documented literal from invented scheduler and filter guarantees',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m11_dynamic_device_allocation.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['A'],['A','B','D'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.practiceQuiz[0].options[1].text,/Appium dynamic selection/);
+ assert.match(d.practiceQuiz[0].options.find(o=>o.id==='B').text,/Appium dynamic selection/);
  assert.match(d.studyGuide[1].elements[0].description,/not arbitrary wildcard syntax/);
  assert.match(d.studyGuide[1].elements[1].items[1],/do not invent a minimum-version comparison/);
  assert.match(d.practiceQuiz[2].scenario,/only one compatible device/);
@@ -1269,7 +1269,7 @@ test('mobile image review documents additional references and resolution methods
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['A','B','C'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[0].elements[1].items[2],/default is 85%/);
  assert.match(d.studyGuide[0].elements[2].text,/does not support Edit images.*MultiScaleTemplate.*Feature/);
- assert.match(d.practiceQuiz[1].options[3].text,/leaves.*rendering.*state unchanged/);
+ assert.match(d.practiceQuiz[1].options.find(o=>o.id==='D').text,/leaves.*rendering.*state unchanged/);
  assert.doesNotMatch(JSON.stringify(d),/Official prerequisites|Official course description|Built on Tosca 2024.2|All are passing builds|all break image matches/);
 });
 
@@ -1285,7 +1285,7 @@ test('mobile tuning review separates scan reset and preview from execution TCPs 
 test('mobile Module review uses documented scrolling and inspected locator evidence rather than symptom guesses',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-mobile/m15_module_properties.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['B']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.practiceQuiz[0].options[1].text,/ScrollingBehavior=None.*Module Properties/);
+ assert.match(d.practiceQuiz[0].options.find(o=>o.id==='B').text,/ScrollingBehavior=None.*Module Properties/);
  assert.match(d.practiceQuiz[1].scenario,/Inspection confirms.*English label/);
  assert.match(d.studyGuide[2].elements[2].text,/does not support Tosca user simulations/);
  assert.doesNotMatch(JSON.stringify(d),/guarantees inconsistency|each point directly|normally the clearest|every TestCase inherits it/);
@@ -1366,7 +1366,7 @@ test('Testim execution review distinguishes timeout units, quota scope, graph se
  assert.match(d.studyGuide[1].elements[1].description,/not automatic encryption.*Static JSON.*JavaScript.*password-type/);
  assert.match(d.studyGuide[2].elements[0].description,/CLI.*milliseconds.*Scheduler.*seconds.*temporarily/);
  assert.match(d.studyGuide[3].elements[1].description,/graph plots execution count.*not duration/);
- assert.match(d.practiceQuiz[7].options[3].text,/locally from the editor/);
+ assert.match(d.practiceQuiz[7].options.find(o=>o.id==='D').text,/locally from the editor/);
  assert.doesNotMatch(JSON.stringify(d),/next test case.*fails to run|main mechanism for keeping sensitive|runs directly from the editor are.*excluded|every.*nothing remembered/);
 });
 
@@ -1376,7 +1376,7 @@ test('Testim management review scopes Auto Improve, status initialization and ch
  assert.match(d.studyGuide[0].elements[1].description,/At feature enablement.*not.*perpetual/);
  assert.match(d.studyGuide[3].elements[0].description,/writable master.*read-only master.*other branches.*Manual locator editing/);
  assert.match(d.studyGuide[2].elements[0].description,/failing Before All stops.*not certify.*every abort/);
- assert.match(d.practiceQuiz[3].options[0].text,/Save a changed test/);
+ assert.match(d.practiceQuiz[3].options.find(o=>o.id==='A').text,/Save a changed test/);
  assert.doesNotMatch(JSON.stringify(d),/auto-applied based on having run|whenever changes are made to the test|automatically provision.*already configured/);
 });
 
@@ -1452,7 +1452,7 @@ test('Testim hook review applies configuration and Run on choices and separates 
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['B'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[0].elements[0].description,/apply it.*does not attach it to every test/);
  assert.match(d.studyGuide[0].elements[1].description,/Always, Success, Failure.*skipped/);
- assert.match(d.practiceQuiz[2].options[0].text,/Configuration File beforeTest/);
+ assert.match(d.practiceQuiz[2].options.find(o=>o.id==='A').text,/Configuration File beforeTest/);
  assert.doesNotMatch(JSON.stringify(d),/no per-test manual wiring|repairs?.*correct.*stale state/);
 });
 
@@ -1468,7 +1468,7 @@ test('Testim result review separates local debug modes, failure cause tags and i
 test('Testim CLI review scopes installation, individual timeout and multiple intersection operands',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m17_leveraging_cli.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['A'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.practiceQuiz[0].options[0].text,/npm install -g/);
+ assert.match(d.practiceQuiz[0].options.find(o=>o.id==='A').text,/npm install -g/);
  assert.match(d.studyGuide[1].elements[0].items[2],/OR semantics by default.*--intersect-with-operand/);
  assert.match(d.studyGuide[1].elements[0].items[3],/individual test.*not.*total suite duration/);
 });
@@ -1476,7 +1476,7 @@ test('Testim CLI review scopes installation, individual timeout and multiple int
 test('Testim cross-browser review corrects grid selection flag and separates matrix from device coverage',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m18_executing_tests_multiple_browsers.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.equal(d.practiceQuiz[2].options[2].text,'--grid');
+ assert.equal(d.practiceQuiz[2].options.find(o=>o.id==='C').text,'--grid');
  assert.match(d.studyGuide[0].elements[2].description,/--grid selects.*--test-config selects/);
  assert.match(d.studyGuide[0].elements[1].description,/single grid test.*not evidence of physical-device/);
  assert.doesNotMatch(JSON.stringify(d),/--test-config.*sets which grid|--test-config is used to add\/update the grid/);
@@ -1540,7 +1540,7 @@ test('Testim debugging review separates browser code debugging from CLI and scop
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['A'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[1].elements[1].description,/Chrome DevTools.*CLI actions are not listed/);
  assert.match(d.studyGuide[1].elements[0].description,/unexecuted steps have no runtime values/);
- assert.match(d.practiceQuiz[2].options[1].text,/another breakpoint/);
+ assert.match(d.practiceQuiz[2].options.find(o=>o.id==='B').text,/another breakpoint/);
  assert.doesNotMatch(JSON.stringify(d),/Run locally step by step|Play Next Step|custom action\/validation\/CLI steps/);
 });
 
@@ -1549,7 +1549,7 @@ test('Testim streamlining review scopes Turbo artifacts and removes unsupported 
  d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['C'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[1].elements[0].description,/professional-plan.*not a promised result.*crashes/);
  assert.match(d.studyGuide[0].elements[2].description,/owned-test runs.*rather than filtering only actions/);
- assert.match(d.practiceQuiz[2].options[1].text,/Connect Testim/);
+ assert.match(d.practiceQuiz[2].options.find(o=>o.id==='B').text,/Connect Testim/);
  assert.doesNotMatch(JSON.stringify(d),/video is saved.*test results|up to 30% faster|just your own recent activity/);
 });
 
@@ -1564,7 +1564,7 @@ test('Testim project review distinguishes membership and built-in audit and prot
 
 for(const [file,keys,verify] of [
  ['m29_using_rest_api.json',[['B'],['B'],['B']],d=>{assert.match(d.studyGuide[0].elements[2].description,/already has its PAK- prefix.*additionally.*does not replace/);assert.doesNotMatch(JSON.stringify(d),/instead of \(or alongside\)|is instead added/);}],
- ['m30_best_practices_automating_logins.json',[['B'],['B'],['B']],d=>{assert.match(d.studyGuide[0].elements[2].description,/blur validation.*Replay/);assert.match(d.practiceQuiz[0].options[1].text,/bind the credential entry steps/);assert.match(d.studyGuide[1].elements[1].description,/skipped login group alone does not prove authentication/);assert.doesNotMatch(JSON.stringify(d),/guarantees? a clean/);}],
+ ['m30_best_practices_automating_logins.json',[['B'],['B'],['B']],d=>{assert.match(d.studyGuide[0].elements[2].description,/blur validation.*Replay/);assert.match(d.practiceQuiz[0].options.find(o=>o.id==='B').text,/bind the credential entry steps/);assert.match(d.studyGuide[1].elements[1].description,/skipped login group alone does not prove authentication/);assert.doesNotMatch(JSON.stringify(d),/guarantees? a clean/);}],
  ['m31_automating_mobile_tests.json',[['A'],['B'],['A'],['A']],d=>{assert.match(d.studyGuide[1].elements[2].items[2],/re-recording/);assert.match(d.studyGuide[1].elements[2].items[3],/x86_64.*simulator.*real-device/);assert.match(d.studyGuide[0].elements[0].description,/separate project for each mobile OS/);assert.doesNotMatch(JSON.stringify(d),/Need maximum stability|more stable, faster, more versatile testing/);}]
 ])test('Testim final-source regression: '+file,()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/'+file),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
@@ -1587,19 +1587,19 @@ test('PBA View review scopes read-only display and corrects promoted action prec
 test('PBA assigning work review separates Get Next Work and SLA scopes from guarantees and default reject assumptions',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/business-architect/m11_assigning_completing_work.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.type==='multi-select'?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.equal(d.practiceQuiz[5].options[0].text,'Configured Get Next Work selection');assert.match(d.practiceQuiz[10].rationale,/resolve, continue or change Stage/);assert.match(d.studyGuide[3].elements[2].description,/At 100.*notifications/);assert.match(d.studyGuide[3].bulletPoints[2],/Initial Case urgency.*App Studio/);assert.match(d.learningObjectives[3],/without guaranteeing timely completion/);assert.doesNotMatch(JSON.stringify(d),/always distinct outcomes that lead to different paths/);
+ assert.equal(d.practiceQuiz[5].options.find(o=>o.id==='A').text,'Configured Get Next Work selection');assert.match(d.practiceQuiz[10].rationale,/resolve, continue or change Stage/);assert.match(d.studyGuide[3].elements[2].description,/At 100.*notifications/);assert.match(d.studyGuide[3].bulletPoints[2],/Initial Case urgency.*App Studio/);assert.match(d.learningObjectives[3],/without guaranteeing timely completion/);assert.doesNotMatch(JSON.stringify(d),/always distinct outcomes that lead to different paths/);
 });
 
 test('PBA workflow review distinguishes Stage skip and Process start polarity and Constellation PDF limitations',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/business-architect/m12_controlling_case_workflow.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===3?['A','B','C']:q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.studyGuide[4].elements[0].description,/Create cannot be skipped.*false Process start condition skips/);assert.match(d.practiceQuiz[2].rationale,/opposite polarity/);assert.match(d.studyGuide[1].elements[1].text,/Constellation needs a workaround/);assert.equal(d.practiceQuiz[5].options[0].text,'Send an email / run a Data Transform');assert.match(d.studyGuide[3].elements[2].items[1],/class\/ruleset context/);
+ assert.match(d.studyGuide[4].elements[0].description,/Create cannot be skipped.*false Process start condition skips/);assert.match(d.practiceQuiz[2].rationale,/opposite polarity/);assert.match(d.studyGuide[1].elements[1].text,/Constellation needs a workaround/);assert.equal(d.practiceQuiz[5].options.find(o=>o.id==='A').text,'Send an email / run a Data Transform');assert.match(d.studyGuide[3].elements[2].items[1],/class\/ruleset context/);
 });
 
 test('PBA Case relationship review requires existing all-child dependencies and distinguishes resolved from successful',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/business-architect/m13_managing_case_relationships.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.practiceQuiz[2].options[0].text,/all already-created.*without user cancellation/);assert.match(d.practiceQuiz[2].rationale,/Resolved-prefixed.*specific success status/);assert.match(d.studyGuide[0].elements[3].description,/copying does not create ongoing synchronization/);assert.match(d.practiceQuiz[6].hint,/Resolved-Duplicate/);assert.match(d.topics[2].url,/duplicate-search\/v7/);
+ assert.match(d.practiceQuiz[2].options.find(o=>o.id==='A').text,/all already-created.*without user cancellation/);assert.match(d.practiceQuiz[2].rationale,/Resolved-prefixed.*specific success status/);assert.match(d.studyGuide[0].elements[3].description,/copying does not create ongoing synchronization/);assert.match(d.practiceQuiz[6].hint,/Resolved-Duplicate/);assert.match(d.topics[2].url,/duplicate-search\/v7/);
 });
 
 test('PBA data-value review scopes transform invocation and validation triggers and table result modes',()=>{
@@ -1617,7 +1617,7 @@ test('PBA access review separates design personas active access context and comp
 test('PBA UI review scopes theme presentation and separates Visible Disabled and Required behavior',()=>{
  const crypto=require('node:crypto'),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),entry=inv.modules.find(m=>m.id==='BA-M16'),bytes=fs.readFileSync(entry.file),d=JSON.parse(bytes),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(entry.localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
  d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,q.selectCount===3?['A','B','C']:q.selectCount===2?['A','B']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
- assert.match(d.studyGuide[1].elements[0].description,/across an application.*arbitrary per-field/);assert.match(d.studyGuide[2].elements[1].description,/Visible true.*Disabled true.*Required true/);assert.equal(d.practiceQuiz[1].options[2].text,'Insights');assert.match(d.studyGuide[0].bulletPoints[3],/separate portals are not mandatory/);
+ assert.match(d.studyGuide[1].elements[0].description,/across an application.*arbitrary per-field/);assert.match(d.studyGuide[2].elements[1].description,/Visible true.*Disabled true.*Required true/);assert.equal(d.practiceQuiz[1].options.find(o=>o.id==='C').text,'Insights');assert.match(d.studyGuide[0].bulletPoints[3],/separate portals are not mandatory/);
 });
 
 test('PBA Insights review scopes sharing and BIX extraction and supplies table-chart configuration concepts',()=>{
@@ -1664,13 +1664,13 @@ test('Mobile introduction distinguishes authenticated five-topic syllabus from i
 test('Original AE1 custom-control exercise retains deployment, rescan and steering facts without universal installation claims',()=>{
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m07_custom_controls.json')),s=d.studyGuide[1],steps=d.studyGuide[2].elements.find(e=>e.type==='steps').items;
  assert.match(s.elements[0].description,/FancyComboBox\.dll and HtmlTable\.dll/);assert.ok(s.elements[1].description.includes('C:\\Program Files (x86)\\TRICENTIS\\Tosca Testsuite\\TBox'));assert.match(s.elements[1].description,/closes Tosca.*reopens Commander.*not a universal path/);
- assert.ok(steps.some(s=>/66744/.test(s)));assert.ok(steps.some(s=>/57445/.test(s)));assert.ok(steps.some(s=>/Planned.*Input/.test(s)));assert.ok(steps.some(s=>/ScratchBook/.test(s)));assert.match(d.practiceQuiz[1].options[2].text,/Close Tosca.*reopen Commander.*rescan/);assert.match(d.examPitfalls[2].bestPractice,/Vision AI.*avoid customization/);assert.doesNotMatch(JSON.stringify(d),/instructions remain unverified|package availability is unverified|instructions were unavailable/);
+ assert.ok(steps.some(s=>/66744/.test(s)));assert.ok(steps.some(s=>/57445/.test(s)));assert.ok(steps.some(s=>/Planned.*Input/.test(s)));assert.ok(steps.some(s=>/ScratchBook/.test(s)));assert.match(d.practiceQuiz[1].options.find(o=>o.id==='C').text,/Close Tosca.*reopen Commander.*rescan/);assert.match(d.examPitfalls[2].bestPractice,/Vision AI.*avoid customization/);assert.doesNotMatch(JSON.stringify(d),/instructions remain unverified|package availability is unverified|instructions were unavailable/);
 });
 
 test('Original Grand Scenario includes PDF fields, Excel row selection, saved attachments and modern mail caveats',()=>{
  const d=JSON.parse(fs.readFileSync('data/tosca-ae1/m12_grand_scenario.json')),text=JSON.stringify(d),s=d.studyGuide;
  assert.equal(s[1].elements[1].items.length,4);assert.match(s[4].elements[0].description,/Company=Demowebshop.*\{B\[orderNumber\]\}.*41\.00/);assert.match(s[3].elements[0].description,/OrderDataRange from A1 to D5/);assert.match(s[3].elements[1].items[1],/\$header.*Company.*OrderNumber.*OrderTotal/);assert.match(s[3].elements[1].items[3],/Save=True/);
- assert.match(d.practiceQuiz[4].options[0].text,/Invoice\.pdf.*Order_Details\.xlsx/);assert.match(s[6].elements[1].text,/removed Basic authentication for EWS.*OAuth2/);assert.match(s[6].elements[2].text,/SMTP sends mail; IMAP accesses incoming mail/);assert.doesNotMatch(text,/14-step flow|complete the official.*unverified|exact exercise sequence have not been inspected/);
+ assert.match(d.practiceQuiz[4].options.find(o=>o.id==='A').text,/Invoice\.pdf.*Order_Details\.xlsx/);assert.match(s[6].elements[1].text,/removed Basic authentication for EWS.*OAuth2/);assert.match(s[6].elements[2].text,/SMTP sends mail; IMAP accesses incoming mail/);assert.doesNotMatch(text,/14-step flow|complete the official.*unverified|exact exercise sequence have not been inspected/);
 });
 
 test('Completed original source-review inventory retains a current reviewed hash for every local module',()=>{

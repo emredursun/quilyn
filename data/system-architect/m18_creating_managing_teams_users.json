@@ -77,7 +77,7 @@
           "type": "interactive",
           "title": "Worklist vs Work Queue Decisions",
           "height": 420,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Named vs Pool\", \"scenario\": \"A procurement manager personally signs off on all contracts. No one else can approve in their absence \\u2014 only they can complete the Contract Approval Assignment. Where should this Assignment be routed?\", \"opts\": [\"Manager's Worklist \\u2014 route directly to the specific named operator's personal queue when individual accountability is required\", \"Contract Approval Work Queue \\u2014 any authorized approver can claim it from the pool\", \"Broadcast to all approvers' Worklists simultaneously \\u2014 the first to respond is the valid approval\", \"Business logic routing to find the approver with the fewest assignments \\u2014 ensures load balancing across named individuals\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. When a specific named individual must complete the work (personal accountability), route to their Worklist.\", \"\\u2717 Incorrect. A Work Queue supports eligible users claiming shared work \\u2014 the scenario requires ONE specific person.\", \"\\u2717 Incorrect. Broadcasting to multiple Worklists creates multiple Assignments and potential duplicate completions.\", \"\\u2717 Incorrect. Load balancing chooses dynamically \\u2014 it cannot guarantee the specific named manager receives every contract.\"]}, {\"label\": \"Shared Pool\", \"scenario\": \"A document verification team of 12 analysts must process verification requests. All 12 should see the same incoming requests. Whoever is free picks it up. Which routing applies?\", \"opts\": [\"Document Verification Work Queue \\u2014 one Assignment visible to all 12; first to claim removes it from the pool for others\", \"Each analyst's individual Worklist \\u2014 broadcast to all 12 simultaneously\", \"Round-robin across the 12 Worklists \\u2014 one at a time, rotating\", \"Route to the team lead's Worklist; team lead delegates to available analysts\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Work Queue = shared pool. One Assignment, 12 can see it, first to claim processes it. No duplicates.\", \"\\u2717 Incorrect. Broadcasting to 12 Worklists creates 12 separate Assignments \\u2014 all 12 could submit the same verification, creating conflicts.\", \"\\u2717 Incorrect. Round-robin sends to one analyst at a time, removing visibility from the other 11 who may also be available.\", \"\\u2717 Incorrect. Manager delegation is a manual bottleneck \\u2014 defeats the purpose of automated shared-pool routing.\"]}, {\"label\": \"Queue vs List Behavior\", \"scenario\": \"A CSR claims a customer complaint Assignment from the Work Queue. 30 minutes later, they are pulled into an urgent meeting. What happens to the Assignment they claimed?\", \"opts\": [\"The Assignment is in their Worklist and stays there \\u2014 it's their responsibility. They (or a manager) must reassign it back to the queue or to another CSR if they cannot complete it\", \"The Assignment automatically returns to the Work Queue after 30 minutes of inactivity\", \"The Assignment is shared with their team automatically when they become inactive \\u2014 any team member can complete it\", \"The Assignment is escalated to the manager by the SLA, who then manually reassigns it\"], \"correct\": 0, \"fbs\": [\"\\u2713 Correct. Once claimed, the Assignment moves to the CSR's Worklist and is assigned to that operator. It does not auto-return unless a manager manually reassigns it (or an SLA escalation triggers reassignment).\", \"\\u2717 Incorrect. Assignments do not auto-return to a queue based on inactivity time. The SLA escalation timeout can trigger reassignment, but that requires explicit SLA configuration.\", \"\\u2717 Incorrect. Claimed Assignments are not automatically shared \\u2014 they are exclusively in the claiming CSR's Worklist until completed or explicitly reassigned.\", \"\\u2717 Incorrect. An escalation notification requires explicit configuration; a notification alone does not reassign the work. Any automatic reassignment must be explicitly configured; notification and reassignment are different actions.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Named vs Pool\",\n    \"scenario\": \"A procurement manager personally signs off on all contracts. No one else can approve in their absence — only they can complete the Contract Approval Assignment. Where should this Assignment be routed?\",\n    \"opts\": [\n      \"The manager's personal Worklist\",\n      \"Broadcast to approver Worklists\",\n      \"Route by lowest Assignment count\",\n      \"The Contract Approval Work Queue\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. When a specific named individual must complete the work (personal accountability), route to their Worklist.\",\n      \"✗ Incorrect. Broadcasting to multiple Worklists creates multiple Assignments and potential duplicate completions.\",\n      \"✗ Incorrect. Load balancing chooses dynamically — it cannot guarantee the specific named manager receives every contract.\",\n      \"✗ Incorrect. A Work Queue supports eligible users claiming shared work — the scenario requires ONE specific person.\"\n    ]\n  },\n  {\n    \"label\": \"Shared Pool\",\n    \"scenario\": \"A document verification team of 12 analysts must process verification requests. All 12 should see the same incoming requests. Whoever is free picks it up. Which routing applies?\",\n    \"opts\": [\n      \"The team lead's personal Worklist\",\n      \"The shared Document Verification Work Queue\",\n      \"Each analyst's individual Worklist\",\n      \"Round-robin across the twelve individual Worklists\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"✗ Incorrect. Manager delegation is a manual bottleneck — defeats the purpose of automated shared-pool routing.\",\n      \"✓ Correct. Work Queue = shared pool. One Assignment, 12 can see it, first to claim processes it. No duplicates.\",\n      \"✗ Incorrect. Broadcasting to 12 Worklists creates 12 separate Assignments — all 12 could submit the same verification, creating conflicts.\",\n      \"✗ Incorrect. Round-robin sends to one analyst at a time, removing visibility from the other 11 who may also be available.\"\n    ]\n  },\n  {\n    \"label\": \"Queue vs List Behavior\",\n    \"scenario\": \"A CSR claims a customer complaint Assignment from the Work Queue. 30 minutes later, they are pulled into an urgent meeting. What happens to the Assignment they claimed?\",\n    \"opts\": [\n      \"It automatically returns to the Work Queue after 30 minutes of inactivity\",\n      \"It becomes shared with the team when the CSR becomes inactive\",\n      \"It stays in their Worklist until the CSR or manager reassigns it\",\n      \"The SLA escalates it to the manager, who manually reassigns it\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. Assignments do not auto-return to a queue based on inactivity time. The SLA escalation timeout can trigger reassignment, but that requires explicit SLA configuration.\",\n      \"✗ Incorrect. Claimed Assignments are not automatically shared — they are exclusively in the claiming CSR's Worklist until completed or explicitly reassigned.\",\n      \"✓ Correct. Once claimed, the Assignment moves to the CSR's Worklist and is assigned to that operator. It does not auto-return unless a manager manually reassigns it (or an SLA escalation triggers reassignment).\",\n      \"✗ Incorrect. An escalation notification requires explicit configuration; a notification alone does not reassign the work. Any automatic reassignment must be explicitly configured; notification and reassignment are different actions.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-ada5ef3ae095"
@@ -132,26 +132,25 @@
       "scenario": "A finance analyst, a marketing manager, and a staff writer in DIFFERENT business units all maintain the company website and must share a pool of work. What should the SA create?",
       "options": [
         {
-          "id": "A",
-          "text": "A Work Group — a cross-functional team (with one Work Queue) whose members share work regardless of business unit"
-        },
-        {
           "id": "B",
           "text": "A new business unit that contains all three"
         },
         {
-          "id": "C",
-          "text": "Three separate Worklists that sync with each other"
-        },
-        {
           "id": "D",
           "text": "An Access Role shared by the three"
+        },
+        {
+          "id": "A",
+          "text": "A Work Group"
+        },
+        {
+          "id": "C",
+          "text": "Three separate Worklists that sync with each other"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Cross-functional teams that share work assignments use a Work Group structure.",
       "rationale": "The team can collaborate across existing business units.",
       "optionExplanations": {
         "A": "The team can collaborate across existing business units.",
@@ -160,7 +159,10 @@
         "D": "A role does not by itself establish this routing team."
       },
       "lessonSection": "section-37f40fcb138a",
-      "explanationReviewedOn": "2026-10-03"
+      "explanationReviewedOn": "2026-10-03",
+      "previousSignatures": [
+        "[\"single-select\",\"A finance analyst, a marketing manager, and a staff writer in DIFFERENT business units all maintain the company website and must share a pool of work. What should the SA create?\",[[\"A\",\"A Work Group — a cross-functional team (with one Work Queue) whose members share work regardless of business unit\"],[\"B\",\"A new business unit that contains all three\"],[\"C\",\"Three separate Worklists that sync with each other\"],[\"D\",\"An Access Role shared by the three\"]],[\"A\"]]"
+      ]
     },
     {
       "questionId": "m18_q02",
@@ -168,16 +170,16 @@
       "scenario": "In the documented Work Group configuration, which field identifies the queue used as the group default?",
       "options": [
         {
+          "id": "C",
+          "text": "The Case status label"
+        },
+        {
           "id": "A",
           "text": "Default Work Queue on the Work Group record"
         },
         {
           "id": "B",
           "text": "The operator password"
-        },
-        {
-          "id": "C",
-          "text": "The Case status label"
         },
         {
           "id": "D",
@@ -204,20 +206,20 @@
       "scenario": "A BA is explaining assignment routing to a client stakeholder who is designing team workflows. What is the key difference between a Work Queue and a Worklist in Pega?",
       "options": [
         {
-          "id": "A",
-          "text": "A Work Queue is shared by all operators in a Work Group; a Worklist holds only one operator's work. Assignments move from the Queue to a Worklist when ready"
+          "id": "C",
+          "text": "A Worklist is shared; a Work Queue is personal"
         },
         {
           "id": "B",
           "text": "They are identical; the names are interchangeable"
         },
         {
-          "id": "C",
-          "text": "A Worklist is shared; a Work Queue is personal"
-        },
-        {
           "id": "D",
           "text": "A Work Queue stores rules; a Worklist stores data"
+        },
+        {
+          "id": "A",
+          "text": "A Work Queue is shared by all operators in a Work Group; a Worklist holds only one operator's work. Assignments move from the Queue to a Worklist when ready"
         }
       ],
       "correctOptions": [
@@ -244,16 +246,16 @@
           "text": "At least one, and the operator may belong to more than one"
         },
         {
+          "id": "D",
+          "text": "Exactly two — a primary and a backup"
+        },
+        {
           "id": "B",
           "text": "Exactly one — operators cannot belong to multiple Work Groups"
         },
         {
           "id": "C",
           "text": "Zero or more — Work Group membership is optional"
-        },
-        {
-          "id": "D",
-          "text": "Exactly two — a primary and a backup"
         }
       ],
       "correctOptions": [
@@ -276,20 +278,20 @@
       "scenario": "A BA is setting up a Work Group for a loan processing team and is asked why the manager field is required. For what purpose does Pega use the Work Group manager's information?",
       "options": [
         {
-          "id": "A",
-          "text": "Notification Tasks, approval Tasks, routing Tasks, and escalation — managers also monitor/report via the Web Portal"
-        },
-        {
           "id": "B",
           "text": "Only for sending marketing emails"
         },
         {
-          "id": "C",
-          "text": "To store the Ruleset version of the application"
+          "id": "A",
+          "text": "Notification Tasks, approval Tasks, routing Tasks, and escalation — managers also monitor/report via the Web Portal"
         },
         {
           "id": "D",
           "text": "To authenticate operators at login"
+        },
+        {
+          "id": "C",
+          "text": "To store the Ruleset version of the application"
         }
       ],
       "correctOptions": [
@@ -316,16 +318,16 @@
           "text": "They help transfer Assignments and can cover when the primary manager is unavailable"
         },
         {
+          "id": "D",
+          "text": "From outside the Work Group, they can still complete Assignments from the Work Queue"
+        },
+        {
           "id": "B",
           "text": "They cannot perform approvals"
         },
         {
           "id": "C",
           "text": "They must be a member of the Work Group"
-        },
-        {
-          "id": "D",
-          "text": "From outside the Work Group, they can still complete Assignments from the Work Queue"
         }
       ],
       "correctOptions": [
@@ -350,10 +352,6 @@
       "scenario": "An SA refers to an 'Operator' in Dev Studio. What is the equivalent term in App Studio?",
       "options": [
         {
-          "id": "A",
-          "text": "A User (also called 'people') — the same record, different studio label"
-        },
-        {
           "id": "B",
           "text": "A Persona"
         },
@@ -364,6 +362,10 @@
         {
           "id": "D",
           "text": "An Access Group"
+        },
+        {
+          "id": "A",
+          "text": "A User (also called 'people') — the same record, different studio label"
         }
       ],
       "correctOptions": [
@@ -390,12 +392,12 @@
           "text": "The default@pega.com Work Queue"
         },
         {
-          "id": "B",
-          "text": "No Work Queue — the first Work Group does not need one"
-        },
-        {
           "id": "C",
           "text": "A Worklist instead of a Work Queue"
+        },
+        {
+          "id": "B",
+          "text": "No Work Queue — the first Work Group does not need one"
         },
         {
           "id": "D",
@@ -422,20 +424,20 @@
       "scenario": "A team of 12 eligible operators should pull Claims Assignments from one shared pool. Which routing target expresses that requirement?",
       "options": [
         {
-          "id": "A",
-          "text": "The Claims-Processing workbasket — routes to the shared queue where any of the 12 can pull work"
-        },
-        {
-          "id": "B",
-          "text": "The Work Group Manager worklist — the manager redistributes to team members"
-        },
-        {
           "id": "C",
           "text": "Round-robin assignment to each of the 12 operator worklists"
         },
         {
           "id": "D",
           "text": "Skill-match query returning the first available member across the 12"
+        },
+        {
+          "id": "A",
+          "text": "The Claims-Processing workbasket — routes to the shared queue where any of the 12 can pull work"
+        },
+        {
+          "id": "B",
+          "text": "The Work Group Manager worklist — the manager redistributes to team members"
         }
       ],
       "correctOptions": [
@@ -458,10 +460,6 @@
       "scenario": "In the documented Work Group configuration, where are additional Authorized Managers listed?",
       "options": [
         {
-          "id": "A",
-          "text": "Authorized managers on the Work Group tab"
-        },
-        {
           "id": "B",
           "text": "A Case status field"
         },
@@ -472,6 +470,10 @@
         {
           "id": "D",
           "text": "An automatic Deputy Work Group Manager field required by this procedure"
+        },
+        {
+          "id": "A",
+          "text": "Authorized managers on the Work Group tab"
         }
       ],
       "correctOptions": [
@@ -494,20 +496,20 @@
       "scenario": "Routing resolves three Assignments to the same named manager, with no alternate routing configured. Which destination matches this individual routing?",
       "options": [
         {
-          "id": "A",
-          "text": "The named manager’s personal Worklist"
+          "id": "D",
+          "text": "An automatic alternate manager destination solely because there are three Assignments"
         },
         {
-          "id": "B",
-          "text": "All three route to the Work Group workbasket, accessible by any member"
+          "id": "A",
+          "text": "The named manager’s personal Worklist"
         },
         {
           "id": "C",
           "text": "Pega rejects the second and third because the WGM worklist holds only one active assignment"
         },
         {
-          "id": "D",
-          "text": "An automatic alternate manager destination solely because there are three Assignments"
+          "id": "B",
+          "text": "All three route to the Work Group workbasket, accessible by any member"
         }
       ],
       "correctOptions": [
@@ -530,20 +532,20 @@
       "scenario": "A Work Queue has a Roles restriction configured. A user can access the queue but has none of those roles. What requirement is missing?",
       "options": [
         {
-          "id": "A",
-          "text": "At least one role listed in the Work Queue configuration"
-        },
-        {
-          "id": "B",
-          "text": "Exactly two Work Group memberships"
-        },
-        {
           "id": "C",
           "text": "A new Case title"
         },
         {
           "id": "D",
           "text": "The correspondence editor’s preview"
+        },
+        {
+          "id": "A",
+          "text": "At least one role listed in the Work Queue configuration"
+        },
+        {
+          "id": "B",
+          "text": "Exactly two Work Group memberships"
         }
       ],
       "correctOptions": [
@@ -566,20 +568,20 @@
       "scenario": "An SA is explaining how to structure a cross-functional team in a Pega application. Which TWO statements correctly describe a Work Group?",
       "options": [
         {
-          "id": "A",
-          "text": "The introductory team model associates cross-functional users with shared work"
-        },
-        {
           "id": "B",
           "text": "A designated manager supports supervision of that team’s work"
+        },
+        {
+          "id": "D",
+          "text": "A Work Group must be associated with exactly one Persona or it cannot be created in App Studio"
         },
         {
           "id": "C",
           "text": "A Work Group stores individual Worklist assignments for each team member privately, separate from the shared queue"
         },
         {
-          "id": "D",
-          "text": "A Work Group must be associated with exactly one Persona or it cannot be created in App Studio"
+          "id": "A",
+          "text": "The introductory team model associates cross-functional users with shared work"
         }
       ],
       "correctOptions": [
@@ -603,6 +605,10 @@
       "scenario": "Which TWO statements describe Authorized Managers in the introductory Teams of users topic?",
       "options": [
         {
+          "id": "D",
+          "text": "Their designation automatically grants approval authority"
+        },
+        {
           "id": "A",
           "text": "They can assist with transferring Assignments"
         },
@@ -613,10 +619,6 @@
         {
           "id": "C",
           "text": "They automatically receive System Administrator permissions"
-        },
-        {
-          "id": "D",
-          "text": "Their designation automatically grants approval authority"
         }
       ],
       "correctOptions": [

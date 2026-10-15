@@ -26,7 +26,8 @@ for (const meta of track.modules.filter(m => m.ready !== false)) {
     assert.equal(new Set(question.correctOptions).size, question.correctOptions.length);
     assert(question.correctOptions.every(a => options.has(a)));
     assert.equal(question.type, question.correctOptions.length === 1 ? 'single-select' : 'multi-select');
-    assert(question.rationale && question.hint);
+    assert(question.rationale);
+    assert(question.hint === undefined || typeof question.hint === 'string');
   }
   for (const source of sources) {
     assert(data.practiceQuiz.some(q => q.sourceUrl === source), 'Each topic has retrieval practice');

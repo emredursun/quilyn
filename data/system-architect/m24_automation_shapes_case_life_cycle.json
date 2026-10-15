@@ -107,7 +107,7 @@
           "type": "interactive",
           "title": "Automation Shape Selector",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"PDF from a View\", \"scenario\": \"In an application with supported View-to-PDF generation, a Case must produce and attach a PDF of its summary View. Which shape matches the request?\", \"opts\": [\"Create PDF — creates a PDF file from a specified View and attaches it to the Case\", \"Attach content — attaches the rendered View as a file the user uploads\", \"Generate document — the only shape that can output any document, including PDFs from Views\", \"Post to Pulse — posts the View as a PDF to the Case's Pulse stream\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Create PDF matches the specified View-to-attachment operation. Constellation requires a workaround in the reviewed topic.\", \"✗ Incorrect. Attach content attaches a file, URL, or note — it does not render a View into a PDF, and 'user uploads' breaks the no-user-action requirement.\", \"✗ Incorrect. Generate document is a separate shape for Case documents; the shape that renders a specified View to PDF is Create PDF.\", \"✗ Incorrect. Post to Pulse sends a message to the social stream — it does not generate or attach a PDF.\"]}, {\"label\": \"Mobile alert vs multi-Channel\", \"scenario\": \"When a high-priority Case is routed, the assigned agent must get an alert specifically on their iOS/Android device that the Case needs action. Which shape is the precise fit?\", \"opts\": [\"Push notification — sends a notification to an iOS or Android mobile device that a Case requires user action\", \"Send notification — the mobile-only shape that targets the operator's phone\", \"Send email — email is delivered to the phone's mail app, which counts as a push\", \"Post to Pulse — Pulse posts surface as mobile push notifications automatically\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Push notification specifically targets an iOS/Android mobile device to signal that a Case needs user action.\", \"✗ Incorrect. Send notification sends over MULTIPLE Channels — it is not the mobile-device-specific shape. Push notification is the precise fit.\", \"✗ Incorrect. Send email sends an email message — it is not a device push notification.\", \"✗ Incorrect. Post to Pulse writes to the social stream; it is not a mobile push mechanism.\"]}, {\"label\": \"Copy data automatically\", \"scenario\": \"At checkout, the workflow must execute a selected Data Transform to copy a matching shipping address into billing fields. Which shape runs that Rule?\", \"opts\": [\"Run Data Transform — runs a Data Transform rule that copies the shipping address into the billing address fields at runtime\", \"Questionnaire — presents a short form so the user confirms the copy\", \"Update a Case — updates child Cases with the address, which cascades to billing\", \"Wait — pauses until the addresses match, then Pega copies them\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Run Data Transform executes a Data Transform at runtime to copy/initialize Case data with no user interaction — exactly this checkout use case.\", \"✗ Incorrect. Questionnaire asks the user to complete a form — that adds user interaction, which the requirement excludes.\", \"✗ Incorrect. The request explicitly asks to run a selected Data Transform. Update a Case supports Case updates but does not identify that requested Rule-execution shape.\", \"✗ Incorrect. Wait pauses for a timer or Case-status condition — it does not copy data.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good \\u2014 review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"PDF from a View\",\n    \"scenario\": \"In an application with supported View-to-PDF generation, a Case must produce and attach a PDF of its summary View. Which shape matches the request?\",\n    \"opts\": [\n      \"Generate document\",\n      \"Post to Pulse\",\n      \"Attach content\",\n      \"Create PDF\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"✗ Incorrect. Generate document is a separate shape for Case documents; the shape that renders a specified View to PDF is Create PDF.\",\n      \"✗ Incorrect. Post to Pulse sends a message to the social stream — it does not generate or attach a PDF.\",\n      \"✗ Incorrect. Attach content attaches a file, URL, or note — it does not render a View into a PDF, and 'user uploads' breaks the no-user-action requirement.\",\n      \"✓ Correct. Create PDF matches the specified View-to-attachment operation. Constellation requires a workaround in the reviewed topic.\"\n    ]\n  },\n  {\n    \"label\": \"Mobile alert vs multi-Channel\",\n    \"scenario\": \"When a high-priority Case is routed, the assigned agent must get an alert specifically on their iOS/Android device that the Case needs action. Which shape is the precise fit?\",\n    \"opts\": [\n      \"Send email\",\n      \"Push notification\",\n      \"Post to Pulse\",\n      \"Send notification\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"✗ Incorrect. Send email sends an email message — it is not a device push notification.\",\n      \"✓ Correct. Push notification specifically targets an iOS/Android mobile device to signal that a Case needs user action.\",\n      \"✗ Incorrect. Post to Pulse writes to the social stream; it is not a mobile push mechanism.\",\n      \"✗ Incorrect. Send notification sends over MULTIPLE Channels — it is not the mobile-device-specific shape. Push notification is the precise fit.\"\n    ]\n  },\n  {\n    \"label\": \"Copy data automatically\",\n    \"scenario\": \"At checkout, the workflow must execute a selected Data Transform to copy a matching shipping address into billing fields. Which shape runs that Rule?\",\n    \"opts\": [\n      \"Wait\",\n      \"Questionnaire\",\n      \"Run Data Transform\",\n      \"Update a Case\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. Wait pauses for a timer or Case-status condition — it does not copy data.\",\n      \"✗ Incorrect. Questionnaire asks the user to complete a form — that adds user interaction, which the requirement excludes.\",\n      \"✓ Correct. Run Data Transform executes a Data Transform at runtime to copy/initialize Case data with no user interaction — exactly this checkout use case.\",\n      \"✗ Incorrect. The request explicitly asks to run a selected Data Transform. Update a Case supports Case updates but does not identify that requested Rule-execution shape.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good \\u2014 review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-d35136c8b812"
@@ -157,16 +157,16 @@
       "scenario": "In an application where PDF generation from a View is supported, which shape creates that PDF and attaches it automatically to the Case?",
       "options": [
         {
-          "id": "A",
-          "text": "Create PDF — creates a PDF file from a specified View and attaches it to the Case"
-        },
-        {
           "id": "B",
           "text": "Collect information — displays a form to the user who must enter the PDF content manually"
         },
         {
           "id": "C",
           "text": "Attach content — the user attaches the View as a file to the Case"
+        },
+        {
+          "id": "A",
+          "text": "Create PDF — creates a PDF file from a specified View and attaches it to the Case"
         },
         {
           "id": "D",
@@ -176,7 +176,6 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "PDF from a specified View, attached automatically = Create PDF.",
       "rationale": "Create PDF matches the requested View-to-attachment operation. The reviewed topic notes that Constellation needs a workaround; this question assumes supported generation rather than promising universal availability.",
       "optionExplanations": {
         "A": "This is the described View-to-PDF attachment task, with support assumed by the scenario rather than guaranteed for every application.",
@@ -193,6 +192,10 @@
       "scenario": "A Case should automatically spin off one or more related Cases when it reaches a specific Step. Which Automation shape?",
       "options": [
         {
+          "id": "D",
+          "text": "Wait — pauses the Case until a child Case is created manually"
+        },
+        {
           "id": "A",
           "text": "Create Case — creates one or more Cases from the current Case automatically"
         },
@@ -203,16 +206,11 @@
         {
           "id": "C",
           "text": "Update a Case — updating the current Case automatically creates its child Cases"
-        },
-        {
-          "id": "D",
-          "text": "Wait — pauses the Case until a child Case is created manually"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Create one or more Cases from the current Case = Create Case.",
       "rationale": "Create Case starts one or more related Cases from the current Case. Moving Stages or updating existing Case data does not by itself satisfy a requirement to create them.",
       "optionExplanations": {
         "A": "Case creation satisfies the need for new related work; the table does not restrict every created Case to child-only relationships.",
@@ -229,20 +227,20 @@
       "scenario": "In the reviewed Automation table, how do the described purposes of Create PDF and Generate document differ?",
       "options": [
         {
-          "id": "A",
-          "text": "Create PDF renders a specified View into a PDF and attaches it; Generate document generates Case documents as part of the Case Life Cycle"
-        },
-        {
           "id": "B",
           "text": "They are the same shape with two names; either generates any document from any source"
+        },
+        {
+          "id": "D",
+          "text": "Generate document attaches files to a Case; Create PDF sends them by email"
         },
         {
           "id": "C",
           "text": "Create PDF works only in Constellation; Generate document works only in the legacy UI"
         },
         {
-          "id": "D",
-          "text": "Generate document attaches files to a Case; Create PDF sends them by email"
+          "id": "A",
+          "text": "Create PDF renders a specified View into a PDF and attaches it; Generate document generates Case documents as part of the Case Life Cycle"
         }
       ],
       "correctOptions": [
@@ -284,7 +282,6 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Run a Data Transform at runtime to copy fields = Run Data Transform.",
       "rationale": "Run Data Transform executes a Data Transform rule at runtime to copy/initialize Case data — the exact checkout use case. B is wrong because Approve/Reject is a human decision step. C is wrong because Send notification sends a message, not field copies. D is wrong because Connect Generative AI is for GenAI prompts/responses, not deterministic field copying.",
       "optionExplanations": {
         "A": "Executing the selected transformation directly matches deterministic field copying; the scenario does not require user approval or messaging.",
@@ -301,20 +298,20 @@
       "scenario": "Which THREE names appear in the reviewed App Studio Automation table?",
       "options": [
         {
-          "id": "A",
-          "text": "Search duplicate Cases — automatically searches for duplicate Cases using set conditions"
-        },
-        {
-          "id": "B",
-          "text": "Post to Pulse — creates a message and posts it to the Pulse social stream"
+          "id": "D",
+          "text": "Call REST API — invokes an external REST service directly as an Automation shape"
         },
         {
           "id": "C",
           "text": "Connect Generative AI — uses customized Pega GenAI rules (define prompt and response structure)"
         },
         {
-          "id": "D",
-          "text": "Call REST API — invokes an external REST service directly as an Automation shape"
+          "id": "B",
+          "text": "Post to Pulse — creates a message and posts it to the Pulse social stream"
+        },
+        {
+          "id": "A",
+          "text": "Search duplicate Cases — automatically searches for duplicate Cases using set conditions"
         }
       ],
       "correctOptions": [
@@ -340,20 +337,20 @@
       "scenario": "A parent Case must pause until all its child Cases are resolved before continuing. Which Automation shape?",
       "options": [
         {
-          "id": "A",
-          "text": "Wait — pauses the Case until a specified condition is fulfilled, such as a timer or a Case status"
-        },
-        {
           "id": "B",
           "text": "Persist Case — pauses the Case until the children are written to the database"
         },
         {
-          "id": "C",
-          "text": "Change to next Stage — advances the Case, which waits for children automatically"
+          "id": "A",
+          "text": "Wait — pauses the Case until a specified condition is fulfilled, such as a timer or a Case status"
         },
         {
           "id": "D",
           "text": "Update a Case — updating children pauses the parent until they finish"
+        },
+        {
+          "id": "C",
+          "text": "Change to next Stage — advances the Case, which waits for children automatically"
         }
       ],
       "correctOptions": [
@@ -395,7 +392,6 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Temporary → permanent in the DB = Persist Case.",
       "rationale": "Persist Case converts a temporary Case into a permanent object in the database. B is wrong because Update a Case updates Case data (current Case or children/descendants) and is not the shape defined for converting temporary to permanent. C and D are wrong because attaching content or generating a document are not mechanisms for persisting a temporary Case.",
       "optionExplanations": {
         "A": "This task explicitly makes the temporary Case permanent, matching the stated lifecycle transition.",
@@ -448,16 +444,16 @@
       "scenario": "A workflow reaches a Run Data Transform step configured to copy an address. Which statement describes this specific step’s behavior?",
       "options": [
         {
-          "id": "A",
-          "text": "It executes the selected Data Transform automatically rather than asking the user to re-enter the address"
+          "id": "C",
+          "text": "They can only be added in the Process modeler, never in the Case Life Cycle"
         },
         {
           "id": "B",
           "text": "They always display a form and wait for user input before executing"
         },
         {
-          "id": "C",
-          "text": "They can only be added in the Process modeler, never in the Case Life Cycle"
+          "id": "A",
+          "text": "It executes the selected Data Transform automatically rather than asking the user to re-enter the address"
         },
         {
           "id": "D",
@@ -484,10 +480,6 @@
       "scenario": "A workflow must update existing child Cases and their descendants. Which shape in the reviewed table supports that target?",
       "options": [
         {
-          "id": "A",
-          "text": "Update a Case — updates the current Case or all child Cases and descendants"
-        },
-        {
           "id": "B",
           "text": "Create Case — creates the children and updates them at the same time"
         },
@@ -498,12 +490,15 @@
         {
           "id": "D",
           "text": "Change to a Stage — moving Stage updates all descendants"
+        },
+        {
+          "id": "A",
+          "text": "Update a Case — updates the current Case or all child Cases and descendants"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Update current Case OR all children/descendants = Update a Case.",
       "rationale": "Update a Case supports the current Case or child/descendant target described in the table. Configure the intended target; do not assume that selecting it always updates both the current Case and every descendant.",
       "optionExplanations": {
         "A": "The reviewed table includes updates to child Cases and descendants; configure that target instead of assuming a universal combined update.",
@@ -539,7 +534,6 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "GenAI prompt + response structure = Connect Generative AI (needs GenAI enabled).",
       "rationale": "Connect Generative AI uses customized Pega GenAI rules; you define the prompt and the response structure, and generative AI must be enabled/configured in application settings. B, C, and D describe unrelated shapes that do not provide GenAI prompt/response configuration.",
       "optionExplanations": {
         "A": "The customized prompt/response task fits, and the reviewed source explicitly requires enabling and configuring generative AI.",
@@ -556,20 +550,20 @@
       "scenario": "Which TWO statements correctly pair a need with the right Stage-navigation Automation shape?",
       "options": [
         {
-          "id": "A",
-          "text": "Return the Case to the Stage it was in before → Change to the previous Stage"
+          "id": "D",
+          "text": "Return to the previously visited Stage → Change to next Stage"
         },
         {
-          "id": "B",
-          "text": "Advance the Case to the following Stage automatically → Change to next Stage"
+          "id": "A",
+          "text": "Return the Case to the Stage it was in before → Change to the previous Stage"
         },
         {
           "id": "C",
           "text": "Jump to any specific Stage → Change to next Stage"
         },
         {
-          "id": "D",
-          "text": "Return to the previously visited Stage → Change to next Stage"
+          "id": "B",
+          "text": "Advance the Case to the following Stage automatically → Change to next Stage"
         }
       ],
       "correctOptions": [
@@ -594,20 +588,20 @@
       "scenario": "A Claims workflow uses Send email and Run Data Transform for configured system tasks. Which TWO statements correctly describe these two steps?",
       "options": [
         {
-          "id": "A",
-          "text": "They execute the configured email or data operation without asking a person to perform that operation manually"
+          "id": "D",
+          "text": "Automation shapes in App Studio are restricted to sending emails and cannot perform other types of system actions"
         },
         {
           "id": "B",
           "text": "They can run as steps in Case processing when the workflow reaches them"
         },
         {
-          "id": "C",
-          "text": "Automation shapes always require a human approver to confirm the action before the automation executes"
+          "id": "A",
+          "text": "They execute the configured email or data operation without asking a person to perform that operation manually"
         },
         {
-          "id": "D",
-          "text": "Automation shapes in App Studio are restricted to sending emails and cannot perform other types of system actions"
+          "id": "C",
+          "text": "Automation shapes always require a human approver to confirm the action before the automation executes"
         }
       ],
       "correctOptions": [

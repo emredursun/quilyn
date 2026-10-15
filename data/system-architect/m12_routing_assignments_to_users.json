@@ -66,7 +66,7 @@
           "type": "interactive",
           "title": "Routing Design Decisions",
           "height": 420,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Accountability vs Availability\", \"scenario\": \"A financial audit Step must be completed by ONE specific named auditor (Emma Chen) who has personal accountability for the sign-off. Which routing configuration is correct?\", \"opts\": [\"Route to Emma Chen's Worklist — the Worklist routes the Assignment to a specific operator's personal queue; accountability is enforced\", \"Route to the Audit Work Queue — any available auditor can pick it up from the shared pool\", \"Route using business logic to find the auditor with the least assignments — load balancing selects Emma probabilistically\", \"Route to the manager's Worklist and let the manager delegate to Emma manually\"], \"correct\": 0, \"fbs\": [\"✓ Correct. When personal accountability to a named individual is required, the Worklist is correct — it routes directly to one specific Operator's queue.\", \"✗ Incorrect. A Work Queue is shared — ANY qualified auditor can pick it up, which eliminates named accountability.\", \"✗ Incorrect. Load-balancing selects whichever auditor has the least work — it may never select Emma and cannot enforce named accountability.\", \"✗ Incorrect. Manager delegation adds unnecessary steps when Emma's name can be directly specified in the routing configuration.\"]}, {\"label\": \"Shared Pool\", \"scenario\": \"A 'Document Review' Assignment should be available to any of 30 available document specialists — whoever is free picks it up. No single specialist is responsible. How should this be routed?\", \"opts\": [\"Route to the Document Review Work Queue shared by all 30 specialists — any available specialist can pull the Assignment from the shared pool\", \"Route to all 30 specialists' Worklists simultaneously — the first to open the Case 'wins' and Pega cancels the rest\", \"Route to the team lead's Worklist; the team lead redistributes manually to available specialists\", \"Route to the specific specialist who reviewed the PREVIOUS document in this Case to maintain consistency\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Work Queue = shared pool. One Assignment, 30 specialists who can all see and pick it up. The first to accept it removes it from the queue.\", \"Individual routing does not automatically broadcast and deduplicate one shared Assignment across all personal Worklists.\", \"✗ Incorrect. Manual redistribution by the team lead is an unnecessary bottleneck that defeats the purpose of automation.\", \"✗ Incorrect. Consistency in specialist assignment is a business preference, not a reason to hard-code routing to a specific past operator — that creates single-point-of-failure risk.\"]}, {\"label\": \"Conditional routing\", \"scenario\": \"High-risk claims need a specialist queue; other claims need the general queue. What configuration fits?\", \"opts\": [\"Business logic routing selects the destination according to the risk condition.\", \"Current user always means a high-risk specialist.\", \"Every claim goes to a fixed developer ID.\", \"Queue names automatically infer the risk rule.\"], \"correct\": 0, \"fbs\": [\"Correct. Configure the condition and both destinations.\", \"The current user does not imply specialist qualification.\", \"A fixed developer ignores the policy.\", \"Names do not implement the required business condition.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Accountability vs Availability\",\n    \"scenario\": \"A financial audit Step must be completed by ONE specific named auditor (Emma Chen) who has personal accountability for the sign-off. Which routing configuration is correct?\",\n    \"opts\": [\n      \"Route using business logic to find the auditor with the least assignments — load balancing selects Emma probabilistically\",\n      \"Route to the manager's Worklist and let the manager delegate to Emma manually\",\n      \"Route to the Audit Work Queue — any available auditor can pick it up from the shared pool\",\n      \"Route to Emma Chen's Worklist — the Worklist routes the Assignment to a specific operator's personal queue; accountability is enforced\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"✗ Incorrect. Load-balancing selects whichever auditor has the least work — it may never select Emma and cannot enforce named accountability.\",\n      \"✗ Incorrect. Manager delegation adds unnecessary steps when Emma's name can be directly specified in the routing configuration.\",\n      \"✗ Incorrect. A Work Queue is shared — ANY qualified auditor can pick it up, which eliminates named accountability.\",\n      \"✓ Correct. When personal accountability to a named individual is required, the Worklist is correct — it routes directly to one specific Operator's queue.\"\n    ]\n  },\n  {\n    \"label\": \"Shared Pool\",\n    \"scenario\": \"A 'Document Review' Assignment should be available to any of 30 available document specialists — whoever is free picks it up. No single specialist is responsible. How should this be routed?\",\n    \"opts\": [\n      \"Route to the team lead's Worklist; the team lead redistributes manually to available specialists\",\n      \"Route to the specific specialist who reviewed the PREVIOUS document in this Case to maintain consistency\",\n      \"Route to the Document Review Work Queue shared by all 30 specialists — any available specialist can pull the Assignment from the shared pool\",\n      \"Route to all 30 specialists' Worklists simultaneously — the first to open the Case 'wins' and Pega cancels the rest\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. Manual redistribution by the team lead is an unnecessary bottleneck that defeats the purpose of automation.\",\n      \"✗ Incorrect. Consistency in specialist assignment is a business preference, not a reason to hard-code routing to a specific past operator — that creates single-point-of-failure risk.\",\n      \"✓ Correct. Work Queue = shared pool. One Assignment, 30 specialists who can all see and pick it up. The first to accept it removes it from the queue.\",\n      \"Individual routing does not automatically broadcast and deduplicate one shared Assignment across all personal Worklists.\"\n    ]\n  },\n  {\n    \"label\": \"Conditional routing\",\n    \"scenario\": \"High-risk claims need a specialist queue; other claims need the general queue. What configuration fits?\",\n    \"opts\": [\n      \"Queue names automatically infer the risk rule.\",\n      \"Business logic routing selects the destination according to the risk condition.\",\n      \"Every claim goes to a fixed developer ID.\",\n      \"Current user always means a high-risk specialist.\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"Names do not implement the required business condition.\",\n      \"Correct. Configure the condition and both destinations.\",\n      \"A fixed developer ignores the policy.\",\n      \"The current user does not imply specialist qualification.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         },
         {
           "type": "diagram",
@@ -132,20 +132,20 @@
       "scenario": "A shared Claims Review Assignment must be visible to ALL 25 members of the claims team simultaneously so whichever agent is free can pick it up. A colleague suggests routing it to each agent's Worklist. What is the problem with this suggestion, and what is the correct approach?",
       "options": [
         {
-          "id": "A",
-          "text": "Use one shared Work Queue Assignment that an eligible claims agent can select; a Worklist targets an individual instead of this shared pool"
-        },
-        {
-          "id": "B",
-          "text": "Place the same Assignment on every personal Worklist and rely on automatic deduplication"
+          "id": "D",
+          "text": "Broadcast independent copies to every Worklist and use urgency to merge the results"
         },
         {
           "id": "C",
           "text": "Route to the manager and require manual redistribution for every item"
         },
         {
-          "id": "D",
-          "text": "Broadcast independent copies to every Worklist and use urgency to merge the results"
+          "id": "B",
+          "text": "Place the same Assignment on every personal Worklist and rely on automatic deduplication"
+        },
+        {
+          "id": "A",
+          "text": "Use one shared Work Queue Assignment that an eligible claims agent can select; a Worklist targets an individual instead of this shared pool"
         }
       ],
       "correctOptions": [
@@ -168,26 +168,25 @@
       "scenario": "A new Case is created and must be routed to whoever is logged in and created it. The SA wants the assignment sent to that specific user automatically. Which routing option is correct?",
       "options": [
         {
-          "id": "A",
-          "text": "Current operator — routes the assignment to the user who is currently logged in and triggered the Case creation"
-        },
-        {
           "id": "B",
           "text": "Work queue — routes the assignment to a shared queue for any available user to claim"
         },
         {
-          "id": "C",
-          "text": "Reporting manager — routes the assignment to the manager of the user who created the Case"
-        },
-        {
           "id": "D",
           "text": "Specific operator — routes to a hard-coded user ID entered by the SA, not the logged-in user"
+        },
+        {
+          "id": "A",
+          "text": "Current operator — routes the assignment to the user who is currently logged in and triggered the Case creation"
+        },
+        {
+          "id": "C",
+          "text": "Reporting manager — routes the assignment to the manager of the user who created the Case"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Whoever is logged in right now = Current operator.",
       "rationale": "Current operator routes the assignment to whoever is currently logged in — the person creating the Case. Work queues are shared pools; specific operator routes to a hard-coded user.",
       "optionExplanations": {
         "A": "At this creation point the current user is the initiating user in the scenario.",
@@ -204,20 +203,20 @@
       "scenario": "A 'Contract Review' assignment must go to the manager of whichever user submitted the contract, without the SA needing to know who that person is in advance. Which routing option handles this dynamically?",
       "options": [
         {
-          "id": "A",
-          "text": "Business logic routing configured to resolve the submitter’s manager and route to that user"
-        },
-        {
-          "id": "B",
-          "text": "Current user routing, which always finds a different user’s manager"
-        },
-        {
           "id": "C",
           "text": "A general managers’ Work Queue, which always selects the submitter’s own manager"
         },
         {
+          "id": "A",
+          "text": "Business logic routing configured to resolve the submitter’s manager and route to that user"
+        },
+        {
           "id": "D",
           "text": "A fixed operator ID that automatically changes for every submitter"
+        },
+        {
+          "id": "B",
+          "text": "Current user routing, which always finds a different user’s manager"
         }
       ],
       "correctOptions": [
@@ -244,16 +243,16 @@
           "text": "Business logic routing with conditions selecting the appropriate Work Queue"
         },
         {
+          "id": "D",
+          "text": "No routing configuration because Pega guesses the risk policy automatically"
+        },
+        {
           "id": "B",
           "text": "Specific user routing that always names the developer"
         },
         {
           "id": "C",
           "text": "Current user routing without any risk condition"
-        },
-        {
-          "id": "D",
-          "text": "No routing configuration because Pega guesses the risk policy automatically"
         }
       ],
       "correctOptions": [
@@ -276,10 +275,6 @@
       "scenario": "A 'Claims Processing' step must be handled by any available claims processor rather than a specific person. The team is large and processors should self-assign from a shared pool. Which routing mechanism is correct?",
       "options": [
         {
-          "id": "A",
-          "text": "A work queue — assignments are placed in a shared queue and any eligible user with access to that queue can claim and work them"
-        },
-        {
           "id": "B",
           "text": "Current operator — the assignment is created under the name of whoever created the Case and any processor can then impersonate that operator"
         },
@@ -290,6 +285,10 @@
         {
           "id": "D",
           "text": "Reporting manager — the assignment goes to the team lead who then manually delegates to individual processors"
+        },
+        {
+          "id": "A",
+          "text": "A work queue — assignments are placed in a shared queue and any eligible user with access to that queue can claim and work them"
         }
       ],
       "correctOptions": [
@@ -312,6 +311,10 @@
       "scenario": "The Claims Work Queue should require a ClaimsProcessor access role to process its Assignments. What should the SA configure?",
       "options": [
         {
+          "id": "D",
+          "text": "A Persona display name alone, treating it as the complete security policy"
+        },
+        {
           "id": "A",
           "text": "Required roles in the Work Queue’s Roles configuration, alongside the application’s access configuration"
         },
@@ -322,10 +325,6 @@
         {
           "id": "C",
           "text": "A label on a Data Page without any authorization configuration"
-        },
-        {
-          "id": "D",
-          "text": "A Persona display name alone, treating it as the complete security policy"
         }
       ],
       "correctOptions": [
@@ -352,12 +351,12 @@
           "text": "Two sequential Assignment Steps in one Process: credit check followed by final approval"
         },
         {
-          "id": "B",
-          "text": "Parallel branches that create both tasks at once"
-        },
-        {
           "id": "C",
           "text": "A shared queue without defining any dependency between the tasks"
+        },
+        {
+          "id": "B",
+          "text": "Parallel branches that create both tasks at once"
         },
         {
           "id": "D",
@@ -384,16 +383,16 @@
       "scenario": "Document Verification should be available to eligible on-duty agents, who select the work themselves from a shared pool. Which routing option fits?",
       "options": [
         {
-          "id": "A",
-          "text": "A work queue — the operations team maintains membership of the queue; whoever is on duty and claims the assignment handles it"
-        },
-        {
           "id": "B",
           "text": "Current user — keeps the task with the preceding user, who need not be an on-duty verifier"
         },
         {
           "id": "C",
           "text": "Specific operator — the SA enters a rotating list of user IDs in the routing rule that changes each shift"
+        },
+        {
+          "id": "A",
+          "text": "A work queue — the operations team maintains membership of the queue; whoever is on duty and claims the assignment handles it"
         },
         {
           "id": "D",
@@ -420,20 +419,20 @@
       "scenario": "An SA explains the difference between a worklist and a work queue to a new team member. Which statement is correct?",
       "options": [
         {
-          "id": "A",
-          "text": "A worklist displays assignments routed directly to one specific user; a work queue displays assignments available for any eligible user to claim"
+          "id": "D",
+          "text": "A worklist and a work queue are interchangeable terms for the same Pega artifact"
         },
         {
           "id": "B",
           "text": "A worklist is a shared pool for a team; a work queue is a personal to-do list for one user"
         },
         {
-          "id": "C",
-          "text": "A worklist displays Case history; a work queue displays pending assignments across all Case Types"
+          "id": "A",
+          "text": "A worklist displays assignments routed directly to one specific user; a work queue displays assignments available for any eligible user to claim"
         },
         {
-          "id": "D",
-          "text": "A worklist and a work queue are interchangeable terms for the same Pega artifact"
+          "id": "C",
+          "text": "A worklist displays Case history; a work queue displays pending assignments across all Case Types"
         }
       ],
       "correctOptions": [
@@ -456,20 +455,20 @@
       "scenario": "Manager Approval must be selected from a shared queue only by authorized users holding the SeniorManager access role. Which configuration fits?",
       "options": [
         {
-          "id": "A",
-          "text": "Route to the appropriate Work Queue and configure SeniorManager as a required role for processing its work"
-        },
-        {
-          "id": "B",
-          "text": "Route to Current user and assume that user always has SeniorManager"
-        },
-        {
           "id": "C",
           "text": "Route to a manager and assume every manager inherently holds SeniorManager"
         },
         {
           "id": "D",
           "text": "Enter a wildcard role name as a fixed operator ID"
+        },
+        {
+          "id": "B",
+          "text": "Route to Current user and assume that user always has SeniorManager"
+        },
+        {
+          "id": "A",
+          "text": "Route to the appropriate Work Queue and configure SeniorManager as a required role for processing its work"
         }
       ],
       "correctOptions": [
@@ -492,6 +491,10 @@
       "scenario": "The developer completes the first task during testing. The next Step is explicitly configured to route to Current user and appears on the developer’s Worklist. Why?",
       "options": [
         {
+          "id": "D",
+          "text": "Current user is an alias for a fixed developer ID stored at design time"
+        },
+        {
           "id": "A",
           "text": "Current user keeps the next Assignment with the user who completed the preceding task"
         },
@@ -502,10 +505,6 @@
         {
           "id": "C",
           "text": "Manager routing always selects the original developer"
-        },
-        {
-          "id": "D",
-          "text": "Current user is an alias for a fixed developer ID stored at design time"
         }
       ],
       "correctOptions": [
@@ -532,22 +531,21 @@
           "text": "Specific operator — routes to a named, hard-coded user ID regardless of context"
         },
         {
+          "id": "D",
+          "text": "Reporting manager — routes to the manager of whoever submitted the Case, which may or may not be the Head of Compliance"
+        },
+        {
           "id": "B",
           "text": "Current operator — routes to the Head of Compliance if they happen to be logged in"
         },
         {
           "id": "C",
           "text": "Work queue — places the assignment in a queue that only the Head of Compliance can access"
-        },
-        {
-          "id": "D",
-          "text": "Reporting manager — routes to the manager of whoever submitted the Case, which may or may not be the Head of Compliance"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Always the same fixed person = Specific operator.",
       "rationale": "Specific operator routes to a hard-coded user ID — always the same person regardless of who is logged in or who submitted. Use this only when the assignment genuinely must go to one named individual.",
       "optionExplanations": {
         "A": "A known fixed recipient fits Specific user routing.",
@@ -564,16 +562,16 @@
       "scenario": "A Pega System Architect is configuring routing for an Assignment Step. Which TWO routing options are available when configuring how work is distributed to users?",
       "options": [
         {
-          "id": "A",
-          "text": "Route to a specific user’s Worklist"
+          "id": "C",
+          "text": "Route directly to a stylesheet as the Assignment owner"
         },
         {
           "id": "B",
           "text": "Route to a shared Work Queue"
         },
         {
-          "id": "C",
-          "text": "Route directly to a stylesheet as the Assignment owner"
+          "id": "A",
+          "text": "Route to a specific user’s Worklist"
         },
         {
           "id": "D",
@@ -605,16 +603,16 @@
           "text": "Any authorized team member can pick up work from a Work Queue"
         },
         {
-          "id": "B",
-          "text": "Work Queues support team-based routing for shared Assignments"
+          "id": "D",
+          "text": "A Work Queue requires all team members to log in with the same credentials"
         },
         {
           "id": "C",
           "text": "Work in a Work Queue is visible only to the team manager, not team members"
         },
         {
-          "id": "D",
-          "text": "A Work Queue requires all team members to log in with the same credentials"
+          "id": "B",
+          "text": "Work Queues support team-based routing for shared Assignments"
         }
       ],
       "correctOptions": [
@@ -638,12 +636,12 @@
       "scenario": "A Pega developer asks about individual Worklists. Which TWO statements are true about how Worklists work in Pega?",
       "options": [
         {
-          "id": "A",
-          "text": "A Worklist contains Assignments routed to a specific operator"
-        },
-        {
           "id": "B",
           "text": "A Worklist is distinct from the shared pool of a Work Queue"
+        },
+        {
+          "id": "A",
+          "text": "A Worklist contains Assignments routed to a specific operator"
         },
         {
           "id": "C",

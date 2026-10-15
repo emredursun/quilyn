@@ -101,7 +101,7 @@
           "type": "interactive",
           "title": "Field Type & View Design Decisions",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Field Type Selection\", \"scenario\": \"A form captures employee job titles. The company has exactly 8 valid titles (Manager, Analyst, etc.). An SA configures the field as Text (single line). A BA reviews and flags it. What is the problem and the correct field type?\", \"opts\": [\"Text (single line) allows arbitrary input — users could type anything. A Picklist enforces the defined set of 8 valid titles and prevents typos\", \"The field type is fine — add a validation rule that checks the submitted text against the 8 allowed values on submit\", \"Use a Boolean field with value '0' for unlisted titles and '1' for valid ones; business logic can handle the exact title elsewhere\", \"Text (single line) is correct because Pega's autocomplete feature on text fields retrieves the allowed list automatically without needing a Picklist\"], \"correct\": 0, \"fbs\": [\"✓ Correct. A Picklist enforces a controlled list, preventing invalid entries and ensuring data consistency.\", \"✗ Incorrect. Checking free text on submit catches mistakes late; users still face an open text box. A Picklist offers only the predefined values from the start.\", \"✗ Incorrect. Using Boolean for job title is semantically wrong — Boolean is for true/false values. Misusing it creates data quality and readability problems.\", \"✗ Incorrect. A Text (single line) field accepts any line of text. A fixed set of allowed values is what the Picklist Field Type provides.\"]}, {\"label\": \"Calculated vs Editable\", \"scenario\": \"A shipping form has a 'Shipping fee' field that must equal a flat $5 for Standard, $15 for Express, or $35 for Overnight — based on the shipping type Picklist selection. A junior SA makes it a free-text Currency field with instructions to type the correct fee. What is the better design?\", \"opts\": [\"Calculate the fee with a decision table (shipping type → fee) and present the result read-only, so the system sets the fee and users cannot override it\", \"Keep it as an editable Currency field but add a validation on submit that checks the value matches the expected fee for the selected shipping type\", \"Use two fields: keep the free-text Currency field for the agent and add a hidden calculated field for reporting — both serve different purposes\", \"A Picklist of fees (5/15/35) where the user selects the amount, rather than having the system calculate it\"], \"correct\": 0, \"fbs\": [\"✓ Correct. The fee depends only on the shipping type, so a decision table can return it. Presenting the result read-only meets the no-override requirement.\", \"✗ Incorrect. Validation on submit still lets users type a wrong fee and only rejects it later. A calculation sets the right value whenever the shipping type changes.\", \"✗ Incorrect. Two fields for the same conceptual value is redundant and creates maintenance confusion. The correct design has one authoritative calculated value.\", \"✗ Incorrect. A Picklist of fees separates the fee selection from the shipping type selection, creating inconsistency — a user could select Express shipping but pick the $5 Standard fee.\"]}, {\"label\": \"View Reusability\", \"scenario\": \"An SA builds a 'Customer Summary' view showing Name, Email, and Account Number. This exact combination needs to appear in 3 different Case Types. What is the most maintainable approach?\", \"opts\": [\"Build one reusable View on the shared data object that holds these fields and reference it from all 3 Case Types\", \"Build 3 copies of the View (one per Case Type) so each Case Type can evolve its Customer Summary independently without affecting others\", \"Use a Partial View in each Case Type, because Partial is the only View type that can ever be reused\", \"Build the View in Dev Studio as a Section rule, which is the only mechanism for cross-Case-Type UI reuse in Constellation\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Views are reusable configurations. Defining the View where the shared fields live lets each Case Type reference it, so one change updates every consumer.\", \"✗ Incorrect. 3 copies create 3 maintenance problems — updating the layout or fields requires editing all 3 independently, risking drift and inconsistency.\", \"✗ Incorrect. Reuse is a property of Views in general; it is not limited to one View type.\", \"✗ Incorrect. In Constellation, Views (not Section rules) are the UI authoring unit. Section rules belong to the Traditional UI architecture.\"]}, {\"label\": \"Read-only and editable together\", \"scenario\": \"In a loan Process, applicants enter their details in a form. At the next Step, a loan officer must see that information without changing it and record an approval decision. How should the loan officer View be configured?\", \"opts\": [\"One View with the applicant fields set to read-only and the decision fields (such as approval reason) editable\", \"Reuse the applicant form unchanged, so the officer can correct any applicant field before deciding\", \"Two separate Case Types: one for the applicant data and one for the officer decision\", \"Make every field in the officer View read-only and capture the decision outside the Case\"], \"correct\": 0, \"fbs\": [\"✓ Correct. A View can mix read-only fields for collected data with editable fields for the task at hand, as in the Views topic loan example.\", \"✗ Incorrect. The requirement is that the officer can read but not update the applicant data. Reusing the editable form ignores that.\", \"✗ Incorrect. Both Steps belong to the same loan Process; field editability is configured in the View, not by splitting the Case.\", \"✗ Incorrect. The officer must record the decision in the Case, so the decision fields need to be editable.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Field Type Selection\",\n    \"scenario\": \"A form captures employee job titles. The company has exactly 8 valid titles (Manager, Analyst, etc.). An SA configures the field as Text (single line). A BA reviews and flags it. What is the problem and the correct field type?\",\n    \"opts\": [\n      \"Encode job titles in a Boolean true/false field\",\n      \"Keep free text and validate allowed titles on submission\",\n      \"Use a Picklist to constrain the eight valid titles\",\n      \"Keep Text and rely on automatic allowed-list autocomplete\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. Using Boolean for job title is semantically wrong — Boolean is for true/false values. Misusing it creates data quality and readability problems.\",\n      \"✗ Incorrect. Checking free text on submit catches mistakes late; users still face an open text box. A Picklist offers only the predefined values from the start.\",\n      \"✓ Correct. A Picklist enforces a controlled list, preventing invalid entries and ensuring data consistency.\",\n      \"✗ Incorrect. A Text (single line) field accepts any line of text. A fixed set of allowed values is what the Picklist Field Type provides.\"\n    ]\n  },\n  {\n    \"label\": \"Calculated vs Editable\",\n    \"scenario\": \"A shipping form has a 'Shipping fee' field that must equal a flat $5 for Standard, $15 for Express, or $35 for Overnight — based on the shipping type Picklist selection. A junior SA makes it a free-text Currency field with instructions to type the correct fee. What is the better design?\",\n    \"opts\": [\n      \"Keep an editable fee alongside a hidden calculated fee\",\n      \"Keep an editable fee and validate it on submission\",\n      \"Let the user select the fee from a Picklist\",\n      \"Calculate the fee from shipping type and show it read-only\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"✗ Incorrect. Two fields for the same conceptual value is redundant and creates maintenance confusion. The correct design has one authoritative calculated value.\",\n      \"✗ Incorrect. Validation on submit still lets users type a wrong fee and only rejects it later. A calculation sets the right value whenever the shipping type changes.\",\n      \"✗ Incorrect. A Picklist of fees separates the fee selection from the shipping type selection, creating inconsistency — a user could select Express shipping but pick the $5 Standard fee.\",\n      \"✓ Correct. The fee depends only on the shipping type, so a decision table can return it. Presenting the result read-only meets the no-override requirement.\"\n    ]\n  },\n  {\n    \"label\": \"View Reusability\",\n    \"scenario\": \"An SA builds a 'Customer Summary' view showing Name, Email, and Account Number. This exact combination needs to appear in 3 different Case Types. What is the most maintainable approach?\",\n    \"opts\": [\n      \"Build one reusable View on the shared data object that holds these fields and reference it from all 3 Case Types\",\n      \"Use a Partial View in each Case Type, because Partial is the only View type that can ever be reused\",\n      \"Build 3 copies of the View (one per Case Type) so each Case Type can evolve its Customer Summary independently without affecting others\",\n      \"Build the View in Dev Studio as a Section rule, which is the only mechanism for cross-Case-Type UI reuse in Constellation\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. Views are reusable configurations. Defining the View where the shared fields live lets each Case Type reference it, so one change updates every consumer.\",\n      \"✗ Incorrect. Reuse is a property of Views in general; it is not limited to one View type.\",\n      \"✗ Incorrect. 3 copies create 3 maintenance problems — updating the layout or fields requires editing all 3 independently, risking drift and inconsistency.\",\n      \"✗ Incorrect. In Constellation, Views (not Section rules) are the UI authoring unit. Section rules belong to the Traditional UI architecture.\"\n    ]\n  },\n  {\n    \"label\": \"Read-only and editable together\",\n    \"scenario\": \"In a loan Process, applicants enter their details in a form. At the next Step, a loan officer must see that information without changing it and record an approval decision. How should the loan officer View be configured?\",\n    \"opts\": [\n      \"Make every field in the officer View read-only and capture the decision outside the Case\",\n      \"One View with the applicant fields set to read-only and the decision fields (such as approval reason) editable\",\n      \"Reuse the applicant form unchanged, so the officer can correct any applicant field before deciding\",\n      \"Two separate Case Types: one for the applicant data and one for the officer decision\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"✗ Incorrect. The officer must record the decision in the Case, so the decision fields need to be editable.\",\n      \"✓ Correct. A View can mix read-only fields for collected data with editable fields for the task at hand, as in the Views topic loan example.\",\n      \"✗ Incorrect. The requirement is that the officer can read but not update the applicant data. Reusing the editable form ignores that.\",\n      \"✗ Incorrect. Both Steps belong to the same loan Process; field editability is configured in the View, not by splitting the Case.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-69c404591e99"
@@ -151,20 +151,20 @@
       "scenario": "A field must let users pick exactly one shipping speed from a fixed set of three values (Standard, Express, Overnight). The list rarely changes and is defined inside the application. Which Field Type best enforces this controlled, single-choice list?",
       "options": [
         {
-          "id": "A",
-          "text": "Picklist — enforces a defined list of allowed values and constrains the user to one selection"
-        },
-        {
-          "id": "B",
-          "text": "Text (single line) with a placeholder listing the three options — guides the user but does not prevent them typing anything else"
-        },
-        {
           "id": "C",
           "text": "Data reference to an external Shipping data object — appropriate when options are sourced from an external system, but overkill for three fixed in-app values"
         },
         {
+          "id": "A",
+          "text": "Picklist — enforces a defined list of allowed values and constrains the user to one selection"
+        },
+        {
           "id": "D",
           "text": "Multi-select Picklist — presents the list but allows multiple selections, violating the 'exactly one' requirement"
+        },
+        {
+          "id": "B",
+          "text": "Text (single line) with a placeholder listing the three options — guides the user but does not prevent them typing anything else"
         }
       ],
       "correctOptions": [
@@ -191,16 +191,16 @@
           "text": "Calculated value driven by an arithmetic expression (Quantity × Unit Price), presented read-only so users cannot override the system-maintained value"
         },
         {
-          "id": "B",
-          "text": "A text field with a default value of '0' that the user can overwrite if Quantity or Price is updated manually"
+          "id": "D",
+          "text": "A Decision Table that returns the correct Line Total when given the Quantity and Unit Price as inputs, displayed as an editable field"
         },
         {
           "id": "C",
           "text": "An editable Currency field with a validation rule that checks Quantity × Unit Price = Line Total on submit"
         },
         {
-          "id": "D",
-          "text": "A Decision Table that returns the correct Line Total when given the Quantity and Unit Price as inputs, displayed as an editable field"
+          "id": "B",
+          "text": "A text field with a default value of '0' that the user can overwrite if Quantity or Price is updated manually"
         }
       ],
       "correctOptions": [
@@ -223,10 +223,6 @@
       "scenario": "A new SA asks what a View actually does in a Constellation application. Which statement correctly describes the role of a View?",
       "options": [
         {
-          "id": "A",
-          "text": "A UI component that gathers data from, or displays data to, the user for the current Step or Case"
-        },
-        {
           "id": "B",
           "text": "A rule that persists Case data to the database when the Case is saved"
         },
@@ -237,6 +233,10 @@
         {
           "id": "D",
           "text": "A routing rule that determines which user or queue receives the Assignment"
+        },
+        {
+          "id": "A",
+          "text": "A UI component that gathers data from, or displays data to, the user for the current Step or Case"
         }
       ],
       "correctOptions": [
@@ -259,20 +259,20 @@
       "scenario": "A developer who built fields in App Studio switches to Dev Studio to inspect them at the rule level. Under what name do those App Studio 'fields' appear in Dev Studio?",
       "options": [
         {
-          "id": "A",
-          "text": "A property"
-        },
-        {
-          "id": "B",
-          "text": "A Field Value"
+          "id": "D",
+          "text": "A Data Transform"
         },
         {
           "id": "C",
           "text": "A Data Page"
         },
         {
-          "id": "D",
-          "text": "A Data Transform"
+          "id": "A",
+          "text": "A property"
+        },
+        {
+          "id": "B",
+          "text": "A Field Value"
         }
       ],
       "correctOptions": [
@@ -295,20 +295,20 @@
       "scenario": "A 'Total Premium' field is calculated from base premium × risk factor. The business forbids users from changing the result. Why present it read-only?",
       "options": [
         {
-          "id": "A",
-          "text": "The system maintains the value from its inputs; an editable field would let a user overwrite the calculated result"
-        },
-        {
-          "id": "B",
-          "text": "Read-only fields are skipped during validation, which makes the form submit faster"
+          "id": "D",
+          "text": "A field must be read-only before any other field's calculation is allowed to reference it"
         },
         {
           "id": "C",
           "text": "Constellation has no editable control for calculated values, so read-only is the only option that renders"
         },
         {
-          "id": "D",
-          "text": "A field must be read-only before any other field's calculation is allowed to reference it"
+          "id": "B",
+          "text": "Read-only fields are skipped during validation, which makes the form submit faster"
+        },
+        {
+          "id": "A",
+          "text": "The system maintains the value from its inputs; an editable field would let a user overwrite the calculated result"
         }
       ],
       "correctOptions": [
@@ -335,16 +335,16 @@
           "text": "Text (single line) stores an arbitrary string — users could type 'maybe'; a Boolean (True/False) field correctly constrains the value, uses a Boolean control, and stores a valid yes/no"
         },
         {
+          "id": "D",
+          "text": "Use an Integer field (0 for No, 1 for Yes) — Pega's Boolean implementation has a known rendering bug in Constellation that Text or Integer avoids"
+        },
+        {
           "id": "B",
           "text": "The issue is not the field type but the missing validation rule — add an Edit Validate that allows only 'Yes' or 'No' as text values"
         },
         {
           "id": "C",
           "text": "Text (single line) is correct for checkboxes in Constellation — the Constellation UI layer automatically converts any text field to a toggle control when the field is used in a form"
-        },
-        {
-          "id": "D",
-          "text": "Use an Integer field (0 for No, 1 for Yes) — Pega's Boolean implementation has a known rendering bug in Constellation that Text or Integer avoids"
         }
       ],
       "correctOptions": [
@@ -367,16 +367,16 @@
       "scenario": "On the Workflow tab, an SA clicks 'Configure View' for a Step so users can enter information at that point in the process. Which View type is created to collect that input?",
       "options": [
         {
+          "id": "C",
+          "text": "Full Page View: a full-page layout such as a Case summary"
+        },
+        {
           "id": "A",
           "text": "Form View — collects user input and is configured per Step"
         },
         {
           "id": "B",
           "text": "Partial View: a reusable fragment that is embedded in other Views"
-        },
-        {
-          "id": "C",
-          "text": "Full Page View: a full-page layout such as a Case summary"
         },
         {
           "id": "D",
@@ -407,12 +407,12 @@
           "text": "The Field Type identifies the type of information the system stores for the field"
         },
         {
-          "id": "B",
-          "text": "Assigning the right Field Type helps users provide valid information and displays data in the correct format"
-        },
-        {
           "id": "C",
           "text": "Field Type only affects how a value is displayed, not the format in which it is stored"
+        },
+        {
+          "id": "B",
+          "text": "Assigning the right Field Type helps users provide valid information and displays data in the correct format"
         },
         {
           "id": "D",
@@ -441,20 +441,20 @@
       "scenario": "The team configured a List View only for displaying records and provided no create action. Users can browse but cannot add records. What explains this behavior?",
       "options": [
         {
-          "id": "A",
-          "text": "Displaying a record list does not itself configure the required create interaction and permissions"
-        },
-        {
-          "id": "B",
-          "text": "Editing is blocked because the users lack the Edit privilege on this Case Type"
-        },
-        {
           "id": "C",
           "text": "A List View can never be made editable under any configuration"
         },
         {
           "id": "D",
           "text": "The List View must be backed by a Savable Data Page before any records can be added"
+        },
+        {
+          "id": "A",
+          "text": "Displaying a record list does not itself configure the required create interaction and permissions"
+        },
+        {
+          "id": "B",
+          "text": "Editing is blocked because the users lack the Edit privilege on this Case Type"
         }
       ],
       "correctOptions": [
@@ -477,20 +477,20 @@
       "scenario": "A field's value must depend on combinations of conditions — for example, a discount rate determined by customer tier AND region. Besides a formula expression, which rule type can compute and return that value declaratively?",
       "options": [
         {
-          "id": "A",
-          "text": "A Decision Table — maps combinations of conditions to result values"
-        },
-        {
-          "id": "B",
-          "text": "A Validate rule — asserts that data is correct but returns no computed value"
+          "id": "D",
+          "text": "An Edit Validate — checks a single field's format and returns true/false, not a tiered value"
         },
         {
           "id": "C",
           "text": "A Data Page — sources and caches data, but does not derive a value from condition combinations"
         },
         {
-          "id": "D",
-          "text": "An Edit Validate — checks a single field's format and returns true/false, not a tiered value"
+          "id": "B",
+          "text": "A Validate rule — asserts that data is correct but returns no computed value"
+        },
+        {
+          "id": "A",
+          "text": "A Decision Table — maps combinations of conditions to result values"
         }
       ],
       "correctOptions": [
@@ -513,16 +513,16 @@
       "scenario": "After a customer submits an incident report through a form, the application shows a read-only confirmation of what was reported. Which statement about this design is correct?",
       "options": [
         {
+          "id": "C",
+          "text": "A read-only confirmation cannot be a View; it must be built outside the Case"
+        },
+        {
           "id": "A",
           "text": "The confirmation is a View that is not a form: a form is one type of View, and Views can also display read-only information"
         },
         {
           "id": "B",
           "text": "The confirmation must be a form, because every View collects user input"
-        },
-        {
-          "id": "C",
-          "text": "A read-only confirmation cannot be a View; it must be built outside the Case"
         },
         {
           "id": "D",
@@ -549,20 +549,20 @@
       "scenario": "An SA designs an 'Address' View on the shared Address data object and references it from several Case Types instead of rebuilding it each time. Why is designing Views for reuse considered best practice?",
       "options": [
         {
-          "id": "A",
-          "text": "A View built once can be referenced across multiple Case Types, so a single update propagates everywhere — saving effort and ensuring consistency"
-        },
-        {
-          "id": "B",
-          "text": "Reusable Views render faster because Pega caches them at the node level"
-        },
-        {
           "id": "C",
           "text": "A View must be reused because it can only be bound to one field at a time"
         },
         {
           "id": "D",
           "text": "Only reusable Views support model-driven controls; single-use Views fall back to manual HTML"
+        },
+        {
+          "id": "A",
+          "text": "A View built once can be referenced across multiple Case Types, so a single update propagates everywhere — saving effort and ensuring consistency"
+        },
+        {
+          "id": "B",
+          "text": "Reusable Views render faster because Pega caches them at the node level"
         }
       ],
       "correctOptions": [
@@ -589,12 +589,12 @@
           "text": "Currency: stores the value and currency symbol based on the default currency type"
         },
         {
-          "id": "B",
-          "text": "Decimal: stores numbers with a fractional part but does not identify a currency"
-        },
-        {
           "id": "C",
           "text": "Text (single line) — accepts any characters, with no monetary validation or formatting"
+        },
+        {
+          "id": "B",
+          "text": "Decimal: stores numbers with a fractional part but does not identify a currency"
         },
         {
           "id": "D",
@@ -621,20 +621,20 @@
       "scenario": "To tailor exactly what a user sees and enters at a particular Step, what does the SA add to that Step's View?",
       "options": [
         {
-          "id": "A",
-          "text": "Fields — each with an appropriate Field Type; fields are the building blocks of a View's UI"
+          "id": "C",
+          "text": "Routing rules — which determine who receives the Assignment, not what the View displays"
         },
         {
           "id": "B",
           "text": "Stages — which structure the Case life cycle, not the contents of a single View"
         },
         {
-          "id": "C",
-          "text": "Routing rules — which determine who receives the Assignment, not what the View displays"
-        },
-        {
           "id": "D",
           "text": "Access Roles — which control permissions, not the composition of a View"
+        },
+        {
+          "id": "A",
+          "text": "Fields — each with an appropriate Field Type; fields are the building blocks of a View's UI"
         }
       ],
       "correctOptions": [
@@ -657,20 +657,20 @@
       "scenario": "A developer is configuring a Calculated Value field for a total price in an order entry Case. Which TWO statements correctly describe Calculated Values in Pega?",
       "options": [
         {
-          "id": "A",
-          "text": "A Calculated Value uses a formula to derive its value automatically from other fields in the Case"
+          "id": "C",
+          "text": "Calculated Values can be edited directly by users alongside automatic recalculation"
         },
         {
           "id": "B",
           "text": "When users must not override the result, the calculated field should be presented read-only"
         },
         {
-          "id": "C",
-          "text": "Calculated Values can be edited directly by users alongside automatic recalculation"
-        },
-        {
           "id": "D",
           "text": "Calculated Values replace Data Pages as the mechanism for storing derived data in a Case"
+        },
+        {
+          "id": "A",
+          "text": "A Calculated Value uses a formula to derive its value automatically from other fields in the Case"
         }
       ],
       "correctOptions": [
@@ -694,16 +694,16 @@
       "scenario": "An SA is defining fields for a customer profile that captures first name, date of birth, and annual income. Which TWO field type choices are appropriate for this scenario?",
       "options": [
         {
-          "id": "A",
-          "text": "Text (Single-line) — for the customer's first name"
+          "id": "C",
+          "text": "Integer — for the customer's first name to track its character length"
         },
         {
           "id": "B",
           "text": "Date only: for the customer's date of birth"
         },
         {
-          "id": "C",
-          "text": "Integer — for the customer's first name to track its character length"
+          "id": "A",
+          "text": "Text (Single-line) — for the customer's first name"
         },
         {
           "id": "D",
@@ -731,10 +731,6 @@
       "scenario": "An SA needs to design a Claims application screen that allows adjusters to edit a single claim and also view a list of prior claims. Which TWO View type characteristics guide the selection of the appropriate View for each purpose?",
       "options": [
         {
-          "id": "A",
-          "text": "Form Views are designed for capturing and editing data for a single Case record"
-        },
-        {
           "id": "B",
           "text": "List Views display a collection of records in a structured grid and are suited for summarizing or browsing multiple records"
         },
@@ -745,6 +741,10 @@
         {
           "id": "D",
           "text": "List Views support real-time inline editing for all field types by default in Constellation applications"
+        },
+        {
+          "id": "A",
+          "text": "Form Views are designed for capturing and editing data for a single Case record"
         }
       ],
       "correctOptions": [

@@ -128,7 +128,7 @@
           "type": "interactive",
           "title": "Spot the Case Life Cycle Flaw",
           "height": 480,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}\nbody{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}\n.label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.scenario{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:14px}\n.opt{display:block;width:100%;text-align:left;margin:6px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}\n.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}\n.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}\n.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;color:var(--soft);border-left:3px solid var(--line);padding-left:10px}\n.fb.ok{border-color:var(--ok);color:var(--ink)}\n.fb.bad{border-color:var(--bad);color:var(--ink)}\n.progress{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:12px}\n.btn{margin-top:12px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}\n.btn:hover{border-color:var(--brand);color:var(--ink)}\n.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}\n.btn.primary:hover{opacity:.88}\n.score-big{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}\n.score-msg{font-size:13px;color:var(--soft);text-align:center}\n\n.config{background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:12px;font-size:12.5px;line-height:1.7;margin-bottom:14px;font-family:monospace}\n.flaw{color:var(--bad);font-weight:700}\n</style></head><body>\n<div class=\"progress\" id=\"prog\">Problem 1 of 4</div>\n<div class=\"card\" id=\"qcard\"></div>\n<div id=\"nav\"></div>\n\n<script>\n(function(){\n  var root=document.documentElement;\n  function apply(t){root.setAttribute('data-theme',t);}\n  apply('__THEME__');\n  window.addEventListener('message',function(e){\n    if(e.data&&e.data.type==='pa-theme') apply(e.data.theme);\n  });\n})();\n</script>\n\n<script>\nvar problems = [\n  {\n    \"label\": \"Case Life Cycle Design\",\n    \"intro\": \"A junior SA designs a loan application Case Life Cycle. Review the structure and identify the ONE design flaw:\",\n    \"config\": [\n      \"Stage 1 (green): Create\",\n      \"  Process: Collect applicant info\",\n      \"    Step: Submit application form\",\n      \"Stage 2 (blue): Credit Check\",\n      \"  Process: Run credit evaluation\",\n      \"    Step: Credit bureau lookup (automation)\",\n      \"Stage 3 (green): Create  ← [SA added a second Create Stage for document upload]\",\n      \"Stage 4 (red): Resolution\",\n      \"  Process: Notify applicant\"\n    ],\n    \"opts\": [\n      \"A second Create Stage was added — only ONE Create Stage is allowed; it is always first and cannot be added again\",\n      \"The Resolution Stage is missing its Stage name — Resolution Stages must be named 'Resolved-Approved' or 'Resolved-Rejected'\",\n      \"The Credit bureau lookup Step has no green icon — all Steps must be Collect information Steps (green)\",\n      \"Stage 2 is labeled 'Credit Check' — Stage names must use verb+noun format, not a noun phrase\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. There is exactly one Create Stage per Case Type — it is fixed as the first Stage and cannot be duplicated. Document upload should be a Process/Step inside a separate primary Stage, not a second Create Stage.\",\n      \"✗ Not the flaw. While Pega recommends 'Resolved-' prefix for Resolution Stage statuses, the Stage itself can be named anything descriptive. The flaw is structural, not a naming convention issue.\",\n      \"✗ Not the flaw. Automation Steps (yellow) are valid and expected in Case Life Cycles — system actions like credit bureau lookups are automation Steps. Not all Steps need to be user Collect information Steps.\",\n      \"✗ Not the flaw. 'Credit Check' (noun phrase) is a valid Stage name — Stages use noun/gerund naming. Verb+noun is the Process and Step convention, not the Stage convention.\"\n    ]\n  },\n  {\n    \"label\": \"Stage Type Usage\",\n    \"intro\": \"An Alternate Stage collects corrections and must return automatically to Review. Which configuration is missing?\",\n    \"config\": [\n      \"Primary Stage: Review\",\n      \"Alternate Stage: Correct Documents\",\n      \"  Process: Collect corrections\",\n      \"  Step: Collect information\",\n      \"  Requirement: return automatically to Review\",\n      \"  [No Change Stage automation configured]\"\n    ],\n    \"opts\": [\n      \"Add a Change Stage automation targeting Review after correction work\",\n      \"The Change Stage automation is wrong — rejections must always route to the Resolution Stage immediately; there is no way to loop within a Case Life Cycle\",\n      \"A Resolution Stage cannot be red; only the Create Stage has a color indicator\",\n      \"Add Parallel Processes because every exception branch requires concurrent approval\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"Correct. Use the explicit destination Stage for the required automatic return. Alternate Stages support exception handling; returning to a Primary Stage is not itself prohibited.\",\n      \"Incorrect. A correction branch does not have to resolve immediately; it can return to the primary path.\",\n      \"Incorrect. A Resolution Stage is identified by red. This does not configure the requested return destination.\",\n      \"Incorrect. Parallel work is independent concurrency, not the required transition to Review.\"\n    ]\n  },\n  {\n    \"label\": \"Draft Mode Usage\",\n    \"intro\": \"An SA creates CustomerProfile in the designer’s Data & Interfaces area. Spot the incorrect claim about that new draft data object.\",\n    \"config\": [\n      \"SA says:\",\n      \"'I added a Draft data object called CustomerProfile — it has all the fields\",\n      \" we discussed: firstName, lastName, email, dateOfBirth. I mapped them to\",\n      \" the correct data types. Draft mode is great because it creates the real\",\n      \" data object AND all the fields automatically so we can test right away.'\"\n    ],\n    \"opts\": [\n      \"Draft data objects are placeholders with NO fields and NO integration — the SA must configure fields separately after the workshop; Draft mode does not auto-create them\",\n      \"Draft mode only works for Stages and Processes — you cannot create Draft data objects; data objects must always be fully configured before being referenced\",\n      \"The SA correctly described Draft mode — Draft data objects do include fields if you type their names in the Draft panel during the workshop\",\n      \"Draft mode creates fully configured data objects only when the application is in Dev Studio; in App Studio, Draft objects are placeholders\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. A Draft data object is a lightweight placeholder — no fields, no integration mapping, no data types. It lets the SA reference the object in the Case Life Cycle now and configure it fully later. The SA's statement misrepresents Draft mode.\",\n      \"✗ Incorrect. Draft mode does support creating Draft data objects. You can reference them in the Case Life Cycle during the workshop. The issue is what those Draft objects contain — not that they cannot exist.\",\n      \"✗ Incorrect. Draft mode does not auto-create fields from typed names. The Draft object is a placeholder shell only.\",\n      \"Incorrect. The documented designer action creates a placeholder; the claim of automatic production fields is unsupported.\"\n    ]\n  },\n  {\n    \"label\": \"Process Naming\",\n    \"intro\": \"An SA names the following Case Life Cycle artifacts. Which ONE naming choice violates the Pega convention?\",\n    \"config\": [\n      \"Case Type name: 'Customer Onboarding'          ← outcome statement ✓\",\n      \"Stage name:     'Document Review'               ← noun/gerund ✓\",\n      \"Process name:   'Review documents'              ← verb+noun ✓\",\n      \"Step name:      'Document Verification'         ← noun phrase\",\n      \"Status:         'Pending-DocumentReview'        ← Pega status format ✓\"\n    ],\n    \"opts\": [\n      \"Step name 'Document Verification' — Steps should use verb+noun ('Verify documents'), not a noun phrase\",\n      \"Case Type name 'Customer Onboarding' — Case Types must use verb+noun format ('Onboard Customer'), not an outcome statement\",\n      \"Stage name 'Document Review' — Stages must use verb+noun ('Review Documents'), not a gerund/noun phrase\",\n      \"Process name 'Review documents' — Processes must use a noun phrase ('Document Review'), not verb+noun\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. Steps use verb+noun ('Collect information', 'Verify documents', 'Send confirmation'). 'Document Verification' is a noun phrase — that is the Stage naming pattern, not the Step pattern.\",\n      \"✗ Incorrect. 'Customer Onboarding' is the correct Case Type format — an outcome statement or noun phrase describing the result of the Case. Verb+noun belongs to Steps and Processes.\",\n      \"✗ Incorrect. 'Document Review' is a valid gerund/noun phrase for a Stage. Stage naming uses noun/gerund forms — this is correct.\",\n      \"✗ Incorrect. 'Review documents' (verb+noun) is the correct Process naming convention. Noun phrases like 'Document Review' are for Stages, not Processes.\"\n    ]\n  }\n];\n\nvar cur = 0, score = 0;\n\nfunction render() {\n  var p = problems[cur];\n  document.getElementById('prog').textContent = 'Problem ' + (cur+1) + ' of ' + problems.length + ' — Score: ' + score + '/' + problems.length;\n  var cfg = p.config.map(function(l){ return l.includes('←') ? '<span class=\"flaw\">'+l+'</span>' : l; }).join('\\n');\n  var html = '<div class=\"label\">' + p.label + '</div>';\n  html += '<div class=\"scenario\">' + p.intro + '</div>';\n  html += '<div class=\"config\">' + cfg + '</div>';\n  p.opts.forEach(function(o, i) {\n    html += '<button class=\"opt\" onclick=\"answer(' + i + ')\">' + o + '</button>';\n  });\n  document.getElementById('qcard').innerHTML = html;\n  document.getElementById('nav').innerHTML = '';\n}\n\nfunction answer(idx) {\n  var p = problems[cur];\n  var btns = document.querySelectorAll('.opt');\n  btns.forEach(function(b){ b.disabled = true; });\n  var correct = idx === p.correct;\n  if (correct) score++;\n  p.opts.forEach(function(o, i) {\n    btns[i].className = i === p.correct ? 'opt ok' : (i === idx && !correct ? 'opt bad' : 'opt');\n  });\n  var fb = document.createElement('div');\n  fb.className = 'fb ' + (correct ? 'ok' : 'bad');\n  fb.textContent = p.fbs[idx];\n  document.getElementById('qcard').appendChild(fb);\n  var nav = document.getElementById('nav');\n  if (cur < problems.length - 1) {\n    nav.innerHTML = '<button class=\"btn primary\" onclick=\"next()\">Next problem →</button>';\n  } else {\n    showResult();\n  }\n}\n\nfunction next() { cur++; render(); }\n\nfunction showResult() {\n  var pct = Math.round(score / problems.length * 100);\n  var msg = pct === 100 ? 'Excellent — you can spot Case Life Cycle design errors confidently.' :\n            pct >= 75 ? 'Good eye. Review the patterns you missed.' :\n            'Work through the Case Life Cycle building blocks again, then retry.';\n  document.getElementById('qcard').innerHTML = '<div class=\"score-big\">' + score + ' / ' + problems.length + ' (' + pct + '%)</div><div class=\"score-msg\">' + msg + '</div>';\n  document.getElementById('nav').innerHTML = '<button class=\"btn\" onclick=\"restart()\">Restart</button>';\n}\n\nfunction restart() { cur = 0; score = 0; render(); }\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}\nbody{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}\n.label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.scenario{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:14px}\n.opt{display:block;width:100%;text-align:left;margin:6px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}\n.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}\n.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}\n.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;color:var(--soft);border-left:3px solid var(--line);padding-left:10px}\n.fb.ok{border-color:var(--ok);color:var(--ink)}\n.fb.bad{border-color:var(--bad);color:var(--ink)}\n.progress{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:12px}\n.btn{margin-top:12px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}\n.btn:hover{border-color:var(--brand);color:var(--ink)}\n.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}\n.btn.primary:hover{opacity:.88}\n.score-big{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}\n.score-msg{font-size:13px;color:var(--soft);text-align:center}\n\n.config{background:var(--bg);border:1px dashed var(--line);border-radius:8px;padding:12px;font-size:12.5px;line-height:1.7;margin-bottom:14px;font-family:monospace}\n.flaw{color:var(--bad);font-weight:700}\n</style></head><body>\n<div class=\"progress\" id=\"prog\">Problem 1 of 4</div>\n<div class=\"card\" id=\"qcard\"></div>\n<div id=\"nav\"></div>\n\n<script>\n(function(){\n  var root=document.documentElement;\n  function apply(t){root.setAttribute('data-theme',t);}\n  apply('__THEME__');\n  window.addEventListener('message',function(e){\n    if(e.data&&e.data.type==='pa-theme') apply(e.data.theme);\n  });\n})();\n</script>\n\n<script>\n/* quilyn-topic-balance-v1 */\nvar problems = [\n  {\n    \"label\": \"Case Life Cycle Design\",\n    \"intro\": \"A junior SA designs a loan application Case Life Cycle. Review the structure and identify the ONE design flaw:\",\n    \"config\": [\n      \"Stage 1 (green): Create\",\n      \"  Process: Collect applicant info\",\n      \"    Step: Submit application form\",\n      \"Stage 2 (blue): Credit Check\",\n      \"  Process: Run credit evaluation\",\n      \"    Step: Credit bureau lookup (automation)\",\n      \"Stage 3 (green): Create\",\n      \"Stage 4 (red): Resolution\",\n      \"  Process: Notify applicant\"\n    ],\n    \"opts\": [\n      \"The Resolution Stage name lacks a 'Resolved-' prefix\",\n      \"Credit bureau lookup is an Automation Step\",\n      \"The Credit Check Stage uses a noun phrase\",\n      \"A second Create Stage was added\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"✗ Not the flaw. While Pega recommends 'Resolved-' prefix for Resolution Stage statuses, the Stage itself can be named anything descriptive. The flaw is structural, not a naming convention issue.\",\n      \"✗ Not the flaw. Automation Steps (yellow) are valid and expected in Case Life Cycles — system actions like credit bureau lookups are automation Steps. Not all Steps need to be user Collect information Steps.\",\n      \"✗ Not the flaw. 'Credit Check' (noun phrase) is a valid Stage name — Stages use noun/gerund naming. Verb+noun is the Process and Step convention, not the Stage convention.\",\n      \"✓ Correct. There is exactly one Create Stage per Case Type — it is fixed as the first Stage and cannot be duplicated. Document upload should be a Process/Step inside a separate primary Stage, not a second Create Stage.\"\n    ]\n  },\n  {\n    \"label\": \"Stage Type Usage\",\n    \"intro\": \"An Alternate Stage collects corrections and must return automatically to Review. Which configuration is missing?\",\n    \"config\": [\n      \"Primary Stage: Review\",\n      \"Alternate Stage: Correct Documents\",\n      \"  Process: Collect corrections\",\n      \"  Step: Collect information\",\n      \"  Requirement: return automatically to Review\",\n      \"  [No Change Stage automation configured]\"\n    ],\n    \"opts\": [\n      \"Add a Change Stage automation targeting Review after correction work\",\n      \"The Change Stage automation is wrong — rejections must always route to the Resolution Stage immediately; there is no way to loop within a Case Life Cycle\",\n      \"Add Parallel Processes because every exception branch requires concurrent approval\",\n      \"A Resolution Stage cannot be red; only the Create Stage has a color indicator\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"Correct. Use the explicit destination Stage for the required automatic return. Alternate Stages support exception handling; returning to a Primary Stage is not itself prohibited.\",\n      \"Incorrect. A correction branch does not have to resolve immediately; it can return to the primary path.\",\n      \"Incorrect. Parallel work is independent concurrency, not the required transition to Review.\",\n      \"Incorrect. A Resolution Stage is identified by red. This does not configure the requested return destination.\"\n    ]\n  },\n  {\n    \"label\": \"Draft Mode Usage\",\n    \"intro\": \"An SA creates CustomerProfile in the designer’s Data & Interfaces area. What should the SA expect from the new draft data object?\",\n    \"config\": [\n      \"SA says:\",\n      \"'I added a Draft data object called CustomerProfile — it has all the fields\",\n      \" we discussed: firstName, lastName, email, dateOfBirth. I mapped them to\",\n      \" the correct data types. Draft mode is great because it creates the real\",\n      \" data object AND all the fields automatically so we can test right away.'\"\n    ],\n    \"opts\": [\n      \"A configured object from names entered during the workshop\",\n      \"An empty placeholder requiring separate field and integration configuration\",\n      \"A fully configured object, but only when using Dev Studio\",\n      \"No draft object: all data objects must be fully configured\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"✗ Incorrect. Draft mode does not auto-create fields from typed names. The Draft object is a placeholder shell only.\",\n      \"✓ Correct. A Draft data object is a lightweight placeholder — no fields, no integration mapping, no data types. It lets the SA reference the object in the Case Life Cycle now and configure it fully later. The SA's statement misrepresents Draft mode.\",\n      \"Incorrect. The documented designer action creates a placeholder; the claim of automatic production fields is unsupported.\",\n      \"✗ Incorrect. Draft mode does support creating Draft data objects. You can reference them in the Case Life Cycle during the workshop. The issue is what those Draft objects contain — not that they cannot exist.\"\n    ]\n  },\n  {\n    \"label\": \"Process Naming\",\n    \"intro\": \"An SA names the following Case Life Cycle artifacts. Which ONE naming choice violates the Pega convention?\",\n    \"config\": [\n      \"Case Type name: 'Customer Onboarding'          ← outcome statement ✓\",\n      \"Stage name:     'Document Review'               ← noun/gerund ✓\",\n      \"Process name:   'Review documents'              ← verb+noun ✓\",\n      \"Step name:      'Document Verification'         ← noun phrase\",\n      \"Status:         'Pending-DocumentReview'        ← Pega status format ✓\"\n    ],\n    \"opts\": [\n      \"Stage name 'Document Review' — Stages must use verb+noun ('Review Documents'), not a gerund/noun phrase\",\n      \"Process name 'Review documents' — Processes must use a noun phrase ('Document Review'), not verb+noun\",\n      \"Step name 'Document Verification' — Steps should use verb+noun ('Verify documents'), not a noun phrase\",\n      \"Case Type name 'Customer Onboarding' — Case Types must use verb+noun format ('Onboard Customer'), not an outcome statement\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. 'Document Review' is a valid gerund/noun phrase for a Stage. Stage naming uses noun/gerund forms — this is correct.\",\n      \"✗ Incorrect. 'Review documents' (verb+noun) is the correct Process naming convention. Noun phrases like 'Document Review' are for Stages, not Processes.\",\n      \"✓ Correct. Steps use verb+noun ('Collect information', 'Verify documents', 'Send confirmation'). 'Document Verification' is a noun phrase — that is the Stage naming pattern, not the Step pattern.\",\n      \"✗ Incorrect. 'Customer Onboarding' is the correct Case Type format — an outcome statement or noun phrase describing the result of the Case. Verb+noun belongs to Steps and Processes.\"\n    ]\n  }\n];\n\nvar cur = 0, score = 0;\n\nfunction render() {\n  var p = problems[cur];\n  document.getElementById('prog').textContent = 'Problem ' + (cur+1) + ' of ' + problems.length + ' — Score: ' + score + '/' + problems.length;\n  var cfg = p.config.map(function(l){ return l.includes('←') ? '<span class=\"flaw\">'+l+'</span>' : l; }).join('\\n');\n  var html = '<div class=\"label\">' + p.label + '</div>';\n  html += '<div class=\"scenario\">' + p.intro + '</div>';\n  html += '<div class=\"config\">' + cfg + '</div>';\n  p.opts.forEach(function(o, i) {\n    html += '<button class=\"opt\" onclick=\"answer(' + i + ')\">' + o + '</button>';\n  });\n  document.getElementById('qcard').innerHTML = html;\n  document.getElementById('nav').innerHTML = '';\n}\n\nfunction answer(idx) {\n  var p = problems[cur];\n  var btns = document.querySelectorAll('.opt');\n  btns.forEach(function(b){ b.disabled = true; });\n  var correct = idx === p.correct;\n  if (correct) score++;\ndocument.getElementById('prog').textContent='Problem '+(cur+1)+' of '+problems.length+' — Score: '+score+'/'+problems.length;\n  p.opts.forEach(function(o, i) {\n    btns[i].className = i === p.correct ? 'opt ok' : (i === idx && !correct ? 'opt bad' : 'opt');\n  });\n  var fb = document.createElement('div');\n  fb.className = 'fb ' + (correct ? 'ok' : 'bad');\n  fb.textContent = p.fbs[idx];\n  document.getElementById('qcard').appendChild(fb);\n  var nav = document.getElementById('nav');\n  if (cur < problems.length - 1) {\n    nav.innerHTML = '<button class=\"btn primary\" onclick=\"next()\">Next problem →</button>';\n  } else {\n    showResult();\n  }\n}\n\nfunction next() { cur++; render(); }\n\nfunction showResult() {\n  var pct = Math.round(score / problems.length * 100);\n  var msg = pct === 100 ? 'Excellent — you can spot Case Life Cycle design errors confidently.' :\n            pct >= 75 ? 'Good eye. Review the patterns you missed.' :\n            'Work through the Case Life Cycle building blocks again, then retry.';\n  document.getElementById('qcard').innerHTML = '<div class=\"score-big\">' + score + ' / ' + problems.length + ' (' + pct + '%)</div><div class=\"score-msg\">' + msg + '</div>';\n  document.getElementById('nav').innerHTML = '<button class=\"btn\" onclick=\"restart()\">Restart</button>';\n}\n\nfunction restart() { cur = 0; score = 0; render(); }\nrender();\n</script></body></html>"
         },
         {
           "type": "concept",
@@ -245,8 +245,8 @@
       "scenario": "A System Architect models an insurance claim as 'Submission', 'Processing', and 'Settlement'. A stakeholder asks what these three milestones represent in the Case Life Cycle. What is the correct answer?",
       "options": [
         {
-          "id": "A",
-          "text": "Stages — the top-level phases that a Case moves through from creation to resolution"
+          "id": "D",
+          "text": "Personas — the roles of the people assigned to work the Case through each phase"
         },
         {
           "id": "B",
@@ -257,8 +257,8 @@
           "text": "Steps — the individual actions that users or the system perform at a given point in the Case"
         },
         {
-          "id": "D",
-          "text": "Personas — the roles of the people assigned to work the Case through each phase"
+          "id": "A",
+          "text": "Stages — the top-level phases that a Case moves through from creation to resolution"
         }
       ],
       "correctOptions": [
@@ -281,20 +281,20 @@
       "scenario": "A bank uses a 'Loan Application' Case Type that has processed 500 individual loan applications this year. Which statement correctly describes the relationship between Case Type and Case?",
       "options": [
         {
-          "id": "A",
-          "text": "The Case Type is the reusable abstract model (the 'cookie cutter'); each loan application is a numbered Case instance created from that model"
-        },
-        {
-          "id": "B",
-          "text": "The Case is the abstract reusable model; the Case Type is the specific numbered instance that is worked and resolved"
+          "id": "D",
+          "text": "A Case Type is a single Step in the process; 500 Cases represent 500 Steps completed in the current period"
         },
         {
           "id": "C",
           "text": "A Case Type and a Case are the same artifact — 'Case Type' is just the administrative display name for a Case in the Rules layer"
         },
         {
-          "id": "D",
-          "text": "A Case Type is a single Step in the process; 500 Cases represent 500 Steps completed in the current period"
+          "id": "A",
+          "text": "The Case Type is the reusable abstract model (the 'cookie cutter'); each loan application is a numbered Case instance created from that model"
+        },
+        {
+          "id": "B",
+          "text": "The Case is the abstract reusable model; the Case Type is the specific numbered instance that is worked and resolved"
         }
       ],
       "correctOptions": [
@@ -353,6 +353,10 @@
       "scenario": "A loan approval Case is rejected by an underwriter due to missing income documents. The process must route the Case off the main path to collect the missing documents, then automatically return it to Underwriting. Which Stage type handles this pattern?",
       "options": [
         {
+          "id": "D",
+          "text": "A parallel Process within the current Stage — runs the document-collection work at the same time as the main underwriting work"
+        },
+        {
           "id": "A",
           "text": "An Alternate Stage — handles deviations and exceptions; a Change Stage automation returns the Case to the primary path when complete"
         },
@@ -363,10 +367,6 @@
         {
           "id": "C",
           "text": "A Primary Stage — the main sequential phases the Case moves through on its normal path to resolution"
-        },
-        {
-          "id": "D",
-          "text": "A parallel Process within the current Stage — runs the document-collection work at the same time as the main underwriting work"
         }
       ],
       "correctOptions": [
@@ -389,26 +389,26 @@
       "scenario": "An SA reviews a Case Life Cycle and notices there is no red Stage at the end. The tech lead flags this as a design gap. What is the correct behavior of Resolution Stages?",
       "options": [
         {
-          "id": "A",
-          "text": "Every Case Type should have at least one Resolution Stage; it is displayed in red and defines end-of-life-cycle behavior such as Resolved-Approved or Resolved-Rejected"
-        },
-        {
           "id": "B",
           "text": "Resolution Stages are optional; a Case Life Cycle is valid without one and the Case simply remains active indefinitely"
+        },
+        {
+          "id": "D",
+          "text": "A Resolution Stage is always the first Stage in the Case Life Cycle, where the system determines whether the request is resolvable"
         },
         {
           "id": "C",
           "text": "A Case Type may have at most one Resolution Stage, and it is always colored green to indicate successful completion"
         },
         {
-          "id": "D",
-          "text": "A Resolution Stage is always the first Stage in the Case Life Cycle, where the system determines whether the request is resolvable"
+          "id": "A",
+          "text": "Every Case Type should have at least one Resolution Stage; it is displayed in red and defines end-of-life-cycle behavior such as Resolved-Approved or Resolved-Rejected"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Red identifies a Resolution Stage; design an explicit closure path.",
+      "hint": "Consider how a Case reaches an explicit business outcome.",
       "rationale": "A well-designed Case Type should include a Resolution Stage to express how work finishes. More than one Resolution Stage can represent different outcomes. This is design guidance, not a claim that the platform cannot save any other configuration.",
       "optionExplanations": {
         "A": "An explicit resolution phase makes the intended closure outcome clear.",
@@ -425,6 +425,10 @@
       "scenario": "A BA is reviewing a Case Life Cycle mockup with a stakeholder. The stakeholder says: 'I see green icons and yellow icons. I assumed green means approved/complete and yellow means warning/pending.' An SA must correct this and explain what the colors actually encode. Which TWO statements accurately describe Pega's Step icon color system?",
       "options": [
         {
+          "id": "D",
+          "text": "Both colors represent user Steps; yellow simply means the Step is optional while green is required"
+        },
+        {
           "id": "A",
           "text": "Green icons are Collect information Steps where a user must complete a Task (Assignment)"
         },
@@ -435,10 +439,6 @@
         {
           "id": "C",
           "text": "Green icons are Automation Steps; yellow icons are Collect information Steps — the opposite of most people's intuition"
-        },
-        {
-          "id": "D",
-          "text": "Both colors represent user Steps; yellow simply means the Step is optional while green is required"
         }
       ],
       "correctOptions": [
@@ -471,12 +471,12 @@
           "text": "As two sequential Processes — IT provisioning completes first, then HR scheduling begins, ensuring a defined order"
         },
         {
-          "id": "C",
-          "text": "As Alternate Stages — IT provisioning and HR scheduling each become separate exception branches triggered when needed"
-        },
-        {
           "id": "D",
           "text": "As two separate Case Life Cycles with no connection — each resolves independently and neither waits for the other"
+        },
+        {
+          "id": "C",
+          "text": "As Alternate Stages — IT provisioning and HR scheduling each become separate exception branches triggered when needed"
         }
       ],
       "correctOptions": [
@@ -499,20 +499,20 @@
       "scenario": "An SA creates a new Case Type in App Studio and sees that the Create Stage already has a default process configured. What is the default Create Process type and its core characteristics?",
       "options": [
         {
-          "id": "A",
-          "text": "A Multi-step Form — a sequential series of Views that a single user completes, submitting the entire form on the last screen"
-        },
-        {
-          "id": "B",
-          "text": "A Parallel Process — multiple simultaneous Assignments across different users, all required before the Case advances"
+          "id": "D",
+          "text": "A Partial View — an embedded, read-only fragment inserted inside another View to display the creation summary"
         },
         {
           "id": "C",
           "text": "A Hierarchical Form — a tree-structured form where sub-forms branch based on earlier answers before submission"
         },
         {
-          "id": "D",
-          "text": "A Partial View — an embedded, read-only fragment inserted inside another View to display the creation summary"
+          "id": "A",
+          "text": "A Multi-step Form — a sequential series of Views that a single user completes, submitting the entire form on the last screen"
+        },
+        {
+          "id": "B",
+          "text": "A Parallel Process — multiple simultaneous Assignments across different users, all required before the Case advances"
         }
       ],
       "correctOptions": [
@@ -535,12 +535,12 @@
       "scenario": "A user fills out a 4-screen Multi-step Form, reaches Screen 3, and realizes they entered their email incorrectly on Screen 1. Can they navigate back?",
       "options": [
         {
-          "id": "A",
-          "text": "Yes — all Multi-step Form navigation styles include Previous/Next buttons; the user can go back freely until a required field blocks them or the form is submitted"
-        },
-        {
           "id": "B",
           "text": "No — navigation in a Multi-step Form is strictly forward-only; once a screen is passed the data is locked and the user must start over"
+        },
+        {
+          "id": "A",
+          "text": "Yes — all Multi-step Form navigation styles include Previous/Next buttons; the user can go back freely until a required field blocks them or the form is submitted"
         },
         {
           "id": "C",
@@ -554,7 +554,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Standard, horizontal, and vertical navigation support Next and Previous before final submission.",
+      "hint": "Consider how navigation is configured for a form.",
       "rationale": "The standard, horizontal, and vertical Multi-step Form navigation styles support Next and Previous. Users can return to earlier Views before submission, subject to required-field constraints.",
       "optionExplanations": {
         "A": "The user can return before submission, subject to required-field constraints.",
@@ -571,20 +571,20 @@
       "scenario": "An SA is in a design workshop with business stakeholders. They want to rapidly sketch the full Case Life Cycle — Stages, Processes, and Steps — without getting blocked configuring every element. Which App Studio feature supports this?",
       "options": [
         {
-          "id": "A",
-          "text": "Draft mode — allows the SA to outline Stages, Processes, and Steps rapidly with placeholder elements configured later"
-        },
-        {
           "id": "B",
           "text": "A Savable Data Page — caches the partial configuration in memory so the SA can resume without saving incomplete rules"
+        },
+        {
+          "id": "D",
+          "text": "Blueprint import — produces a complete, fully configured Case Life Cycle from the stakeholder discussion automatically"
         },
         {
           "id": "C",
           "text": "An Application Profile — generates a skeleton Case Life Cycle from an uploaded process-flow diagram"
         },
         {
-          "id": "D",
-          "text": "Blueprint import — produces a complete, fully configured Case Life Cycle from the stakeholder discussion automatically"
+          "id": "A",
+          "text": "Draft mode — allows the SA to outline Stages, Processes, and Steps rapidly with placeholder elements configured later"
         }
       ],
       "correctOptions": [
@@ -643,6 +643,10 @@
       "scenario": "An SA proposes four artifact names: Stage = 'Review mortgage documents', Process = 'Review documents', Step = 'Collect applicant signature', Case Type = 'Mortgage Approval'. Which proposed name violates the Stage/Process/Step naming convention, and what is a suitable replacement?",
       "options": [
         {
+          "id": "D",
+          "text": "Case Type = 'Mortgage Approval' violates the convention — Case Types use a verb+noun, not an outcome/noun phrase. Replace with 'Approve Mortgage'"
+        },
+        {
           "id": "A",
           "text": "Stage = 'Review mortgage documents' violates the convention — Stages use a noun/gerund, not a verb+noun phrase. Replace with 'Document Review'"
         },
@@ -653,16 +657,12 @@
         {
           "id": "C",
           "text": "Step = 'Collect applicant signature' violates the convention — Steps use a noun, not a verb+noun phrase. Replace with 'Applicant Signature'"
-        },
-        {
-          "id": "D",
-          "text": "Case Type = 'Mortgage Approval' violates the convention — Case Types use a verb+noun, not an outcome/noun phrase. Replace with 'Approve Mortgage'"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Stages describe phases; Processes and Steps describe actions.",
+      "hint": "Compare the naming guidance for different levels of the life cycle.",
       "rationale": "Use a phase name such as 'Document Review' for the Stage. 'Review documents' and 'Collect applicant signature' already follow the verb+noun convention for Processes and Steps. The case name identifies the repeatable business transaction.",
       "optionExplanations": {
         "A": "Document Review describes a phase rather than an action to perform.",
@@ -679,20 +679,20 @@
       "scenario": "A product manager uses the term 'Microjourney' in a planning meeting. An SA needs to explain what a Microjourney is in Pega. Which answer is correct?",
       "options": [
         {
-          "id": "A",
-          "text": "A Microjourney is a Case Life Cycle that takes a customer from a triggering event to a specific, meaningful outcome — a focused slice of the broader customer journey"
-        },
-        {
-          "id": "B",
-          "text": "A Microjourney is an individual field in the Data Model that captures a single moment in the customer's interaction"
-        },
-        {
           "id": "C",
           "text": "A Microjourney is a Ruleset version containing the rules for one release cycle of the application"
         },
         {
           "id": "D",
           "text": "A Microjourney is an external system of record that stores the customer's interaction history"
+        },
+        {
+          "id": "A",
+          "text": "A Microjourney is a Case Life Cycle that takes a customer from a triggering event to a specific, meaningful outcome — a focused slice of the broader customer journey"
+        },
+        {
+          "id": "B",
+          "text": "A Microjourney is an individual field in the Data Model that captures a single moment in the customer's interaction"
         }
       ],
       "correctOptions": [
@@ -715,20 +715,20 @@
       "scenario": "A Case enters an 'Exception Handling' Alternate Stage after a validation failure. Once the user corrects the data, the Case must automatically return to the 'Review' Primary Stage. Which automation accomplishes this?",
       "options": [
         {
-          "id": "A",
-          "text": "Change Stage automation — transitions the Case to a specified Stage; this is the standard mechanism for leaving Alternate Stages and returning to the primary path"
-        },
-        {
-          "id": "B",
-          "text": "A Collect information Step — waits for the user to acknowledge the correction, then advances the Case to the next Step automatically"
+          "id": "D",
+          "text": "An Assignment routing rule — redirects the Case to the 'Review' Stage by reassigning it to the user group responsible for that Stage"
         },
         {
           "id": "C",
           "text": "A Wait Step (timer) — pauses Case processing for a configured duration, after which the Case returns to the primary path automatically"
         },
         {
-          "id": "D",
-          "text": "An Assignment routing rule — redirects the Case to the 'Review' Stage by reassigning it to the user group responsible for that Stage"
+          "id": "B",
+          "text": "A Collect information Step — waits for the user to acknowledge the correction, then advances the Case to the next Step automatically"
+        },
+        {
+          "id": "A",
+          "text": "Change Stage automation — transitions the Case to a specified Stage; this is the standard mechanism for leaving Alternate Stages and returning to the primary path"
         }
       ],
       "correctOptions": [
@@ -772,7 +772,7 @@
         "B",
         "C"
       ],
-      "hint": "Phase → group → action — three levels of hierarchy; one answer is a security artifact.",
+      "hint": "Separate workflow structure from access-control configuration.",
       "rationale": "The three building blocks are Stages (top-level phases), Processes (groups of Steps within a Stage), and Steps (individual actions within a Process). D is wrong because Access Roles are a security construct (RBAC) that governs who can do what — they define permissions, not lifecycle structure, and are not a building block of the Case Life Cycle.",
       "selectCount": 3,
       "optionExplanations": {
@@ -794,16 +794,16 @@
           "text": "Status communicates the current condition; Pending indicates awaited work and Resolved indicates completed processing"
         },
         {
+          "id": "D",
+          "text": "The SA is correct but only for the 'Resolved-' prefix — pending sub-statuses like 'Pending Document' have no system behavior and are purely cosmetic"
+        },
+        {
           "id": "B",
           "text": "The colleague is correct — Case status is display-only metadata; routing and reporting use Process/Stage completion flags, not status values"
         },
         {
           "id": "C",
           "text": "Both are partially correct — status text displays to users (UI purpose) but the system ignores it for any logic, triggers, or reporting queries"
-        },
-        {
-          "id": "D",
-          "text": "The SA is correct but only for the 'Resolved-' prefix — pending sub-statuses like 'Pending Document' have no system behavior and are purely cosmetic"
         }
       ],
       "correctOptions": [
@@ -826,16 +826,16 @@
       "scenario": "A stakeholder asks how the Case Life Cycle and the Microjourney relate to each other. Which statement most accurately describes the relationship?",
       "options": [
         {
+          "id": "C",
+          "text": "The Microjourney replaces the Case Life Cycle in Constellation applications — teams choose one or the other but not both"
+        },
+        {
           "id": "A",
           "text": "The Case Life Cycle is the visual business model of the Microjourney — it shows the structured path a Case follows from creation to a specific resolution outcome"
         },
         {
           "id": "B",
           "text": "The Microjourney and the Case Life Cycle are separate concepts: the Microjourney is a reporting metric and the Case Life Cycle is the application's data model"
-        },
-        {
-          "id": "C",
-          "text": "The Microjourney replaces the Case Life Cycle in Constellation applications — teams choose one or the other but not both"
         },
         {
           "id": "D",
@@ -845,7 +845,7 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "The Case Life Cycle IS the Microjourney expressed as a visual, structured model.",
+      "hint": "How does the scope of a business journey relate to its workflow model?",
       "rationale": "The Case Life Cycle models the work needed for the customer outcome. It gives the journey an operational model; this does not make every broader journey and Case Type the same artifact.",
       "optionExplanations": {
         "A": "The lifecycle expresses the work needed to deliver the modeled outcome.",
@@ -862,16 +862,16 @@
       "scenario": "A Step on the Workflow tab requires a Claims Adjuster to review and approve a submitted claim. This Step is a user action. How is this Step categorized in Pega?",
       "options": [
         {
-          "id": "A",
-          "text": "An Assignment (user Step) — a Step that requires a user to review information and make a decision"
+          "id": "C",
+          "text": "A Resolution Stage — a top-level lifecycle milestone that marks the Case as resolved after the adjuster's decision"
         },
         {
           "id": "B",
           "text": "An Automation Step — the system executes the review-and-approve logic automatically without human intervention"
         },
         {
-          "id": "C",
-          "text": "A Resolution Stage — a top-level lifecycle milestone that marks the Case as resolved after the adjuster's decision"
+          "id": "A",
+          "text": "An Assignment (user Step) — a Step that requires a user to review information and make a decision"
         },
         {
           "id": "D",
@@ -898,10 +898,6 @@
       "scenario": "An SA is explaining the three levels of a Pega Case Life Cycle to a new developer. Which TWO statements correctly describe the relationship between Stages, Processes, and Steps?",
       "options": [
         {
-          "id": "A",
-          "text": "A Stage groups related Processes that collectively accomplish a distinct business milestone"
-        },
-        {
           "id": "B",
           "text": "A Process contains one or more Steps that execute in sequence within that Process"
         },
@@ -912,13 +908,17 @@
         {
           "id": "D",
           "text": "Steps within a Process can belong to multiple Stages simultaneously"
+        },
+        {
+          "id": "A",
+          "text": "A Stage groups related Processes that collectively accomplish a distinct business milestone"
         }
       ],
       "correctOptions": [
         "A",
         "B"
       ],
-      "hint": "Recall the three-level hierarchy: Stage groups Processes, Process contains Steps.",
+      "hint": "Separate containers from individual actions.",
       "rationale": "In a Pega Case Life Cycle, a Stage is the top-level grouping that represents a business phase and can contain multiple Processes. Each Process holds the Steps (Assignments, Automations, Subprocesses) that execute within it. A Stage is not limited to one Process, and Steps belong to exactly one Process.",
       "optionExplanations": {
         "A": "A Stage brings related work together around a business milestone.",
@@ -935,20 +935,20 @@
       "scenario": "A developer is iterating on an incomplete Case Type in a development environment. Which TWO statements correctly describe Draft mode and the checks needed before production release?",
       "options": [
         {
-          "id": "A",
-          "text": "Draft mode permits development testing of Process flows even when some configuration is incomplete"
-        },
-        {
-          "id": "B",
-          "text": "Resolve configuration issues and turn off Draft mode on Process flows before releasing the application to production"
-        },
-        {
           "id": "C",
           "text": "Draft mode immediately activates the Case Type in the production environment for end-user validation"
         },
         {
           "id": "D",
           "text": "Draft mode permanently locks the Case Type until a release manager approves and promotes the configuration"
+        },
+        {
+          "id": "A",
+          "text": "Draft mode permits development testing of Process flows even when some configuration is incomplete"
+        },
+        {
+          "id": "B",
+          "text": "Resolve configuration issues and turn off Draft mode on Process flows before releasing the application to production"
         }
       ],
       "correctOptions": [
@@ -972,20 +972,20 @@
       "scenario": "An SA is designing the Case Life Cycle for a Claims application. Which TWO best practices correctly guide Case Life Cycle design in Pega?",
       "options": [
         {
-          "id": "A",
-          "text": "Each Stage should represent a distinct business milestone or phase in the Claims resolution process"
-        },
-        {
           "id": "B",
           "text": "Stage names should use nouns or gerunds (such as 'Investigation' or 'Reviewing') that reflect the phase of work"
+        },
+        {
+          "id": "D",
+          "text": "Each Step in a Process must take multiple business days to allow SLAs to be configured effectively"
         },
         {
           "id": "C",
           "text": "All Processes in the Case Life Cycle must always execute, regardless of the claim type or conditions"
         },
         {
-          "id": "D",
-          "text": "Each Step in a Process must take multiple business days to allow SLAs to be configured effectively"
+          "id": "A",
+          "text": "Each Stage should represent a distinct business milestone or phase in the Claims resolution process"
         }
       ],
       "correctOptions": [

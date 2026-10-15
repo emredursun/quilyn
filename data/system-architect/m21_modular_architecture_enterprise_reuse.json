@@ -111,7 +111,7 @@
           "type": "interactive",
           "title": "Layer Cake Rule Placement Decisions",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Which Layer?\", \"scenario\": \"A global insurance company has 3 Ruleset layers: Enterprise (bottom), Regional (middle), Local Branch (top). They need to place a 'Fraud Detection' rule that applies to ALL regions and branches with no exceptions. Which layer?\", \"opts\": [\"Enterprise layer (bottom) — rules that apply universally across all regions and branches belong in the base layer; they are inherited by all layers above without needing to be repeated\", \"Regional layer (middle) — the most broadly applicable rules go in the middle layer as a compromise between the universal Enterprise and specific Local layers\", \"Local Branch layer (top) — placing universal rules at the top ensures they are found first and override any potential conflicts\", \"A separate 'Global' Ruleset above the Enterprise layer — global rules need their own dedicated layer separate from Enterprise defaults\"], \"correct\": 0, \"fbs\": [\"The scenario explicitly defines this as the shared base. Verify the configured dependencies of its consumers.\", \"✗ Incorrect. The Regional layer is for rules that apply across branches within a region, not for global rules. Global rules belong in the base Enterprise layer.\", \"✗ Incorrect. The Local Branch layer at the top is for the most specific overrides — putting a universal rule there would mean it only applies in that one branch, not globally.\", \"✗ Incorrect. Adding a 4th layer for 'Global' rules creates unnecessary complexity. The Enterprise (base) layer IS the global layer — it serves exactly this purpose.\"]}, {\"label\": \"Override Placement\", \"scenario\": \"UK regulation requires a different fraud score threshold (lower than the global standard) for all UK branches. Where does this UK-specific override go?\", \"opts\": [\"Regional layer for the UK region — it overrides the Enterprise default for all UK branches while leaving other regions unaffected\", \"Enterprise layer (bottom) — all threshold changes must go in the Enterprise layer to ensure consistency across regions\", \"Local Branch layer (top) — each UK branch should have its own copy of the threshold override for maximum flexibility\", \"A new standalone application just for UK regulatory compliance that imports rules from the global application\"], \"correct\": 0, \"fbs\": [\"In the defined scenario the regional specialization expresses UK variation without changing other regions.\", \"✗ Incorrect. Putting the UK-specific threshold in the Enterprise layer would apply it globally — other regions would also get the lower UK threshold, which is incorrect.\", \"✗ Incorrect. Duplicating the override in every UK branch's Local layer means maintaining the threshold value in every branch independently — maintenance nightmare.\", \"✗ Incorrect. A standalone UK application is extreme overengineering when the Ruleset stack handles regional variation elegantly within one application.\"]}, {\"label\": \"Governed reuse\", \"scenario\": \"Multiple teams consume one shared capability. What supports safe evolution?\", \"opts\": [\"Track ownership and consumers; review compatible updates\", \"Assume pre-testing removes the need for consumer checks\", \"Give all users unrestricted authoring access\", \"Copy every Rule into every application with no tracking\"], \"correct\": 0, \"fbs\": [\"Governance coordinates changes with their consumers.\", \"Pre-testing does not prove every integration.\", \"Reusable behavior does not imply unrestricted permission.\", \"Untracked copies increase separate maintenance.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Which Layer?\",\n    \"scenario\": \"A global insurance company has 3 Ruleset layers: Enterprise (bottom), Regional (middle), Local Branch (top). They need to place a 'Fraud Detection' rule that applies to ALL regions and branches with no exceptions. Which layer?\",\n    \"opts\": [\n      \"A new Global layer\",\n      \"The Enterprise base layer\",\n      \"The Local Branch layer\",\n      \"The Regional middle layer\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"✗ Incorrect. Adding a 4th layer for 'Global' rules creates unnecessary complexity. The Enterprise (base) layer IS the global layer — it serves exactly this purpose.\",\n      \"The scenario explicitly defines this as the shared base. Verify the configured dependencies of its consumers.\",\n      \"✗ Incorrect. The Local Branch layer at the top is for the most specific overrides — putting a universal rule there would mean it only applies in that one branch, not globally.\",\n      \"✗ Incorrect. The Regional layer is for rules that apply across branches within a region, not for global rules. Global rules belong in the base Enterprise layer.\"\n    ]\n  },\n  {\n    \"label\": \"Override Placement\",\n    \"scenario\": \"UK regulation requires a different fraud score threshold (lower than the global standard) for all UK branches. Where does this UK-specific override go?\",\n    \"opts\": [\n      \"Each Local Branch layer\",\n      \"The shared Enterprise layer\",\n      \"The UK Regional layer\",\n      \"A separate UK application\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. Duplicating the override in every UK branch's Local layer means maintaining the threshold value in every branch independently — maintenance nightmare.\",\n      \"✗ Incorrect. Putting the UK-specific threshold in the Enterprise layer would apply it globally — other regions would also get the lower UK threshold, which is incorrect.\",\n      \"In the defined scenario the regional specialization expresses UK variation without changing other regions.\",\n      \"✗ Incorrect. A standalone UK application is extreme overengineering when the Ruleset stack handles regional variation elegantly within one application.\"\n    ]\n  },\n  {\n    \"label\": \"Governed reuse\",\n    \"scenario\": \"Multiple teams consume one shared capability. What supports safe evolution?\",\n    \"opts\": [\n      \"Track ownership and consumers; review compatible updates\",\n      \"Copy every Rule into every application with no tracking\",\n      \"Give all users unrestricted authoring access\",\n      \"Assume pre-testing removes the need for consumer checks\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"Governance coordinates changes with their consumers.\",\n      \"Untracked copies increase separate maintenance.\",\n      \"Reusable behavior does not imply unrestricted permission.\",\n      \"Pre-testing does not prove every integration.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-b286d565dc1b"
@@ -209,20 +209,20 @@
       "scenario": "Which THREE of the following are among the five guiding principles of modular enterprise reuse in Pega?",
       "options": [
         {
-          "id": "A",
-          "text": "Interoperable — components connect seamlessly with other components and systems"
-        },
-        {
           "id": "B",
           "text": "Configurable — component behavior can be adjusted without rewriting the underlying implementation"
         },
         {
-          "id": "C",
-          "text": "Governed — reuse is managed through defined practices, catalogs, and oversight"
-        },
-        {
           "id": "D",
           "text": "Monolithic — the architecture consolidates all logic into a single undivided application layer"
+        },
+        {
+          "id": "A",
+          "text": "Interoperable — components connect seamlessly with other components and systems"
+        },
+        {
+          "id": "C",
+          "text": "Governed — reuse is managed through defined practices, catalogs, and oversight"
         }
       ],
       "correctOptions": [
@@ -230,7 +230,6 @@
         "B",
         "C"
       ],
-      "hint": "Five principles: Interoperable, Configurable, Governed, Updateable, and one more — NOT Monolithic.",
       "rationale": "Consistent building blocks identify the interoperability principle. Adjustable behavior identifies the configuration principle. Defined oversight identifies the governance principle.",
       "selectCount": 3,
       "optionExplanations": {
@@ -248,20 +247,20 @@
       "scenario": "A bank has shared HQ behavior and explicitly configured UK and branch specializations. In this conceptual Layer Cake example, how does layering avoid rewriting the entire base application?",
       "options": [
         {
-          "id": "A",
-          "text": "Shared defaults can be reused while appropriate higher-layer specializations provide the required variation"
-        },
-        {
           "id": "B",
           "text": "The same rule is physically copied into each layer; when UK regulations change, an admin updates all three copies simultaneously via the Ruleset Manager"
         },
         {
-          "id": "C",
-          "text": "The UK Division and Branch each maintain completely independent Pega applications that import only the rules they need from HQ via API"
+          "id": "A",
+          "text": "Shared defaults can be reused while appropriate higher-layer specializations provide the required variation"
         },
         {
           "id": "D",
           "text": "All overrides are stored in a single 'Override Ruleset' at the top of the stack; the system checks this ruleset first and falls through to the base HQ rules for everything not overridden"
+        },
+        {
+          "id": "C",
+          "text": "The UK Division and Branch each maintain completely independent Pega applications that import only the rules they need from HQ via API"
         }
       ],
       "correctOptions": [
@@ -284,20 +283,20 @@
       "scenario": "A team must localize a customer-service app for the UK — adjusting language and regional rules without changing the core enterprise foundation. Which layer of the Situational Layer Cake handles this?",
       "options": [
         {
-          "id": "A",
-          "text": "The Implementation Layer — the outermost layer where country- or region-specific configurations live on top of the shared foundation"
+          "id": "C",
+          "text": "Every Division layer is forbidden from containing any geographic business variation"
         },
         {
           "id": "B",
           "text": "The Enterprise Layer — the innermost shared layer where common assets live that all implementations share"
         },
         {
-          "id": "C",
-          "text": "Every Division layer is forbidden from containing any geographic business variation"
-        },
-        {
           "id": "D",
           "text": "Every localization requires replacing the full application rather than specializing it"
+        },
+        {
+          "id": "A",
+          "text": "The Implementation Layer — the outermost layer where country- or region-specific configurations live on top of the shared foundation"
         }
       ],
       "correctOptions": [
@@ -356,20 +355,20 @@
       "scenario": "An architect builds a powerful Process and complex Decision Table in Dev Studio and wants citizen developers to reuse them in App Studio. What is the mechanism?",
       "options": [
         {
-          "id": "A",
-          "text": "Mark the Rules as relevant records — this surfaces them in App Studio's assembly tools so citizen developers can find and reuse them"
-        },
-        {
-          "id": "B",
-          "text": "Move the Rules into the Implementation Layer — Implementation Layer rules automatically appear in App Studio for all users"
+          "id": "D",
+          "text": "Convert them to Data Pages — converting the rules to Data Pages makes them available in App Studio's data model section"
         },
         {
           "id": "C",
           "text": "Delete them from Dev Studio — removing Dev Studio rules forces the system to use App Studio's built-in versions instead"
         },
         {
-          "id": "D",
-          "text": "Convert them to Data Pages — converting the rules to Data Pages makes them available in App Studio's data model section"
+          "id": "A",
+          "text": "Mark the Rules as relevant records — this surfaces them in App Studio's assembly tools so citizen developers can find and reuse them"
+        },
+        {
+          "id": "B",
+          "text": "Move the Rules into the Implementation Layer — Implementation Layer rules automatically appear in App Studio for all users"
         }
       ],
       "correctOptions": [
@@ -392,20 +391,20 @@
       "scenario": "A System Architect is reviewing which Rule types can be surfaced for reuse in App Studio via the relevant records mechanism. Which THREE Rule types can be marked as relevant records?",
       "options": [
         {
-          "id": "A",
-          "text": "Properties (fields) — individual field definitions can be marked as relevant records for reuse"
+          "id": "D",
+          "text": "Access Groups — Access Groups cannot be marked as relevant records; they are security artifacts managed separately"
         },
         {
           "id": "B",
           "text": "Decision Tables — decision logic rules can be surfaced in App Studio via the relevant records designation"
         },
         {
-          "id": "C",
-          "text": "Service-Level Agreements — SLA rules can be marked as relevant records for reuse across Case Types"
+          "id": "A",
+          "text": "Properties (fields) — individual field definitions can be marked as relevant records for reuse"
         },
         {
-          "id": "D",
-          "text": "Access Groups — Access Groups cannot be marked as relevant records; they are security artifacts managed separately"
+          "id": "C",
+          "text": "Service-Level Agreements — SLA rules can be marked as relevant records for reuse across Case Types"
         }
       ],
       "correctOptions": [
@@ -413,7 +412,6 @@
         "B",
         "C"
       ],
-      "hint": "Properties, Decision Tables, SLAs = valid relevant record types. Access Groups = not.",
       "rationale": "Fields are included among the supported relevant record types. Decision tables are included among the supported relevant record types. SLAs are included among the supported relevant record types.",
       "selectCount": 3,
       "optionExplanations": {
@@ -467,12 +465,12 @@
       "scenario": "A BA wants to find a centralized repository of reusable assets available to the project team. Where does the Reuse Library reside in the Pega platform, and what is its primary purpose?",
       "options": [
         {
-          "id": "A",
-          "text": "In App Studio — a centralized catalog where SAs and citizen developers browse and add pre-built, relevant-record rules to their application"
-        },
-        {
           "id": "B",
           "text": "In Admin Studio — it is a system monitoring dashboard that tracks which rules are being reused across runtime deployments"
+        },
+        {
+          "id": "A",
+          "text": "In App Studio — a centralized catalog where SAs and citizen developers browse and add pre-built, relevant-record rules to their application"
         },
         {
           "id": "C",
@@ -503,26 +501,25 @@
       "scenario": "An enterprise wants to measure the return on investment of its reusable assets by tracking adoption rates and cost savings. Which reuse governance practice does this represent?",
       "options": [
         {
-          "id": "A",
-          "text": "Value measurement — dashboards and reports that track how often reusable assets are used and the cost savings generated"
-        },
-        {
-          "id": "B",
-          "text": "Lifecycle management — tracking which rules are active, deprecated, or scheduled for retirement"
-        },
-        {
           "id": "C",
           "text": "Reuse catalog — the browsable inventory of available reusable assets"
         },
         {
           "id": "D",
           "text": "Education and advocacy — training programs that teach teams how to find and use reusable assets"
+        },
+        {
+          "id": "A",
+          "text": "Value measurement — dashboards and reports that track how often reusable assets are used and the cost savings generated"
+        },
+        {
+          "id": "B",
+          "text": "Lifecycle management — tracking which rules are active, deprecated, or scheduled for retirement"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Tracking adoption + cost savings = Value measurement governance practice.",
       "rationale": "Usage and ROI measures address the value question directly.",
       "optionExplanations": {
         "A": "Usage and ROI measures address the value question directly.",
@@ -539,20 +536,20 @@
       "scenario": "Which Pega real-world example best illustrates the Situational Layer Cake consolidation benefit?",
       "options": [
         {
-          "id": "A",
-          "text": "AIG consolidating 52 disparate claim systems into a single modular Pega application with regional implementation layers"
+          "id": "C",
+          "text": "Deploying 100 separate applications that share no rules — each region gets its own completely independent system"
         },
         {
           "id": "B",
           "text": "A team writing one giant if-then-else application in a single class with no layering — fastest initial delivery"
         },
         {
-          "id": "C",
-          "text": "Deploying 100 separate applications that share no rules — each region gets its own completely independent system"
-        },
-        {
           "id": "D",
           "text": "Converting all application logic into Data Pages so the Situational Layer Cake is replaced by a flat data model"
+        },
+        {
+          "id": "A",
+          "text": "AIG consolidating 52 disparate claim systems into a single modular Pega application with regional implementation layers"
         }
       ],
       "correctOptions": [
@@ -575,20 +572,20 @@
       "scenario": "Which TWO statements correctly describe the roles of App Studio and Dev Studio in modular enterprise reuse?",
       "options": [
         {
-          "id": "A",
-          "text": "Dev Studio is used to create reusable modules, complex rules, and mark them as relevant records for surface in App Studio"
-        },
-        {
           "id": "B",
           "text": "App Studio assembles applications by adding pre-built relevant records from the Reuse Library to a Case Type"
         },
         {
-          "id": "C",
-          "text": "App Studio universally exposes every advanced Rule editor, so Dev Studio is never required"
+          "id": "A",
+          "text": "Dev Studio is used to create reusable modules, complex rules, and mark them as relevant records for surface in App Studio"
         },
         {
           "id": "D",
           "text": "Dev Studio is only used to monitor rule performance and cannot create or modify any rules"
+        },
+        {
+          "id": "C",
+          "text": "App Studio universally exposes every advanced Rule editor, so Dev Studio is never required"
         }
       ],
       "correctOptions": [
@@ -613,10 +610,6 @@
       "scenario": "Which guiding principle of modular enterprise reuse means you can adjust a component's behavior WITHOUT rewriting its underlying implementation?",
       "options": [
         {
-          "id": "A",
-          "text": "Configurable — behavior can be adjusted without rewriting the underlying business logic"
-        },
-        {
           "id": "B",
           "text": "Updateable — components can evolve independently, rather than identifying configuration behavior"
         },
@@ -627,12 +620,15 @@
         {
           "id": "D",
           "text": "Governed — the component is managed through a catalog and oversight process that controls who can change it"
+        },
+        {
+          "id": "A",
+          "text": "Configurable — behavior can be adjusted without rewriting the underlying business logic"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Adjusting application behavior without rewriting underlying code is the Configurable principle.",
       "rationale": "Adjustment without rewriting business logic identifies Configurable.",
       "optionExplanations": {
         "A": "Adjustment without rewriting business logic identifies Configurable.",
@@ -649,16 +645,16 @@
       "scenario": "A reusable Meeting-setup capability is needed by several business processes. What is the recommended modular approach?",
       "options": [
         {
-          "id": "A",
-          "text": "Create a reusable smart shape or module and add it to the Reuse Library so any process can reference it"
+          "id": "C",
+          "text": "Hard-code the meeting steps in each Case Life Cycle separately — this prevents dependencies between Case Types"
         },
         {
           "id": "B",
           "text": "Copy the meeting logic into each Case Type that needs it — duplication is acceptable when the logic is short"
         },
         {
-          "id": "C",
-          "text": "Hard-code the meeting steps in each Case Life Cycle separately — this prevents dependencies between Case Types"
+          "id": "A",
+          "text": "Create a reusable smart shape or module and add it to the Reuse Library so any process can reference it"
         },
         {
           "id": "D",
@@ -685,26 +681,25 @@
       "scenario": "Which Reuse Library governance practice specifically tracks WHERE reusable assets are deployed and manages their active status?",
       "options": [
         {
-          "id": "A",
-          "text": "Deployment and maintenance — tracks where rules are deployed, their active status, and manages updates and retirements"
-        },
-        {
-          "id": "B",
-          "text": "Reuse catalog — the catalog lists available reusable assets but does not track deployment locations"
-        },
-        {
           "id": "C",
           "text": "Education and advocacy — trains teams to find deployed rules and understand their maintenance status"
         },
         {
+          "id": "A",
+          "text": "Deployment and maintenance — tracks where rules are deployed, their active status, and manages updates and retirements"
+        },
+        {
           "id": "D",
           "text": "Value measurement — dashboards showing adoption rates imply deployment locations indirectly"
+        },
+        {
+          "id": "B",
+          "text": "Reuse catalog — the catalog lists available reusable assets but does not track deployment locations"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Track WHERE deployed + active status = Deployment and maintenance.",
       "rationale": "Deployment tracking identifies where assets are consumed.",
       "optionExplanations": {
         "A": "Deployment tracking identifies where assets are consumed.",
@@ -729,12 +724,12 @@
           "text": "Changing a lower enterprise layer automatically rewrites the higher implementation layers — cascade updates are the primary reuse benefit"
         },
         {
-          "id": "C",
-          "text": "Each layer must duplicate the rules of the layers below it — duplication ensures resilience if a lower layer is removed"
-        },
-        {
           "id": "D",
           "text": "The layers are merged into one at deployment — the layered structure only exists during development; it flattens at runtime"
+        },
+        {
+          "id": "C",
+          "text": "Each layer must duplicate the rules of the layers below it — duplication ensures resilience if a lower layer is removed"
         }
       ],
       "correctOptions": [
@@ -757,27 +752,26 @@
       "scenario": "Which TWO lifecycle phases benefit from modular enterprise reuse, per the module?",
       "options": [
         {
-          "id": "A",
-          "text": "Testing — shared, pre-validated reusable components reduce the number of defects and the testing effort needed"
-        },
-        {
           "id": "B",
           "text": "Maintenance — shared components reduce duplicate updates, with governed compatibility and release management"
+        },
+        {
+          "id": "D",
+          "text": "Legal compliance — modular reuse automatically ensures all applications meet regulatory requirements"
         },
         {
           "id": "C",
           "text": "Recruiting — modular architecture reduces hiring needs because fewer developers are required to build each application"
         },
         {
-          "id": "D",
-          "text": "Legal compliance — modular reuse automatically ensures all applications meet regulatory requirements"
+          "id": "A",
+          "text": "Testing — shared, pre-validated reusable components reduce the number of defects and the testing effort needed"
         }
       ],
       "correctOptions": [
         "A",
         "B"
       ],
-      "hint": "Testing and maintenance are stated lifecycle benefits; neither implies automatic compliance or a deployment guarantee.",
       "rationale": "Pre-tested assets can reduce repeated testing while consumers still need validation. Shared assets reduce duplicated maintenance with controlled consumer updates.",
       "selectCount": 2,
       "optionExplanations": {

@@ -126,7 +126,7 @@
           "type": "interactive",
           "title": "Studio & Role Assignment Decisions",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Who Uses Which Studio\", \"scenario\": \"A team needs business configuration, prediction modeling, advanced Rule configuration and View design. Which task-oriented studio selection fits?\", \"opts\": [\"App Studio for business configuration and Views; Prediction Studio for prediction models; Dev Studio for advanced Rules\", \"Alex → Dev Studio, Blake → App Studio, Casey → Prediction Studio, Dana → Dev Studio — the most important users get the most powerful tool\", \"Alex → App Studio, Blake → Dev Studio, Casey → App Studio, Dana → Prediction Studio — Prediction Studio handles complex design work\", \"All four → Dev Studio — a unified tool for all roles reduces context switching and training overhead\"], \"correct\": 0, \"fbs\": [\"✓ Correct. App Studio for business-focused roles (Product Owner, UX Designer). Prediction Studio for ML models. Dev Studio for complex technical development.\", \"✗ Incorrect. Assigning non-technical users to Dev Studio exposes an overly complex interface inappropriate for their tasks. Studios are role-matched for a reason.\", \"✗ Incorrect. Blake's ML work belongs in Prediction Studio, not Dev Studio. The role-studio alignment is inverted.\", \"✗ Incorrect. Dev Studio's complexity is inappropriate for product owners and UX designers. The multi-studio model provides role-appropriate complexity.\"]}, {\"label\": \"Studio Switching\", \"scenario\": \"A developer has appropriate permissions and selects the same application layer and changes in both studios. Does switching studio inherently create a different application?\", \"opts\": [\"No — the studios provide different tools for the application; accessible Rules depend on permissions and development context\", \"No — App Studio uses a separate simplified rule format; Dev Studio rules are generated from App Studio config only during a 'publish' operation\", \"Yes, but only rules created in Dev Studio are visible in App Studio; App Studio rules remain in App Studio's private layer\", \"No — once a Case Type is created in App Studio, it can only be edited in App Studio; Dev Studio cannot access App-Studio-created rules\"], \"correct\": 0, \"fbs\": [\"The tools differ, while access still depends on the selected application and context.\", \"Switching tools is not inherently a publish or conversion operation.\", \"Not every Rule is exposed in every authoring interface.\", \"A studio label does not permanently restrict who can edit a Rule.\"]}, {\"label\": \"Dev Studio for Advanced Rules\", \"scenario\": \"A required advanced Rule editor is not exposed in App Studio. The architect has the appropriate Dev Studio permissions. Which approach fits?\", \"opts\": [\"Use the supported editor in Dev Studio for that Rule\", \"Use a Decision Table in App Studio as an approximation — Decision Tables can perform calculations without needing Dev Studio\", \"File a change request to Pega support to unlock the Declare Expression editor in App Studio\", \"Create a workaround with a Data Transform manually triggered at every Step — it achieves the same result without Dev Studio\"], \"correct\": 0, \"fbs\": [\"Use the editor supported for that Rule and the assigned permissions.\", \"A substitute must satisfy the actual behavior; it is not automatically equivalent.\", \"The scenario already provides supported access, so a support unlock is not required.\", \"Manual triggers do not establish equivalent dependency behavior by themselves.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Who Uses Which Studio\",\n    \"scenario\": \"A team needs business configuration, prediction modeling, advanced Rule configuration and View design. Which task-oriented studio selection fits?\",\n    \"opts\": [\n      \"Alex → Dev Studio, Blake → App Studio, Casey → Prediction Studio, Dana → Dev Studio — the most important users get the most powerful tool\",\n      \"Alex → App Studio, Blake → Dev Studio, Casey → App Studio, Dana → Prediction Studio — Prediction Studio handles complex design work\",\n      \"All four → Dev Studio — a unified tool for all roles reduces context switching and training overhead\",\n      \"App Studio for business configuration and Views; Prediction Studio for prediction models; Dev Studio for advanced Rules\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"✗ Incorrect. Assigning non-technical users to Dev Studio exposes an overly complex interface inappropriate for their tasks. Studios are role-matched for a reason.\",\n      \"✗ Incorrect. Blake's ML work belongs in Prediction Studio, not Dev Studio. The role-studio alignment is inverted.\",\n      \"✗ Incorrect. Dev Studio's complexity is inappropriate for product owners and UX designers. The multi-studio model provides role-appropriate complexity.\",\n      \"✓ Correct. App Studio for business-focused roles (Product Owner, UX Designer). Prediction Studio for ML models. Dev Studio for complex technical development.\"\n    ]\n  },\n  {\n    \"label\": \"Studio Switching\",\n    \"scenario\": \"A developer has appropriate permissions and selects the same application layer and changes in both studios. Does switching studio inherently create a different application?\",\n    \"opts\": [\n      \"Yes, but only rules created in Dev Studio are visible in App Studio; App Studio rules remain in App Studio's private layer\",\n      \"No — the studios provide different tools for the application; accessible Rules depend on permissions and development context\",\n      \"No — App Studio uses a separate simplified rule format; Dev Studio rules are generated from App Studio config only during a 'publish' operation\",\n      \"No — once a Case Type is created in App Studio, it can only be edited in App Studio; Dev Studio cannot access App-Studio-created rules\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"Not every Rule is exposed in every authoring interface.\",\n      \"The tools differ, while access still depends on the selected application and context.\",\n      \"Switching tools is not inherently a publish or conversion operation.\",\n      \"A studio label does not permanently restrict who can edit a Rule.\"\n    ]\n  },\n  {\n    \"label\": \"Dev Studio for Advanced Rules\",\n    \"scenario\": \"A required advanced Rule editor is not exposed in App Studio. The architect has the appropriate Dev Studio permissions. Which approach fits?\",\n    \"opts\": [\n      \"Use the supported editor in Dev Studio for that Rule\",\n      \"Create a workaround with a Data Transform manually triggered at every Step — it achieves the same result without Dev Studio\",\n      \"Use a Decision Table in App Studio as an approximation — Decision Tables can perform calculations without needing Dev Studio\",\n      \"File a change request to Pega support to unlock the Declare Expression editor in App Studio\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"Use the editor supported for that Rule and the assigned permissions.\",\n      \"Manual triggers do not establish equivalent dependency behavior by themselves.\",\n      \"A substitute must satisfy the actual behavior; it is not automatically equivalent.\",\n      \"The scenario already provides supported access, so a support unlock is not required.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-2139f3f61dc3"
@@ -176,20 +176,20 @@
       "scenario": "Who manages the project scope and prioritizes requirements in sprints so each release delivers business value?",
       "options": [
         {
-          "id": "A",
-          "text": "The Product Owner (PO)"
-        },
-        {
-          "id": "B",
-          "text": "The Scrum Master"
-        },
-        {
           "id": "C",
           "text": "The Lead System Architect"
         },
         {
+          "id": "A",
+          "text": "The Product Owner (PO)"
+        },
+        {
           "id": "D",
           "text": "The UX Designer"
+        },
+        {
+          "id": "B",
+          "text": "The Scrum Master"
         }
       ],
       "correctOptions": [
@@ -216,12 +216,12 @@
           "text": "The Scrum Master"
         },
         {
-          "id": "B",
-          "text": "The Project Manager"
-        },
-        {
           "id": "C",
           "text": "The Product Owner"
+        },
+        {
+          "id": "B",
+          "text": "The Project Manager"
         },
         {
           "id": "D",
@@ -248,20 +248,20 @@
       "scenario": "Who is responsible for importing Blueprint files into Pega Platform and configuring functional and technical requirements from user stories?",
       "options": [
         {
-          "id": "A",
-          "text": "The Lead System Architect (LSA)"
+          "id": "D",
+          "text": "The Solutions Consultant"
         },
         {
           "id": "B",
           "text": "The Business Architect"
         },
         {
-          "id": "C",
-          "text": "The Quality Analyst"
+          "id": "A",
+          "text": "The Lead System Architect (LSA)"
         },
         {
-          "id": "D",
-          "text": "The Solutions Consultant"
+          "id": "C",
+          "text": "The Quality Analyst"
         }
       ],
       "correctOptions": [
@@ -284,10 +284,6 @@
       "scenario": "Which role engages the client early in the sales process and co-designs the Blueprint before handing it to the delivery team?",
       "options": [
         {
-          "id": "A",
-          "text": "The Solutions Consultant"
-        },
-        {
           "id": "B",
           "text": "The Project Manager"
         },
@@ -298,6 +294,10 @@
         {
           "id": "D",
           "text": "The Quality Analyst"
+        },
+        {
+          "id": "A",
+          "text": "The Solutions Consultant"
         }
       ],
       "correctOptions": [
@@ -320,16 +320,16 @@
       "scenario": "A new Pega project team is being onboarded and the project lead needs to determine which team members require access to Dev Studio for their day-to-day development and configuration work. Which TWO roles in a Pega project primarily use Dev Studio?",
       "options": [
         {
-          "id": "A",
-          "text": "System Architects"
-        },
-        {
           "id": "B",
           "text": "Quality Analysts"
         },
         {
           "id": "C",
           "text": "Data scientists"
+        },
+        {
+          "id": "A",
+          "text": "System Architects"
         },
         {
           "id": "D",
@@ -358,20 +358,20 @@
       "scenario": "An SA is explaining Pega's parallel development approach to a team that must build three independent features simultaneously without their changes colliding. A developer asks how their personal development environment is isolated from teammates. What is a Workspace in Pega parallel development?",
       "options": [
         {
-          "id": "A",
-          "text": "A secure space tied to ONE operator and ONE application; changes stay private until shared to a Branch"
-        },
-        {
-          "id": "B",
-          "text": "A shared team area where all developers' changes are immediately visible to everyone"
-        },
-        {
           "id": "C",
           "text": "A versioned container of released application features"
         },
         {
           "id": "D",
           "text": "A Work Queue for development tasks"
+        },
+        {
+          "id": "B",
+          "text": "A shared team area where all developers' changes are immediately visible to everyone"
+        },
+        {
+          "id": "A",
+          "text": "A secure space tied to ONE operator and ONE application; changes stay private until shared to a Branch"
         }
       ],
       "correctOptions": [
@@ -394,20 +394,20 @@
       "scenario": "How many Workspaces can an operator have within an application, and how are Workspaces turned on?",
       "options": [
         {
-          "id": "A",
-          "text": "One by default, but the operator can create multiple; Workspaces are enabled with the EnableWorkspace setting"
-        },
-        {
-          "id": "B",
-          "text": "Exactly one, always; they are on by default and cannot be disabled"
-        },
-        {
           "id": "C",
           "text": "Unlimited and shared across applications; no setting is required"
         },
         {
+          "id": "A",
+          "text": "One by default, but the operator can create multiple; Workspaces are enabled with the EnableWorkspace setting"
+        },
+        {
           "id": "D",
           "text": "One per Work Group; enabled in Admin Studio"
+        },
+        {
+          "id": "B",
+          "text": "Exactly one, always; they are on by default and cannot be disabled"
         }
       ],
       "correctOptions": [
@@ -430,20 +430,20 @@
       "scenario": "A Pega project team is about to develop three features in parallel. The SA recommends that each feature be developed in its own Branch Ruleset. A junior developer who is unfamiliar with the concept asks for a definition. What is a Branch Ruleset in Pega Platform?",
       "options": [
         {
-          "id": "A",
-          "text": "A Ruleset that is based on (branched from) another Ruleset and holds the Rules in active development in that Branch"
-        },
-        {
-          "id": "B",
-          "text": "A standalone Ruleset with no relationship to any other Ruleset"
+          "id": "D",
+          "text": "A copy of the entire application database"
         },
         {
           "id": "C",
           "text": "A Ruleset that stores only released, generally available Rules"
         },
         {
-          "id": "D",
-          "text": "A copy of the entire application database"
+          "id": "A",
+          "text": "A branched Ruleset holding Rules under development"
+        },
+        {
+          "id": "B",
+          "text": "A standalone Ruleset with no relationship to any other Ruleset"
         }
       ],
       "correctOptions": [
@@ -458,7 +458,10 @@
         "D": "A development rule container is not a complete database copy."
       },
       "explanationReviewedOn": "2026-10-03",
-      "lessonSection": "section-b93a987d01e1"
+      "lessonSection": "section-b93a987d01e1",
+      "previousSignatures": [
+        "[\"single-select\",\"A Pega project team is about to develop three features in parallel. The SA recommends that each feature be developed in its own Branch Ruleset. A junior developer who is unfamiliar with the concept asks for a definition. What is a Branch Ruleset in Pega Platform?\",[[\"A\",\"A Ruleset that is based on (branched from) another Ruleset and holds the Rules in active development in that Branch\"],[\"B\",\"A standalone Ruleset with no relationship to any other Ruleset\"],[\"C\",\"A Ruleset that stores only released, generally available Rules\"],[\"D\",\"A copy of the entire application database\"]],[\"A\"]]"
+      ]
     },
     {
       "questionId": "m19_q09",
@@ -470,12 +473,12 @@
           "text": "Only after the feature is complete, conflicts are resolved, and approval is granted"
         },
         {
-          "id": "B",
-          "text": "Immediately and automatically as soon as any Rule is changed in the Branch"
-        },
-        {
           "id": "C",
           "text": "Only when all other Branches are also complete"
+        },
+        {
+          "id": "B",
+          "text": "Immediately and automatically as soon as any Rule is changed in the Branch"
         },
         {
           "id": "D",
@@ -502,20 +505,20 @@
       "scenario": "A team wants to check, before merging, how many of their Branch Rules are covered by tests. Which Branch quality metric shows this?",
       "options": [
         {
-          "id": "A",
-          "text": "Test coverage / Unit tests — e.g., the Rules covered and Test pass rate metrics"
-        },
-        {
-          "id": "B",
-          "text": "The Weighted score guardrail metric"
-        },
-        {
           "id": "C",
           "text": "Total merge conflicts"
         },
         {
+          "id": "A",
+          "text": "Test coverage / Unit tests — e.g., the Rules covered and Test pass rate metrics"
+        },
+        {
           "id": "D",
           "text": "Uncovered Rules only — there is no coverage percentage"
+        },
+        {
+          "id": "B",
+          "text": "The Weighted score guardrail metric"
         }
       ],
       "correctOptions": [
@@ -538,20 +541,20 @@
       "scenario": "A team lead is reviewing a development Branch before approving it for merge. Which TWO are Branch quality metrics that Pega uses to judge whether a Branch is ready to merge?",
       "options": [
         {
-          "id": "A",
-          "text": "Guardrails (Weighted score) — number and severity of best-practice warnings"
+          "id": "D",
+          "text": "Ruleset lock count — how many Rulesets are locked"
         },
         {
-          "id": "B",
-          "text": "Merge conflicts (Total merge conflicts) — potential conflicts to resolve"
+          "id": "A",
+          "text": "Guardrails (Weighted score) — number and severity of best-practice warnings"
         },
         {
           "id": "C",
           "text": "Operator Urgency — the priority of the developer's worklist"
         },
         {
-          "id": "D",
-          "text": "Ruleset lock count — how many Rulesets are locked"
+          "id": "B",
+          "text": "Merge conflicts (Total merge conflicts) — potential conflicts to resolve"
         }
       ],
       "correctOptions": [
@@ -576,10 +579,6 @@
       "scenario": "In the documented Locations example, changes start privately, are shared with the feature team, and are then merged before a release. What is that example’s sequence?",
       "options": [
         {
-          "id": "A",
-          "text": "Workspace → Feature Branch → Application integration, before release"
-        },
-        {
           "id": "B",
           "text": "Application → Branch → Workspace"
         },
@@ -590,6 +589,10 @@
         {
           "id": "D",
           "text": "Workspace → Application directly, skipping the Branch"
+        },
+        {
+          "id": "A",
+          "text": "Workspace → Feature Branch → Application integration, before release"
         }
       ],
       "correctOptions": [
@@ -612,16 +615,16 @@
       "scenario": "A Pega project includes System Architects, Business Architects, and developers working in parallel. Which TWO statements correctly describe how roles align with the Pega development environment?",
       "options": [
         {
-          "id": "A",
-          "text": "System Architects primarily use Dev Studio to configure low-level technical Rules and advanced configurations"
-        },
-        {
           "id": "B",
           "text": "Business Architects use App Studio for supported business configuration; advanced Rule types can require other access"
         },
         {
           "id": "C",
           "text": "All team members must use Dev Studio for any Rule configuration — App Studio is view-only and cannot edit Rules"
+        },
+        {
+          "id": "A",
+          "text": "System Architects primarily use Dev Studio to configure low-level technical Rules and advanced configurations"
         },
         {
           "id": "D",

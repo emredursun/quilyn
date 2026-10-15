@@ -76,3 +76,9 @@ test('unsafe source URLs and malformed top-level files fail', t => {
   writeFileSync(join(f.root, 'data/registry.json'), '{broken');
   assert.ok(validateContent(f.root).errors.some(error => error.includes('registry.json')));
 });
+
+test('reviewed answer revisions require a recoverable original question snapshot',t=>{
+ const f=fixture(t),q=f.bank.PSA['Exam 1'][0];q.answerReviewVersion=1;f.write();assert.ok(validateContent(f.root).errors.some(e=>e.includes('recovery snapshot')));
+ q.previousQuestion={d:'Domain',q:'Original question',r:'Original rationale',t:'single',o:['First','Second'],a:[1]};f.write();assert.deepEqual(validateContent(f.root).errors,[]);
+ q.previousQuestion.a=[9];f.write();assert.ok(validateContent(f.root).errors.some(e=>e.includes('recovery snapshot')));
+});

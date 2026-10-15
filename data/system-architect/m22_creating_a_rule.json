@@ -99,7 +99,7 @@
           "type": "interactive",
           "title": "Rule Creation & Versioning Decisions",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Ruleset Versioning\", \"scenario\": \"A developer needs to safely experiment with a new SLA configuration without risking the production routing rule. The production Ruleset is at version 01-01-01. What should they do before making changes?\", \"opts\": [\"Create the changed Rule in a new appropriate development version, retaining the older version\", \"Edit the rule directly in the production version — Pega's rule locking prevents accidental overwrites in shared Rulesets\", \"Copy the rule to a personal file, make changes in production, then restore the file copy if needed\", \"Create a new Rule type to hold the experimental logic — separate rule types cannot conflict with each other\"], \"correct\": 0, \"fbs\": [\"Versioning retains an older definition. 01-01-02 is a patch increment, not a minor increment.\", \"✗ Incorrect. Editing directly in the production version is exactly what the developer should NOT do — there's no separation between the experiment and production logic.\", \"✗ Incorrect. Copying to a file is a manual workaround outside Pega's rule management — not auditable, not recoverable through Pega tooling.\", \"✗ Incorrect. Creating a separate rule type doesn't protect the original — it changes the application architecture and doesn't version the original rule.\"]}, {\"label\": \"Branching for Parallel Work\", \"scenario\": \"Two developers need to independently experiment with routing changes at the same time, without interfering with each other or the main application. What mechanism supports parallel independent development?\", \"opts\": [\"Rule branching — each developer creates a separate branch Ruleset for their experiment; the main Ruleset remains untouched; branches are merged or discarded when the experiment concludes\", \"Each developer checks out a new minor version — two minor versions can coexist in parallel and be merged when ready\", \"One developer uses App Studio, the other uses Dev Studio — the studios maintain separate rule repositories that merge on publish\", \"Each developer works on a separate Pega server with a copy of the application and synchronizes via export/import when done\"], \"correct\": 0, \"fbs\": [\"Branches isolate proposed changes; integration can still require conflict review.\", \"Version boundaries alone do not provide the feature isolation and reviewed merge workflow requested here.\", \"✗ Incorrect. App Studio and Dev Studio use the SAME rule repository — there is no studio-level isolation. Both developers would be editing the same rules.\", \"Separate environments may be used in delivery, but branching directly expresses the requested isolated feature development.\"]}, {\"label\": \"Local vs Shared Field\", \"scenario\": \"An SA is building a 'Fraud Claim' Case Type. They need a field 'FraudIndicatorScore' (a number calculated only for fraud claims) and a field 'CustomerAddress' (needed on Fraud Claims AND Service Request Claims). Where should each field be created?\", \"opts\": [\"FraudIndicatorScore → Local Data Model of the Fraud Claim Case Type (Case-specific). CustomerAddress → shared Address data object (reusable across Case Types)\", \"Both → Local Data Model of the Fraud Claim Case Type — each Case Type manages all its own fields independently\", \"Both → a shared data object — Pega recommends all fields in shared objects for maximum flexibility\", \"FraudIndicatorScore → shared data object (for fraud reporting). CustomerAddress → Local Data Model (since this Case Type uses it)\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Case-specific fields (FraudIndicatorScore) belong in the local Data Model. Reusable fields (CustomerAddress) belong in a shared data object to avoid duplication.\", \"✗ Incorrect. If CustomerAddress is duplicated in every Case Type's local Data Model, a change to the address structure requires updates in every Case Type. Shared objects prevent this.\", \"✗ Incorrect. FraudIndicatorScore is unique to fraud claims — putting it in a shared object pollutes the shared data model with Case-specific concepts.\", \"✗ Incorrect. FraudIndicatorScore in a shared object makes no sense — it's not needed by other Case Types. CustomerAddress in the local Data Model means it can't be easily reused across Case Types.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Ruleset Versioning\",\n    \"scenario\": \"A developer needs to safely experiment with a new SLA configuration without risking the production routing rule. The production Ruleset is at version 01-01-01. What should they do before making changes?\",\n    \"opts\": [\n      \"Create a new Rule type to hold the experimental logic — separate rule types cannot conflict with each other\",\n      \"Create the changed Rule in a new appropriate development version, retaining the older version\",\n      \"Copy the rule to a personal file, make changes in production, then restore the file copy if needed\",\n      \"Edit the rule directly in the production version — Pega's rule locking prevents accidental overwrites in shared Rulesets\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"✗ Incorrect. Creating a separate rule type doesn't protect the original — it changes the application architecture and doesn't version the original rule.\",\n      \"Versioning retains an older definition. 01-01-02 is a patch increment, not a minor increment.\",\n      \"✗ Incorrect. Copying to a file is a manual workaround outside Pega's rule management — not auditable, not recoverable through Pega tooling.\",\n      \"✗ Incorrect. Editing directly in the production version is exactly what the developer should NOT do — there's no separation between the experiment and production logic.\"\n    ]\n  },\n  {\n    \"label\": \"Branching for Parallel Work\",\n    \"scenario\": \"Two developers need to independently experiment with routing changes at the same time, without interfering with each other or the main application. What mechanism supports parallel independent development?\",\n    \"opts\": [\n      \"Parallel minor Ruleset versions, merged after the experiments\",\n      \"Separate Pega servers, synchronized through export/import\",\n      \"Separate studio rule repositories, merged on publishing\",\n      \"Separate branch Rulesets for each developer's experiment\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"Version boundaries alone do not provide the feature isolation and reviewed merge workflow requested here.\",\n      \"Separate environments may be used in delivery, but branching directly expresses the requested isolated feature development.\",\n      \"✗ Incorrect. App Studio and Dev Studio use the SAME rule repository — there is no studio-level isolation. Both developers would be editing the same rules.\",\n      \"Branches isolate proposed changes; integration can still require conflict review.\"\n    ]\n  },\n  {\n    \"label\": \"Local vs Shared Field\",\n    \"scenario\": \"An SA is building a 'Fraud Claim' Case Type. They need a field 'FraudIndicatorScore' (a number calculated only for fraud claims) and a field 'CustomerAddress' (needed on Fraud Claims AND Service Request Claims). Where should each field be created?\",\n    \"opts\": [\n      \"FraudIndicatorScore → shared data object (for fraud reporting). CustomerAddress → Local Data Model (since this Case Type uses it)\",\n      \"Both → a shared data object — Pega recommends all fields in shared objects for maximum flexibility\",\n      \"FraudIndicatorScore → Local Data Model of the Fraud Claim Case Type (Case-specific). CustomerAddress → shared Address data object (reusable across Case Types)\",\n      \"Both → Local Data Model of the Fraud Claim Case Type — each Case Type manages all its own fields independently\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. FraudIndicatorScore in a shared object makes no sense — it's not needed by other Case Types. CustomerAddress in the local Data Model means it can't be easily reused across Case Types.\",\n      \"✗ Incorrect. FraudIndicatorScore is unique to fraud claims — putting it in a shared object pollutes the shared data model with Case-specific concepts.\",\n      \"✓ Correct. Case-specific fields (FraudIndicatorScore) belong in the local Data Model. Reusable fields (CustomerAddress) belong in a shared data object to avoid duplication.\",\n      \"✗ Incorrect. If CustomerAddress is duplicated in every Case Type's local Data Model, a change to the address structure requires updates in every Case Type. Shared objects prevent this.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-ddb427b32976"
@@ -264,16 +264,16 @@
       "scenario": "A BA configures a Process in the App Studio Case Life Cycle. What type of rule is generated in the underlying Pega platform?",
       "options": [
         {
-          "id": "A",
-          "text": "A Flow Rule — the visual process modeled in App Studio is stored as a Flow Rule in the Pega platform"
+          "id": "C",
+          "text": "An Access Role — process definitions in App Studio are stored as Access Role rules that control who can execute them"
         },
         {
           "id": "B",
           "text": "A Ruleset version — each process configured in App Studio creates a new Ruleset version to hold the change"
         },
         {
-          "id": "C",
-          "text": "An Access Role — process definitions in App Studio are stored as Access Role rules that control who can execute them"
+          "id": "A",
+          "text": "A Flow Rule — the visual process modeled in App Studio is stored as a Flow Rule in the Pega platform"
         },
         {
           "id": "D",
@@ -319,7 +319,6 @@
       "correctOptions": [
         "A"
       ],
-      "hint": "Enabling business users to update rules themselves without SA help is Delegation.",
       "rationale": "Explicit delegation gives the selected business users the requested maintenance capability.",
       "optionExplanations": {
         "A": "Explicit delegation gives the selected business users the requested maintenance capability.",
@@ -336,6 +335,10 @@
       "scenario": "A developer needs to preserve the existing Rule while preparing an experiment in a separate development context. Which statement correctly describes versioning and branching?",
       "options": [
         {
+          "id": "D",
+          "text": "Saving the rule to a text file before editing provides a manual backup; paste the original back if the experiment fails"
+        },
+        {
           "id": "A",
           "text": "Create the changed Rule in an appropriate new Ruleset version while retaining the older version"
         },
@@ -346,10 +349,6 @@
         {
           "id": "C",
           "text": "Both described approaches can retain the original; configuration and testing determine the appropriate workflow"
-        },
-        {
-          "id": "D",
-          "text": "Saving the rule to a text file before editing provides a manual backup; paste the original back if the experiment fails"
         }
       ],
       "correctOptions": [
@@ -372,20 +371,20 @@
       "scenario": "A new SA is reviewing a Ruleset named Expense:01-02-03 in Dev Studio and needs to understand what each segment of the version number means. How should you correctly interpret this Ruleset version number?",
       "options": [
         {
-          "id": "A",
-          "text": "Major version 01, minor version 02, patch 03 of the Expense Ruleset — the three segments represent increasing levels of change granularity"
+          "id": "D",
+          "text": "A three-part date stamp (January 2, 2003) embedded in the version number for release tracking purposes"
         },
         {
-          "id": "B",
-          "text": "Version 1,023 of the Expense application — the hyphens separate digit groups in a single continuous version number"
+          "id": "A",
+          "text": "Major version 01, minor version 02, patch 03 of the Expense Ruleset — the three segments represent increasing levels of change granularity"
         },
         {
           "id": "C",
           "text": "Three separate Rulesets named 01, 02, and 03 that are all part of the Expense application"
         },
         {
-          "id": "D",
-          "text": "A three-part date stamp (January 2, 2003) embedded in the version number for release tracking purposes"
+          "id": "B",
+          "text": "Version 1,023 of the Expense application — the hyphens separate digit groups in a single continuous version number"
         }
       ],
       "correctOptions": [
@@ -408,20 +407,20 @@
       "scenario": "An SA is about to create Rulesets for a new Pega insurance implementation and wants the team to follow consistent naming conventions that avoid conflicts with Pega-reserved names. Which TWO of the following are valid Ruleset naming best practices in Pega?",
       "options": [
         {
-          "id": "A",
-          "text": "Use meaningful names and keep them to 32 characters or fewer — names should be descriptive and within Pega's recommended length"
+          "id": "D",
+          "text": "Name every Ruleset after the implementation layer only — using layer names as Ruleset names is the required convention"
         },
         {
-          "id": "B",
-          "text": "Avoid the 'Pega' and 'Pega-' prefix — this prefix is reserved for Pega's own built-in Rulesets and should not be used for custom Rulesets"
+          "id": "A",
+          "text": "Use meaningful names and keep them to 32 characters or fewer — names should be descriptive and within Pega's recommended length"
         },
         {
           "id": "C",
           "text": "Use spaces and dashes freely throughout the name — these characters are supported and encouraged for readability"
         },
         {
-          "id": "D",
-          "text": "Name every Ruleset after the implementation layer only — using layer names as Ruleset names is the required convention"
+          "id": "B",
+          "text": "Avoid the 'Pega' and 'Pega-' prefix — this prefix is reserved for Pega's own built-in Rulesets and should not be used for custom Rulesets"
         }
       ],
       "correctOptions": [
@@ -450,16 +449,16 @@
           "text": "Create it in a shared data object if the field concept is reusable across Case Types (e.g., 'Address'), or in the Case Type's local Data Model if it is specific to only this Case Type — the choice affects reusability"
         },
         {
+          "id": "D",
+          "text": "It does not matter — Pega automatically promotes fields from local Data Models to shared objects after 30 days if they are used in more than one Case Type"
+        },
+        {
           "id": "B",
           "text": "Always create fields in the Case Type's local Data Model — shared data objects are only for fields that will be displayed in reports, not for Case Type fields"
         },
         {
           "id": "C",
           "text": "Always create fields in a shared data object — Pega requires all fields to be in shared objects and the Case Type's local Data Model is read-only"
-        },
-        {
-          "id": "D",
-          "text": "It does not matter — Pega automatically promotes fields from local Data Models to shared objects after 30 days if they are used in more than one Case Type"
         }
       ],
       "correctOptions": [
@@ -482,26 +481,25 @@
       "scenario": "An application needs rules that connect it to an external customer database — connectors, request/response mappings, and integration services. Which class type holds these rules?",
       "options": [
         {
-          "id": "A",
-          "text": "Integration class — stores rules that connect the application to external systems (connectors, mappings, integration services)"
-        },
-        {
-          "id": "B",
-          "text": "Work class — stores the rules describing how Cases are processed (Processes, Stages, Steps)"
+          "id": "D",
+          "text": "Access class — stores security rules that control which users can interact with external systems"
         },
         {
           "id": "C",
           "text": "Data class — stores the rules describing the data model (properties, field specifications)"
         },
         {
-          "id": "D",
-          "text": "Access class — stores security rules that control which users can interact with external systems"
+          "id": "A",
+          "text": "Integration class — stores rules that connect the application to external systems (connectors, mappings, integration services)"
+        },
+        {
+          "id": "B",
+          "text": "Work class — stores the rules describing how Cases are processed (Processes, Stages, Steps)"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Rules governing external connectivity and integration belong to the Integration class.",
       "rationale": "Integration classes group external-interaction behavior.",
       "optionExplanations": {
         "A": "Integration classes group external-interaction behavior.",
@@ -518,26 +516,25 @@
       "scenario": "Which class type contains the rules that describe how to PROCESS Cases — Processes, Stages, decisions, and user interfaces?",
       "options": [
         {
-          "id": "A",
-          "text": "Work class — the class type that holds all rules related to how Cases are executed and processed"
+          "id": "C",
+          "text": "Data class — the class type for data model definitions also contains the Processes and UI rules"
         },
         {
           "id": "B",
           "text": "Integration class — the class type for external connectivity rules also hosts workflow and decision rules"
         },
         {
-          "id": "C",
-          "text": "Data class — the class type for data model definitions also contains the Processes and UI rules"
-        },
-        {
           "id": "D",
           "text": "Rule class — a dedicated 'Rule class' holds all Pega rules; Work, Integration, and Data classes are subsets of it"
+        },
+        {
+          "id": "A",
+          "text": "Work class — the class type that holds all rules related to how Cases are executed and processed"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Case processing rules (Processes, Stages, UI, decisions) = Work class.",
       "rationale": "Work classes group Case processing behavior in this lesson.",
       "optionExplanations": {
         "A": "Work classes group Case processing behavior in this lesson.",
@@ -554,20 +551,20 @@
       "scenario": "A System Architect is reviewing the class hierarchy for a TGB project and sees the class TGB-IT-Work. Which statement about the class hierarchy relationship of TGB-IT-Work is correct?",
       "options": [
         {
-          "id": "A",
-          "text": "TGB-IT-Work is a child of TGB-IT, which is a child of TGB — the hyphens define parent-child relationships in pattern inheritance"
-        },
-        {
           "id": "B",
           "text": "TGB-IT-Work is the parent of TGB — deeper nesting means higher in the hierarchy, not lower"
         },
         {
-          "id": "C",
-          "text": "The hyphens are decorative and carry no semantic meaning in Pega class naming"
+          "id": "A",
+          "text": "TGB-IT-Work is a child of TGB-IT, which is a child of TGB — the hyphens define parent-child relationships in pattern inheritance"
         },
         {
           "id": "D",
           "text": "TGB-IT-Work and TGB are sibling classes with no hierarchical relationship"
+        },
+        {
+          "id": "C",
+          "text": "The hyphens are decorative and carry no semantic meaning in Pega class naming"
         }
       ],
       "correctOptions": [
@@ -590,20 +587,20 @@
       "scenario": "At runtime, in what order does Pega search the class hierarchy for a Rule?",
       "options": [
         {
-          "id": "A",
-          "text": "From the most-specific class, expanding outward toward more-general ancestors until the rule is found or @baseclass is reached"
-        },
-        {
-          "id": "B",
-          "text": "From the most-general class (e.g., @baseclass), narrowing down to the most-specific class where the rule was defined"
-        },
-        {
           "id": "C",
           "text": "Randomly across all classes — Pega uses a hash to select the class to search first for performance"
         },
         {
           "id": "D",
           "text": "From the Integration class first, then the Data class, then the Work class — class type determines search order"
+        },
+        {
+          "id": "A",
+          "text": "From the most-specific class, expanding outward toward more-general ancestors until the rule is found or @baseclass is reached"
+        },
+        {
+          "id": "B",
+          "text": "From the most-general class (e.g., @baseclass), narrowing down to the most-specific class where the rule was defined"
         }
       ],
       "correctOptions": [
@@ -634,18 +631,17 @@
           "text": "Directed inheritance — explicitly specifies the parent class on the class definition, unrelated to naming patterns"
         },
         {
-          "id": "C",
-          "text": "Multiple inheritance — allows a class to inherit from multiple parents simultaneously"
-        },
-        {
           "id": "D",
           "text": "Manual inheritance — requires the developer to explicitly copy rules from ancestor classes into the child class"
+        },
+        {
+          "id": "C",
+          "text": "Multiple inheritance — allows a class to inherit from multiple parents simultaneously"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Pattern inheritance follows the shared prefix. A Work- parent outside that prefix is an explicit directed relationship.",
       "rationale": "Shared class-name prefixes identify the pattern mechanism.",
       "optionExplanations": {
         "A": "Shared class-name prefixes identify the pattern mechanism.",
@@ -662,26 +658,25 @@
       "scenario": "An application class must inherit standard Pega platform rules from the Work- class, which is NOT a naming ancestor. Which inheritance type achieves this?",
       "options": [
         {
-          "id": "A",
-          "text": "Directed inheritance — explicitly specified on the class definition to point to a class outside the naming hierarchy"
+          "id": "C",
+          "text": "Ruleset inheritance — inheriting from a Ruleset version automatically includes Work- class rules"
         },
         {
           "id": "B",
           "text": "Pattern inheritance — automatically searches ancestors by naming prefix; it automatically finds Work- in the prefix chain"
         },
         {
-          "id": "C",
-          "text": "Ruleset inheritance — inheriting from a Ruleset version automatically includes Work- class rules"
-        },
-        {
           "id": "D",
           "text": "Delegation — delegating Work- class rules to the child class makes them available in the child's context"
+        },
+        {
+          "id": "A",
+          "text": "Directed inheritance — explicitly specified on the class definition to point to a class outside the naming hierarchy"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Cross-hierarchy inheritance = Directed inheritance (explicit parent on class definition).",
       "rationale": "An explicit parent supports reuse outside the naming hierarchy.",
       "optionExplanations": {
         "A": "An explicit parent supports reuse outside the naming hierarchy.",
@@ -698,26 +693,25 @@
       "scenario": "During rule resolution, what is the LAST class Pega searches before returning a 'rule not found' result?",
       "options": [
         {
-          "id": "A",
-          "text": "@baseclass — the ultimate base class that all classes ultimately inherit from; the final stop in rule resolution"
-        },
-        {
           "id": "B",
           "text": "The Work-Cover class — the Work-Cover class is the last class checked because it holds the most generic rules"
         },
         {
-          "id": "C",
-          "text": "The Integration class — Pega always checks the Integration class last as the system-level fallback"
+          "id": "A",
+          "text": "@baseclass — the ultimate base class that all classes ultimately inherit from; the final stop in rule resolution"
         },
         {
           "id": "D",
           "text": "The topmost Ruleset — Pega searches Rulesets in version order and returns 'not found' when the top Ruleset is exhausted"
+        },
+        {
+          "id": "C",
+          "text": "The Integration class — Pega always checks the Integration class last as the system-level fallback"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Last class in rule resolution chain = @baseclass.",
       "rationale": "The introductory inheritance search terminates at this ultimate base class.",
       "optionExplanations": {
         "A": "The introductory inheritance search terminates at this ultimate base class.",
@@ -742,12 +736,12 @@
           "text": "Delegation to business users — both teams delegate the history rule to their business users who maintain it separately"
         },
         {
-          "id": "C",
-          "text": "A shared Ruleset version number — giving both Case Types the same Ruleset version number causes them to share rules"
-        },
-        {
           "id": "D",
           "text": "A simultaneous branch merge — merging both branches at the same time causes Pega to deduplicate the history rule"
+        },
+        {
+          "id": "C",
+          "text": "A shared Ruleset version number — giving both Case Types the same Ruleset version number causes them to share rules"
         }
       ],
       "correctOptions": [
@@ -770,20 +764,20 @@
       "scenario": "A developer needs a variant of an existing routing rule that should apply only to a more-specific class without modifying the original. Which approach should they use?",
       "options": [
         {
-          "id": "A",
-          "text": "Copy (Save As) the Rule into the appropriate child class — the child class's version takes precedence over the ancestor's via rule resolution"
-        },
-        {
           "id": "B",
           "text": "Delete the original and rewrite it — removing the original forces all classes to use the new version"
         },
         {
-          "id": "C",
-          "text": "Rename the Ruleset — changing the Ruleset name redirects rule resolution to the renamed version for the specific class"
-        },
-        {
           "id": "D",
           "text": "Convert it to a Data Page — converting the routing rule to a Data Page makes it class-specific automatically"
+        },
+        {
+          "id": "A",
+          "text": "Copy (Save As) the Rule into the appropriate child class — the child class's version takes precedence over the ancestor's via rule resolution"
+        },
+        {
+          "id": "C",
+          "text": "Rename the Ruleset — changing the Ruleset name redirects rule resolution to the renamed version for the specific class"
         }
       ],
       "correctOptions": [
@@ -806,26 +800,25 @@
       "scenario": "To increase a Rule's reusability and avoid creating many near-duplicate versions for small variations, what technique should be applied?",
       "options": [
         {
-          "id": "A",
-          "text": "Parametrization — the rule's logic is driven by a passed-in parameter rather than hard-coded values, enabling one rule to handle many variants"
+          "id": "C",
+          "text": "Adding more patch versions — creating many patch versions of the same rule makes each version serve a different use case"
         },
         {
           "id": "B",
           "text": "Locking all Rulesets — locking prevents anyone from creating near-duplicate versions, forcing reuse of the existing rule"
         },
         {
-          "id": "C",
-          "text": "Adding more patch versions — creating many patch versions of the same rule makes each version serve a different use case"
-        },
-        {
           "id": "D",
           "text": "Moving the Rule to the Implementation Layer — implementation-layer rules are automatically reused across all Case Types"
+        },
+        {
+          "id": "A",
+          "text": "Parametrization — the rule's logic is driven by a passed-in parameter rather than hard-coded values, enabling one rule to handle many variants"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "One rule, many variants via parameters = Parametrization.",
       "rationale": "Passed parameters allow one Rule to express supported variations.",
       "optionExplanations": {
         "A": "Passed parameters allow one Rule to express supported variations.",
@@ -842,20 +835,20 @@
       "scenario": "A new BA is asking about class hierarchy ownership during project kickoff. Who typically designs the class hierarchy for a new Pega implementation, and when in the project lifecycle is it done?",
       "options": [
         {
-          "id": "A",
-          "text": "The LSA and project leaders typically plan it before building the application"
-        },
-        {
           "id": "B",
           "text": "Business users after go-live — business stakeholders refine the class hierarchy based on real usage patterns"
         },
         {
-          "id": "C",
-          "text": "The Scrum Master during retrospectives — class hierarchy adjustments are identified and made during sprint retrospectives"
+          "id": "A",
+          "text": "The LSA and project leaders typically plan it before building the application"
         },
         {
           "id": "D",
           "text": "The Business Architect in App Studio during Case modeling — class hierarchy is configured automatically as Cases are designed"
+        },
+        {
+          "id": "C",
+          "text": "The Scrum Master during retrospectives — class hierarchy adjustments are identified and made during sprint retrospectives"
         }
       ],
       "correctOptions": [
@@ -878,16 +871,16 @@
       "scenario": "Which analogy correctly captures the relationship between a Rule and a Ruleset?",
       "options": [
         {
-          "id": "A",
-          "text": "A Rule is like a song; a Ruleset is like the album — songs (rules) are grouped in albums (Rulesets) for organization and versioning"
-        },
-        {
           "id": "B",
           "text": "A Rule is like an album; a Ruleset is like a song — Rulesets are the individual artifacts and Rules are their containers"
         },
         {
           "id": "C",
           "text": "A Rule and a Ruleset are identical — they are two terms for the same Pega artifact"
+        },
+        {
+          "id": "A",
+          "text": "A Rule is like a song; a Ruleset is like the album — songs (rules) are grouped in albums (Rulesets) for organization and versioning"
         },
         {
           "id": "D",
@@ -914,10 +907,6 @@
       "scenario": "An SA is establishing version control practices for a new Pega project team to ensure that rules are developed safely and promoted correctly across environments. Which TWO are recognized best practices for Ruleset saving and versioning in Pega?",
       "options": [
         {
-          "id": "A",
-          "text": "Limit development to Rulesets in the topmost Application Layer and keep built-on applications locked"
-        },
-        {
           "id": "B",
           "text": "Create a new Ruleset with a top-level class that inherits directly from @baseclass"
         },
@@ -928,6 +917,10 @@
         {
           "id": "D",
           "text": "Keep all application rules in a single Ruleset regardless of the application's size or team structure"
+        },
+        {
+          "id": "A",
+          "text": "Limit development to Rulesets in the topmost Application Layer and keep built-on applications locked"
         }
       ],
       "correctOptions": [
@@ -952,20 +945,20 @@
       "scenario": "An SA is explaining how Rulesets control rule access and promotion in Pega Platform. Which TWO statements correctly describe Ruleset behavior?",
       "options": [
         {
-          "id": "A",
-          "text": "A Ruleset groups related Rules that are developed and promoted together as a deployable unit across environments"
+          "id": "D",
+          "text": "Rulesets are exclusively managed in Dev Studio and cannot be created or viewed in App Studio"
         },
         {
           "id": "B",
           "text": "Lock older Ruleset versions and create an appropriate new unlocked version for further development"
         },
         {
-          "id": "C",
-          "text": "All Rules in a Pega application must belong to the same Ruleset regardless of which component or layer they support"
+          "id": "A",
+          "text": "A Ruleset groups related Rules that are developed and promoted together as a deployable unit across environments"
         },
         {
-          "id": "D",
-          "text": "Rulesets are exclusively managed in Dev Studio and cannot be created or viewed in App Studio"
+          "id": "C",
+          "text": "All Rules in a Pega application must belong to the same Ruleset regardless of which component or layer they support"
         }
       ],
       "correctOptions": [
@@ -989,10 +982,6 @@
       "scenario": "For the class-based Rules described in this lesson, which TWO statements explain inheritance and specialization?",
       "options": [
         {
-          "id": "A",
-          "text": "Eligible Rules can be reused through parent/child class relationships"
-        },
-        {
           "id": "B",
           "text": "An applicable child-class specialization can be selected through Rule resolution"
         },
@@ -1003,6 +992,10 @@
         {
           "id": "D",
           "text": "Class inheritance only applies to Data Transforms and has no effect on Decision Tables, Activities, or other rule types"
+        },
+        {
+          "id": "A",
+          "text": "Eligible Rules can be reused through parent/child class relationships"
         }
       ],
       "correctOptions": [
@@ -1026,12 +1019,12 @@
       "scenario": "A developer is creating a new Decision Table Rule in Pega. Which TWO steps are part of the Rule creation process in Dev Studio?",
       "options": [
         {
-          "id": "A",
-          "text": "Select the Rule Type (Decision Table) that matches the business requirement for the new Rule"
-        },
-        {
           "id": "B",
           "text": "Specify the class and Ruleset (including version) to which the new Rule will be assigned"
+        },
+        {
+          "id": "A",
+          "text": "Select the Rule Type (Decision Table) that matches the business requirement for the new Rule"
         },
         {
           "id": "C",

@@ -47,7 +47,7 @@
           "type": "interactive",
           "title": "Case Status & Guidance Design Decisions",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Status Prefix\", \"scenario\": \"A CSR's dashboard shows a loan Case with status 'Pending-Approval'. Another shows 'Resolved-Approved'. A manager asks: 'Which Case is still open and which is closed?' How does a SA explain this quickly?\", \"opts\": [\"'Resolved-Approved' is closed — the 'Resolved-' prefix is Pega's signal that the Case has reached end-of-life. 'PendingApproval' (no Resolved- prefix) is still active\", \"'PendingApproval' is closed because the approval is pending final resolution. 'Resolved-Approved' is open — it shows the approval is resolved but the Case continues\", \"Both are open — a Case only closes when manually deleted from the system. Status prefixes are display labels only\", \"'Resolved-Approved' means the approval sub-process resolved, but the parent Case may still be open — the prefix only closes sub-processes\"], \"correct\": 0, \"fbs\": [\"✓ Correct. 'Resolved-' prefix = Case is closed. Any status without the 'Resolved-' prefix = Case is still active (New, Open-, Pending are all active).\", \"✗ Incorrect. 'Resolved-' closes the CASE, not the pending action. PendingApproval is an active status for a Case awaiting an approver's decision.\", \"✗ Incorrect. Status prefixes are meaningful to the Pega platform — it uses the 'Resolved-' prefix to automatically close Cases in reporting and querying.\", \"✗ Incorrect. 'Resolved-' at the Case level closes the entire Case, not just a sub-process. Sub-process resolution uses different mechanisms.\"]}, {\"label\": \"Stage status\", \"scenario\": \"An Investigation Stage is configured with Open-Investigation. What changes when the Case enters that Stage?\", \"opts\": [\"The configured Case status is applied.\", \"The Case must be deleted.\", \"Every field becomes required.\", \"The status cannot be automated.\"], \"correct\": 0, \"fbs\": [\"Correct. An explicit Stage status applies at entry.\", \"A status update does not delete the Case.\", \"Field requirements are separate configuration.\", \"Configured status updates can be automatic.\"]}, {\"label\": \"Instruction override\", \"scenario\": \"The task Form needs a clearer instruction than its Step default. What can the SA configure?\", \"opts\": [\"Override the Step instructions in the Form.\", \"Store the instruction in the Case status.\", \"Rename the Work Queue.\", \"Remove all field validation.\"], \"correct\": 0, \"fbs\": [\"Correct. Form instruction configuration supports a custom override.\", \"Status should communicate state, not store instructions.\", \"Routing destinations do not define Form instruction text.\", \"Guidance is not a replacement for enforcement.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Status Prefix\",\n    \"scenario\": \"A CSR's dashboard shows a loan Case with status 'Pending-Approval'. Another shows 'Resolved-Approved'. A manager asks: 'Which Case is still open and which is closed?' How does a SA explain this quickly?\",\n    \"opts\": [\n      \"'Resolved-Approved' means the approval sub-process resolved, but the parent Case may still be open — the prefix only closes sub-processes\",\n      \"Both are open — a Case only closes when manually deleted from the system. Status prefixes are display labels only\",\n      \"'Resolved-Approved' is closed — the 'Resolved-' prefix is Pega's signal that the Case has reached end-of-life. 'PendingApproval' (no Resolved- prefix) is still active\",\n      \"'PendingApproval' is closed because the approval is pending final resolution. 'Resolved-Approved' is open — it shows the approval is resolved but the Case continues\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. 'Resolved-' at the Case level closes the entire Case, not just a sub-process. Sub-process resolution uses different mechanisms.\",\n      \"✗ Incorrect. Status prefixes are meaningful to the Pega platform — it uses the 'Resolved-' prefix to automatically close Cases in reporting and querying.\",\n      \"✓ Correct. 'Resolved-' prefix = Case is closed. Any status without the 'Resolved-' prefix = Case is still active (New, Open-, Pending are all active).\",\n      \"✗ Incorrect. 'Resolved-' closes the CASE, not the pending action. PendingApproval is an active status for a Case awaiting an approver's decision.\"\n    ]\n  },\n  {\n    \"label\": \"Stage status\",\n    \"scenario\": \"An Investigation Stage is configured with Open-Investigation. What changes when the Case enters that Stage?\",\n    \"opts\": [\n      \"The configured Case status is applied.\",\n      \"Every field becomes required.\",\n      \"The status cannot be automated.\",\n      \"The Case must be deleted.\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"Correct. An explicit Stage status applies at entry.\",\n      \"Field requirements are separate configuration.\",\n      \"Configured status updates can be automatic.\",\n      \"A status update does not delete the Case.\"\n    ]\n  },\n  {\n    \"label\": \"Instruction override\",\n    \"scenario\": \"The task Form needs a clearer instruction than its Step default. What can the SA configure?\",\n    \"opts\": [\n      \"Remove all field validation.\",\n      \"Override the Step instructions in the Form.\",\n      \"Store the instruction in the Case status.\",\n      \"Rename the Work Queue.\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"Guidance is not a replacement for enforcement.\",\n      \"Correct. Form instruction configuration supports a custom override.\",\n      \"Status should communicate state, not store instructions.\",\n      \"Routing destinations do not define Form instruction text.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-531b1bd68360"
@@ -118,26 +118,25 @@
       "scenario": "A user filling out a loan application form needs to understand what value to enter in a 'Requested Loan Purpose' field. The SA wants to display a short description of accepted values directly below the field label. Which UI guidance mechanism should be used?",
       "options": [
         {
-          "id": "A",
-          "text": "Field-level help text — a short description shown directly beneath the field label to guide the user on valid inputs"
-        },
-        {
-          "id": "B",
-          "text": "A Pulse comment — the SA adds a comment to the Case's Pulse stream that the user reads before filling out the field"
+          "id": "D",
+          "text": "An email notification — the system sends an email to the user before they open the form describing what to enter"
         },
         {
           "id": "C",
           "text": "A Case-wide tooltip — a single tooltip at the top of the form describes every field in the Case for the user"
         },
         {
-          "id": "D",
-          "text": "An email notification — the system sends an email to the user before they open the form describing what to enter"
+          "id": "A",
+          "text": "Field-level help text — a short description shown directly beneath the field label to guide the user on valid inputs"
+        },
+        {
+          "id": "B",
+          "text": "A Pulse comment — the SA adds a comment to the Case's Pulse stream that the user reads before filling out the field"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Short description below a field label = field-level help text.",
       "rationale": "Field-level help text appears directly beneath or beside the field label, giving the user immediate, contextual guidance without leaving the form. Tooltips are on-demand (hover); section headers provide structural context.",
       "optionExplanations": {
         "A": "Field text supplies guidance where the user enters this value.",
@@ -190,20 +189,20 @@
       "scenario": "A report reads a custom StatusWork property instead of the standard Case status property. Which property should the SA inspect?",
       "options": [
         {
-          "id": "A",
-          "text": "Work-.pyStatusWork — the standard property for Case status"
+          "id": "C",
+          "text": "StatusWork — Pega automatically treats a missing prefix as equivalent"
         },
         {
           "id": "B",
           "text": "pxStatusWork — all work status properties use this name"
         },
         {
-          "id": "C",
-          "text": "StatusWork — Pega automatically treats a missing prefix as equivalent"
-        },
-        {
           "id": "D",
           "text": "workStatus — the standard property was renamed and pyStatusWork is obsolete"
+        },
+        {
+          "id": "A",
+          "text": "Work-.pyStatusWork — the standard property for Case status"
         }
       ],
       "correctOptions": [
@@ -226,6 +225,10 @@
       "scenario": "A Claims application needs active-review, approved and withdrawn statuses. Which set most clearly distinguishes active work from resolved outcomes?",
       "options": [
         {
+          "id": "D",
+          "text": "Start-Review, End-Approved and End-Withdrawn as the standard categories"
+        },
+        {
           "id": "A",
           "text": "Open-Review, Resolved-Approved and Resolved-Withdrawn"
         },
@@ -236,10 +239,6 @@
         {
           "id": "C",
           "text": "Open-Review, Completed and Finished as the resolution statuses"
-        },
-        {
-          "id": "D",
-          "text": "Start-Review, End-Approved and End-Withdrawn as the standard categories"
         }
       ],
       "correctOptions": [
@@ -262,20 +261,20 @@
       "scenario": "A Form View needs different instructions from the default instructions configured on its Case Step. What supported configuration fits?",
       "options": [
         {
-          "id": "A",
-          "text": "Override the Step instructions with custom text in the Form View"
-        },
-        {
-          "id": "B",
-          "text": "Add a Pulse post and assume it replaces Step instructions"
+          "id": "D",
+          "text": "Rename the Work Queue so its name becomes the Form instructions"
         },
         {
           "id": "C",
           "text": "Change the Case status to store the full instruction paragraph"
         },
         {
-          "id": "D",
-          "text": "Rename the Work Queue so its name becomes the Form instructions"
+          "id": "A",
+          "text": "Override the Step instructions with custom text in the Form View"
+        },
+        {
+          "id": "B",
+          "text": "Add a Pulse post and assume it replaces Step instructions"
         }
       ],
       "correctOptions": [
@@ -298,10 +297,6 @@
       "scenario": "A business stakeholder asks the SA: 'How does Pega help users avoid entering a date in the wrong format?' Which built-in mechanism enforces this on the View?",
       "options": [
         {
-          "id": "A",
-          "text": "Field-level validation — configuring a Date field type enforces the correct format automatically and shows an inline error if the format is wrong"
-        },
-        {
           "id": "B",
           "text": "A Data Page — the Data Page rejects incorrectly formatted dates before they reach the Case and returns a formatted value to the View"
         },
@@ -312,12 +307,15 @@
         {
           "id": "D",
           "text": "A Case Life Cycle transition condition — the Stage transition checks the date format and refuses to advance the workflow if it is wrong"
+        },
+        {
+          "id": "A",
+          "text": "Field-level validation — configuring a Date field type enforces the correct format automatically and shows an inline error if the format is wrong"
         }
       ],
       "correctOptions": [
         "A"
       ],
-      "hint": "Format enforcement on a form field = field-level validation (built-in on Date field type).",
       "rationale": "Use an appropriate Date field type and supported date control. Format checks do not replace business validation such as whether the date is in the future.",
       "optionExplanations": {
         "A": "Date metadata supports an appropriate input format and control.",
@@ -334,6 +332,10 @@
       "scenario": "A Collect information Step asks for a billing address. Users keep entering their shipping address. What guidance should the SA add?",
       "options": [
         {
+          "id": "D",
+          "text": "A resolved Case status before the user completes the form"
+        },
+        {
           "id": "A",
           "text": "Step instructions explicitly asking for the billing address associated with the payment method"
         },
@@ -344,10 +346,6 @@
         {
           "id": "C",
           "text": "A Ruleset name containing the words billing address"
-        },
-        {
-          "id": "D",
-          "text": "A resolved Case status before the user completes the form"
         }
       ],
       "correctOptions": [
@@ -410,12 +408,12 @@
           "text": "The Case is waiting for fulfillment-related work or an event"
         },
         {
-          "id": "B",
-          "text": "The Case is deleted and cannot be inspected"
-        },
-        {
           "id": "C",
           "text": "All processing is finished and the Case is resolved"
+        },
+        {
+          "id": "B",
+          "text": "The Case is deleted and cannot be inspected"
         },
         {
           "id": "D",
@@ -442,20 +440,20 @@
       "scenario": "Users can already see an instruction paragraph in their Assignment form. What is its purpose?",
       "options": [
         {
-          "id": "A",
-          "text": "Explain what they need to accomplish in this Assignment"
-        },
-        {
-          "id": "B",
-          "text": "Change the Case’s access-control permissions"
-        },
-        {
           "id": "C",
           "text": "Automatically fill every required field"
         },
         {
+          "id": "A",
+          "text": "Explain what they need to accomplish in this Assignment"
+        },
+        {
           "id": "D",
           "text": "Replace every validation Rule with natural-language text"
+        },
+        {
+          "id": "B",
+          "text": "Change the Case’s access-control permissions"
         }
       ],
       "correctOptions": [
@@ -478,20 +476,20 @@
       "scenario": "A Receipt Amount must not be negative. The error should be reported when the user submits the Form. Which approach fits?",
       "options": [
         {
-          "id": "A",
-          "text": "Configure a validation condition with a clear error message for a negative amount"
-        },
-        {
-          "id": "B",
-          "text": "Hide the Stage label without validating the amount"
+          "id": "D",
+          "text": "Post a Pulse comment instead of preventing invalid submission"
         },
         {
           "id": "C",
           "text": "Assume the Data Page rejects any negative number even without a configured constraint"
         },
         {
-          "id": "D",
-          "text": "Post a Pulse comment instead of preventing invalid submission"
+          "id": "A",
+          "text": "Configure a validation condition with a clear error message for a negative amount"
+        },
+        {
+          "id": "B",
+          "text": "Hide the Stage label without validating the amount"
         }
       ],
       "correctOptions": [
@@ -514,10 +512,6 @@
       "scenario": "A Case enters an Investigation Stage with a configured Open-Investigation status. What happens?",
       "options": [
         {
-          "id": "A",
-          "text": "The Case status updates to the configured value when the Case enters the Stage"
-        },
-        {
           "id": "B",
           "text": "The user must rename the Case manually for the status to change"
         },
@@ -528,6 +522,10 @@
         {
           "id": "D",
           "text": "The Stage is skipped because only Pending statuses can be used"
+        },
+        {
+          "id": "A",
+          "text": "The Case status updates to the configured value when the Case enters the Stage"
         }
       ],
       "correctOptions": [
@@ -550,20 +548,20 @@
       "scenario": "A final Stage has resolution status Resolved-Completed. When should that resolution status describe the Case?",
       "options": [
         {
-          "id": "A",
-          "text": "After the Processes in the final Stage complete"
+          "id": "D",
+          "text": "Only when an administrator deletes the Case"
         },
         {
           "id": "B",
           "text": "Immediately before any final-Stage Process has started"
         },
         {
-          "id": "C",
-          "text": "Whenever the user changes a tooltip label"
+          "id": "A",
+          "text": "After the Processes in the final Stage complete"
         },
         {
-          "id": "D",
-          "text": "Only when an administrator deletes the Case"
+          "id": "C",
+          "text": "Whenever the user changes a tooltip label"
         }
       ],
       "correctOptions": [
@@ -590,16 +588,16 @@
           "text": "Open-"
         },
         {
-          "id": "B",
-          "text": "Resolved-"
+          "id": "D",
+          "text": "Completed-"
         },
         {
           "id": "C",
           "text": "Active-"
         },
         {
-          "id": "D",
-          "text": "Completed-"
+          "id": "B",
+          "text": "Resolved-"
         }
       ],
       "correctOptions": [
@@ -623,12 +621,12 @@
       "scenario": "An SA is designing user guidance for a multi-step Claims process in Pega Constellation. Which TWO elements provide in-context guidance to users completing an Assignment?",
       "options": [
         {
-          "id": "A",
-          "text": "Instructions text configured for the Assignment Step"
-        },
-        {
           "id": "B",
           "text": "Additional text configured alongside the relevant input field"
+        },
+        {
+          "id": "A",
+          "text": "Instructions text configured for the Assignment Step"
         },
         {
           "id": "C",
@@ -660,20 +658,20 @@
       "scenario": "A BA wants to understand Case Status behavior in Pega. Which TWO statements correctly describe how Case Status communicates progress?",
       "options": [
         {
-          "id": "A",
-          "text": "Case status communicates progress through the Case life cycle"
+          "id": "C",
+          "text": "Case status is inherently restricted to administrators"
         },
         {
           "id": "B",
           "text": "A configured Stage or Step status is applied automatically at that transition"
         },
         {
-          "id": "C",
-          "text": "Case status is inherently restricted to administrators"
-        },
-        {
           "id": "D",
           "text": "Users must always edit status manually at every Step"
+        },
+        {
+          "id": "A",
+          "text": "Case status communicates progress through the Case life cycle"
         }
       ],
       "correctOptions": [
@@ -697,20 +695,20 @@
       "scenario": "An SA is reviewing Case Status values configured in a Pega Claims application. Which TWO statements describe the correct naming convention for Case Status?",
       "options": [
         {
-          "id": "A",
-          "text": "The standard status table includes New, Open, Pending and Resolved"
-        },
-        {
-          "id": "B",
-          "text": "A descriptive suffix can clarify a status such as Open-Investigation or Resolved-Withdrawn"
+          "id": "D",
+          "text": "Every status must begin with the application name"
         },
         {
           "id": "C",
           "text": "Any invented prefix automatically carries the same resolution semantics"
         },
         {
-          "id": "D",
-          "text": "Every status must begin with the application name"
+          "id": "B",
+          "text": "A descriptive suffix can clarify a status such as Open-Investigation or Resolved-Withdrawn"
+        },
+        {
+          "id": "A",
+          "text": "The standard status table includes New, Open, Pending and Resolved"
         }
       ],
       "correctOptions": [

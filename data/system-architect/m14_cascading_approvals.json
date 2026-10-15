@@ -89,7 +89,7 @@
           "type": "interactive",
           "title": "Cascading approval: pick the right model",
           "height": 460,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Management depth\", \"scenario\": \"A request needs one manager below a threshold and two above it. Which setting fits?\", \"opts\": [\"Reporting structure with Custom conditional levels\", \"One level unconditionally\", \"All levels unconditionally\", \"A majority vote\"], \"correct\": 0, \"fbs\": [\"Conditions choose the required depth.\", \"One omits the second required level.\", \"All ignores the smaller-request limit.\", \"Voting does not encode this ordered depth.\"]}, {\"label\": \"Cross-department review\", \"scenario\": \"A request needs its manager and an independent compliance reviewer in sequence. Which model fits?\", \"opts\": [\"Authority matrix with the required ordered parties\", \"Only the manager hierarchy\", \"Only the requester\", \"A first-response-wins broadcast\"], \"correct\": 0, \"fbs\": [\"The matrix can include a party outside the hierarchy.\", \"The independent reviewer is not inferred from manager relationships.\", \"The requester does not replace either reviewer.\", \"The policy requires both decisions, not the first reply.\"]}, {\"label\": \"Table population\", \"scenario\": \"Several Decision table rows should supply approvers but only one result is collected. What should be checked?\", \"opts\": [\"Evaluate all rows\", \"Increase urgency\", \"Change a View color\", \"Remove all but one required reviewer\"], \"correct\": 0, \"fbs\": [\"Check the setting that gathers all matching results.\", \"Urgency does not change table evaluation.\", \"Presentation does not build the list.\", \"Removing required reviewers changes the policy.\"]}, {\"label\": \"Reject policy\", \"scenario\": \"Rejection is configured to resolve the request. What follows a rejected decision?\", \"opts\": [\"The configured resolution path\", \"An automatic majority override\", \"An automatic new approval from the requester\", \"No flow action because only Approve is configurable\"], \"correct\": 0, \"fbs\": [\"Follow the explicit rejected outcome.\", \"The configuration does not establish voting.\", \"A restart requires its own design.\", \"Reject has configurable flow.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good \\u2014 review the missed items.':'Re-read the module and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Management depth\",\n    \"scenario\": \"A request needs one manager below a threshold and two above it. Which setting fits?\",\n    \"opts\": [\n      \"A majority vote\",\n      \"All levels unconditionally\",\n      \"One level unconditionally\",\n      \"Reporting structure with Custom conditional levels\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"Voting does not encode this ordered depth.\",\n      \"All ignores the smaller-request limit.\",\n      \"One omits the second required level.\",\n      \"Conditions choose the required depth.\"\n    ]\n  },\n  {\n    \"label\": \"Cross-department review\",\n    \"scenario\": \"A request needs its manager and an independent compliance reviewer in sequence. Which model fits?\",\n    \"opts\": [\n      \"Authority matrix with the required ordered parties\",\n      \"A first-response-wins broadcast\",\n      \"Only the manager hierarchy\",\n      \"Only the requester\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"The matrix can include a party outside the hierarchy.\",\n      \"The policy requires both decisions, not the first reply.\",\n      \"The independent reviewer is not inferred from manager relationships.\",\n      \"The requester does not replace either reviewer.\"\n    ]\n  },\n  {\n    \"label\": \"Table population\",\n    \"scenario\": \"Several Decision table rows should supply approvers but only one result is collected. What should be checked?\",\n    \"opts\": [\n      \"Remove all but one required reviewer\",\n      \"Evaluate all rows\",\n      \"Increase urgency\",\n      \"Change a View color\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"Removing required reviewers changes the policy.\",\n      \"Check the setting that gathers all matching results.\",\n      \"Urgency does not change table evaluation.\",\n      \"Presentation does not build the list.\"\n    ]\n  },\n  {\n    \"label\": \"Reject policy\",\n    \"scenario\": \"Rejection is configured to resolve the request. What follows a rejected decision?\",\n    \"opts\": [\n      \"An automatic majority override\",\n      \"An automatic new approval from the requester\",\n      \"The configured resolution path\",\n      \"No flow action because only Approve is configurable\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"The configuration does not establish voting.\",\n      \"A restart requires its own design.\",\n      \"Follow the explicit rejected outcome.\",\n      \"Reject has configurable flow.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good \\u2014 review the missed items.':'Re-read the module and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         },
         {
           "type": "diagram",
@@ -144,12 +144,12 @@
       "scenario": "A purchase needs the requester’s management hierarchy to review in order. Which model fits?",
       "options": [
         {
-          "id": "A",
-          "text": "Reporting structure"
-        },
-        {
           "id": "B",
           "text": "A parallel majority ballot"
+        },
+        {
+          "id": "A",
+          "text": "Reporting structure"
         },
         {
           "id": "C",
@@ -180,20 +180,20 @@
       "scenario": "A reporting-structure approval uses Reporting Manager. The wrong manager is selected. Which relationship should be inspected first?",
       "options": [
         {
-          "id": "A",
-          "text": "The current user’s operator record and configured Reporting Manager"
-        },
-        {
-          "id": "B",
-          "text": "The page’s stylesheet"
-        },
-        {
           "id": "C",
           "text": "A mandatory rule that every approval must wait for a deadline"
         },
         {
           "id": "D",
           "text": "An authority matrix that this approval does not use"
+        },
+        {
+          "id": "A",
+          "text": "The current user’s operator record and configured Reporting Manager"
+        },
+        {
+          "id": "B",
+          "text": "The page’s stylesheet"
         }
       ],
       "correctOptions": [
@@ -216,20 +216,20 @@
       "scenario": "An expense requires one management level below a threshold and two above it. Which reporting-structure setting supports this?",
       "options": [
         {
-          "id": "A",
-          "text": "Custom levels selected using When Rules"
-        },
-        {
-          "id": "B",
-          "text": "All levels for every expense"
-        },
-        {
           "id": "C",
           "text": "One level for every expense"
         },
         {
           "id": "D",
           "text": "Only a random named recipient"
+        },
+        {
+          "id": "B",
+          "text": "All levels for every expense"
+        },
+        {
+          "id": "A",
+          "text": "Custom levels selected using When Rules"
         }
       ],
       "correctOptions": [
@@ -260,12 +260,12 @@
           "text": "Reporting structure that somehow reaches unrelated departments"
         },
         {
-          "id": "C",
-          "text": "One applicant decision"
-        },
-        {
           "id": "D",
           "text": "A parallel majority ballot"
+        },
+        {
+          "id": "C",
+          "text": "One applicant decision"
         }
       ],
       "correctOptions": [
@@ -288,6 +288,10 @@
       "scenario": "An authority matrix is populated by a Decision table with Evaluate all rows. Several conditions match. How are approvals ordered?",
       "options": [
         {
+          "id": "D",
+          "text": "The table results are ignored in favor of manager traversal"
+        },
+        {
           "id": "A",
           "text": "The matching results populate an approver list; routing follows list order"
         },
@@ -298,10 +302,6 @@
         {
           "id": "C",
           "text": "One party is selected randomly"
-        },
-        {
-          "id": "D",
-          "text": "The table results are ignored in favor of manager traversal"
         }
       ],
       "correctOptions": [
@@ -328,16 +328,16 @@
           "text": "Follow the configured rejection and resolution path"
         },
         {
-          "id": "B",
-          "text": "Automatically override the rejection with the VP’s vote"
+          "id": "D",
+          "text": "Count a majority across all managers"
         },
         {
           "id": "C",
           "text": "Automatically restart from the first manager"
         },
         {
-          "id": "D",
-          "text": "Count a majority across all managers"
+          "id": "B",
+          "text": "Automatically override the rejection with the VP’s vote"
         }
       ],
       "correctOptions": [
@@ -360,20 +360,20 @@
       "scenario": "A BA describes cascading approval as simultaneous majority voting. What is the correction?",
       "options": [
         {
-          "id": "A",
-          "text": "It represents an ordered series of approvals"
-        },
-        {
-          "id": "B",
-          "text": "It is exactly a parallel majority ballot"
-        },
-        {
           "id": "C",
           "text": "It cannot include human reviewers"
         },
         {
           "id": "D",
           "text": "It has no configured rejection behavior"
+        },
+        {
+          "id": "A",
+          "text": "It represents an ordered series of approvals"
+        },
+        {
+          "id": "B",
+          "text": "It is exactly a parallel majority ballot"
         }
       ],
       "correctOptions": [
@@ -396,20 +396,20 @@
       "scenario": "Which TWO statements distinguish the cascading models?",
       "options": [
         {
-          "id": "A",
-          "text": "Reporting structure derives management levels from configured relationships"
-        },
-        {
-          "id": "B",
-          "text": "Authority matrix can include parties outside that hierarchy"
-        },
-        {
           "id": "C",
           "text": "Reporting structure identifies any unrelated department automatically"
         },
         {
           "id": "D",
           "text": "Authority matrix means simultaneous majority voting"
+        },
+        {
+          "id": "A",
+          "text": "Reporting structure derives management levels from configured relationships"
+        },
+        {
+          "id": "B",
+          "text": "Authority matrix can include parties outside that hierarchy"
         }
       ],
       "correctOptions": [
@@ -434,20 +434,20 @@
       "scenario": "A Decision table feeding an authority matrix stops after one matching result despite several required matches. Which table setting should be checked?",
       "options": [
         {
-          "id": "A",
-          "text": "Evaluate all rows"
-        },
-        {
           "id": "B",
           "text": "Replace the approval with one reviewer"
+        },
+        {
+          "id": "D",
+          "text": "Move the table into a stylesheet"
         },
         {
           "id": "C",
           "text": "Use an SLA to gather more table rows"
         },
         {
-          "id": "D",
-          "text": "Move the table into a stylesheet"
+          "id": "A",
+          "text": "Evaluate all rows"
         }
       ],
       "correctOptions": [
@@ -470,12 +470,12 @@
       "scenario": "A reporting-structure approval needs the entire configured hierarchy. Which setting fits?",
       "options": [
         {
-          "id": "A",
-          "text": "All, using the selected Reporting Manager or Workgroup Manager source"
-        },
-        {
           "id": "B",
           "text": "Custom must always be used for an unconditional full chain"
+        },
+        {
+          "id": "A",
+          "text": "All, using the selected Reporting Manager or Workgroup Manager source"
         },
         {
           "id": "C",
@@ -510,16 +510,16 @@
           "text": "Dev Studio: Approve/Reject, Cascading, then the chosen model"
         },
         {
-          "id": "B",
-          "text": "Only a checkbox in the Case data model"
-        },
-        {
           "id": "C",
           "text": "Only a runtime administration toggle"
         },
         {
           "id": "D",
           "text": "Only an adaptive prediction model"
+        },
+        {
+          "id": "B",
+          "text": "Only a checkbox in the Case data model"
         }
       ],
       "correctOptions": [
@@ -542,16 +542,16 @@
       "scenario": "A reporting-structure approval selects Reporting Manager. The employee is the current user when the approval is reached. Where is the first manager identified?",
       "options": [
         {
-          "id": "A",
-          "text": "The current employee’s operator record"
-        },
-        {
           "id": "B",
           "text": "An Access Group list sorted by seniority"
         },
         {
           "id": "C",
           "text": "The SLA escalation list automatically"
+        },
+        {
+          "id": "A",
+          "text": "The current employee’s operator record"
         },
         {
           "id": "D",
@@ -578,12 +578,12 @@
       "scenario": "Which TWO requirements suit a cascading approval?",
       "options": [
         {
-          "id": "A",
-          "text": "Several required reviewers must decide in an ordered series"
-        },
-        {
           "id": "B",
           "text": "The required management depth varies with Case conditions"
+        },
+        {
+          "id": "A",
+          "text": "Several required reviewers must decide in an ordered series"
         },
         {
           "id": "C",
@@ -615,8 +615,8 @@
       "scenario": "The current user’s reporting hierarchy is used with conditional depth. Which TWO statements are correct?",
       "options": [
         {
-          "id": "A",
-          "text": "The selected manager relationship identifies the first reviewer"
+          "id": "D",
+          "text": "An authority matrix is required as well"
         },
         {
           "id": "B",
@@ -627,8 +627,8 @@
           "text": "Every reviewer is assigned simultaneously"
         },
         {
-          "id": "D",
-          "text": "An authority matrix is required as well"
+          "id": "A",
+          "text": "The selected manager relationship identifies the first reviewer"
         }
       ],
       "correctOptions": [

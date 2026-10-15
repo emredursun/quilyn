@@ -164,6 +164,10 @@ export function validateContent(root) {
         check(['single', 'multi', 'multiple'].includes(question.t), `${qLabel}: unsupported type`);
         check(question.t !== 'single' || question.a.length === 1, `${qLabel}: single requires one answer`);
         check(!['multi', 'multiple'].includes(question.t) || question.a.length >= 2, `${qLabel}: multi requires multiple answers`);
+        if(question.answerReviewVersion!==undefined){
+          const prior=question.previousQuestion;
+          check(question.answerReviewVersion===1 && record(prior) && text(prior.q) && text(prior.r) && Array.isArray(prior.o) && prior.o.length>=2 && prior.o.every(text) && Array.isArray(prior.a) && prior.a.length>0 && prior.a.every(i=>Number.isInteger(i)&&i>=0&&i<prior.o.length), `${qLabel}: invalid reviewed-answer recovery snapshot`);
+        }
         sourceUrl(question.src, `${qLabel} source URL`);
       }
     }

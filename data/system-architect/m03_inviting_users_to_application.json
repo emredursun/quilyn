@@ -93,7 +93,7 @@
           "type": "interactive",
           "title": "Persona & Access Architecture Decisions",
           "height": 460,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}\nbody{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}\n.label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.scenario{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:14px}\n.opt{display:block;width:100%;text-align:left;margin:6px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}\n.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}\n.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}\n.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;color:var(--soft);border-left:3px solid var(--line);padding-left:10px}\n.fb.ok{border-color:var(--ok);color:var(--ink)}\n.fb.bad{border-color:var(--bad);color:var(--ink)}\n.progress{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:12px}\n.btn{margin-top:12px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}\n.btn:hover{border-color:var(--brand);color:var(--ink)}\n.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}\n.btn.primary:hover{opacity:.88}\n.score-big{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}\n.score-msg{font-size:13px;color:var(--soft);text-align:center}\n</style></head><body>\n<div class=\"progress\" id=\"prog\">Scenario 1 of 4</div>\n<div class=\"card\" id=\"qcard\"></div>\n<div id=\"nav\"></div>\n\n<script>\n(function(){\n  var root=document.documentElement;\n  function apply(t){root.setAttribute('data-theme',t);}\n  apply('__THEME__');\n  window.addEventListener('message',function(e){\n    if(e.data&&e.data.type==='pa-theme') apply(e.data.theme);\n  });\n})();\n</script>\n\n<script>\nvar scenarios = [\n  {\n    \"label\": \"Persona Architecture\",\n    \"scenario\": \"HealthCorp is launching a Pega claims application. It has 500 nurses who submit claims, 80 reviewers who approve/reject, and 15 compliance officers who view-only. A PM asks: 'How many Personas and Operators do we need?' What is the correct architecture?\",\n    \"opts\": [\n      \"595 Operators (one per individual) + 3 Personas (Nurse, Reviewer, Compliance Officer) — Operators are per-person logins; Personas are per-interaction-pattern\",\n      \"3 Operators (one per role) + 3 Personas — Operators represent roles, not individuals, so one per job function is enough\",\n      \"595 Operators + 595 Personas — each individual needs their own Persona for security isolation\",\n      \"3 Personas + 0 Operators — modern Pega uses Personas as login identities; Operators are legacy\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. Operators = individual login accounts (595 for 595 people). Personas = reusable role templates (3 patterns: submit, approve, view-only). This is the standard Pega access architecture.\",\n      \"✗ Incorrect. Operators are NOT role abstractions — they are individual user accounts. With 3 Operators, 595 people would share 3 logins, breaking audit trails and individual accountability.\",\n      \"Incorrect. Shared business needs do not require a Persona per individual; each person still needs a unique account.\",\n      \"Incorrect. A Persona describes a business user type, not an individual login account.\"\n    ]\n  },\n  {\n    \"label\": \"Channel Assignment\",\n    \"scenario\": \"A Nurse Persona uses a web portal on desktop and also needs access via a mobile app for field submissions. A Reviewer Persona only uses the web portal. How many Channel interfaces does each Persona need?\",\n    \"opts\": [\n      \"Nurse → 2 Channels (Web + Mobile); Reviewer → 1 Channel (Web) — one Persona can have multiple Channels for different delivery surfaces\",\n      \"Each Persona can only have 1 Channel — create a separate NurseMobile Persona for mobile access and keep Nurse for desktop only\",\n      \"Channels are application-wide, not per-Persona — configure Web and Mobile once at the application level and all Personas get both automatically\",\n      \"Mobile access requires a completely separate Pega application — you cannot add a Mobile Channel to an existing Persona in the same app\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. One Persona can be associated with multiple Channels. The Nurse Persona gets both Web and Mobile Channel interfaces; the Reviewer gets Web only. This is the standard multi-channel Persona pattern.\",\n      \"✗ Incorrect. Creating a separate Persona solely for a different device creates configuration duplication and maintenance burden. Multiple Channels on one Persona is the supported, recommended approach.\",\n      \"Incorrect. Multiple Personas can share a Channel, but creating the Channel does not automatically authorize every Persona to use it.\",\n      \"✗ Incorrect. Mobile Channels are supported within the same Pega application — no separate app is needed. Pega's App Studio supports adding Mobile Channel interfaces to existing Personas.\"\n    ]\n  },\n  {\n    \"label\": \"User onboarding\",\n    \"scenario\": \"Dana joins as a compliance officer. Which App Studio action creates the individual user and selects the appropriate business assignment?\",\n    \"opts\": [\n      \"Use Users > User management > People, enter Dana’s email address and assign the Compliance Officer Persona\",\n      \"Share the existing generic admin account with Dana\",\n      \"Create a Persona named Dana instead of an individual user\",\n      \"Create a dedicated Channel for Dana instead of assigning a role\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"Correct. People manages individual users and their Persona or developer-role assignment. Verify the configured access against Dana’s duties.\",\n      \"Incorrect. Accounts should be unique to each individual, not shared generic accounts.\",\n      \"Incorrect. A Persona models a business user type, not Dana’s individual identity.\",\n      \"Incorrect. A Channel is an interface and does not replace individual user creation or appropriate role assignment.\"\n    ]\n  },\n  {\n    \"label\": \"Changing Access\",\n    \"scenario\": \"A nurse, Alex, is promoted to a senior reviewer role. Alex should now approve claims instead of submitting them. What is the correct way to update Alex's access in Pega?\",\n    \"opts\": [\n      \"Assign the Reviewer Persona and verify that configured permissions match Alex’s new approval duties\",\n      \"Add the Reviewer Access Role directly to Alex's Operator record in Dev Studio — this is more targeted than changing the Persona\",\n      \"Create a new hybrid 'NurseReviewer' Persona for Alex — you cannot change a user's Persona once they have submitted Cases\",\n      \"Delete Alex's Operator record and re-invite as a new user with the Reviewer role — this is the only way to fully reset access\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"Correct. Update the assignment to match the new business responsibilities and verify authorization; a Persona change is not a guarantee of every security or routing setting.\",\n      \"Incorrect. Access Roles are application security configuration; directly adding a role to an Operator is not the documented People-tab role-assignment flow.\",\n      \"Incorrect. Existing Case history does not imply a Persona assignment can never change.\",\n      \"Incorrect. A role change does not require deleting the individual user and creating a replacement identity.\"\n    ]\n  }\n];\n\nvar cur = 0, score = 0;\n\nfunction render() {\n  var s = scenarios[cur];\n  document.getElementById('prog').textContent = 'Scenario ' + (cur+1) + ' of ' + scenarios.length + ' — Score: ' + score + '/' + scenarios.length;\n  var html = '<div class=\"label\">' + s.label + '</div>';\n  html += '<div class=\"scenario\">' + s.scenario + '</div>';\n  s.opts.forEach(function(o, i) {\n    html += '<button class=\"opt\" onclick=\"answer(' + i + ')\">' + o + '</button>';\n  });\n  document.getElementById('qcard').innerHTML = html;\n  document.getElementById('nav').innerHTML = '';\n}\n\nfunction answer(idx) {\n  var s = scenarios[cur];\n  var btns = document.querySelectorAll('.opt');\n  btns.forEach(function(b){ b.disabled = true; });\n  var correct = idx === s.correct;\n  if (correct) score++;\n  s.opts.forEach(function(o, i) {\n    btns[i].className = i === s.correct ? 'opt ok' : (i === idx && !correct ? 'opt bad' : 'opt');\n  });\n  var fb = document.createElement('div');\n  fb.className = 'fb ' + (correct ? 'ok' : 'bad');\n  fb.textContent = s.fbs[idx];\n  document.getElementById('qcard').appendChild(fb);\n  var nav = document.getElementById('nav');\n  if (cur < scenarios.length - 1) {\n    nav.innerHTML = '<button class=\"btn primary\" onclick=\"next()\">Next scenario →</button>';\n  } else {\n    showResult();\n  }\n}\n\nfunction next() { cur++; render(); }\n\nfunction showResult() {\n  var pct = Math.round(score / scenarios.length * 100);\n  var msg = pct === 100 ? 'Perfect — you understand the Operator/Persona/Channel/Access architecture cold.' :\n            pct >= 75 ? 'Good. Review the scenarios you missed — especially the invite vs. Persona assignment distinction.' :\n            'Re-study the Persona, Operator, and Access Group relationship before the exam.';\n  document.getElementById('qcard').innerHTML = '<div class=\"score-big\">' + score + ' / ' + scenarios.length + ' (' + pct + '%)</div><div class=\"score-msg\">' + msg + '</div>';\n  document.getElementById('nav').innerHTML = '<button class=\"btn\" onclick=\"restart()\">Restart</button>';\n}\n\nfunction restart() { cur = 0; score = 0; render(); }\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\n<style>\n:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}\nbody{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px}\n.label{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.scenario{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:14px}\n.opt{display:block;width:100%;text-align:left;margin:6px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}\n.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}\n.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}\n.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;color:var(--soft);border-left:3px solid var(--line);padding-left:10px}\n.fb.ok{border-color:var(--ok);color:var(--ink)}\n.fb.bad{border-color:var(--bad);color:var(--ink)}\n.progress{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:12px}\n.btn{margin-top:12px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}\n.btn:hover{border-color:var(--brand);color:var(--ink)}\n.btn.primary{background:var(--brand);color:#fff;border-color:var(--brand)}\n.btn.primary:hover{opacity:.88}\n.score-big{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}\n.score-msg{font-size:13px;color:var(--soft);text-align:center}\n</style></head><body>\n<div class=\"progress\" id=\"prog\">Scenario 1 of 4</div>\n<div class=\"card\" id=\"qcard\"></div>\n<div id=\"nav\"></div>\n\n<script>\n(function(){\n  var root=document.documentElement;\n  function apply(t){root.setAttribute('data-theme',t);}\n  apply('__THEME__');\n  window.addEventListener('message',function(e){\n    if(e.data&&e.data.type==='pa-theme') apply(e.data.theme);\n  });\n})();\n</script>\n\n<script>\n/* quilyn-topic-balance-v1 */\nvar scenarios = [\n  {\n    \"label\": \"Persona Architecture\",\n    \"scenario\": \"HealthCorp is launching a Pega claims application. It has 500 nurses who submit claims, 80 reviewers who approve/reject, and 15 compliance officers who view-only. A PM asks: 'How many Personas and Operators do we need?' What is the correct architecture?\",\n    \"opts\": [\n      \"0 Operators and 3 Personas\",\n      \"595 Operators and 595 Personas\",\n      \"3 Operators and 3 Personas\",\n      \"595 Operators and 3 Personas\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"Incorrect. A Persona describes a business user type, not an individual login account.\",\n      \"Incorrect. Shared business needs do not require a Persona per individual; each person still needs a unique account.\",\n      \"✗ Incorrect. Operators are NOT role abstractions — they are individual user accounts. With 3 Operators, 595 people would share 3 logins, breaking audit trails and individual accountability.\",\n      \"✓ Correct. Operators = individual login accounts (595 for 595 people). Personas = reusable role templates (3 patterns: submit, approve, view-only). This is the standard Pega access architecture.\"\n    ]\n  },\n  {\n    \"label\": \"Channel Assignment\",\n    \"scenario\": \"A Nurse Persona uses a web portal on desktop and also needs access via a mobile app for field submissions. A Reviewer Persona only uses the web portal. How many Channel interfaces does each Persona need?\",\n    \"opts\": [\n      \"Mobile requires a separate Pega application\",\n      \"One Channel per Persona; create a separate NurseMobile Persona\",\n      \"Nurse: Web and Mobile; Reviewer: Web\",\n      \"Both Personas automatically get every configured Channel\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. Mobile Channels are supported within the same Pega application — no separate app is needed. Pega's App Studio supports adding Mobile Channel interfaces to existing Personas.\",\n      \"✗ Incorrect. Creating a separate Persona solely for a different device creates configuration duplication and maintenance burden. Multiple Channels on one Persona is the supported, recommended approach.\",\n      \"✓ Correct. One Persona can be associated with multiple Channels. The Nurse Persona gets both Web and Mobile Channel interfaces; the Reviewer gets Web only. This is the standard multi-channel Persona pattern.\",\n      \"Incorrect. Multiple Personas can share a Channel, but creating the Channel does not automatically authorize every Persona to use it.\"\n    ]\n  },\n  {\n    \"label\": \"User onboarding\",\n    \"scenario\": \"Dana joins as a compliance officer. Which App Studio action creates the individual user and selects the appropriate business assignment?\",\n    \"opts\": [\n      \"Use Users > User management > People, enter Dana’s email address and assign the Compliance Officer Persona\",\n      \"Create a Persona named Dana instead of an individual user\",\n      \"Create a dedicated Channel for Dana instead of assigning a role\",\n      \"Share the existing generic admin account with Dana\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"Correct. People manages individual users and their Persona or developer-role assignment. Verify the configured access against Dana’s duties.\",\n      \"Incorrect. A Persona models a business user type, not Dana’s individual identity.\",\n      \"Incorrect. A Channel is an interface and does not replace individual user creation or appropriate role assignment.\",\n      \"Incorrect. Accounts should be unique to each individual, not shared generic accounts.\"\n    ]\n  },\n  {\n    \"label\": \"Changing Access\",\n    \"scenario\": \"A nurse, Alex, is promoted to a senior reviewer role. Alex should now approve claims instead of submitting them. What is the correct way to update Alex's access in Pega?\",\n    \"opts\": [\n      \"Add the Reviewer Access Role directly to Alex's Operator record in Dev Studio — this is more targeted than changing the Persona\",\n      \"Assign the Reviewer Persona and verify that configured permissions match Alex’s new approval duties\",\n      \"Delete Alex's Operator record and re-invite as a new user with the Reviewer role — this is the only way to fully reset access\",\n      \"Create a new hybrid 'NurseReviewer' Persona for Alex — you cannot change a user's Persona once they have submitted Cases\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"Incorrect. Access Roles are application security configuration; directly adding a role to an Operator is not the documented People-tab role-assignment flow.\",\n      \"Correct. Update the assignment to match the new business responsibilities and verify authorization; a Persona change is not a guarantee of every security or routing setting.\",\n      \"Incorrect. A role change does not require deleting the individual user and creating a replacement identity.\",\n      \"Incorrect. Existing Case history does not imply a Persona assignment can never change.\"\n    ]\n  }\n];\n\nvar cur = 0, score = 0;\n\nfunction render() {\n  var s = scenarios[cur];\n  document.getElementById('prog').textContent = 'Scenario ' + (cur+1) + ' of ' + scenarios.length + ' — Score: ' + score + '/' + scenarios.length;\n  var html = '<div class=\"label\">' + s.label + '</div>';\n  html += '<div class=\"scenario\">' + s.scenario + '</div>';\n  s.opts.forEach(function(o, i) {\n    html += '<button class=\"opt\" onclick=\"answer(' + i + ')\">' + o + '</button>';\n  });\n  document.getElementById('qcard').innerHTML = html;\n  document.getElementById('nav').innerHTML = '';\n}\n\nfunction answer(idx) {\n  var s = scenarios[cur];\n  var btns = document.querySelectorAll('.opt');\n  btns.forEach(function(b){ b.disabled = true; });\n  var correct = idx === s.correct;\n  if (correct) score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+scenarios.length+' — Score: '+score+'/'+scenarios.length;\n  s.opts.forEach(function(o, i) {\n    btns[i].className = i === s.correct ? 'opt ok' : (i === idx && !correct ? 'opt bad' : 'opt');\n  });\n  var fb = document.createElement('div');\n  fb.className = 'fb ' + (correct ? 'ok' : 'bad');\n  fb.textContent = s.fbs[idx];\n  document.getElementById('qcard').appendChild(fb);\n  var nav = document.getElementById('nav');\n  if (cur < scenarios.length - 1) {\n    nav.innerHTML = '<button class=\"btn primary\" onclick=\"next()\">Next scenario →</button>';\n  } else {\n    showResult();\n  }\n}\n\nfunction next() { cur++; render(); }\n\nfunction showResult() {\n  var pct = Math.round(score / scenarios.length * 100);\n  var msg = pct === 100 ? 'Perfect — you understand the Operator/Persona/Channel/Access architecture cold.' :\n            pct >= 75 ? 'Good. Review the scenarios you missed — especially the invite vs. Persona assignment distinction.' :\n            'Re-study the Persona, Operator, and Access Group relationship before the exam.';\n  document.getElementById('qcard').innerHTML = '<div class=\"score-big\">' + score + ' / ' + scenarios.length + ' (' + pct + '%)</div><div class=\"score-msg\">' + msg + '</div>';\n  document.getElementById('nav').innerHTML = '<button class=\"btn\" onclick=\"restart()\">Restart</button>';\n}\n\nfunction restart() { cur = 0; score = 0; render(); }\nrender();\n</script></body></html>"
         }
       ],
       "sectionId": "section-2801e37418f1"
@@ -143,20 +143,20 @@
       "scenario": "A logistics company has 40 dispatchers who all perform the same job functions and need identical access to Cases. How many Personas should be created for this group?",
       "options": [
         {
-          "id": "A",
-          "text": "One Persona shared by all 40 dispatchers — a Persona represents a category of users with the same role, not an individual user"
+          "id": "D",
+          "text": "One Access Role per Case — because each Case Type requires a separate access definition for every dispatcher"
         },
         {
-          "id": "B",
-          "text": "Forty Personas — one per dispatcher — since each Operator ID is unique, each user needs a unique Persona"
+          "id": "A",
+          "text": "One Persona shared by all 40 dispatchers — a Persona represents a category of users with the same role, not an individual user"
         },
         {
           "id": "C",
           "text": "One Operator record shared by all 40 — a Persona is not needed when users share the same login credentials"
         },
         {
-          "id": "D",
-          "text": "One Access Role per Case — because each Case Type requires a separate access definition for every dispatcher"
+          "id": "B",
+          "text": "Forty Personas — one per dispatcher — since each Operator ID is unique, each user needs a unique Persona"
         }
       ],
       "correctOptions": [
@@ -179,20 +179,20 @@
       "scenario": "GlobalBank has 300 tellers, 50 fraud analysts, and 20 compliance officers — all using the same Pega application. A BA proposes: 'We need 370 Personas, one per employee, to ensure each person's role is captured.' An SA responds that this fundamentally misunderstands what a Persona is. What IS the correct architecture and the principle behind it?",
       "options": [
         {
-          "id": "A",
-          "text": "Create 370 Operator records (one per individual) but only 3 Personas — a Persona represents a job function/interaction pattern shared by a group; many users share one Persona"
-        },
-        {
-          "id": "B",
-          "text": "Create 3 Operators (one per job function) and 3 Personas — an Operator represents a role, not a specific individual, so one per job title is sufficient"
+          "id": "D",
+          "text": "Create only 3 Personas with no Operators — Pega authentication resolves users to Personas directly, making Operator records unnecessary in modern Pega versions"
         },
         {
           "id": "C",
           "text": "Create 370 Operators AND 370 Personas — security best practice requires each user to have their own isolated Persona to prevent cross-contamination of access rights"
         },
         {
-          "id": "D",
-          "text": "Create only 3 Personas with no Operators — Pega authentication resolves users to Personas directly, making Operator records unnecessary in modern Pega versions"
+          "id": "B",
+          "text": "Create 3 Operators (one per job function) and 3 Personas — an Operator represents a role, not a specific individual, so one per job title is sufficient"
+        },
+        {
+          "id": "A",
+          "text": "Create 370 Operator records (one per individual) but only 3 Personas — a Persona represents a job function/interaction pattern shared by a group; many users share one Persona"
         }
       ],
       "correctOptions": [
@@ -251,20 +251,20 @@
       "scenario": "A compliance officer reviews the Pega application design and asks: 'You have a Web Portal and a Mobile Portal — are those two separate applications, or are they Channels of the same application?' A BA responds that they are Channels. The officer then asks: 'So what exactly IS a Channel, and how does it relate to a Persona?' Which answer is most accurate?",
       "options": [
         {
-          "id": "A",
-          "text": "A Channel is the interface (web, mobile, messaging) through which a Persona interacts with a Case; multiple Channels can be associated with one Persona"
-        },
-        {
           "id": "B",
           "text": "A Channel is a database table that stores Case data for each interface; the Persona selects which table to read from based on the user's device"
         },
         {
-          "id": "C",
-          "text": "A Channel is a Decision Table that routes Cases based on the user's device type; the Persona overrides the Channel's routing logic when roles conflict"
-        },
-        {
           "id": "D",
           "text": "A Channel is a Ruleset that contains all Portal-specific rules; each Persona must be assigned to exactly one Channel, creating a one-to-one mapping"
+        },
+        {
+          "id": "A",
+          "text": "A Channel is the interface (web, mobile, messaging) through which a Persona interacts with a Case; multiple Channels can be associated with one Persona"
+        },
+        {
+          "id": "C",
+          "text": "A Channel is a Decision Table that routes Cases based on the user's device type; the Persona overrides the Channel's routing logic when roles conflict"
         }
       ],
       "correctOptions": [
@@ -287,16 +287,16 @@
       "scenario": "A new dispatcher joins the company. The SA must configure their Pega access so they can see and work the same Cases as the other dispatchers. What is the correct configuration step?",
       "options": [
         {
-          "id": "A",
-          "text": "Assign the Dispatcher Persona through user management and verify its configured permissions and work responsibilities"
-        },
-        {
           "id": "B",
           "text": "Change the user's authentication provider from LDAP to Pega-native, which automatically applies the dispatcher permissions"
         },
         {
           "id": "C",
           "text": "Create a Wait Step in the relevant Case Type that routes an Assignment to the new user's Operator ID until their access is confirmed"
+        },
+        {
+          "id": "A",
+          "text": "Assign the Dispatcher Persona through user management and verify its configured permissions and work responsibilities"
         },
         {
           "id": "D",
@@ -331,12 +331,12 @@
           "text": "A Data Transform — defines how data is moved and mapped between clipboard pages when the Persona's user opens a Case"
         },
         {
-          "id": "C",
-          "text": "A Work Queue — the routing destination where Cases are assigned when no specific user is targeted for the Persona's role"
-        },
-        {
           "id": "D",
           "text": "A Decision Tree — evaluates a set of conditions to determine which Persona applies to a given Case assignment"
+        },
+        {
+          "id": "C",
+          "text": "A Work Queue — the routing destination where Cases are assigned when no specific user is targeted for the Persona's role"
         }
       ],
       "correctOptions": [
@@ -359,20 +359,20 @@
       "scenario": "An SA needs to add a Claims Manager Persona to the application. Where can they create it?",
       "options": [
         {
-          "id": "A",
-          "text": "App Studio — Users > User Management > Persona"
-        },
-        {
           "id": "B",
           "text": "Prediction Studio — the Persona Designer in Prediction Studio lets SAs define user roles and their predictive models"
+        },
+        {
+          "id": "D",
+          "text": "The Dev Studio Records tab — Personas are a Rule type that must be authored directly in the Rules layer via the Records tab"
         },
         {
           "id": "C",
           "text": "Admin Studio only — Persona definitions are system-level constructs managed through the Admin Studio security console"
         },
         {
-          "id": "D",
-          "text": "The Dev Studio Records tab — Personas are a Rule type that must be authored directly in the Rules layer via the Records tab"
+          "id": "A",
+          "text": "App Studio — Users > User Management > Persona"
         }
       ],
       "correctOptions": [
@@ -395,16 +395,16 @@
       "scenario": "A BA is writing user-access documentation. Which TWO statements about users and Personas in Pega are correct?",
       "options": [
         {
+          "id": "C",
+          "text": "A Persona represents a single, specific individual user — each user must have a unique Persona with their name"
+        },
+        {
           "id": "A",
           "text": "Many users can be assigned to the same Persona — a Persona is a role category, not a one-to-one mapping to an individual"
         },
         {
           "id": "B",
           "text": "A new Persona includes an associated role and receives default permissions and a Work Queue"
-        },
-        {
-          "id": "C",
-          "text": "A Persona represents a single, specific individual user — each user must have a unique Persona with their name"
         },
         {
           "id": "D",
@@ -433,12 +433,12 @@
       "scenario": "A new Pega application is in UAT. Alice, Bob and Carol need different responsibilities. An admin claims inviting them is enough to guarantee all intended permissions. Which onboarding approach is most accurate?",
       "options": [
         {
-          "id": "A",
-          "text": "Create the individual user with an email address in People and assign an appropriate Persona or developer role"
-        },
-        {
           "id": "B",
           "text": "Inviting a user fully configures their access — it automatically assigns the default Persona and populates all necessary Access Roles based on their job title in the Operator profile"
+        },
+        {
+          "id": "A",
+          "text": "Create the individual user with an email address in People and assign an appropriate Persona or developer role"
         },
         {
           "id": "C",
@@ -477,12 +477,12 @@
           "text": "Change the portal theme for the user's Operator record — the portal theme controls which case actions and approval buttons are visible"
         },
         {
-          "id": "C",
-          "text": "Increase the SLA urgency value on the Claims Case Type — higher urgency escalates the Case to senior roles automatically"
-        },
-        {
           "id": "D",
           "text": "Add a Wait Step to the Claims process that checks the user's job title and routes to the manager queue if the title matches"
+        },
+        {
+          "id": "C",
+          "text": "Increase the SLA urgency value on the Claims Case Type — higher urgency escalates the Case to senior roles automatically"
         }
       ],
       "correctOptions": [
@@ -505,20 +505,20 @@
       "scenario": "An SA needs to find the record that represents an individual dispatcher named Maya Chen in the Pega system. What artifact should they look up?",
       "options": [
         {
-          "id": "A",
-          "text": "Maya Chen’s Operator ID record — the individual user identity rather than the shared Dispatcher Persona"
-        },
-        {
-          "id": "B",
-          "text": "The 'Dispatcher' Persona — Personas represent individuals, so Maya Chen's details are stored in the Dispatcher Persona record"
-        },
-        {
           "id": "C",
           "text": "The 'Dispatcher' Access Role — Access Roles list the individual users granted each permission, so Maya's record is there"
         },
         {
           "id": "D",
           "text": "Maya Chen's Channel record — Channels store per-user interface preferences and authentication details for each individual"
+        },
+        {
+          "id": "B",
+          "text": "The 'Dispatcher' Persona — Personas represent individuals, so Maya Chen's details are stored in the Dispatcher Persona record"
+        },
+        {
+          "id": "A",
+          "text": "Maya Chen’s Operator ID record — the individual user identity rather than the shared Dispatcher Persona"
         }
       ],
       "correctOptions": [
@@ -541,16 +541,16 @@
       "scenario": "A Pega application serves both 'Claims Adjusters' who review claims and 'Claims Managers' who approve them. They need different portals and different case action permissions. What is the correct modeling approach?",
       "options": [
         {
-          "id": "A",
-          "text": "Define Claims Adjuster and Claims Manager Personas and configure suitable Channels and permissions for each"
-        },
-        {
           "id": "B",
           "text": "Create one shared Persona for both roles and use field-level visibility rules to hide the approval button from adjusters"
         },
         {
           "id": "C",
           "text": "Assign both job functions to a single Operator record with dual Access Roles — the system presents the correct actions based on the active task"
+        },
+        {
+          "id": "A",
+          "text": "Define Claims Adjuster and Claims Manager Personas and configure suitable Channels and permissions for each"
         },
         {
           "id": "D",
@@ -577,20 +577,20 @@
       "scenario": "A stakeholder asks an SA to clarify what 'Persona' and 'Channel' each represent in the application design. Which pairing is correct?",
       "options": [
         {
-          "id": "A",
-          "text": "Persona = a category of users who interact with Cases the same way (their role); Channel = the interface through which that role interacts (web portal, mobile app, messaging)"
-        },
-        {
-          "id": "B",
-          "text": "Persona = a single named individual user; Channel = the Ruleset version that packages the rules for that user's application"
-        },
-        {
           "id": "C",
           "text": "Persona = an Access Role defining what the user can do; Channel = the Operator ID record that identifies the individual user"
         },
         {
+          "id": "A",
+          "text": "Persona = a category of users who interact with Cases the same way (their role); Channel = the interface through which that role interacts (web portal, mobile app, messaging)"
+        },
+        {
           "id": "D",
           "text": "Persona = the database table storing user records; Channel = the SLA rule governing how quickly Cases must be resolved"
+        },
+        {
+          "id": "B",
+          "text": "Persona = a single named individual user; Channel = the Ruleset version that packages the rules for that user's application"
         }
       ],
       "correctOptions": [
@@ -613,20 +613,20 @@
       "scenario": "A company adds 200 new customer service representatives who all need the same access as existing CSRs. An SA completes the setup in minutes. Why does this scale so efficiently?",
       "options": [
         {
-          "id": "A",
-          "text": "Reuse the CSR Persona for the new individual users, with its established role and configured permissions"
-        },
-        {
           "id": "B",
           "text": "Because Personas compile the application's Ruleset into a compressed package that installs instantly on each new user's device"
+        },
+        {
+          "id": "D",
+          "text": "Because Personas replace the need for authentication — the Persona itself verifies the user's identity against Active Directory"
         },
         {
           "id": "C",
           "text": "Because Personas store the application's Case data records, so each new CSR inherits the full history of existing Cases automatically"
         },
         {
-          "id": "D",
-          "text": "Because Personas replace the need for authentication — the Persona itself verifies the user's identity against Active Directory"
+          "id": "A",
+          "text": "Reuse the CSR Persona for the new individual users, with its established role and configured permissions"
         }
       ],
       "correctOptions": [
@@ -686,16 +686,16 @@
       "scenario": "In App Studio user management, which TWO actions onboard an individual user with an appropriate business role?",
       "options": [
         {
-          "id": "A",
-          "text": "Create the individual user with an email address in the People tab"
-        },
-        {
           "id": "B",
           "text": "Assign the appropriate Persona for the user’s business responsibilities"
         },
         {
           "id": "C",
           "text": "Manually create a personal Ruleset for the user to store their individual rule overrides"
+        },
+        {
+          "id": "A",
+          "text": "Create the individual user with an email address in the People tab"
         },
         {
           "id": "D",
@@ -727,16 +727,16 @@
           "text": "Create the Persona with a name that reflects the user's business role in the application"
         },
         {
-          "id": "B",
-          "text": "Associate the Persona with one or more Channel interfaces to define the experience that role receives"
-        },
-        {
           "id": "C",
           "text": "Configure login credentials and password policies directly on the Persona record"
         },
         {
           "id": "D",
           "text": "Grant full system administrator access to the Persona so users can manage Channel settings"
+        },
+        {
+          "id": "B",
+          "text": "Associate the Persona with one or more Channel interfaces to define the experience that role receives"
         }
       ],
       "correctOptions": [

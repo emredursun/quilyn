@@ -64,7 +64,7 @@
           "type": "interactive",
           "title": "Blueprint Decision Simulator",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Blueprint Access\", \"scenario\": \"A BA has no Operator login to the company’s Pega Platform instance. Must that instance be provisioned before she can start a Blueprint design?\", \"opts\": [\"No — Blueprint is a separate SaaS service; Platform instance access is not required to start the proposal\", \"Yes — Blueprint requires at least a Pega free-trial account to authenticate before generating any proposals\", \"Yes — Blueprint accesses the company's Pega environment to validate rule names, so the user must be an Operator in that environment\", \"No — Blueprint is available in App Studio under File → New Blueprint; the BA just needs to open App Studio\"], \"correct\": 0, \"fbs\": [\"Correct. Platform identity and Blueprint access are separate. Follow SaaS sign-in and collaboration requirements; the URL does not grant unrestricted access.\", \"Incorrect. The source does not require a Platform trial environment before starting the separate SaaS design.\", \"Incorrect. A Platform Operator account is not the prerequisite for generating the proposal.\", \"✗ Incorrect. Blueprint is not a feature inside App Studio — it is a separate SaaS product at pega.com/blueprint.\"]}, {\"label\": \"Blueprint Import\", \"scenario\": \"In the documented new-application Blueprint import, which statement correctly describes Access Roles and the Branch?\", \"opts\": [\"Access Roles are the exception to creation inside the Branch; this does not mean they are excluded from the application\", \"Access Roles must be in the Branch, so their absence there proves the import failed\", \"Access Roles are never created by Blueprint import and always require recreation from scratch\", \"Only environments before Infinity 24 place Access Roles outside the Branch\"], \"correct\": 0, \"fbs\": [\"Correct. The source describes branch placement, not exclusion from asset creation. Inspect application security separately.\", \"Incorrect. Access Roles are the documented exception to branch placement.\", \"Incorrect. Absence from the Branch is not evidence of absence from the application.\", \"Incorrect. The source does not state this release cutoff.\"]}, {\"label\": \"Blueprint vs App Studio\", \"scenario\": \"After importing a Blueprint, a product manager says: 'Great — now that we have Blueprint, we don't need App Studio anymore. Blueprint is the replacement.' How should the SA respond?\", \"opts\": [\"Blueprint augments App Studio — after import, the team continues configuring and building the application in App Studio; Blueprint accelerates the start but does not replace the build process\", \"The manager is correct — Blueprint generates a fully working, deploy-ready application that no longer needs manual configuration in App Studio\", \"Blueprint replaces App Studio only for the design phase; once the application is live, you return to App Studio for future changes\", \"Blueprint generates the configuration but it must be opened in Dev Studio (not App Studio) for all further changes\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Blueprint jumpstarts design; App Studio is where the team builds, configures, and refines the actual running application.\", \"✗ Incorrect. A Blueprint import produces a starting point, not a finished application. Significant configuration, testing, and iteration remains in App Studio.\", \"✗ Incorrect. Blueprint is used pre-build and again when adding major features — it does not have a 'design phase only' limitation, and it does not replace App Studio for live applications.\", \"✗ Incorrect. App Studio remains the primary tool for configuring the application after a Blueprint import. There is no requirement to use Dev Studio instead.\"]}, {\"label\": \"Blueprint Best Practices\", \"scenario\": \"A team skips the refinement step after Blueprint generates a proposal and immediately exports/imports it. The resulting application has misnamed Case Types and incorrect Data Model fields. What best practice did they violate?\", \"opts\": [\"Review and modify the AI-generated proposal before exporting — developers are responsible for validating and correcting Blueprint suggestions before import\", \"Always export within 30 minutes of generation — Blueprint proposals expire and the fields revert to defaults if not exported quickly\", \"The issue was caused by not running PremBridge before generating — PremBridge ensures accurate field name generation\", \"There is no best practice to review proposals — Blueprint content is automatically validated against the Pega rule schema before export\"], \"correct\": 0, \"fbs\": [\"Correct. Compare the proposal to business requirements before importing; automated checks do not replace stakeholder and developer review.\", \"✗ Incorrect. Blueprint proposals do not expire on a time limit. The refinement step is about quality, not timing.\", \"✗ Incorrect. PremBridge is unrelated to Blueprint's field name accuracy. Review is a human responsibility, not a tool prerequisite.\", \"Incorrect. Whatever automated validation is available, it cannot prove that the proposal meets these business requirements.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Blueprint Access\",\n    \"scenario\": \"A BA has no Operator login to the company’s Pega Platform instance. Must that instance be provisioned before she can start a Blueprint design?\",\n    \"opts\": [\n      \"Yes — Blueprint accesses the company's Pega environment to validate rule names, so the user must be an Operator in that environment\",\n      \"No — Blueprint is a separate SaaS service; Platform instance access is not required to start the proposal\",\n      \"No — Blueprint is available in App Studio under File → New Blueprint; the BA just needs to open App Studio\",\n      \"Yes — Blueprint requires at least a Pega free-trial account to authenticate before generating any proposals\"\n    ],\n    \"correct\": 1,\n    \"fbs\": [\n      \"Incorrect. A Platform Operator account is not the prerequisite for generating the proposal.\",\n      \"Correct. Platform identity and Blueprint access are separate. Follow SaaS sign-in and collaboration requirements; the URL does not grant unrestricted access.\",\n      \"✗ Incorrect. Blueprint is not a feature inside App Studio — it is a separate SaaS product at pega.com/blueprint.\",\n      \"Incorrect. The source does not require a Platform trial environment before starting the separate SaaS design.\"\n    ]\n  },\n  {\n    \"label\": \"Blueprint Import\",\n    \"scenario\": \"In the documented new-application Blueprint import, which statement correctly describes Access Roles and the Branch?\",\n    \"opts\": [\n      \"Access Roles must be in the Branch, so their absence there proves the import failed\",\n      \"Access Roles are never created by Blueprint import and always require recreation from scratch\",\n      \"Access Roles are the exception to creation inside the Branch; this does not mean they are excluded from the application\",\n      \"Only environments before Infinity 24 place Access Roles outside the Branch\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"Incorrect. Access Roles are the documented exception to branch placement.\",\n      \"Incorrect. Absence from the Branch is not evidence of absence from the application.\",\n      \"Correct. The source describes branch placement, not exclusion from asset creation. Inspect application security separately.\",\n      \"Incorrect. The source does not state this release cutoff.\"\n    ]\n  },\n  {\n    \"label\": \"Blueprint vs App Studio\",\n    \"scenario\": \"After importing a Blueprint, a product manager says: 'Great — now that we have Blueprint, we don't need App Studio anymore. Blueprint is the replacement.' How should the SA respond?\",\n    \"opts\": [\n      \"Blueprint accelerates initial design; continue configuration in App Studio\",\n      \"Blueprint replaces App Studio with a deploy-ready application requiring no configuration\",\n      \"Blueprint replaces App Studio during design; return there after the application goes live\",\n      \"Blueprint output requires Dev Studio for every subsequent configuration change\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. Blueprint jumpstarts design; App Studio is where the team builds, configures, and refines the actual running application.\",\n      \"✗ Incorrect. A Blueprint import produces a starting point, not a finished application. Significant configuration, testing, and iteration remains in App Studio.\",\n      \"✗ Incorrect. Blueprint is used pre-build and again when adding major features — it does not have a 'design phase only' limitation, and it does not replace App Studio for live applications.\",\n      \"✗ Incorrect. App Studio remains the primary tool for configuring the application after a Blueprint import. There is no requirement to use Dev Studio instead.\"\n    ]\n  },\n  {\n    \"label\": \"Blueprint Best Practices\",\n    \"scenario\": \"A team skips the refinement step after Blueprint generates a proposal and immediately exports/imports it. The resulting application has misnamed Case Types and incorrect Data Model fields. What best practice did they violate?\",\n    \"opts\": [\n      \"Export within 30 minutes before the proposal expires\",\n      \"Run PremBridge before generation to ensure correct field names\",\n      \"Rely on automatic schema validation instead of reviewing the proposal\",\n      \"Review and refine the generated proposal before exporting it\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"✗ Incorrect. Blueprint proposals do not expire on a time limit. The refinement step is about quality, not timing.\",\n      \"✗ Incorrect. PremBridge is unrelated to Blueprint's field name accuracy. Review is a human responsibility, not a tool prerequisite.\",\n      \"Incorrect. Whatever automated validation is available, it cannot prove that the proposal meets these business requirements.\",\n      \"Correct. Compare the proposal to business requirements before importing; automated checks do not replace stakeholder and developer review.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next →</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=75?'Good — review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         },
         {
           "type": "diagram",
@@ -176,20 +176,20 @@
       "scenario": "A business team without access to a Pega Platform development instance wants to design an application before development begins. What makes Blueprint suitable?",
       "options": [
         {
-          "id": "A",
-          "text": "It is independent SaaS; a Platform development instance or Operator login is not required to begin design"
-        },
-        {
-          "id": "B",
-          "text": "It runs inside Dev Studio, but stakeholders can be granted temporary guest access without a full Pega license"
+          "id": "D",
+          "text": "It can only be used after the Pega Platform environment has been provisioned, since it reads existing Case Type metadata"
         },
         {
           "id": "C",
           "text": "It requires every participant to have an LSA-level license so the designs are authoritative and can be imported"
         },
         {
-          "id": "D",
-          "text": "It can only be used after the Pega Platform environment has been provisioned, since it reads existing Case Type metadata"
+          "id": "A",
+          "text": "It is independent SaaS; a Platform development instance or Operator login is not required to begin design"
+        },
+        {
+          "id": "B",
+          "text": "It runs inside Dev Studio, but stakeholders can be granted temporary guest access without a full Pega license"
         }
       ],
       "correctOptions": [
@@ -212,20 +212,20 @@
       "scenario": "An SA describes a new 'Claims Management' application to Pega Blueprint in plain business language. What does Blueprint propose in response?",
       "options": [
         {
-          "id": "A",
-          "text": "Case Types, Case Life Cycles, Data Models, data objects, and Personas — the full application design skeleton"
+          "id": "C",
+          "text": "A list of Rulesets and their version numbers — the packaging structure for the application's deployable artifacts"
         },
         {
           "id": "B",
           "text": "Server hardware specifications, network topology, and database schema — the infrastructure design for the application"
         },
         {
-          "id": "C",
-          "text": "A list of Rulesets and their version numbers — the packaging structure for the application's deployable artifacts"
-        },
-        {
           "id": "D",
           "text": "Access Roles and Operator IDs — the security and user configuration for all roles in the Claims Management system"
+        },
+        {
+          "id": "A",
+          "text": "Case Types, Case Life Cycles, Data Models, data objects, and Personas — the full application design skeleton"
         }
       ],
       "correctOptions": [
@@ -248,20 +248,20 @@
       "scenario": "A stakeholder says, 'Now that we have Blueprint, we don't need App Studio anymore.' How should the SA respond?",
       "options": [
         {
-          "id": "A",
-          "text": "Blueprint augments App Studio and other Pega tools by accelerating the initial design phase — the team still builds and refines in App Studio"
-        },
-        {
-          "id": "B",
-          "text": "The stakeholder is correct — Blueprint fully replaces App Studio for all Case Type configuration and application authoring"
-        },
-        {
           "id": "C",
           "text": "Blueprint replaces App Studio for initial design but is used alongside Dev Studio for implementation"
         },
         {
+          "id": "A",
+          "text": "Blueprint augments App Studio and other Pega tools by accelerating the initial design phase — the team still builds and refines in App Studio"
+        },
+        {
           "id": "D",
           "text": "Blueprint and App Studio cannot be used on the same project — teams must choose one tool for the full lifecycle"
+        },
+        {
+          "id": "B",
+          "text": "The stakeholder is correct — Blueprint fully replaces App Studio for all Case Type configuration and application authoring"
         }
       ],
       "correctOptions": [
@@ -288,16 +288,16 @@
           "text": "The Lead System Architect (LSA), as the assigned implementation owner"
         },
         {
-          "id": "B",
-          "text": "The Product Owner — approves the Blueprint import as a business gate before any technical work begins"
-        },
-        {
           "id": "C",
           "text": "The Scrum Master — facilitates the import ceremony and ensures all team members have reviewed the Blueprint before it proceeds"
         },
         {
           "id": "D",
           "text": "The end customer — reviews and approves the Blueprint export file before the LSA is authorized to import it"
+        },
+        {
+          "id": "B",
+          "text": "The Product Owner — approves the Blueprint import as a business gate before any technical work begins"
         }
       ],
       "correctOptions": [
@@ -320,20 +320,20 @@
       "scenario": "An LSA uses the documented new-application Blueprint import. Which created asset type is the exception to placement inside the Branch?",
       "options": [
         {
-          "id": "A",
-          "text": "Access Roles — they are not created inside the Branch on import; all other Blueprint-generated assets (Case Types, Data Objects, Personas) are placed in the Branch"
-        },
-        {
-          "id": "B",
-          "text": "Case Types — they are created at the application level, not in the Branch, to ensure they are immediately available to all environments"
-        },
-        {
           "id": "C",
           "text": "Data objects — they are created directly in the production Ruleset because they represent the system of record structure"
         },
         {
           "id": "D",
           "text": "Personas — they require Admin Studio authorization before being placed in the Branch, so they are held in a staging area"
+        },
+        {
+          "id": "B",
+          "text": "Case Types — they are created at the application level, not in the Branch, to ensure they are immediately available to all environments"
+        },
+        {
+          "id": "A",
+          "text": "Access Roles — they are not created inside the Branch on import; all other Blueprint-generated assets (Case Types, Data Objects, Personas) are placed in the Branch"
         }
       ],
       "correctOptions": [
@@ -356,20 +356,20 @@
       "scenario": "A BA insists the team must install 'Pega GenAI PremBridge' and have an active Pega environment before they can even start generating a Blueprint proposal for a new application. Is the BA correct, and why?",
       "options": [
         {
-          "id": "A",
-          "text": "No — Blueprint is a standalone SaaS tool at pega.com/blueprint; no Pega environment or PremBridge installation is needed to generate or collaborate on a Blueprint"
-        },
-        {
-          "id": "B",
-          "text": "Yes — PremBridge provides the GenAI gateway that Blueprint relies on; without it, natural-language processing during generation is unavailable"
-        },
-        {
           "id": "C",
           "text": "Partially — you don't need PremBridge, but you DO need an active Pega Infinity '23+ environment running before Blueprint generation can begin"
         },
         {
+          "id": "A",
+          "text": "No — Blueprint is a standalone SaaS tool at pega.com/blueprint; no Pega environment or PremBridge installation is needed to generate or collaborate on a Blueprint"
+        },
+        {
           "id": "D",
           "text": "Yes — Blueprint requires a Pega environment so it can validate proposed Case Types against existing rule names in the system"
+        },
+        {
+          "id": "B",
+          "text": "Yes — PremBridge provides the GenAI gateway that Blueprint relies on; without it, natural-language processing during generation is unavailable"
         }
       ],
       "correctOptions": [
@@ -396,16 +396,16 @@
           "text": "Blueprint import accelerates creation of an editable application skeleton for the team to demonstrate, configure and test"
         },
         {
-          "id": "B",
-          "text": "Blueprint import permanently locks the application to the Blueprint design, ensuring the demo exactly matches the agreed specifications"
+          "id": "D",
+          "text": "Blueprint import disables App Studio to prevent unauthorized edits to the generated application during the demo period"
         },
         {
           "id": "C",
           "text": "Blueprint import deletes any existing Case Types in the target application and replaces them with the Blueprint's design"
         },
         {
-          "id": "D",
-          "text": "Blueprint import disables App Studio to prevent unauthorized edits to the generated application during the demo period"
+          "id": "B",
+          "text": "Blueprint import permanently locks the application to the Blueprint design, ensuring the demo exactly matches the agreed specifications"
         }
       ],
       "correctOptions": [
@@ -428,20 +428,20 @@
       "scenario": "A BA and SA collaborate in Pega Blueprint before any development begins. Which TWO statements correctly describe how Blueprint is generated and modified?",
       "options": [
         {
-          "id": "A",
-          "text": "You describe the application in business terms (natural language) and Blueprint proposes an initial Case Types, Data Models, and Personas design"
-        },
-        {
-          "id": "B",
-          "text": "You can refine the Blueprint proposal — editing Stages, Steps, fields, data objects, and Personas — before importing into Pega Platform"
+          "id": "D",
+          "text": "Blueprint generation requires the SA to write a JSON schema file describing the Case Types before the AI can propose a design"
         },
         {
           "id": "C",
           "text": "Once a Blueprint is generated it is locked and cannot be edited; all refinements must happen after import in App Studio"
         },
         {
-          "id": "D",
-          "text": "Blueprint generation requires the SA to write a JSON schema file describing the Case Types before the AI can propose a design"
+          "id": "B",
+          "text": "You can refine the Blueprint proposal — editing Stages, Steps, fields, data objects, and Personas — before importing into Pega Platform"
+        },
+        {
+          "id": "A",
+          "text": "You describe the application in business terms (natural language) and Blueprint proposes an initial Case Types, Data Models, and Personas design"
         }
       ],
       "correctOptions": [
@@ -466,16 +466,16 @@
       "scenario": "An insurance company wants to build a 'Claims Adjudication' application using industry-accepted best practices without starting from scratch. How does Blueprint support this?",
       "options": [
         {
-          "id": "A",
-          "text": "Blueprint provides industry best-practice templates that encode Pega's accumulated expertise — the team selects and refines the template for their specific needs"
+          "id": "C",
+          "text": "Blueprint's templates only work for generic, non-industry applications; industry-specific apps must be designed from scratch"
         },
         {
           "id": "B",
           "text": "Blueprint forbids any customization of the generated design to ensure the application adheres strictly to the industry template"
         },
         {
-          "id": "C",
-          "text": "Blueprint's templates only work for generic, non-industry applications; industry-specific apps must be designed from scratch"
+          "id": "A",
+          "text": "Blueprint provides industry best-practice templates that encode Pega's accumulated expertise — the team selects and refines the template for their specific needs"
         },
         {
           "id": "D",
@@ -502,6 +502,10 @@
       "scenario": "Traditional Pega application design through workshops and requirements documentation took weeks to months before development could begin. Why did Pega create Blueprint?",
       "options": [
         {
+          "id": "D",
+          "text": "Blueprint was created to store production data and reduce database costs by pre-generating data objects"
+        },
+        {
           "id": "A",
           "text": "Blueprint's GenAI-infused design approach helps teams align on an optimized solution faster and gets them into development in days instead of weeks"
         },
@@ -512,10 +516,6 @@
         {
           "id": "C",
           "text": "Blueprint was created to replace the Case Life Cycle concept with a new event-driven architecture"
-        },
-        {
-          "id": "D",
-          "text": "Blueprint was created to store production data and reduce database costs by pre-generating data objects"
         }
       ],
       "correctOptions": [
@@ -574,20 +574,20 @@
       "scenario": "Where does a team begin collaborative Blueprint design without first provisioning a Pega Platform development instance?",
       "options": [
         {
-          "id": "A",
-          "text": "At pega.com/blueprint, the separate SaaS service, with its appropriate sign-in and collaboration access"
-        },
-        {
-          "id": "B",
-          "text": "Open Admin Studio and navigate to the Blueprint tab — Blueprint is built into the Pega administration console and requires admin credentials"
-        },
-        {
           "id": "C",
           "text": "Use Prediction Studio's Blueprint module — it is co-located with AI model management because Blueprint uses the same GenAI infrastructure"
         },
         {
           "id": "D",
           "text": "Open App Studio → New Application → Blueprint mode — Blueprint is a guided wizard launched from within an existing Pega application"
+        },
+        {
+          "id": "B",
+          "text": "Open Admin Studio and navigate to the Blueprint tab — Blueprint is built into the Pega administration console and requires admin credentials"
+        },
+        {
+          "id": "A",
+          "text": "At pega.com/blueprint, the separate SaaS service, with its appropriate sign-in and collaboration access"
         }
       ],
       "correctOptions": [
@@ -610,20 +610,20 @@
       "scenario": "An LSA uses the documented new-application Build from a Blueprint workflow. Which TWO statements are correct?",
       "options": [
         {
-          "id": "A",
-          "text": "Using an existing application as the built-on template through this wizard requires saving that application as a template"
-        },
-        {
           "id": "B",
           "text": "Created assets except Access Roles go into a Branch; this is a placement exception"
         },
         {
-          "id": "C",
-          "text": "Import always overwrites and deletes all existing Case Types in the target application"
+          "id": "A",
+          "text": "Using an existing application as the built-on template through this wizard requires saving that application as a template"
         },
         {
           "id": "D",
           "text": "Only the Business Analyst, as the Blueprint author, can perform the import"
+        },
+        {
+          "id": "C",
+          "text": "Import always overwrites and deletes all existing Case Types in the target application"
         }
       ],
       "correctOptions": [
@@ -648,20 +648,20 @@
       "scenario": "A team choosing an industry template in Blueprint asks what value the template provides beyond a blank starting point. What is the correct answer?",
       "options": [
         {
-          "id": "A",
-          "text": "Templates instantly apply decades of Pega's accumulated best-practice expertise to the proposed application design"
-        },
-        {
-          "id": "B",
-          "text": "Templates provide random sample data records for populating the demo environment with realistic test data"
+          "id": "D",
+          "text": "Templates contain only Access Role definitions specific to the chosen industry, with no Case Type or workflow content"
         },
         {
           "id": "C",
           "text": "Templates provide server provisioning scripts pre-configured for the chosen industry's compliance requirements"
         },
         {
-          "id": "D",
-          "text": "Templates contain only Access Role definitions specific to the chosen industry, with no Case Type or workflow content"
+          "id": "A",
+          "text": "Templates instantly apply decades of Pega's accumulated best-practice expertise to the proposed application design"
+        },
+        {
+          "id": "B",
+          "text": "Templates provide random sample data records for populating the demo environment with realistic test data"
         }
       ],
       "correctOptions": [
@@ -688,16 +688,16 @@
           "text": "Describe in business terms → Receive AI proposal → Refine the proposal → Export/import into Pega Platform"
         },
         {
-          "id": "B",
-          "text": "Export/import into Pega Platform → Describe in business terms → Receive AI proposal → Refine the proposal"
-        },
-        {
           "id": "C",
           "text": "Receive AI proposal → Describe in business terms → Refine the proposal → Export/import into Pega Platform"
         },
         {
           "id": "D",
           "text": "Describe in business terms → Export/import into Pega Platform → Receive AI proposal → Refine the proposal"
+        },
+        {
+          "id": "B",
+          "text": "Export/import into Pega Platform → Describe in business terms → Receive AI proposal → Refine the proposal"
         }
       ],
       "correctOptions": [
@@ -720,20 +720,20 @@
       "scenario": "A team is using Pega Blueprint to accelerate the design of a new Customer Service application. Which TWO statements correctly describe the Pega Blueprint workflow?",
       "options": [
         {
-          "id": "A",
-          "text": "The Describe phase uses AI to generate a structured application Blueprint from a natural language business description"
+          "id": "D",
+          "text": "The Describe phase permanently locks the Blueprint, preventing any refinements before import"
         },
         {
-          "id": "B",
-          "text": "The Refine phase allows the SA to review and adjust the AI-generated Blueprint before importing it into Pega Platform"
+          "id": "A",
+          "text": "The Describe phase uses AI to generate a structured application Blueprint from a natural language business description"
         },
         {
           "id": "C",
           "text": "The Import phase requires the SA to manually recreate all Rules in Dev Studio based on the generated Blueprint PDF"
         },
         {
-          "id": "D",
-          "text": "The Describe phase permanently locks the Blueprint, preventing any refinements before import"
+          "id": "B",
+          "text": "The Refine phase allows the SA to review and adjust the AI-generated Blueprint before importing it into Pega Platform"
         }
       ],
       "correctOptions": [
@@ -757,20 +757,20 @@
       "scenario": "An SA is explaining when to use Pega Blueprint versus App Studio to a business stakeholder. Which TWO statements correctly differentiate the two tools?",
       "options": [
         {
-          "id": "A",
-          "text": "Pega Blueprint uses AI to accelerate the initial application design phase, generating a Case Type outline from a business description"
-        },
-        {
           "id": "B",
           "text": "App Studio is used to configure and refine the actual Pega Rules and Case Type logic after the Blueprint has been imported"
         },
         {
-          "id": "C",
-          "text": "Pega Blueprint replaces App Studio entirely once a Blueprint is generated, eliminating the need for any further Rule configuration"
-        },
-        {
           "id": "D",
           "text": "App Studio must be used first to generate the initial Blueprint before Pega Blueprint can be launched"
+        },
+        {
+          "id": "A",
+          "text": "Pega Blueprint uses AI to accelerate the initial application design phase, generating a Case Type outline from a business description"
+        },
+        {
+          "id": "C",
+          "text": "Pega Blueprint replaces App Studio entirely once a Blueprint is generated, eliminating the need for any further Rule configuration"
         }
       ],
       "correctOptions": [

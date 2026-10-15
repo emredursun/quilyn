@@ -64,6 +64,7 @@
       (v.startedAt === undefined || date(v.startedAt)) &&
       (v.deadline === undefined || number(v.deadline,0,1e15)) &&
       (v.signature === undefined || typeof v.signature === 'string' && v.signature.length <= 1000000) &&
+      (v.optionOrderVersion === undefined || v.optionOrderVersion === 1) &&
       (v.flags === undefined || Array.isArray(v.flags) && v.flags.length === v.answers.length && v.flags.every(function(b){return typeof b==='boolean';})) &&
       (v.index === undefined || integer(v.index,0,Math.max(0,v.answers.length-1))) &&
       (v.view === undefined || ['single','list'].includes(v.view)) && typeof v.name === 'string' &&
@@ -149,7 +150,7 @@
         var modern = value.version === 2, entries = modern ? value.answers : value;
         for (var id of Object.keys(entries)) {
           var question = modern ? data.practiceQuiz.find(function(q) { return q.questionId === id; }) : data.practiceQuiz[Number(id)];
-          if (modern && (!question || entries[id].signature !== quizSignature(question))) { unknown.push(key + '/' + id); continue; }
+          if (modern && (!question || !matchesQuizSignature(question, entries[id].signature))) { unknown.push(key + '/' + id); continue; }
           if (!question || !entries[id].selected.every(function(option) { return question.options.some(function(o) { return o.id === option; }); }))
             throw new Error('Quiz answers do not match available content: ' + key);
           if (question.type === 'single-select' && entries[id].selected.length > 1) throw new Error('Single-select quiz has multiple answers: ' + key);
@@ -183,6 +184,10 @@
   function quizSignature(q) {
     return JSON.stringify([q.type, q.scenario, q.options.map(function(o) { return [o.id,o.text]; }).sort(function(a,b) { return a[0].localeCompare(b[0]); }), q.correctOptions.slice().sort()]);
   }
+  // Reviewed wording edits retain their exact previous signatures, never just an ID.
+  function matchesQuizSignature(q, signature) {
+    return signature === quizSignature(q) || (q.previousSignatures || []).indexOf(signature) >= 0;
+  }
   function quizState(saved, questions) {
     var next = {version:2, answers:{}};
     if (saved.attemptId) next.attemptId=saved.attemptId;
@@ -190,7 +195,7 @@
     questions.forEach(function(q,i) {
       var modern = saved.version === 2, prior = modern ? saved.answers[q.questionId] : saved[i];
       var signature = quizSignature(q);
-      if (!prior || modern && prior.signature !== signature) return;
+      if (!prior || modern && !matchesQuizSignature(q, prior.signature)) return;
       if (!prior.selected.every(function(id) { return q.options.some(function(o) { return o.id === id; }); })) return;
       next.answers[q.questionId] = Object.assign({}, prior, {signature:signature});
     });

@@ -18,6 +18,8 @@ const scripts = readdirSync(join(root, 'scripts')).filter(file => file.endsWith(
 for (const file of [...sourceFiles, ...interactiveFiles, 'sw.js', ...scripts]) run(['--check', file]);
 console.log(`Syntax verified: ${sourceFiles.length + interactiveFiles.length + scripts.length + 1} JavaScript files.`);
 run(['scripts/validate-content.mjs']);
+run(['scripts/audit-quiz-bias.mjs', '--check']);
+run(['scripts/audit-topic-quizzes.mjs', '--check']);
 run(['scripts/interactive-assets.mjs', '--check']);
 run(['scripts/content-quality.mjs', '--check']);
 run(['scripts/library-index.mjs', '--check']);

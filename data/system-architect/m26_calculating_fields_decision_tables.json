@@ -71,7 +71,7 @@
           "type": "interactive",
           "title": "Pick the calculation type",
           "height": 440,
-          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\nvar S=[{\"label\": \"Sum across a list\", \"scenario\": \"An order total must aggregate the already calculated cost of every line item. Which basic aggregate calculation choice fits directly?\", \"opts\": [\"A Function — the Sum of function iterates over the list of line items and adds their costs\", \"An Expression — reference a single field with the dot operator\", \"A Decision table — test conditions to return the total\", \"A When condition — return true when the total is reached\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Functions iterate over items in a list; Sum of adds all the line-item costs to produce the order total.\", \"✗ Incorrect. The offered single-field reference does not aggregate all line costs. Expressions may use functions, so do not interpret this as a universal expression limitation.\", \"✗ Incorrect. A Decision table returns a result from logical tests on conditions, not a running sum over a list.\", \"✗ Incorrect. A When condition returns true/false; it is not one of the three App Studio calculation types.\"]}, {\"label\": \"Formula from fields\", \"scenario\": \"Order tax must equal the tax rate multiplied by the order total: .TaxRate * .OrderTotal. Which calculation type is this?\", \"opts\": [\"An Expression — it references fields with the dot operator and supports multiplication\", \"A Function — Maximum of returns the product of two fields\", \"A Decision table — multiplication is a logical test on conditions\", \"Concatenation — joining .TaxRate and .OrderTotal produces the tax\"], \"correct\": 0, \"fbs\": [\"✓ Correct. An expression references fields by name (dot operator) and supports operations like multiplication — .TaxRate * .OrderTotal.\", \"✗ Incorrect. Maximum of finds the largest item in a list; it does not multiply two fields.\", \"✗ Incorrect. A Decision table returns a result from conditions; multiplication is an expression operation.\", \"✗ Incorrect. Concatenation assembles TEXT strings, not a numeric product.\"]}, {\"label\": \"Result from conditions\", \"scenario\": \"The interest rate for a loan must be selected from the loan type using a set of logical tests. The app is NOT based on Constellation. How do you make this work in App Studio?\", \"opts\": [\"Build the Decision table in Dev Studio, mark it as a relevant record, then reference it from App Studio\", \"Create a custom Decision table directly in App Studio — always available regardless of UI architecture\", \"Use the Sum of function on the loan type list\", \"Use a concatenation expression to join loan type and rate\"], \"correct\": 0, \"fbs\": [\"✓ Correct. Custom Decision tables in App Studio require Constellation. Otherwise, build it in Dev Studio and mark it as a relevant record so App Studio can reference it.\", \"✗ Incorrect. Creating a CUSTOM Decision table directly in App Studio is supported only on Constellation-based applications.\", \"✗ Incorrect. Sum of adds list items — it cannot select a rate from the loan type via logical tests.\", \"✗ Incorrect. Concatenation builds text strings; it does not perform conditional rate selection.\"]}],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=67?'Good \\u2014 review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
+          "html": "<!doctype html><html data-theme=\"__THEME__\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"><style>:root[data-theme=\"dark\"]{--bg:#171d34;--card:#1d2542;--ink:#eef1fb;--soft:#c8cee6;--line:rgba(255,255,255,.14);--brand:#6d8bff;--ok:#34d399;--okbg:rgba(52,211,153,.16);--bad:#fb7185;--badbg:rgba(251,113,133,.16)}\n:root[data-theme=\"light\"]{--bg:#f3f6fc;--card:#ffffff;--ink:#14182b;--soft:#39415f;--line:rgba(18,22,45,.14);--brand:#5566e6;--ok:#0f9d6e;--okbg:rgba(15,157,110,.14);--bad:#e11d48;--badbg:rgba(225,29,72,.10)}\n*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);padding:14px}\n.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:10px}\n.lbl{font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;color:var(--soft);margin-bottom:8px}\n.sc{font-size:13.5px;font-weight:600;line-height:1.55;margin-bottom:12px}\n.opt{display:block;width:100%;text-align:left;margin:5px 0 0;padding:11px 14px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink);font-size:13px;font-weight:500;cursor:pointer;transition:.15s}\n.opt:hover:not(:disabled){border-color:var(--brand)}.opt.ok{background:var(--okbg);border-color:var(--ok);cursor:default}.opt.bad{background:var(--badbg);border-color:var(--bad);cursor:default}.opt:disabled{cursor:default}\n.fb{margin-top:10px;font-size:12.5px;line-height:1.5;border-left:3px solid var(--line);padding-left:10px;color:var(--soft)}.fb.ok{border-color:var(--ok);color:var(--ink)}.fb.bad{border-color:var(--bad);color:var(--ink)}\n.prog{font-size:12px;font-weight:700;color:var(--brand);margin-bottom:10px}\n.btn{margin-top:10px;background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;padding:7px 16px;font-size:12.5px;cursor:pointer;font-family:inherit}.btn:hover{border-color:var(--brand);color:var(--ink)}.btn.p{background:var(--brand);color:#fff;border-color:var(--brand)}.btn.p:hover{opacity:.88}\n.sb{font-size:22px;font-weight:800;color:var(--brand);text-align:center;margin:8px 0 4px}.sm{font-size:13px;color:var(--soft);text-align:center}</style></head><body>\n<div class=\"prog\" id=\"prog\"></div><div class=\"card\" id=\"qc\"></div><div id=\"nav\"></div><script>(function(){var r=document.documentElement;function a(t){r.setAttribute('data-theme',t);}a('__THEME__');window.addEventListener('message',function(e){if(e.data&&e.data.type==='pa-theme')a(e.data.theme);});})()</script>\n<script>\n/* quilyn-topic-balance-v1 */\nvar S=[\n  {\n    \"label\": \"Sum across a list\",\n    \"scenario\": \"An order total must aggregate the already calculated cost of every line item. Which basic aggregate calculation choice fits directly?\",\n    \"opts\": [\n      \"A When condition\",\n      \"Decision table: conditions\",\n      \"Expression: field reference\",\n      \"Function: Sum of\"\n    ],\n    \"correct\": 3,\n    \"fbs\": [\n      \"✗ Incorrect. A When condition returns true/false; it is not one of the three App Studio calculation types.\",\n      \"✗ Incorrect. A Decision table returns a result from logical tests on conditions, not a running sum over a list.\",\n      \"✗ Incorrect. The offered single-field reference does not aggregate all line costs. Expressions may use functions, so do not interpret this as a universal expression limitation.\",\n      \"✓ Correct. Functions iterate over items in a list; Sum of adds all the line-item costs to produce the order total.\"\n    ]\n  },\n  {\n    \"label\": \"Formula from fields\",\n    \"scenario\": \"Order tax must equal the tax rate multiplied by the order total: .TaxRate * .OrderTotal. Which calculation type is this?\",\n    \"opts\": [\n      \"Expression: field multiplication\",\n      \"Text concatenation\",\n      \"Function: Maximum of\",\n      \"Decision table: conditions\"\n    ],\n    \"correct\": 0,\n    \"fbs\": [\n      \"✓ Correct. An expression references fields by name (dot operator) and supports operations like multiplication — .TaxRate * .OrderTotal.\",\n      \"✗ Incorrect. Concatenation assembles TEXT strings, not a numeric product.\",\n      \"✗ Incorrect. Maximum of finds the largest item in a list; it does not multiply two fields.\",\n      \"✗ Incorrect. A Decision table returns a result from conditions; multiplication is an expression operation.\"\n    ]\n  },\n  {\n    \"label\": \"Result from conditions\",\n    \"scenario\": \"The interest rate for a loan must be selected from the loan type using a set of logical tests. The app is NOT based on Constellation. How do you make this work in App Studio?\",\n    \"opts\": [\n      \"Create a custom Decision table directly in App Studio — always available regardless of UI architecture\",\n      \"Use a concatenation expression to join loan type and rate\",\n      \"Build the Decision table in Dev Studio, mark it as a relevant record, then reference it from App Studio\",\n      \"Use the Sum of function on the loan type list\"\n    ],\n    \"correct\": 2,\n    \"fbs\": [\n      \"✗ Incorrect. Creating a CUSTOM Decision table directly in App Studio is supported only on Constellation-based applications.\",\n      \"✗ Incorrect. Concatenation builds text strings; it does not perform conditional rate selection.\",\n      \"✓ Correct. Custom Decision tables in App Studio require Constellation. Otherwise, build it in Dev Studio and mark it as a relevant record so App Studio can reference it.\",\n      \"✗ Incorrect. Sum of adds list items — it cannot select a rate from the loan type via logical tests.\"\n    ]\n  }\n],cur=0,score=0;\nfunction render(){var s=S[cur];document.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' \\u2014 Score: '+score+'/'+S.length;\nvar h='<div class=\"lbl\">'+s.label+'</div><div class=\"sc\">'+s.scenario+'</div>';\ns.opts.forEach(function(o,i){h+='<button class=\"opt\" onclick=\"ans('+i+')\">'+o+'</button>';});\ndocument.getElementById('qc').innerHTML=h;document.getElementById('nav').innerHTML='';}\nfunction ans(i){var s=S[cur];var bs=document.querySelectorAll('.opt');bs.forEach(function(b){b.disabled=true;});\nvar ok=i===s.correct;if(ok)score++;\ndocument.getElementById('prog').textContent='Scenario '+(cur+1)+' of '+S.length+' — Score: '+score+'/'+S.length;\ns.opts.forEach(function(o,j){bs[j].className=j===s.correct?'opt ok':(j===i&&!ok?'opt bad':'opt');});\nvar fb=document.createElement('div');fb.className='fb '+(ok?'ok':'bad');fb.textContent=s.fbs[i];\ndocument.getElementById('qc').appendChild(fb);\nif(cur<S.length-1)document.getElementById('nav').innerHTML='<button class=\"btn p\" onclick=\"nxt()\">Next \\u2192</button>';\nelse done();}\nfunction nxt(){cur++;render();}\nfunction done(){var p=Math.round(score/S.length*100);var m=p===100?'Perfect.':p>=67?'Good \\u2014 review the missed items.':'Re-read the module content and retry.';\ndocument.getElementById('qc').innerHTML='<div class=\"sb\">'+score+'/'+S.length+' ('+p+'%)</div><div class=\"sm\">'+m+'</div>';\ndocument.getElementById('nav').innerHTML='<button class=\"btn\" onclick=\"restart()\">Restart</button>';}\nfunction restart(){cur=0;score=0;render();}\nrender();\n</script></body></html>"
         },
         {
           "type": "diagram",
@@ -162,20 +162,20 @@
       "scenario": "An SA is reviewing the options available for configuring Calculated Value fields in App Studio and a junior developer asks what types of calculation logic are supported. Which three calculation types does App Studio provide when configuring a Calculated Value field?",
       "options": [
         {
-          "id": "A",
-          "text": "Functions, Expressions, and Decision tables"
-        },
-        {
           "id": "B",
           "text": "Expressions, Decision tables, and Decision trees"
+        },
+        {
+          "id": "D",
+          "text": "Data transforms, Activities, and Expressions"
         },
         {
           "id": "C",
           "text": "Functions, When conditions, and Decision trees"
         },
         {
-          "id": "D",
-          "text": "Data transforms, Activities, and Expressions"
+          "id": "A",
+          "text": "Functions, Expressions, and Decision tables"
         }
       ],
       "correctOptions": [
@@ -198,20 +198,20 @@
       "scenario": "What do Functions iterate over, and which field types do they support?",
       "options": [
         {
-          "id": "A",
-          "text": "They iterate over items in a data relationship (a list) and support Decimal, Currency, and Integer field types"
-        },
-        {
           "id": "B",
           "text": "They iterate over rows of a Decision table and support Text and Date types"
         },
         {
-          "id": "C",
-          "text": "They iterate over Stages in a Case and support any field type"
-        },
-        {
           "id": "D",
           "text": "They iterate over Access Roles and support Boolean fields only"
+        },
+        {
+          "id": "A",
+          "text": "They iterate over items in a data relationship (a list) and support Decimal, Currency, and Integer field types"
+        },
+        {
+          "id": "C",
+          "text": "They iterate over Stages in a Case and support any field type"
         }
       ],
       "correctOptions": [
@@ -234,12 +234,12 @@
       "scenario": "Each shopping-cart line already has a calculated cost including its quantity. Which aggregate function produces the order total from those line costs?",
       "options": [
         {
-          "id": "A",
-          "text": "Sum of — adds all items in the specified property instances"
-        },
-        {
           "id": "B",
           "text": "Average of — calculates the average value of all instances"
+        },
+        {
+          "id": "A",
+          "text": "Sum of — adds all items in the specified property instances"
         },
         {
           "id": "C",
@@ -270,20 +270,20 @@
       "scenario": "Each eligible promotional discount has a comparable numeric monetary value. Which function selects the largest value from that list?",
       "options": [
         {
-          "id": "A",
-          "text": "Maximum of — determines the largest value among the discounts"
-        },
-        {
-          "id": "B",
-          "text": "Minimum of — determines the smallest value among the discounts"
-        },
-        {
           "id": "C",
           "text": "Sum of — adds all the discounts together"
         },
         {
           "id": "D",
           "text": "Average of — averages the discounts"
+        },
+        {
+          "id": "A",
+          "text": "Maximum of — determines the largest value among the discounts"
+        },
+        {
+          "id": "B",
+          "text": "Minimum of — determines the smallest value among the discounts"
         }
       ],
       "correctOptions": [
@@ -306,8 +306,8 @@
       "scenario": "In an expression, how do you reference a field, and what does the symbol provide?",
       "options": [
         {
-          "id": "A",
-          "text": "The dot operator ('.') references a field by name and lists the fields available in the current Case context"
+          "id": "D",
+          "text": "The slash ('/') references a field and lists the Case Stages"
         },
         {
           "id": "B",
@@ -318,8 +318,8 @@
           "text": "The hash symbol ('#') references a field and lists every Ruleset version"
         },
         {
-          "id": "D",
-          "text": "The slash ('/') references a field and lists the Case Stages"
+          "id": "A",
+          "text": "The dot operator ('.') references a field by name and lists the fields available in the current Case context"
         }
       ],
       "correctOptions": [
@@ -378,20 +378,20 @@
       "scenario": "An appraisal firm wants a comment like 'Appraiser 04795AD appraised Silver platter at a value of USD 350.' assembled from field values and static text. Which expression technique is this?",
       "options": [
         {
-          "id": "A",
-          "text": "Concatenation — combine field references with static text in quotation marks using '+'"
-        },
-        {
-          "id": "B",
-          "text": "A Sum of function over the text fields"
-        },
-        {
           "id": "C",
           "text": "A Decision table that returns the full sentence"
         },
         {
+          "id": "A",
+          "text": "Concatenation — combine field references with static text in quotation marks using '+'"
+        },
+        {
           "id": "D",
           "text": "A Boolean AND expression that joins the fields"
+        },
+        {
+          "id": "B",
+          "text": "A Sum of function over the text fields"
         }
       ],
       "correctOptions": [
@@ -414,20 +414,20 @@
       "scenario": "Setting a loan's interest rate by evaluating the loan type against a set of logical tests is best implemented with which calculation type?",
       "options": [
         {
-          "id": "A",
-          "text": "A Decision table — it evaluates fields with logical tests to return an appropriate result"
-        },
-        {
           "id": "B",
           "text": "A Function — Sum of returns the interest rate from the loan type"
         },
         {
-          "id": "C",
-          "text": "An Expression — multiply the loan type by a coefficient"
-        },
-        {
           "id": "D",
           "text": "Concatenation — join the loan type and a default rate"
+        },
+        {
+          "id": "A",
+          "text": "A Decision table — it evaluates fields with logical tests to return an appropriate result"
+        },
+        {
+          "id": "C",
+          "text": "An Expression — multiply the loan type by a coefficient"
         }
       ],
       "correctOptions": [
@@ -450,20 +450,20 @@
       "scenario": "A System Architect built a decision table in Dev Studio. What must be done so a Citizen Developer can reference it in App Studio?",
       "options": [
         {
-          "id": "A",
-          "text": "Mark the decision table as a relevant record"
+          "id": "C",
+          "text": "Assign the table to an Access Role"
         },
         {
           "id": "B",
           "text": "Lock the Ruleset version that contains the table"
         },
         {
-          "id": "C",
-          "text": "Assign the table to an Access Role"
-        },
-        {
           "id": "D",
           "text": "Add the table to a Work Queue"
+        },
+        {
+          "id": "A",
+          "text": "Mark the decision table as a relevant record"
         }
       ],
       "correctOptions": [
@@ -486,20 +486,20 @@
       "scenario": "Under what condition can a custom decision table be created directly in App Studio?",
       "options": [
         {
-          "id": "A",
-          "text": "Only when the application is based on Constellation"
-        },
-        {
-          "id": "B",
-          "text": "Always — App Studio supports custom decision tables in every application"
-        },
-        {
           "id": "C",
           "text": "Only when the user has a System Architect Access Role"
         },
         {
+          "id": "A",
+          "text": "Only when the application is based on Constellation"
+        },
+        {
           "id": "D",
           "text": "Only when the Ruleset is unlocked in Dev Studio"
+        },
+        {
+          "id": "B",
+          "text": "Always — App Studio supports custom decision tables in every application"
         }
       ],
       "correctOptions": [
@@ -560,20 +560,20 @@
       "scenario": "An SA is recommending a calculation approach for an insurance application where premium rate depends on age brackets and coverage type. Which TWO statements correctly describe when a Decision table is the appropriate calculation type?",
       "options": [
         {
-          "id": "A",
-          "text": "A Decision table is appropriate when the calculated value depends on evaluating discrete input ranges or categories that map to specific output values"
-        },
-        {
-          "id": "B",
-          "text": "A row can test multiple input conditions, all of which must match for that row’s result under the described standard evaluation"
-        },
-        {
           "id": "C",
           "text": "A Decision table is the best choice when the calculation is a simple arithmetic formula such as price multiplied by quantity"
         },
         {
           "id": "D",
           "text": "Decision tables can return only numbers, never a supported text result"
+        },
+        {
+          "id": "B",
+          "text": "A row can test multiple input conditions, all of which must match for that row’s result under the described standard evaluation"
+        },
+        {
+          "id": "A",
+          "text": "A Decision table is appropriate when the calculated value depends on evaluating discrete input ranges or categories that map to specific output values"
         }
       ],
       "correctOptions": [
@@ -601,23 +601,22 @@
           "text": "Functions — basic aggregate choices such as Sum of or Maximum of over a list relationship"
         },
         {
-          "id": "B",
-          "text": "Decision tables — condition-outcome mappings that return a value based on evaluated field inputs"
-        },
-        {
           "id": "C",
           "text": "Machine Learning model — a predictive model trained on historical Case data to forecast the field value"
         },
         {
           "id": "D",
           "text": "Direct SQL query — a raw database query executed against the Pega schema to compute the field value"
+        },
+        {
+          "id": "B",
+          "text": "Decision tables — condition-outcome mappings that return a value based on evaluated field inputs"
         }
       ],
       "correctOptions": [
         "A",
         "B"
       ],
-      "hint": "App Studio offers three calculation types: Functions, Expressions, and Decision tables — no ML or SQL.",
       "rationale": "The reviewed App Studio calculation choices include basic aggregate Functions and Decision tables, as well as Expressions. ML prediction and direct SQL are not the named calculation types; callable expression functions are not the same as these aggregate choices.",
       "optionExplanations": {
         "A": "These aggregate choices are the Function category in the reviewed calculation list, distinct from arbitrary callable expression functions.",
