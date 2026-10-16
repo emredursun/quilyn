@@ -57,7 +57,7 @@ test('unknown bookmark references are preserved and reported during backup impor
 test('scrolling back to the toolbar does not erase the last reading section and listeners are cleaned up',()=>{
  const {s,context}=setup();const events={};context.window.addEventListener=(name,fn)=>events[name]=fn;context.window.removeEventListener=(name,fn)=>{if(events[name]===fn)delete events[name];};
  const controls={},toolbar={setAttribute(){},querySelector(id){return controls[id]||(controls[id]={setAttribute(){},classList:{add(){}}});}},tab={dataset:{v:'guide'},click(){}};let headingTop=-10;const heading={textContent:'Section two',getBoundingClientRect:()=>({top:headingTop})};
- const root={isConnected:true,querySelector(selector){return selector==='.sp-section-bar'?{before(){},appendChild(){},getBoundingClientRect:()=>({bottom:140})}:tab;},querySelectorAll:()=>[heading]};context.document.createElement=()=>toolbar;
+ const root={isConnected:true,querySelector(selector){if(selector==='#v-guide')return null;return selector==='.sp-section-bar'?{before(){},appendChild(){},getBoundingClientRect:()=>({bottom:140})}:tab;},querySelectorAll:()=>[heading]};context.document.createElement=()=>toolbar;
  s.attachLesson(root,'PSSA','M1');events.scroll();headingTop=900;events.scroll();s.leaveLesson();assert.equal(s.preferences('PSSA').positions.M1.section,'Section two');assert.equal(events.scroll,undefined);
 });
 
@@ -96,7 +96,7 @@ test('study workspace separates saved collection from daily planning and escapes
  const s=env.context.window.QuilynStudy,p=preferences(),t={...track,trackName:'Track <unsafe>'},plan=s.recommend(t,user(),{mistakes:{}},p,date),saved=[{id:'M1',name:'Saved <script>lesson</script>'}];
  const bookmarks=s.workspace(t,p,plan,saved,[],'Estimate','', 'bookmarks',date);
  assert.ok(bookmarks.includes('id="sp-search"'));assert.ok(bookmarks.includes('aria-current="page"'));assert.ok(bookmarks.includes('data-remove="M1"'));assert.ok(bookmarks.includes('&lt;script&gt;'));assert.ok(!bookmarks.includes('<script>'));assert.ok(!bookmarks.includes('id="sp-form"'));assert.ok(!bookmarks.includes('TODAY’S FOCUS'));
- const daily=s.workspace(t,p,plan,saved,[],'Estimate','',null,date);assert.ok(daily.includes('id="sp-form"'));assert.ok(daily.includes('Suggested time, not completed time'));assert.ok(daily.includes('How the estimate works'));assert.ok(!daily.includes('data-remove='));assert.equal((daily.match(/>Start activity /g)||[]).length,1);
+ const daily=s.workspace(t,p,plan,saved,[],'Estimate','',null,date);assert.ok(daily.includes('id="sp-form"'));assert.ok(daily.includes('Planned study blocks, not completed time'));assert.ok(daily.includes('How the budget works'));assert.ok(!daily.includes('data-remove='));assert.equal((daily.match(/>Start activity /g)||[]).length,1);
  const empty=s.workspace(t,p,plan,[],[],'Estimate','', 'bookmarks',date);assert.ok(empty.includes('Build your revision shortlist'));assert.ok(empty.includes('href="#home"'));
 });
 
@@ -107,4 +107,20 @@ test('PSA legacy SRS IDs count scheduled cards without migrating saved identitie
  const plan=s.recommend(psa,state,{mistakes:{}},preferences(),date);
  assert.equal(plan.due,1);assert.equal(plan.actions[0].id,'review');assert.equal(JSON.stringify(cards),before);
  assert.equal(p.moduleId('PSA','m48'),'SA-M48');assert.equal(p.moduleId('PSA','m49'),'m49');assert.equal(p.moduleId('PBA','m01'),'m01');
+});
+
+test('study blocks remain separate from authored module durations and do not mutate existing preferences',()=>{
+ const {s}=setup(),p=preferences(),before=JSON.stringify(p),t={...track,modules:[{id:'M1',name:'Long lesson',studyArea:'Foundations',studyEstimate:'55 min · 5 topics'},{id:'M2',name:'Ranged lesson',studyEstimate:'15–20 min + practice'}]};
+ const plan=s.recommend(t,user(),{mistakes:{}},p,date);assert.equal(plan.actions[0].minutes,20);assert.equal(plan.actions[0].moduleEstimate,'55 min · 5 topics');assert.equal(plan.actions[1].minutes,10);assert.equal(plan.actions[1].moduleEstimate,'15–20 min + practice');assert.equal(plan.actions[0].topic,'Foundations');assert.match(plan.actions[0].url,/\/guide$/);assert.match(plan.actions[0].reason,/course order/);assert.equal(JSON.stringify(p),before);
+});
+test('plan presentation preserves ranges, reference-only resources and unknown duration without a completion promise',()=>{
+ const {s,context}=setup();vm.runInNewContext(fs.readFileSync('core/js/study-plan.js','utf8').replace('global.QuilynStudy={','global.QuilynStudy={workspace:workspace,'),context);
+ for(const [estimate,expected] of [['15–20 min + practice','15–20 min + practice'],['Reference','Reference material · no duration provided'],[null,'Duration not documented'],['<script>','&lt;script&gt;']]){
+  const p=preferences(),t={...track,modules:[{id:'M1',name:'Lesson',studyEstimate:estimate}]},plan=s.recommend(t,user(),{mistakes:{}},p,date),html=context.window.QuilynStudy.workspace(t,p,plan,[],[],'Time budget','',null,date);
+  assert.ok(html.includes(expected));assert.match(html,/20 MIN TODAY/);assert.match(html,/Why these activities/);assert.doesNotMatch(html,/MIN ESTIMATE|Your budget covers|<script>/);
+ }
+});
+test('every module duration in the registry matches its authored content verbatim',()=>{
+ const registry=JSON.parse(fs.readFileSync('data/registry.json'));
+ for(const t of registry.tracks)for(const m of t.modules){if(m.ready===false)continue;const d=JSON.parse(fs.readFileSync(m.file));assert.equal(m.studyEstimate,d.estTime||null,m.id);}
 });

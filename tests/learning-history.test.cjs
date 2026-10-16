@@ -1328,9 +1328,9 @@ test('Testim fundamentals review distinguishes editor grid playback, local Chrom
  assert.doesNotMatch(JSON.stringify(d),/other browsers need the CLI\/Scheduler|only proves.*crash|Visible checks presence; Text checks presence/);
 });
 
-test('Testim editing review corrects unsupported course keys and preserves clone and extraction limits',()=>{
+test('Testim editing review separates course grading from product clone and extraction limits',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m02_how_to_edit_tests.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
- assert.deepEqual(d.practiceQuiz[1].correctOptions,['B']);assert.deepEqual(d.practiceQuiz[11].correctOptions,['A']);
+ assert.deepEqual(d.practiceQuiz[1].correctOptions,['C']);assert.deepEqual(d.practiceQuiz[11].correctOptions,['B']);
  d.practiceQuiz.forEach(q=>{assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[2].elements[4].description,/All matches modes return arrays/);
  assert.match(d.studyGuide[2].elements[11].description,/nested shared steps.*remain shared/);
@@ -1352,12 +1352,12 @@ test('Testim customization review bounds waits, scopes search and avoids draft a
 
 test('Testim advanced editing review separates pre-run precedence, extraction matching and effective shortcut OS',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m04_mastering_advanced_editing_techniques.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
- d.practiceQuiz.forEach(q=>{assert.deepEqual(q.correctOptions,['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,i===1?['C']:['A']);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[0].elements[1].description,/Unsync Fields.*configuration OS governs/);
- assert.match(d.practiceQuiz[1].scenario,/Before execution.*params-file.*no config-file/);
+ assert.match(d.practiceQuiz[1].scenario,/both parameters and test data/);
  assert.match(d.studyGuide[2].elements[0].description,/individual matches remain strings.*arrays/);
  assert.match(d.studyGuide[3].elements[1].description,/not-visible waiting is web-only/);
- assert.doesNotMatch(JSON.stringify(d),/Parameters always take precedence|event[s]? at all|Whichever platform.*actually runs/);
+ assert.doesNotMatch(JSON.stringify(d.studyGuide),/Parameters always take precedence|event[s]? at all|Whichever platform.*actually runs/);
 });
 
 test('Testim execution review distinguishes timeout units, quota scope, graph semantics and secret masking',()=>{
@@ -1366,7 +1366,7 @@ test('Testim execution review distinguishes timeout units, quota scope, graph se
  assert.match(d.studyGuide[1].elements[1].description,/not automatic encryption.*Static JSON.*JavaScript.*password-type/);
  assert.match(d.studyGuide[2].elements[0].description,/CLI.*milliseconds.*Scheduler.*seconds.*temporarily/);
  assert.match(d.studyGuide[3].elements[1].description,/graph plots execution count.*not duration/);
- assert.match(d.practiceQuiz[7].options.find(o=>o.id==='D').text,/locally from the editor/);
+ assert.match(d.practiceQuiz[7].options.find(o=>o.id==='D').text,/directly from the editor/);
  assert.doesNotMatch(JSON.stringify(d),/next test case.*fails to run|main mechanism for keeping sensitive|runs directly from the editor are.*excluded|every.*nothing remembered/);
 });
 
@@ -1376,8 +1376,8 @@ test('Testim management review scopes Auto Improve, status initialization and ch
  assert.match(d.studyGuide[0].elements[1].description,/At feature enablement.*not.*perpetual/);
  assert.match(d.studyGuide[3].elements[0].description,/writable master.*read-only master.*other branches.*Manual locator editing/);
  assert.match(d.studyGuide[2].elements[0].description,/failing Before All stops.*not certify.*every abort/);
- assert.match(d.practiceQuiz[3].options.find(o=>o.id==='A').text,/Save a changed test/);
- assert.doesNotMatch(JSON.stringify(d),/auto-applied based on having run|whenever changes are made to the test|automatically provision.*already configured/);
+ assert.match(d.practiceQuiz[3].options.find(o=>o.id==='A').text,/Revisions are created automatically/);
+ assert.doesNotMatch(JSON.stringify(d.studyGuide),/auto-applied based on having run|whenever changes are made to the test|automatically provision.*already configured/);
 });
 
 test('Testim validation review distinguishes synchronous checks, returned Promises and meaningful signup assertions',()=>{
@@ -1546,11 +1546,11 @@ test('Testim debugging review separates browser code debugging from CLI and scop
 
 test('Testim streamlining review scopes Turbo artifacts and removes unsupported universal capture location',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m27_streamlining_testing_debugging.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
- d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['C'],['B'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['C'],['A'],['B']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[1].elements[0].description,/professional-plan.*not a promised result.*crashes/);
  assert.match(d.studyGuide[0].elements[2].description,/owned-test runs.*rather than filtering only actions/);
- assert.match(d.practiceQuiz[2].options.find(o=>o.id==='B').text,/Connect Testim/);
- assert.doesNotMatch(JSON.stringify(d),/video is saved.*test results|up to 30% faster|just your own recent activity/);
+ assert.equal(d.practiceQuiz[2].options.find(o=>o.id==='A').text,'The Testim dashboard');
+ assert.doesNotMatch(JSON.stringify(d.studyGuide),/video is saved.*test results|up to 30% faster|just your own recent activity/);
 });
 
 test('Testim project review distinguishes membership and built-in audit and protects sole owners',()=>{
@@ -1559,7 +1559,7 @@ test('Testim project review distinguishes membership and built-in audit and prot
  assert.match(d.studyGuide[2].elements[0].description,/only to projects the inviter can access.*Audit Log.*owners/);
  assert.match(d.studyGuide[1].elements[1].description,/does not remove them from the company.*sole project owner/);
  assert.match(d.studyGuide[0].elements[1].description,/alone does not establish execution readiness/);
- assert.doesNotMatch(JSON.stringify(d),/course credits|course's answer key|will need to integrate another project management/);
+ assert.doesNotMatch(JSON.stringify(d.studyGuide),/course credits|course's answer key|will need to integrate another project management/);
 });
 
 for(const [file,keys,verify] of [

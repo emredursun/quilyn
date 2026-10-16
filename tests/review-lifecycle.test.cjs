@@ -49,6 +49,7 @@ test('each real track domain overview accounts for every loaded review card and 
   const counts=[...grid.innerHTML.matchAll(/0% \(0\/(\d+)\)/g)].map(m=>Number(m[1]));
   assert.match(sidebar.innerHTML,/<button type="button" id="rv-sb-start"/);assert.doesNotMatch(sidebar.innerHTML,/javascript:/);
   assert.equal(counts.reduce((a,b)=>a+b,0),expected,track.trackId);assert.ok(counts.every(n=>n>0),track.trackId);
-  if(track.trackId==='AE1'){assert.match(grid.innerHTML,/General/);assert.doesNotMatch(grid.innerHTML,/Case Management|Pega GenAI/);}
+  assert.doesNotMatch(grid.innerHTML,/>General</,track.trackId);
+  if(track.trackId==='AE1'){assert.match(grid.innerHTML,/Engine foundations/);assert.doesNotMatch(grid.innerHTML,/Case Management|Pega GenAI/);}
  }
 });

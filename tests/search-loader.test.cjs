@@ -1,0 +1,8 @@
+const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+function setup(){let resolve,reject,loads=0,shown=0,hidden=0,alerts=0;const events={},window={alert:()=>alerts++,QuilynRuntime:{search(){loads++;return new Promise((yes,no)=>{resolve=yes;reject=no;});}}};
+ vm.runInNewContext(fs.readFileSync('core/js/search.js','utf8'),{window,document:{addEventListener:(name,fn)=>events[name]=fn}});
+ return {api:window.PegaSearch,events,resolve(){window.PegaSearchView={show:()=>shown++,hide:()=>hidden++};resolve(window.PegaSearchView);},reject:()=>reject(Error('offline')),counts:()=>({loads,shown,hidden,alerts})};
+}
+test('the initial search loader deduplicates opens and reuses the loaded view',async()=>{const h=setup(),first=h.api.show();assert.equal(first,h.api.show());h.resolve();await first;await h.api.show();assert.deepEqual(h.counts(),{loads:1,shown:2,hidden:0,alerts:0});});
+test('hiding while search loads prevents a late modal from opening',async()=>{const h=setup(),pending=h.api.show();h.api.hide();h.resolve();await pending;assert.equal(h.counts().shown,0);await h.api.show();h.api.hide();assert.equal(h.counts().shown,1);assert.equal(h.counts().hidden,1);});
+test('a failed search view can be retried and the keyboard shortcut loads it on demand',async()=>{const h=setup();let prevented=false;h.events.keydown({key:'k',ctrlKey:true,preventDefault(){prevented=true;}});assert.equal(prevented,true);const pending=h.api.show();h.reject();await pending;assert.equal(h.counts().alerts,1);const retry=h.api.show();h.resolve();await retry;assert.equal(h.counts().loads,2);assert.equal(h.counts().shown,1);});

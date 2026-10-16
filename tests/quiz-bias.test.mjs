@@ -62,7 +62,7 @@ test('source corrections preserve old attempts for review rather than silently r
   for(const signed of [false,true]){const saved={name:g.name,remaining:60,answers:g.questions.map(()=>[0]),checked:g.questions.map(()=>true),...(signed?{signature:'original-bank-signature'}:{})};const before=JSON.stringify(saved);const result=migrate(saved,g.questions,()=> 'current');assert.equal(result.requiresContentReview,true);assert.equal(JSON.stringify(saved),before);assert.deepEqual(JSON.parse(JSON.stringify(result.answers)),saved.answers);}
   const modern={optionOrderVersion:1,answers:g.questions.map(()=>[])};assert.equal(migrate(modern,g.questions,()=>''),modern);
   for(const [i,q]of g.questions.entries())if(q.answerReviewVersion){assert.ok(q.previousQuestion);const snapshot=j.mockQuestion(g.track,g.name,q.previousQuestion,i);assert.equal(snapshot.scenario,q.previousQuestion.q);assert.deepEqual(Array.from(snapshot.correct),q.previousQuestion.a.map(a=>String.fromCharCode(65+a)));}
- }assert.equal(affected,5);
+ }assert.equal(affected,8);
 });
 test('mock start archives original answers and displays the content-change notice before a new attempt',()=>{
  const {j}=setup();const values=new Map(),saved={name:'Exam',remaining:60,answers:[[1]],checked:[true]},notice={textContent:''};values.set('pegaMock_PSA_Exam',JSON.stringify(saved));let archived=null,started=0,home=0,allowArchive=true;

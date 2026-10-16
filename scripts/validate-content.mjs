@@ -57,6 +57,7 @@ export function validateContent(root) {
       check(text(meta.id) && /^[A-Za-z0-9-]+$/.test(meta.id), `${moduleLabel}: invalid ID`);
       check(!moduleIds.has(meta.id), `${moduleLabel}: duplicate module ID`);
       moduleIds.add(meta.id);
+      if (meta.studyArea !== undefined) check(text(meta.studyArea) && meta.studyArea.length <= 100, `${moduleLabel}: invalid study area`);
       check(text(meta.name), `${moduleLabel}: missing name`);
       check(meta.ready === undefined || typeof meta.ready === 'boolean', `${moduleLabel}: ready must be boolean`);
       if (meta.ready === false) continue;

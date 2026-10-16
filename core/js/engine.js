@@ -129,19 +129,13 @@
     // Module list
     var hash = parseHash();
     var ul = document.getElementById("paModList");
-    ul.innerHTML = track.modules.map(function (m, i) {
-      var done = isModuleComplete(activeTrackId, m.id);
-      var active = hash.moduleId === m.id;
-      var soon = m.ready === false;
-      return (
-        '<li><a href="#' + activeTrackId + "/" + m.id + '"' +
-        ' class="' + (active ? "active " : "") + (done ? "done" : "") + '">' +
-        '<span class="mnum">' + (done ? "✓" : (i + 1)) + "</span>" +
-        '<span class="mname">' + esc(m.name) + "</span>" +
-        (soon ? '<span class="pa-badge-soon">soon</span>' : (done ? '<span class="mtick">✓</span>' : "")) +
-        "</a></li>"
-      );
-    }).join("");
+    var request=moduleRequest;
+    ul.textContent='Loading modules…';
+    window.QuilynRuntime.personalization().then(function(study){
+      if(request!==moduleRequest)return;
+      var state=loadState();
+      study.moduleNavigation(ul,track,(state.userProgress||{})[activeTrackId]||{},hash.moduleId);
+    }).catch(function(){if(request===moduleRequest)ul.innerHTML=track.modules.map(function(m){return '<li><a href="#'+activeTrackId+'/'+m.id+'">'+esc(m.name)+'</a></li>';}).join('');});
   }
 
   /* Router */
@@ -356,10 +350,10 @@
       : '<h2 class="pa-h2">' + esc(moduleTitle) + "</h2>";
     c.innerHTML =
       moduleTitleHtml +
-      '<p class="quilyn-provenance">Independent study notes · ' + (data.platformVersion ? 'Version ' + esc(data.platformVersion) : 'Version not documented') + ' · ' +
+      '<details class="quilyn-module-details"'+(window.matchMedia('(max-width:860px)').matches?'':' open')+'><summary>About this module &amp; sources</summary><p class="quilyn-provenance">Independent study notes · ' + (data.platformVersion ? 'Version ' + esc(data.platformVersion) : 'Version not documented') + ' · ' +
       (data.sourceReviewedOn ? 'Reviewed ' + esc(data.sourceReviewedOn) : 'Review date not documented') + ' · Module mastery: 70% quiz score</p>' +
       '<p class="quilyn-provenance"><a href="#library">Browse concepts</a> · <a target="_blank" rel="noopener noreferrer" href="https://github.com/emredursun/quilyn/issues/new?title='+encodeURIComponent('Content feedback: '+activeTrackId+'/'+meta.id)+'&amp;body='+encodeURIComponent('Lesson: https://emredursun.github.io/quilyn/#'+activeTrackId+'/'+meta.id+'\n\nDescribe the issue and include an official reference if available.\nDo not include personal progress or private data.')+'">Report a content issue ↗</a></p>' +
-      '<div class="sp-section-bar"><div class="pa-tabs">' +
+      '</details><div class="sp-section-bar"><div class="pa-tabs">' +
       '<button data-v="guide" class="active">📘 Study Guide</button>' +
       '<button data-v="pitfalls">⚠️ Exam Pitfalls</button>' +
       '<button data-v="quiz">🧠 Practice Quiz</button>' +

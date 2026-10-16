@@ -7,7 +7,9 @@
   'use strict';
 
   var PASS = 0.65, TIME_MIN = 90, BASE_TIME=90;
+  var revisionTrack=null;
   function configureExam(track) {
+    revisionTrack=track;
     var spec = track && track.exam || {};
     PASS = (spec.passPercent || 65) / 100;
     BASE_TIME = TIME_MIN = spec.timeMinutes || 90;
@@ -578,6 +580,7 @@
       });
     }
 
+    if(global.QuilynJournal&&global.QuilynJournal.mountRevision)global.QuilynJournal.mountRevision(q('revision'),revisionTrack,qs,answers);
     show('results');
   }
 
@@ -669,7 +672,7 @@
           '<div id="mv-resPct" class="v-muted"></div>' +
           '<div style="margin:12px 0"><span class="pill" id="mv-resPill"></span></div>' +
           '<div class="v-muted" id="mv-resTime"></div>' +
-          '<div class="dombars" id="mv-domBreak"></div>' +
+          '<div class="dombars" id="mv-domBreak"></div><div id="mv-revision"></div>' +
           '<div class="v-row" style="justify-content:center;margin-top:20px;flex-wrap:wrap;gap:8px">' +
             '<button class="v-btn" id="mv-reviewBtn">Review answers</button>' +
             '<button class="v-btn" id="mv-retryBtn">Retake this exam</button>' +

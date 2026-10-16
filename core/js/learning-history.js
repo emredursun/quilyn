@@ -132,6 +132,21 @@
     }
     draw();
   }
+  function revisionPlan(track,questions,answers){
+    var topics=new Map(),unanswered=0;
+    questions.forEach(function(q,i){var selected=answers[i]||[];if(!selected.length){unanswered++;return;}if(equal(selected,q.a))return;
+      var domain=q.d||'Uncategorized',module=(track.modules||[]).find(function(m){return m.ready!==false&&(q.sourceModuleId?m.id===q.sourceModuleId:m.name===domain);}),area=(track.modules||[]).find(function(m){return m.studyArea&&m.studyArea.toLowerCase().replace(/&/g,'and')===domain.toLowerCase().replace(/&/g,'and');});
+      var key=module?'module:'+module.id:'topic:'+domain;
+      if(!topics.has(key))topics.set(key,{title:module?module.name:domain,count:0,href:module?'#'+encodeURIComponent(track.trackId)+'/'+encodeURIComponent(module.id)+'/guide':area?'#library/area/'+encodeURIComponent(area.studyArea):'#library/search/'+encodeURIComponent(domain),specific:!!module});
+      topics.get(key).count++;
+    });
+    return {unanswered:unanswered,topics:Array.from(topics.values()).sort(function(a,b){return b.count-a.count;}).slice(0,3)};
+  }
+  function revisionHTML(plan){
+    return '<section class="jl-revision" aria-label="Suggested revision"><h3>What to study next</h3><p>Suggestions use incorrect answers in this attempt. Unanswered questions are counted separately.</p>'+(plan.unanswered?'<p>'+plan.unanswered+' unanswered question(s). Review those answers before deciding which topics need more work.</p>':'')+(plan.topics.length?'<ol>'+plan.topics.map(function(item){return '<li><div><strong>'+esc(item.title)+'</strong><p>'+item.count+' incorrect answer(s) · '+(item.specific?'Related lesson':'Explore matching resources')+'</p></div><a class="pa-btn" href="'+esc(item.href)+'">'+(item.specific?'Open lesson':'Explore topic')+'</a></li>';}).join('')+'</ol>':'<p>No targeted topic suggestions from answered questions. Review the explanations or schedule a later Smart Review session.</p>')+'<p><a href="#mistakes">Open mistakes notebook</a> · <a href="#review">Smart Review</a></p></section>';
+  }
+
+  function mountRevision(target,track,questions,answers){if(target&&track)target.innerHTML=revisionHTML(revisionPlan(track,questions,answers));}
   function examControls(root,config){
     var wrap=root.querySelector('#mv-questions'), nav=document.createElement('div');nav.className='jl-exam-nav';wrap.before(nav);
     var cards=Array.from(wrap.children);
@@ -147,5 +162,39 @@
     function changed(){if(config.disabled)return;draw();config.save(config);(config.view==='single'?nav:cards[config.index]).scrollIntoView({block:'start'});}
     draw();return {refresh:draw,disable:function(){config.disabled=true;draw();},config:config};
   }
-  global.QuilynJournal={migrateMockState:migrateMockState,id:id,abandon:abandon,valid:valid,record:record,read:read,quizQuestion:quizQuestion,mockQuestion:mockQuestion,bankSignature:bankSignature,feedbackHTML:feedbackHTML,validFeedback:validFeedback,mount:mount,examControls:examControls};
+  /* View-only navigation: question IDs and stored answers remain untouched. */
+  function practiceControls(wrap,questions,answers,activate){
+    var cards=Array.from(wrap.children),index=questions.findIndex(function(q){return !answers[q.questionId]||!answers[q.questionId].graded;});
+    if(index<0)index=0;
+    var single=global.matchMedia('(max-width:860px)').matches,disabled=false;
+    var nav=document.createElement('nav'),bottom=document.createElement('nav');
+    nav.className='pq-navigation';nav.setAttribute('aria-label','Practice quiz navigation');
+    nav.innerHTML='<label>View<select class="pq-layout"><option value="single">One question</option><option value="list">All questions</option></select></label><label>Question<select class="pq-jump"></select></label><div class="pq-buttons"><button type="button" class="pa-btn pq-previous">Previous</button><button type="button" class="pa-btn pq-next">Next</button></div><p class="pq-status" role="status"></p>';
+    bottom.className='pq-question-actions';bottom.setAttribute('aria-label','Question actions');
+    bottom.innerHTML='<button type="button" class="pa-btn pq-previous">Previous</button><span class="pq-position"></span><button type="button" class="pa-btn pq-next">Next</button>';
+    wrap.before(nav);wrap.after(bottom);
+    var layout=nav.querySelector('.pq-layout'),jump=nav.querySelector('.pq-jump'),status=nav.querySelector('.pq-status');
+    jump.innerHTML=questions.map(function(q,i){return '<option value="'+i+'">Q'+(i+1)+'</option>';}).join('');
+    function draw(){
+      var checked=0;
+      questions.forEach(function(q,i){var saved=answers[q.questionId],label=saved&&saved.graded?'Checked':saved&&saved.selected&&saved.selected.length?'Selected':'Unanswered';if(saved&&saved.graded)checked++;jump.options[i].textContent='Q'+(i+1)+' · '+label;cards[i].hidden=single&&i!==index;});
+      layout.value=single?'single':'list';jump.value=String(index);bottom.hidden=!single;
+      [nav,bottom].forEach(function(el){el.querySelector('.pq-previous').disabled=disabled||index===0;el.querySelector('.pq-next').disabled=disabled||index===cards.length-1;});
+      layout.disabled=jump.disabled=disabled;
+      status.textContent='Question '+(index+1)+' of '+cards.length+' · '+checked+' of '+cards.length+' checked';
+      bottom.querySelector('.pq-position').textContent=(index+1)+' / '+cards.length;
+      activate(index);
+    }
+    function go(next,focus){
+      if(disabled||next<0||next>=cards.length)return;
+      index=next;draw();
+      if(focus){var stem=cards[index].querySelector('.scenario');stem.tabIndex=-1;stem.focus({preventScroll:true});cards[index].scrollIntoView({block:'start'});}
+    }
+    layout.onchange=function(){if(disabled)return;single=layout.value==='single';draw();};
+    jump.onchange=function(){go(Number(jump.value),true);};
+    [nav,bottom].forEach(function(el){el.querySelector('.pq-previous').onclick=function(){go(index-1,true);};el.querySelector('.pq-next').onclick=function(){go(index+1,true);};});
+    cards.forEach(function(card,i){card.addEventListener('focusin',function(){if(!single&&index!==i){index=i;draw();}});card.addEventListener('click',function(){if(!single&&index!==i){index=i;draw();}});});
+    draw();return {refresh:draw,disable:function(){disabled=true;draw();}};
+  }
+  global.QuilynJournal={mountRevision:mountRevision,revisionPlan:revisionPlan,revisionHTML:revisionHTML,practiceControls:practiceControls,migrateMockState:migrateMockState,id:id,abandon:abandon,valid:valid,record:record,read:read,quizQuestion:quizQuestion,mockQuestion:mockQuestion,bankSignature:bankSignature,feedbackHTML:feedbackHTML,validFeedback:validFeedback,mount:mount,examControls:examControls};
 })(window);

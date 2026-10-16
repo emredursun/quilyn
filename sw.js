@@ -1,4 +1,4 @@
-const CACHE_NAME = 'quilyn-v225';
+const CACHE_NAME = 'quilyn-v235';
 const STATIC_ASSETS = [
   './', './index.html', './manifest.json', './icon.svg', './favicon.ico',
   './assets/brand/icon-192.png', './assets/brand/icon-512.png',
@@ -9,7 +9,7 @@ const STATIC_ASSETS = [
   './core/js/home-view.js', './core/css/home.css', './core/js/library.js', './core/css/library.css', './data/library-index.json', './core/js/store.js', './core/js/quiz-engine.js',
   './core/js/engine.js', './core/js/mobile-nav.js', './core/js/enhancement.js',
   './core/js/mock-view.js', './core/js/review-view.js',
-  './core/js/app-shell.js', './core/js/search.js',
+  './core/js/app-shell.js', './core/js/search.js', './core/js/search-view.js',
   './core/js/settings.js', './core/js/track-switcher.js',
   './data/interactive-manifest.json', './data/content-manifest.json', './data/registry.json', './data/mock-exams.json'
 ];

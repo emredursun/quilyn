@@ -71,6 +71,7 @@
   function render(container, questions, onComplete, pill, transient, context, unsaved) {
     container.innerHTML = "";
     var total = questions.length;
+    var navigation = null;
     var graded = new Array(total).fill(false);
     var correctFlags = new Array(total).fill(false);
 
@@ -96,7 +97,7 @@
     function persist() { if (!transient && writable) saveState(state); }
     if(externalQuiz)global.removeEventListener('quilyn-progress-external',externalQuiz);
     externalQuiz=function(event){if(!transient&&(event.detail.key===storageKey()||event.detail.key===null)){
-      if(conflicted)return;conflicted=true;writable=false;container.querySelectorAll('.pa-opt').forEach(function(option){option.classList.add('disabled');option.setAttribute('aria-disabled','true');});container.querySelectorAll('input,button').forEach(function(control){control.disabled=true;});
+      if(conflicted)return;conflicted=true;writable=false;if(navigation)navigation.disable();container.querySelectorAll('.pa-opt').forEach(function(option){option.classList.add('disabled');option.setAttribute('aria-disabled','true');});container.querySelectorAll('input,button').forEach(function(control){control.disabled=true;});
       var notice=document.createElement('p');notice.setAttribute('role','alert');notice.textContent='This quiz changed in another tab. Reopen the lesson to use the latest saved answers.';container.prepend(notice);
     }};
     global.addEventListener('quilyn-progress-external',externalQuiz);
@@ -303,6 +304,7 @@
           // Persist selection immediately
           state.answers[q.questionId] = { selected: selected.slice(), graded: false, signature: global.QuilynProgress.quizSignature(q) };
           persist();
+          if(navigation)navigation.refresh();
         });
       });
 
@@ -327,9 +329,11 @@
           global.QuilynJournal.record({id:state.attemptId,track:context.track,kind:transient?'retry':'quiz',mode:'practice',name:context.name||'Quiz',total:total,startedAt:state.startedAt,status:rows.length===total?'completed':'in-progress'},rows);
         }
         refreshBar();
+        if(navigation)navigation.refresh();
       });
     });
 
+    if(total && global.QuilynJournal && global.QuilynJournal.practiceControls) navigation=global.QuilynJournal.practiceControls(listWrap,questions,state.answers,function(index){_kbActiveIdx=index;});
     // Sync bar with any restored graded questions
     refreshBar();
 

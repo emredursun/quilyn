@@ -182,7 +182,7 @@
     '<div class="pa-settings-section">' +
       '<h4>⌨️ Keyboard Shortcuts</h4>' +
       '<table class="pa-kbd-table">' +
-        '<tr><td><kbd>Ctrl/⌘ K</kbd></td><td>Open module search</td></tr>' +
+        '<tr><td><kbd>Ctrl/⌘ K</kbd></td><td>Search modules, topics and concepts</td></tr>' +
         '<tr><td><kbd>A</kbd> <kbd>B</kbd> <kbd>C</kbd> <kbd>D</kbd></td><td>Select quiz option</td></tr>' +
         '<tr><td><kbd>Enter</kbd></td><td>Check answer / Next question (SRS)</td></tr>' +
         '<tr><td><kbd>H</kbd></td><td>Toggle hint</td></tr>' +

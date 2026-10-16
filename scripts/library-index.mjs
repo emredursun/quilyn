@@ -6,7 +6,7 @@ const registry=JSON.parse(readFileSync(resolve(root,'data/registry.json')));
 const entries=[];
 for(const track of registry.tracks) for(const meta of track.modules.filter(m=>m.ready!==false)) {
  const module=JSON.parse(readFileSync(resolve(root,meta.file)));
- const common={track:track.trackId,trackName:track.trackName,module:meta.id,moduleTitle:module.moduleTitle||meta.name,source:module.moduleUrl||'',version:module.platformVersion||null,reviewedOn:module.sourceReviewedOn||null};
+ const common={studyArea:meta.studyArea||meta.examDomain||null,track:track.trackId,trackName:track.trackName,module:meta.id,moduleTitle:module.moduleTitle||meta.name,source:module.moduleUrl||'',version:module.platformVersion||null,reviewedOn:module.sourceReviewedOn||null};
  entries.push({...common,kind:'module',title:common.moduleTitle,text:(module.topics||[]).map(t=>t.title).join(' · '),href:'#'+track.trackId+'/'+meta.id});
  for(const section of module.studyGuide) {
   if(!section.sectionId)throw new Error('Missing stable section ID: '+meta.id);

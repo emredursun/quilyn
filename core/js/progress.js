@@ -170,6 +170,7 @@
         var available=new Set(meta?meta.modules.filter(function(m){return m.ready!==false;}).map(function(m){return m.id;}):[]);
         value.tracks[trackId].bookmarks.concat(Object.keys(value.tracks[trackId].positions)).forEach(function(id){if(!available.has(id))unknown.push(trackId+'/'+id);});
       });
+      if(key==='quilyn_study'&&global.QuilynStudy.validateSavedReferences)unknown.push(...await global.QuilynStudy.validateSavedReferences(value,registry));
       var progress = key === 'pega_lms_state' ? value.userProgress : key === 'pega_universal_state' ? value.lms && value.lms.userProgress : null;
       if (progress) Object.keys(progress).forEach(function(trackId) {
         var trackMeta = registry.tracks.find(function(t) { return t.trackId === trackId; });

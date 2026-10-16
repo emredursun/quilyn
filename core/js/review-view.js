@@ -131,7 +131,7 @@
   }
   function getStats() {
     var t=today(),due=0,nw=0,mastered=0;
-    Object.keys(cardBank).forEach(function(k){var c=srs.cards[k];if(!c){nw++;due++;return;}if(c.box===5)mastered++;if(c.dueDate<=t)due++;});
+    Object.keys(cardBank).forEach(function(k){var c=srs.cards[k];if(!c){nw++;return;}if(c.box===5)mastered++;if(c.dueDate<=t)due++;});
     return {total:Object.keys(cardBank).length,due:due,newCards:nw,mastered:mastered};
   }
 
@@ -295,8 +295,11 @@
       '<div class="stat-box"><div class="num ok">'+stats.mastered+'</div><div class="lbl">Mastered</div></div>'+
       '<div class="stat-box"><div class="num">'+stats.total+'</div><div class="lbl">Total Cards</div></div>'+
       '<div class="stat-box"><div class="num warn">'+currentStreak()+'</div><div class="lbl">Day Streak</div></div>';
+    var available=stats.due+stats.newCards;
+    var note=r('session-note');
+    if(note) note.textContent=stats.due+' scheduled reviews due · '+stats.newCards+' new cards available. Each session includes up to '+SESSION_SIZE+' cards, balancing due reviews with new material.';
     var btnStart=r('btn-start');
-    if(btnStart){if(stats.due===0){btnStart.textContent='✓ All caught up today!';btnStart.disabled=true;}else{btnStart.textContent='▶ Review '+Math.min(stats.due,SESSION_SIZE)+' Cards';btnStart.disabled=false;}}
+    if(btnStart){if(available===0){btnStart.textContent='✓ All caught up today!';btnStart.disabled=true;}else{btnStart.textContent='▶ Review '+Math.min(available,SESSION_SIZE)+' Cards';btnStart.disabled=false;}}
     var dg=r('domain-grid');
     if(dg) dg.innerHTML=DOMAINS.map(function(dom){
       var keys=Object.keys(cardBank).filter(function(k){return(MOD_DOMAIN[cardBank[k].moduleId]||'General')===dom;});
@@ -330,7 +333,7 @@
       '<li><div class="rv-sidebar-stat"><span>Total</span><b>'+stats.total+'</b></div></li>'+
       '<li><div class="rv-sidebar-stat"><span>Streak</span><b style="color:var(--pa-warn,#fbbf24)">'+currentStreak()+'</b></div></li>'+
       '<li style="margin-top:12px">'+
-        '<button type="button" id="rv-sb-start" class="pa-shell-sidebar-item">▶ Start Session</button>'+
+        '<button type="button" id="rv-sb-start" class="pa-shell-sidebar-item"'+(stats.due+stats.newCards?'>▶ Review '+Math.min(stats.due+stats.newCards,SESSION_SIZE)+' Cards':' disabled>✓ All caught up today!')+'</button>'+
       '</li>';
     var sbStart=_sidebarEl.querySelector('#rv-sb-start');
     if(sbStart) sbStart.addEventListener('click',function(){showSec('session');startSession();});
@@ -370,13 +373,13 @@
         '<div class="v-card">'+
           '<h2>Overview</h2><p><a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></p>'+
           '<div class="stats-row" id="rv-stats-row"></div>'+
+          '<p id="rv-session-note" class="v-muted"></p>'+
           '<div class="v-row" style="margin-top:14px">'+
             '<button class="v-btn v-primary" id="rv-btn-start">▶ Start Review Session</button>'+
-            '<button class="v-btn v-danger" id="rv-btn-reset">Reset Progress</button>'+
           '</div>'+
         '</div>'+
         '<div class="v-card">'+
-          '<h2>Domain Mastery</h2>'+
+          '<h2>Topic mastery</h2><p class="v-muted">Study topics organize these cards; they do not represent official exam weights. Mastered means Box 5.</p>'+
           '<div class="domain-grid" id="rv-domain-grid"></div>'+
         '</div>'+
         '<div class="v-card v-hide" id="rv-card-surp">'+
@@ -393,6 +396,7 @@
             '<b>Interleaved:</b> Due reviews and new cards are balanced across available modules. Mastered means Box 5.'+
           '</div>'+
         '</div>'+
+        '<details class="rv-data-management"><summary>Manage review data</summary><p>Reset spaced repetition for this track only. Quiz scores, bookmarks and attempt history are kept. Export a backup in Settings first.</p><button class="v-btn v-danger" id="rv-btn-reset">Reset this track’s review progress</button></details>'+
       '</section>'+
       /* session */
       '<section id="rv-session" class="v-hide">'+
@@ -439,7 +443,7 @@
     /* Wire buttons */
     var btnStart=r('btn-start'); if(btnStart) btnStart.addEventListener('click',startSession);
     var btnReset=r('btn-reset'); if(btnReset) btnReset.addEventListener('click',function(){
-      if(confirm('All SRS progress will be permanently deleted. Are you sure?')){
+      if(confirm('Reset review progress for the current track? Quiz scores, bookmarks and attempt history will be kept. This cannot be undone.')){
         if(global.PegaStore) { 
           var t = getTrack();
           if (!global.PegaStore.state.tracks[t]) global.PegaStore.state.tracks[t] = { mock: {}, srs: {} };
@@ -478,7 +482,7 @@
             .then(function(data){
               if(request !== generation) return;
               var mid=data.moduleId||meta.id; var mname=data.moduleTitle||meta.name;
-              if (data.examDomain || meta.examDomain) MOD_DOMAIN[meta.id] = data.examDomain || meta.examDomain;
+              if (data.examDomain || meta.examDomain || meta.studyArea) MOD_DOMAIN[meta.id] = data.examDomain || meta.examDomain || meta.studyArea;
               (data.practiceQuiz||[]).forEach(function(q){cardBank[mid+'::'+q.questionId]={moduleId:meta.id,moduleName:mname,q:q};});
               loaded++;
               if(progEl) progEl.textContent=loaded+' / '+mods.length+' modules loaded';
