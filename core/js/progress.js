@@ -154,6 +154,7 @@
           if (!question || !entries[id].selected.every(function(option) { return question.options.some(function(o) { return o.id === option; }); }))
             throw new Error('Quiz answers do not match available content: ' + key);
           if (question.type === 'single-select' && entries[id].selected.length > 1) throw new Error('Single-select quiz has multiple answers: ' + key);
+          if (!modern && question.courseKeyReviewVersion === 1) unknown.push(key + '/' + id);
         }
       } else if ((match = /^pegaMock_([^_]+)_(.+)$/.exec(key))) {
         bank = bank || await global.QuilynRuntime.json('data/mock-exams.json');
@@ -196,7 +197,7 @@
     questions.forEach(function(q,i) {
       var modern = saved.version === 2, prior = modern ? saved.answers[q.questionId] : saved[i];
       var signature = quizSignature(q);
-      if (!prior || modern && !matchesQuizSignature(q, prior.signature)) return;
+      if (!prior || !modern && q.courseKeyReviewVersion === 1 || modern && !matchesQuizSignature(q, prior.signature)) return;
       if (!prior.selected.every(function(id) { return q.options.some(function(o) { return o.id === id; }); })) return;
       next.answers[q.questionId] = Object.assign({}, prior, {signature:signature});
     });

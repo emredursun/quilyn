@@ -1,5 +1,7 @@
 # Testim course keys and UX pre-release review
 
+Latest follow-up: [course-bank review](testim-course-bank-followup.md). The original review below describes commit 87016e1. The subsequent local follow-up restores two additional module keys and two mock copies (16 of each in total), adds a 49-link course audit, and reviews all 32 remaining differences without guessing their Academy keys.
+
 Date: 2026-10-16. Branch: codex/ux-first-improvements. This report covers local changes only; no merge, push or deployment.
 
 ## Findings and fixes

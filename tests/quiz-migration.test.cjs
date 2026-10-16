@@ -9,6 +9,19 @@ test('legacy answers migrate by question ID and remain valid for backups',()=>{
  const {api}=setup();const migrated=api.quizState({0:{selected:['A'],graded:true,correct:true}},questions);
  assert.equal(migrated.answers.Q1.selected[0],'A');assert.equal(api.validEntry(key,migrated),true);assert.equal(api.validEntry(key,{0:{selected:['A'],graded:true}}),true);
 });
+test('unsigned legacy answers for course-key corrections are not silently regraded and originals remain recoverable',()=>{
+ const {api,values}=setup(),old={0:{selected:['A'],graded:true,correct:true},1:{selected:['A'],graded:true,correct:true}},before=JSON.stringify(old),reviewed=[{...questions[0],courseKeyReviewVersion:1},questions[1]];
+ const next=api.quizState(old,reviewed);assert.equal(next.answers.Q1,undefined);assert.deepEqual(Array.from(next.answers.Q2.selected),['A']);assert.equal(JSON.stringify(old),before);assert.equal(api.archive(key,old),true);assert.equal([...values.values()][0],before);
+});
+test('current signed course-key answers still restore after a reviewed question reload',()=>{
+ const {api}=setup(),q={...questions[0],courseKeyReviewVersion:1},saved={version:2,answers:{Q1:{selected:['A'],graded:true,signature:api.quizSignature(q)}}};
+ assert.deepEqual(Array.from(api.quizState(saved,[q]).answers.Q1.selected),['A']);
+});
+test('import flags unsigned course-key records for review and still rejects invalid option references',async()=>{
+ const {api,window}=setup();window.QuilynRuntime={json:async path=>path==='data/registry.json'?{tracks:[{trackId:'PBA',modules:[{id:'BA-M01',file:'module'}]}]}:{practiceQuiz:[{...questions[0],courseKeyReviewVersion:1},questions[1]]}};
+ const legacy={0:{selected:['A'],graded:true}},bundle={version:2,state:{[key]:legacy}};assert.deepEqual(Array.from(await api.validateReferences(bundle)),[key+'/0']);assert.equal(legacy[0].graded,true);
+ legacy[0].selected=['Z'];await assert.rejects(api.validateReferences(bundle),/do not match/);
+});
 test('question and option reordering preserves answers; revised wording and answer invalidate them',()=>{
  const {api}=setup();const state=api.quizState({0:{selected:['A'],graded:true,correct:true}},questions);
  const reordered=[questions[1],{...questions[0],options:questions[0].options.slice().reverse()}];assert.equal(api.quizState(state,reordered).answers.Q1.selected[0],'A');

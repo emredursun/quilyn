@@ -2,9 +2,9 @@
 
 242 banks; 2844 questions; 0 skewed banks.
 
-Single-select positions: 628 / 633 / 602 / 570 / 0 / 0 / 0 / 0. All correct-option positions (includes multi-select): 841 / 857 / 821 / 784 / 4 / 2 / 1 / 0.
+Single-select positions: 628 / 633 / 602 / 570 / 0 / 0 / 0 / 0. All correct-option positions (includes multi-select): 841 / 857 / 821 / 786 / 4 / 2 / 1 / 0.
 
-Heuristic flags: longest: 1403; shortest: 321; wrong-absolutes: 760; anchored/letter-reference: 21; detailed: 197; stem-echo: 37.
+Heuristic flags: longest: 1405; shortest: 321; wrong-absolutes: 760; anchored/letter-reference: 21; detailed: 197; stem-echo: 37.
 
 Counts use words; longest/shortest exclude ties; detailed means at least twice the longest distractor and at least 8 words. Hints are opt-in before grading; rationales and option explanations are revealed after grading. Stem echo and absolutes are review leads, not factual findings. Anchored detection is deliberately conservative. Skew allows integer rounding for small quizzes, otherwise >40% for four options (1/N + 15 points for others). Multi-select counts measure inclusion, not mutually exclusive outcomes. Archived data_backup directories and data/review design metadata are not loaded by the site.
 
@@ -194,7 +194,7 @@ Counts use words; longest/shortest exclude ties; detailed means at least twice t
 | TESTIM / TESTIM-M03 | practice | 10 | 3/3/2/2 | {} | 3/3/2/2 | 5 / 0 | longest: 5, wrong-absolutes: 2, shortest: 1 |  |
 | TESTIM / TESTIM-M04 | practice | 5 | 1/2/1/1 | {} | 1/2/1/1 | 0 / 0 | wrong-absolutes: 2 |  |
 | TESTIM / TESTIM-M05 | practice | 8 | 2/2/2/2 | {} | 2/2/2/2 | 4 / 0 | longest: 4, wrong-absolutes: 1 |  |
-| TESTIM / TESTIM-M06 | practice | 8 | 2/2/1/1/0 | {"2":2} | 4/2/2/2/0 | 3 / 0 | longest: 3, shortest: 1 |  |
+| TESTIM / TESTIM-M06 | practice | 8 | 2/2/1/1/0 | {"2":1,"3":1} | 4/2/2/3/0 | 4 / 0 | longest: 4, shortest: 1 |  |
 | TESTIM / TESTIM-M07 | practice | 5 | 2/1/1/1 | {} | 2/1/1/1 | 3 / 0 | wrong-absolutes: 5, longest: 3 |  |
 | TESTIM / TESTIM-M08 | practice | 5 | 1/2/1/1 | {} | 1/2/1/1 | 2 / 0 | longest: 2, wrong-absolutes: 2 |  |
 | TESTIM / TESTIM-M09 | practice | 6 | 1/1/2/2 | {} | 1/1/2/2 | 5 / 1 | longest: 5, detailed: 1, wrong-absolutes: 1 |  |
@@ -244,7 +244,7 @@ Counts use words; longest/shortest exclude ties; detailed means at least twice t
 | TMOB / Mock Exam 2 | mock | 7 | 2/2/1/2 | {} | 2/2/1/2 | 7 / 2 | longest: 7, detailed: 2 |  |
 | TMOB / Mock Exam 3 | mock | 8 | 2/2/2/2 | {} | 2/2/2/2 | 7 / 4 | longest: 7, detailed: 4, wrong-absolutes: 1 |  |
 | TESTIM / Mock Exam 1 | mock | 32 | 9/8/8/7 | {} | 9/8/8/7 | 16 / 2 | longest: 16, wrong-absolutes: 12, anchored/letter-reference: 1, detailed: 2 |  |
-| TESTIM / Mock Exam 2 | mock | 32 | 8/8/7/7 | {"2":2} | 9/10/7/8 | 16 / 2 | longest: 16, detailed: 2, shortest: 5, wrong-absolutes: 5 |  |
+| TESTIM / Mock Exam 2 | mock | 32 | 8/8/7/7 | {"2":1,"3":1} | 9/10/7/9 | 17 / 2 | longest: 17, detailed: 2, shortest: 5, wrong-absolutes: 5 |  |
 | TESTIM / Mock Exam 3 | mock | 32 | 8/8/8/7/0 | {"2":1} | 8/8/8/8/1 | 15 / 6 | longest: 15, wrong-absolutes: 11, detailed: 6, shortest: 1 |  |
 | TESTIM / Mock Exam 4 | mock | 31 | 8/8/7/7 | {"2":1} | 9/8/7/8 | 20 / 5 | wrong-absolutes: 13, longest: 20, detailed: 5, shortest: 3 |  |
 | TESTIM / Mock Exam 5 | mock | 31 | 8/9/7/7 | {} | 8/9/7/7 | 11 / 3 | wrong-absolutes: 8, longest: 11, shortest: 1, detailed: 3 |  |
@@ -2074,6 +2074,7 @@ Counts use words; longest/shortest exclude ties; detailed means at least twice t
 
 - Q2: longest
 - Q3: longest
+- Q5: longest
 - Q7: longest
 - Q8: shortest
 
@@ -2663,6 +2664,7 @@ Counts use words; longest/shortest exclude ties; detailed means at least twice t
 - Q8: wrong-absolutes
 - Q9: longest
 - Q10: longest
+- Q11: longest
 - Q12: wrong-absolutes
 - Q14: longest
 - Q17: longest

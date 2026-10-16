@@ -106,7 +106,9 @@
     var completed = Object.keys(state.answers).length === total && Object.keys(state.answers).every(function(k) { return state.answers[k].graded; });
     if (legacy) {
       var note = document.createElement('p');
-      note.textContent = 'Older answers were restored using the current question order. If this lesson changed since your last visit, reset the quiz to reassess. The original record is preserved in your backup.';
+      note.textContent = questions.some(function(q,i){return q.courseKeyReviewVersion===1&&prior[i];})
+        ? 'Older answers for questions whose course key changed are kept in your backup. Answer those questions again; other compatible answers have been restored.'
+        : 'Older answers were restored using the current question order. If this lesson changed since your last visit, reset the quiz to reassess. The original record is preserved in your backup.';
       container.appendChild(note);
     }
 

@@ -21,6 +21,7 @@ run(['scripts/study-estimates.mjs', '--check']);
 run(['scripts/validate-content.mjs']);
 run(['scripts/audit-quiz-bias.mjs', '--check']);
 run(['scripts/audit-topic-quizzes.mjs', '--check']);
+run(['scripts/audit-testim-course-keys.mjs']);
 run(['scripts/interactive-assets.mjs', '--check']);
 run(['scripts/content-quality.mjs', '--check']);
 run(['scripts/library-index.mjs', '--check']);

@@ -121,6 +121,7 @@ export function validateContent(root) {
         questionIds.add(question.questionId);
         check(text(question.scenario) && text(question.rationale), `${qLabel}: scenario and rationale are required`);
         check(['single-select', 'multi-select'].includes(question.type), `${qLabel}: unsupported type`);
+        check(question.courseKeyReviewVersion === undefined || question.courseKeyReviewVersion === 1, `${qLabel}: invalid course key review version`);
         if (!Array.isArray(question.options) || !Array.isArray(question.correctOptions)) {
           errors.push(`${qLabel}: options and correctOptions must be arrays`); continue;
         }

@@ -1372,7 +1372,7 @@ test('Testim execution review distinguishes timeout units, quota scope, graph se
 
 test('Testim management review scopes Auto Improve, status initialization and changed-test revisions',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m06_advanced_test_management.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
- d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D','E'],['A'],['C'],['A'],['A','B'],['B'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['D','E'],['A'],['C'],['A'],['A','B','D'],['B'],['B'],['C']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[0].elements[1].description,/At feature enablement.*not.*perpetual/);
  assert.match(d.studyGuide[3].elements[0].description,/writable master.*read-only master.*other branches.*Manual locator editing/);
  assert.match(d.studyGuide[2].elements[0].description,/failing Before All stops.*not certify.*every abort/);
@@ -1506,7 +1506,7 @@ test('Testim repository integration review preserves Master-base and pull-reques
 
 test('Testim TMS review distinguishes credentials mappings remote reporting and quota',()=>{
  const crypto=require('node:crypto'),bytes=fs.readFileSync('data/tosca-testim/m22_enhancing_test_workflows_integrations.json'),d=JSON.parse(bytes),inv=JSON.parse(fs.readFileSync('docs/source-review-inventory-2026-10-02.json')),ids=new Set(d.studyGuide.map(s=>s.sectionId));assert.equal(inv.modules.find(m=>m.id===d.moduleId).localReview.contentSha256,crypto.createHash('sha256').update(bytes).digest('hex'));
- d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['B'],['D'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
+ d.practiceQuiz.forEach((q,i)=>{assert.deepEqual(q.correctOptions,[['A'],['D'],['A']][i]);assert.ok(ids.has(q.lessonSection));assert.deepEqual(Object.keys(q.optionExplanations).sort(),q.options.map(o=>o.id).sort());});
  assert.match(d.studyGuide[2].elements[0].description,/TTM API key.*Xray.*Jira\/Xray/);
  assert.match(d.studyGuide[2].elements[1].description,/multiple TTM.*skips.*disconnecting removes mappings/);
  assert.match(d.studyGuide[2].elements[3].text,/separate from subscription quota.*local CLI\/library/);
