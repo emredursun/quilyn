@@ -1,6 +1,6 @@
 # Release preflight: 2026-10-28 (ISTQB CTFL track)
 
-Branch: `codex/ux-first-improvements`. This preflight records the tested candidate. Publication has **not** been authorized yet. Committing, pushing and live verification each need separate approval.
+Branch: `codex/ux-first-improvements`. This preflight records the tested candidate. The owner authorized publication ("Commit and publish") on 2026-10-28.
 
 ## Scope of this candidate
 
@@ -51,3 +51,18 @@ Branch: `codex/ux-first-improvements`. This preflight records the tested candida
 
 - Physical iOS and Android devices, Safari and Firefox, VoiceOver, real 200% and 400% zoom, and participant usability testing.
 - The Testim editorial items still open from the 2026-10-17 preflight. This candidate does not change them.
+
+## Publication and live verification
+
+- Commits `c7027b3` (app), `6cf5b05` (CTFL track) and `ac4aafd` (preflight) were pushed to `codex/ux-first-improvements` and fast-forwarded to `main`.
+- GitHub Actions on `ac4aafd`: Quality passed on `main` and on the branch, and *pages build and deployment* succeeded.
+- Live checks on https://emredursun.github.io/quilyn/:
+  - the app, `sw.js`, the registry, the CTFL module JSON, `learn/ctfl/` pages and `learning-history.js` all return 200
+  - the live service worker cache is `quilyn-v242`, and the page loads assets with `v=20261028a`
+  - the registry contains the CTFL track
+  - in the browser, chapter 1 opens with *About this preparation track*, then exam essentials and the study method, and ends with the keyword self-check
+  - the 5 exercises in chapter 1 have collapsed solutions
+  - Mock Exams 2, 4 and 6 contain FL-5.1.3
+  - the live mock view includes the K-level breakdown, and the objective links are available
+  - no console errors
+- Still not verified after publication: the device, browser and assistive-technology checks listed above.
