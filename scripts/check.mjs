@@ -19,6 +19,7 @@ for (const file of [...sourceFiles, ...interactiveFiles, 'sw.js', ...scripts]) r
 console.log(`Syntax verified: ${sourceFiles.length + interactiveFiles.length + scripts.length + 1} JavaScript files.`);
 run(['scripts/study-estimates.mjs', '--check']);
 run(['scripts/validate-content.mjs']);
+run(['scripts/build-istqb.mjs', '--check']);
 run(['scripts/audit-quiz-bias.mjs', '--check']);
 run(['scripts/audit-topic-quizzes.mjs', '--check']);
 run(['scripts/audit-testim-course-keys.mjs']);

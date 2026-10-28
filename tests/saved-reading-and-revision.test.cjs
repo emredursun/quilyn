@@ -45,3 +45,15 @@ test('concept focus has a timer fallback when animation frames are unavailable o
   vm.runInNewContext(source,{window,document:{addEventListener(){},createElement:()=>({appendChild(b){b.parentNode=this;},setAttribute(){}})}});window.QuilynStudy.attachReadingSaves(root,'PSA','SA-M01');assert.equal(focused,0);timer();assert.equal(focused,1);assert.equal(scrolled,1);assert.equal(term.tabIndex,-1);if(frame)frame();assert.equal(focused,1);
  }
 });
+test('CTFL mock mistakes resolve to numbered modules and learning-objective lesson sections',()=>{
+ const w=setup().window,registry=JSON.parse(fs.readFileSync('data/registry.json','utf8')),track=registry.tracks.find(t=>t.trackId==='CTFL');
+ const items=Object.values(JSON.parse(fs.readFileSync('data/mock-exams.json','utf8')).CTFL).flat();
+ const sections=new Map(track.modules.map(m=>[m.id,new Set(JSON.parse(fs.readFileSync(m.file,'utf8')).studyGuide.map(s=>s.sectionId))]));
+ for(const q of items){const plan=w.QuilynJournal.revisionPlan(track,[q],[[q.a[0]===0?1:0]]),o=plan.topics[0].objectives[0],[,trackId,moduleId,,section]=o.href.split(/[#/]/);
+  assert.equal(trackId,'CTFL');assert.equal(o.id,q.learningObjectiveId);assert.ok(sections.get(moduleId).has(section),q.questionId+' -> '+o.href);assert.equal(moduleId,'CTFL-C'+q.chapter);}
+ const form=items.slice(0,40),plan=w.QuilynJournal.revisionPlan(track,form,form.map(q=>[q.a[0]===0?1:0]));
+ assert.equal(plan.topics.length,6);assert.equal(plan.topics.reduce((n,t)=>n+t.objectives.length,0),40);assert.equal(plan.topics[0].title,'4. Test Analysis and Design');
+ assert.match(w.QuilynJournal.revisionHTML(plan),/Missed objectives: <a href="#CTFL\/CTFL-C4\/guide\/fl-4-/);
+ const html=w.QuilynJournal.objectiveHTML(track,{...items[0],learningObjectiveId:'FL-<x>'});assert.doesNotMatch(html,/<x>/);
+ assert.equal(w.QuilynJournal.objectiveHTML(track,{d:'Unknown',learningObjectiveId:'FL-1.1.1'}),'');
+});

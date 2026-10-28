@@ -1,0 +1,10 @@
+export const reviewedOn='2026-10-28';
+export const official='https://istqb.org/certifications/certified-tester-foundation-level-ctfl-v4-0/';
+export const syllabus='https://istqb.org/?download_id=3345&sdm_process_download=1';
+export const bvaClarification='https://istqb.org/wp-content/uploads/2025/10/Boundary-Value-Analysis-white-paper.pdf';
+export const structure='https://istqb.org/?download_id=3832&sdm_process_download=1';
+export const rules='https://istqb.org/?download_id=3829&sdm_process_download=1';
+export const samples=[['A','1.7',3352,3357],['B','1.7',3359,3365],['C','1.6',3369,3372],['D','1.5',3376,3380]].map(([set,version,q,a])=>({set,version,questions:'https://istqb.org/?download_id='+q+'&sdm_process_download=1',answers:'https://istqb.org/?download_id='+a+'&sdm_process_download=1'}));
+export const attribution='Independent study notes and questions written by Quilyn, based on the ISTQB® CTFL Syllabus v4.0.1. The syllabus is © ISTQB® and its credited authors; see the Copyright Notice in the syllabus for the full credits and terms of use. Quilyn is not affiliated with, accredited by or endorsed by ISTQB®, and this track is not accredited training.';
+export const disclosure='Six original 40-question practice forms, separate from the 128 topic questions. Forms share learning objectives and techniques but no exact question stems. Each follows the CTFL chapter, K-level and selectable-LO group counts. The content received two separate AI reviews and a correction re-review. It has no human SME sign-off or candidate-based difficulty calibration. Forms vary in case complexity and are not equated. Use fresh official sample papers as well; repeated scores are not independent readiness evidence.';
+export const learningSource='https://www.psychologicalscience.org/journals/pspi/1529100612453266/';
