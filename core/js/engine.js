@@ -343,7 +343,7 @@
     var moduleTitle = data.moduleTitle || meta.name;
     window.QuilynProgress.activity('visit', activeTrackId, meta.id);
     document.title = moduleTitle + ' — Quilyn';
-    var academyLabel = (data.moduleId && /^(TAS|TAPI|TDS|AE|TMOB|TESTIM)/.test(data.moduleId)) ? "Tricentis Academy" : "Pega Academy";
+    var academyLabel = data.moduleId && /^CTFL-/.test(data.moduleId) ? 'ISTQB official syllabus' : (data.moduleId && /^(TAS|TAPI|TDS|AE|TMOB|TESTIM)/.test(data.moduleId)) ? "Tricentis Academy" : "Pega Academy";
     var moduleTitleHtml = data.moduleUrl
       ? '<h2 class="pa-h2">' + esc(moduleTitle) +
         ' <a class="pa-module-ext" href="' + esc(data.moduleUrl) + '" target="_blank" rel="noopener" title="View on ' + academyLabel + '">' + academyLabel + ' ↗</a></h2>'
@@ -457,7 +457,7 @@
   function buildObjectives(data) {
     var obj = data.learningObjectives || [];
     if (!obj.length) return "";
-    var topicsAcademyLabel = (data.moduleId && /^(TAS|TAPI|TDS|AE|TMOB|TESTIM)/.test(data.moduleId)) ? "Tricentis Academy" : "Pega Academy";
+    var topicsAcademyLabel = data.moduleId && /^CTFL-/.test(data.moduleId) ? 'ISTQB official syllabus' : (data.moduleId && /^(TAS|TAPI|TDS|AE|TMOB|TESTIM)/.test(data.moduleId)) ? "Tricentis Academy" : "Pega Academy";
     var topicsHtml = "";
     if (data.topics && data.topics.length) {
       topicsHtml =
@@ -518,6 +518,12 @@
             '<ol class="pa-steps-list">' +
             (el.items || []).map(function (i) { return "<li>" + esc(i) + "</li>"; }).join("") +
             "</ol></div>";
+        } else if (el.type === "exercise") {
+          inner +=
+            '<div class="pa-exercise"><span class="pa-tag">Try first</span>' +
+            (el.title ? '<div class="pa-exercise-title">' + esc(el.title) + "</div>" : "") +
+            "<p>" + esc(el.prompt) + "</p>" +
+            '<details class="pa-exercise-solution"><summary>Show solution</summary><p>' + esc(el.solution) + "</p></details></div>";
         } else if (el.type === "list") {
           inner +=
             '<div class="pa-list">' +
@@ -654,10 +660,26 @@
     var mount = document.getElementById("paQuizMount");
     var questions = data.practiceQuiz || [];
     if (!questions.length) { mount.innerHTML = '<div class="pa-empty">No quiz for this module.</div>'; return; }
-    PegaQuiz.render(mount, questions, function (pct) {
-      recordQuiz(activeTrackId, meta.id, pct);
-      renderSidebar(); // reflect completion immediately
-    }, pill, false, {track:activeTrackId,moduleId:meta.id,name:meta.name,domain:data.examDomain||meta.examDomain||'General'});
+    var quizRoot = mount;
+    var topics = data.quizTopics || [];
+    var selector = null;
+    if (topics.length) {
+      mount.innerHTML = '<label for="paQuizScope">Practice scope</label> <select id="paQuizScope"><option value="">Full chapter quiz (' + questions.length + ' questions)</option>' +
+        topics.map(function(topic) { return '<option value="' + esc(topic.id) + '">' + esc(topic.id + ' · ' + topic.title) + '</option>'; }).join('') +
+        '</select><p class="quilyn-provenance">Topic practice starts fresh when you switch. Chapter answers stay saved. Only a full chapter quiz updates module mastery; topic attempts appear in your history.</p><div id="paQuizQuestions"></div>';
+      quizRoot = mount.querySelector('#paQuizQuestions');
+      selector = mount.querySelector('#paQuizScope');
+    }
+    function drawQuiz() {
+      var scope = selector ? selector.value : '';
+      var selected = scope ? questions.filter(function(question) { return question.learningObjectiveId === scope; }) : questions;
+      PegaQuiz.render(quizRoot, selected, scope ? null : function (pct) {
+        recordQuiz(activeTrackId, meta.id, pct);
+        renderSidebar(); // reflect completion immediately
+      }, pill, Boolean(scope), {track:activeTrackId,moduleId:meta.id,name:scope ? meta.name + ' · ' + scope : meta.name,practiceScope:scope ? 'topic' : 'chapter',domain:data.examDomain||meta.examDomain||'General'});
+    }
+    if (selector) selector.addEventListener('change', drawQuiz);
+    drawQuiz();
   }
 
   /* Chrome */

@@ -38,7 +38,7 @@ test('a delayed concept focus cannot affect a new route that reused the same con
 });
 test('concept focus has a timer fallback when animation frames are unavailable or suspended',()=>{
  for(const frames of [true,false]){
-  let frame,timer,focused=0,scrolled=0;const term={focus(){focused++;},scrollIntoView(){scrolled++;}},card={appendChild(b){b.parentNode=this;},querySelector:()=>term},heading={textContent:'First section',after(){}},section={getAttribute:()=> 'section-one',querySelector:()=>heading,querySelectorAll:()=>[card]},guide={isConnected:true,hidden:false,querySelectorAll:()=>[section]},status={};
+  let frame,timer,focused=0,scrolled=0;const term={focus(){focused++;},scrollIntoView(){scrolled++;}},card={appendChild(b){b.parentNode=this;},querySelector:()=>term},heading={textContent:'First section',appendChild(b){b.parentNode=this;}},section={getAttribute:()=> 'section-one',querySelector:()=>heading,querySelectorAll:()=>[card]},guide={isConnected:true,hidden:false,querySelectorAll:()=>[section]},status={};
   const root={isConnected:true,querySelector:s=>s==='#v-guide'?guide:status},window={addEventListener(){},location:{hash:'#PSA/SA-M01/guide/section-one/Term'},setTimeout:fn=>timer=fn,QuilynProgress:{read:()=>({version:1,tracks:{}})}};
   if(frames)window.requestAnimationFrame=fn=>frame=fn;
   term.textContent='Term';const source=fs.readFileSync('core/js/study-plan.js','utf8').replace('global.QuilynStudy={','global.QuilynStudy={attachReadingSaves:attachReadingSaves,');

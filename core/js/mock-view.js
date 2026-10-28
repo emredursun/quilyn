@@ -6,16 +6,16 @@
 (function (global) {
   'use strict';
 
-  var PASS = 0.65, TIME_MIN = 90, BASE_TIME=90;
+  var PASS = 0.65, TIME_MIN = 90, BASE_TIME=90, chosenTime=90;
   var revisionTrack=null;
   function configureExam(track) {
     revisionTrack=track;
     var spec = track && track.exam || {};
     PASS = (spec.passPercent || 65) / 100;
-    BASE_TIME = TIME_MIN = spec.timeMinutes || 90;
+    chosenTime = BASE_TIME = TIME_MIN = spec.timeMinutes || 90;
   }
   function practiceLabel(name,count){return count<40?'Mini Practice '+name.replace(/^Mock Exam\s*/, ''):name;}
-  function practiceMinutes(count){return count<40?Math.max(5,count*2):BASE_TIME;}
+  function practiceMinutes(count){return count<40?Math.max(5,count*2):chosenTime;}
   var externalConflict=false;
   var EXAMS = {};
   var dismissActions = null;
@@ -100,7 +100,7 @@
     var scores = loadScores();
     var grid = q('examGrid'); if (!grid) return;
     var disclosure=q('bankDisclosure');
-    if (disclosure) disclosure.textContent=getTrack()==='PSSA'?'These practice forms reuse original module quiz questions. Questions do not repeat between the three forms. Scores reflect practice, not an unseen readiness assessment.':'';
+    if (disclosure) disclosure.textContent=revisionTrack&&revisionTrack.exam&&revisionTrack.exam.bankDisclosure ? revisionTrack.exam.bankDisclosure : getTrack()==='PSSA'?'These practice forms reuse original module quiz questions. Questions do not repeat between the three forms. Scores reflect practice, not an unseen readiness assessment.':'';
     grid.innerHTML = '';
 
     var examKeys = Object.keys(EXAMS);
@@ -120,7 +120,7 @@
                          (saved.attemptId || saved.answers.some(function(a) { return a.length > 0; }));
         var el = document.createElement('button'); el.type = 'button'; el.className = 'examcard';
         el.innerHTML = '<span class="quilyn-exam-title">' + esc(practiceLabel(name,qs.length)) + '</span>' +
-          '<p>' + qs.length + ' questions · ' + practiceMinutes(qs.length) + ' min · ' + Math.round(PASS * 100) + '% practice target'+(qs.length<40?' · Short question bank; not a full-length exam':'')+'</p>' +
+          '<p>' + qs.length + ' questions · ' + (inProgress ? saved.durationMinutes || practiceMinutes(qs.length) : practiceMinutes(qs.length)) + ' min · ' + Math.round(PASS * 100) + '% practice target'+(qs.length<40?' · Short question bank; not a full-length exam':'')+'</p>' +
           '<div class="best">' + esc(best) + '</div>' +
           (inProgress ? '<div class="in-progress-badge">In progress</div>' : '');
         el.onclick = function() { startExam(name); };
@@ -334,7 +334,7 @@
         "<div class='opts'>" + opts + "</div>" +
         "<div class='check-wrap'"+(examMode==='simulation'?' hidden':'')+"><button class='v-btn check-btn' disabled>Check Answer</button></div>" +
         "<div class='verdict'></div>" +
-        "<div class='rat'><b>Rationale:</b> " + (examMode==='simulation'?'':esc(qu.r)+(global.QuilynJournal?global.QuilynJournal.feedbackHTML(global.QuilynJournal.mockQuestion(getTrack(),current,qu,i)):'')) + "</div>" +
+        "<div class='rat'><b>Rationale:</b> " + (examMode==='simulation'?'':esc(qu.r)+(global.QuilynJournal&&global.QuilynJournal.objectiveHTML?global.QuilynJournal.objectiveHTML(revisionTrack,qu):'')+(global.QuilynJournal?global.QuilynJournal.feedbackHTML(global.QuilynJournal.mockQuestion(getTrack(),current,qu,i)):'')) + "</div>" +
         (qu.src && examMode!=='simulation' ? "<div class='qsrc'><a href='" + qu.src + "' target='_blank' rel='noopener'>View source question ↗</a></div>" : "");
 
       card.querySelectorAll('.opt').forEach(function(o) {
@@ -564,22 +564,22 @@
     var resTime = q('resTime');
     if (resTime) resTime.textContent = 'Time used: ' + um + 'm ' + (us<10?'0':'') + us + 's' + (auto?' (time expired — auto-submitted)':'');
 
-    /* Domain breakdown */
-    var db = q('domBreak');
-    if (db) {
-      db.innerHTML = '<h3 class="res-section-title">Domain breakdown</h3>';
-      Object.keys(dom).forEach(function(d) {
-        var o = dom[d]; if (!o || o.t === 0) return;
-        var p = Math.round(o.c / o.t * 100);
-        var col = p >= PASS * 100 ? 'var(--pa-ok,#34d399)' : (p >= 50 ? 'var(--pa-warn,#fbbf24)' : 'var(--pa-bad,#fb7185)');
-        db.insertAdjacentHTML('beforeend',
-          '<div class="dombar">' +
-            '<div class="lab"><span>' + esc(d) + '</span><span>' + o.c + '/' + o.t + ' (' + p + '%)</span></div>' +
-            '<div class="track"><i style="width:' + p + '%;background:' + col + '"></i></div>' +
-          '</div>');
+    /* Domain (chapter order) and K-level breakdowns */
+    var db = q('domBreak'), lv = {}, ch = {};
+    qs.forEach(function(qu, i) { ch[qu.d] = ch[qu.d] || qu.chapter || 0; var k = qu.kLevel; if (!k) return; lv[k] = lv[k] || { c: 0, t: 0 }; lv[k].t++; if (setsEqual(answers[i], qu.a)) lv[k].c++; });
+    function bars(title, groups, keys, neutral) {
+      db.insertAdjacentHTML('beforeend', '<h3 class="res-section-title">' + title + '</h3>');
+      keys.forEach(function(d) {
+        var o = groups[d], p = Math.round(o.c / o.t * 100);
+        var col = neutral ? 'var(--pa-brand)' : p >= PASS * 100 ? 'var(--pa-ok,#34d399)' : (p >= 50 ? 'var(--pa-warn,#fbbf24)' : 'var(--pa-bad,#fb7185)');
+        db.insertAdjacentHTML('beforeend', '<div class="dombar"><div class="lab"><span>' + esc(d) + '</span><span>' + o.c + '/' + o.t + ' (' + p + '%)</span></div><div class="track"><i style="width:' + p + '%;background:' + col + '"></i></div></div>');
       });
     }
-
+    if (db) {
+      db.innerHTML = '';
+      bars('Domain breakdown', dom, Object.keys(dom).sort(function(a, b) { return ch[a] - ch[b]; }));
+      if (Object.keys(lv).length) { bars('K-level breakdown', lv, Object.keys(lv).sort(), true); db.insertAdjacentHTML('beforeend', '<p class="v-muted">K1 remember · K2 understand · K3 apply. Small samples: indicative only.</p>'); }
+    }
     if(global.QuilynJournal&&global.QuilynJournal.mountRevision)global.QuilynJournal.mountRevision(q('revision'),revisionTrack,qs,answers);
     show('results');
   }
@@ -605,7 +605,7 @@
         });
       }
 
-      var rat=card.querySelector('.rat');if(rat)rat.innerHTML='<b>Rationale:</b> '+esc(qu.r)+(global.QuilynJournal?global.QuilynJournal.feedbackHTML(global.QuilynJournal.mockQuestion(getTrack(),current,qu,i)):'');
+      var rat=card.querySelector('.rat');if(rat)rat.innerHTML='<b>Rationale:</b> '+esc(qu.r)+(global.QuilynJournal&&global.QuilynJournal.objectiveHTML?global.QuilynJournal.objectiveHTML(revisionTrack,qu):'')+(global.QuilynJournal?global.QuilynJournal.feedbackHTML(global.QuilynJournal.mockQuestion(getTrack(),current,qu,i)):'');
       card.classList.add('reviewed');
       var ok = setsEqual(answers[i], qu.a);
       card.classList.remove('ok','no'); card.classList.add(ok?'ok':'no');
@@ -637,7 +637,8 @@
           '<h2>Choose a practice exam</h2>' +
           '<p class="v-muted">Longer practice banks use a ' + TIME_MIN + '-minute timer and a ' + Math.round(PASS * 100) + '% pass mark. Available question coverage is shown below. Mini Practice banks have fewer than 40 questions, use a suggested two-minute-per-question timer (minimum five minutes), and do not represent full exam coverage. Saved older sessions keep their original timer.</p>' +
           '<p id="mv-bankDisclosure" class="v-muted"></p>' +
-          '<p><a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></p><label>Mode <select id="mv-mode"><option value="practice">Learning — pause and check answers</option><option value="simulation">Exam simulation — continuous timer, answers after submission</option></select></label><p class="v-muted">Simulation time continues when you leave or reload. It cannot be paused.</p><div class="examgrid" id="mv-examGrid"></div>' +
+          (revisionTrack && revisionTrack.exam && revisionTrack.exam.extendedTimeMinutes ? '<label for="mv-duration">Practice timer</label> <select id="mv-duration"><option value="' + BASE_TIME + '">' + BASE_TIME + ' minutes — standard</option><option value="' + revisionTrack.exam.extendedTimeMinutes + '">' + revisionTrack.exam.extendedTimeMinutes + ' minutes — extended</option></select><p class="v-muted">Extended time in the real exam depends on provider-confirmed eligibility. Saved attempts keep the timer they started with.</p>' : '') +
+          '<p><a href="#history">Attempt history</a> · <a href="#mistakes">Mistakes notebook</a></p><label for="mv-mode">Mode</label> <select id="mv-mode"><option value="practice">Learning — pause and check answers</option><option value="simulation">Exam simulation — continuous timer, answers after submission</option></select><p class="v-muted">Simulation time continues when you leave or reload. It cannot be paused.</p><div class="examgrid" id="mv-examGrid"></div>' +
         '</div>' +
         '<div class="v-card">' +
           '<h2>Practice bank coverage</h2>' +
@@ -708,6 +709,10 @@
     document.getElementById("paContent").focus({preventScroll:true});
     contentEl.innerHTML = getHTML();
     _root = contentEl.querySelector('.pa-view--mock');
+    if (q('duration')) q('duration').addEventListener('change', function() {
+      chosenTime = Number(this.value) === revisionTrack.exam.extendedTimeMinutes ? revisionTrack.exam.extendedTimeMinutes : BASE_TIME;
+      renderHome();
+    });
     q('actionToggle').addEventListener('click', function() {
       var open = this.getAttribute('aria-expanded') !== 'true';
       this.setAttribute('aria-expanded',String(open));

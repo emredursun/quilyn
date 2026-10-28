@@ -12,5 +12,6 @@ test('library filters combine track, kind and all search words; feedback URLs pr
 test('all static lesson URLs have unique metadata, substantial HTML content, canonicals and compatible app links',()=>{
  const sitemap=fs.readFileSync('sitemap.xml','utf8'),titles=new Set();
  for(const t of registry.tracks)for(const m of t.modules){const path='learn/'+t.trackId.toLowerCase()+'/'+m.id.toLowerCase()+'/',html=fs.readFileSync(path+'index.html','utf8'),d=JSON.parse(fs.readFileSync(m.file)),title=html.match(/<title>(.*?)<\/title>/)[1];assert.ok(!titles.has(title),title);titles.add(title);assert.ok(html.includes('href="https://emredursun.github.io/quilyn/'+path+'"'));assert.ok(sitemap.includes('https://emredursun.github.io/quilyn/'+path));assert.ok(html.includes('index.html#'+t.trackId+'/'+m.id));for(const s of d.studyGuide)assert.ok(html.includes('id="'+s.sectionId+'"'));assert.doesNotMatch(html,/Version undefined|Reviewed undefined|<script>/);assert.match(html,/<meta name="description" content="[^\"]+"/);}
- assert.equal(titles.size,210);assert.equal((sitemap.match(/<loc>/g)||[]).length,223);
+ const moduleCount=registry.tracks.reduce((n,t)=>n+t.modules.filter(m=>m.ready!==false).length,0);
+ assert.equal(titles.size,moduleCount);assert.equal((sitemap.match(/<loc>/g)||[]).length,moduleCount+registry.tracks.length+2);
 });

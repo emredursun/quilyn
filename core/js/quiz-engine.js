@@ -153,6 +153,8 @@
       else if (pct >= 60) msg = "Getting there. Re-read the Study Guide, then retry.";
       else msg = "Work through the Study Guide again, then retry.";
 
+      if (context.practiceScope === 'topic') msg = 'Topic practice is a starting check, not module mastery. Explain your reasoning and try a new example on a later day.';
+
       // Collect wrong questions for retry mode
       var wrongQuestions = questions.filter(function (q, i) { return !correctFlags[i]; });
       var retryHtml = wrongQuestions.length > 0
@@ -328,7 +330,7 @@
         persist();
         if(writable&&global.QuilynJournal){
           var rows=questions.filter(function(item){return state.answers[item.questionId]&&state.answers[item.questionId].graded;}).map(function(item){return {snapshot:global.QuilynJournal.quizQuestion(context.track,context.moduleId||'',item,context.domain),selected:state.answers[item.questionId].selected.slice(),conf:null};});
-          global.QuilynJournal.record({id:state.attemptId,track:context.track,kind:transient?'retry':'quiz',mode:'practice',name:context.name||'Quiz',total:total,startedAt:state.startedAt,status:rows.length===total?'completed':'in-progress'},rows);
+          global.QuilynJournal.record({id:state.attemptId,track:context.track,kind:transient&&context.practiceScope!=='topic'?'retry':'quiz',mode:'practice',name:context.name||'Quiz',total:total,startedAt:state.startedAt,status:rows.length===total?'completed':'in-progress'},rows);
         }
         refreshBar();
         if(navigation)navigation.refresh();

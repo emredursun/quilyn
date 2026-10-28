@@ -97,9 +97,10 @@ export function validateContent(root) {
         }
         for (const el of section.elements) {
           if (!record(el)) { errors.push(`${moduleLabel}: invalid study-guide element`); continue; }
-          check(['concept','analogy','text','interactive','diagram','links','list','note','table','steps','warning','pdf','pdfLibrary'].includes(el.type), `${moduleLabel}: unknown study-guide element ${el.type}`);
+          check(['concept','analogy','text','interactive','diagram','links','list','note','table','steps','warning','pdf','pdfLibrary','exercise'].includes(el.type), `${moduleLabel}: unknown study-guide element ${el.type}`);
           if (el.type === 'concept') check(text(el.term) && text(el.description), `${moduleLabel}: invalid concept`);
           if (['analogy','text','note','warning'].includes(el.type)) check(text(el.text), `${moduleLabel}: invalid text element`);
+          if (el.type === 'exercise') check(text(el.prompt) && text(el.solution), `${moduleLabel}: exercise needs a prompt and a solution`);
           if (el.type === 'interactive') check(text(el.html) && text(el.title), `${moduleLabel}: invalid exercise`);
           if (el.type === 'diagram') check(text(el.svg) && !/<script\b|\son\w+\s*=|javascript:/i.test(el.svg), `${moduleLabel}: unsafe or empty SVG`);
           if (el.type === 'table') check(Array.isArray(el.headers) && el.headers.every(value => typeof value === 'string') && Array.isArray(el.rows) && el.rows.every(row => Array.isArray(row) && row.length === el.headers.length && row.every(cell => typeof cell === 'string')), `${moduleLabel}: invalid table`);
